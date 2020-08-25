@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/tradecenter.iml" filepath="$PROJECT_DIR$/tradecenter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tradecenter-common/tradecenter-common.iml" filepath="$PROJECT_DIR$/tradecenter-common/tradecenter-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tradecenter-dao/tradecenter-dao.iml" filepath="$PROJECT_DIR$/tradecenter-dao/tradecenter-dao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tradecenter-domain/tradecenter-domain.iml" filepath="$PROJECT_DIR$/tradecenter-domain/tradecenter-domain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tradecenter-export/tradecenter-export.iml" filepath="$PROJECT_DIR$/tradecenter-export/tradecenter-export.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tradecenter-parent/tradecenter-parent.iml" filepath="$PROJECT_DIR$/tradecenter-parent/tradecenter-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tradecenter-rpc/tradecenter-rpc.iml" filepath="$PROJECT_DIR$/tradecenter-rpc/tradecenter-rpc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tradecenter-service/tradecenter-service.iml" filepath="$PROJECT_DIR$/tradecenter-service/tradecenter-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tradecenter-web/tradecenter-web.iml" filepath="$PROJECT_DIR$/tradecenter-web/tradecenter-web.iml" />
+    </modules>
+  </component>
+</project>

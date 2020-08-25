@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.basecenter.dao.AddressBaseDAO">
+	<resultMap id="AddressbaseMapper" type="com.camelot.basecenter.domain.AddressBase">
+	        <result property="id" column="id" />
+			<result property="code" column="code" />
+			<result property="parentcode" column="parentCode" />
+			<result property="yn" column="yn" />
+			<result property="name" column="name" />
+			<result property="level" column="level" />
+			<result property="createtime" column="createTime" />
+			<result property="updatetime" column="updateTime" />
+			<result property="nameFirstLetter" column="name_first_letter" />
+			<result property="nameLetter" column="name_letter" />
+	</resultMap>
+	
+	<resultMap id="AddressbaseDTOMapper" type="com.camelot.basecenter.dto.AddressBaseDTO">
+	        <result property="id" column="id" />
+			<result property="code" column="code" />
+			<result property="parentcode" column="parentCode" />
+			<result property="name" column="name" />
+			<result property="yn" column="yn" />
+			<result property="level" column="level" />
+			<result property="createtime" column="createTime" />
+			<result property="updatetime" column="updateTime" />
+			<result property="nameFirstLetter" column="name_first_letter" />
+			<result property="nameLetter" column="name_letter" />
+	</resultMap>
+	<!-- TreeNode -->
+	<resultMap id="ZtreeNodeDTOMapper" type="com.camelot.basecenter.dto.ZtreeNodeDTO">
+			<result property="id" column="code" />
+			<result property="pId" column="parentCode" />
+			<result property="name" column="name" />
+	</resultMap>
+	
+	<select id="queryAddressBase" resultMap="AddressbaseDTOMapper">
+	  	select * from delivery_addressbase  where yn='1' and parentCode = #{parentcode}
+	</select>
+	<select id="queryNameById" resultMap="AddressbaseDTOMapper">
+	 select name from delivery_addressbase where yn=1 and code=#{id}
+	</select>
+ 	<select id="queryNameByCode" resultMap="AddressbaseDTOMapper">
+		 <![CDATA[ select * from delivery_addressbase where yn=1 ]]>
+		 <if test=" code!= null and code !='' ">
+			  <![CDATA[ and code in]]>
+			  <foreach collection="code" item="it" index="index" open="(" separator="," close=")">
+			   	<![CDATA[   #{it} ]]>
+			  </foreach>
+		</if>
+		order by name_first_letter
+	</select>
+	
+	<select id="getQualifiedName" parameterType="int" resultType="string">
+		SELECT
+			CONCAT(level1.name, level2.name)
+		FROM
+			delivery_addressbase level2
+		LEFT JOIN
+			delivery_addressbase level1 on level2.parentCode = level1.code
+		WHERE
+			level2.code = #{areaCode}
+	</select>
+	
+	<select id="getAddressesByLevel" parameterType="int" resultMap="AddressbaseDTOMapper">
+		SELECT * FROM delivery_addressbase WHERE level = #{level} order by name_first_letter
+	</select>
+	
+	<select id="queryAddressListByName" resultMap="AddressbaseDTOMapper">
+		<![CDATA[ SELECT * FROM delivery_addressbase WHERE yn='1' and level = 2 and
+		  name like #{name} ]]>
+	</select>
+	
+	<select id="queryByNameLetter" resultMap="AddressbaseDTOMapper">
+		select * from delivery_addressbase where yn=1 and level = 2 and name_letter=#{nameLetter}
+	</select>
+	
+	<!-- thinking -->
+	<sql id="tabName">
+		delivery_addressbase_bak
+	</sql>
+	
+	<insert id="newAdd" keyProperty="id" useGeneratedKeys="true">
+		insert into <include refid="tabName"/>(
+							id,
+							code,
+							parentCode,
+							name,
+							yn,
+							level,
+							createTime,
+							updateTime,
+							name_first_letter
+						   )values(
+						    #{id},
+						    #{code},
+						    #{parentcode},
+						    #{name},
+						    #{yn},
+						    #{level},
+						    now(),
+						    now(),
+						    #{nameFirstLetter}
+						   )
+	
+	</insert>
+	
+	<update id="newUpdate">
+	  update <include refid="tabName"/> 
+	 	 <set>
+		     updateTime =now(),
+			     <if test="code != null">
+			       code = #{code},
+			     </if>
+			     <if test="parentcode != null">
+			       parentCode = #{parentcode},
+			     </if>
+			     <if test="name != null">
+			       name = #{name},
+			     </if>
+			     <if test="yn != null">
+			       yn = #{yn},
+			     </if>
+			     <if test="level != null">
+			       level = #{level},
+			     </if>
+			     <if test="nameFirstLetter != null">
+			       name_first_letter = #{nameFirstLetter}
+			     </if>
+	 	 </set>
+	 	 where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from  <include refid="tabName"/> where code = #{code}
+	
+	</delete>
+	
+	
+	
+	<select id="getByCode" resultMap="AddressbaseDTOMapper">
+	
+	 	select * from  <include refid="tabName"/>
+	 	 		 where yn=1 and code=#{code}
+	</select>
+	
+	<select id="getChildsByParentCode" resultMap="AddressbaseDTOMapper">
+	 	select * from <include refid="tabName"/> 
+	 			 where yn = 1 
+	 			 <choose>
+	 				 <when test="parentCode != null">
+	 				  		and parentCode = #{parentCode}
+	 				 </when>
+	 				 <otherwise>
+	 				        and (parentCode is null or parentCode = -1)
+	 				 </otherwise>
+	 			 </choose>
+	</select>
+	
+	
+	<select id="getAddressesByLevels" parameterType="int" resultMap="ZtreeNodeDTOMapper">
+		SELECT * FROM <include refid="tabName"/> WHERE  level  in
+				<foreach item="item" collection="array"  open="(" separator="," close=")">
+		           #{item}
+				</foreach>
+	</select>
+	
+	
+	<select id="getTreeRoot" resultMap="ZtreeNodeDTOMapper">
+	 	select * from  <include refid="tabName"/>  where yn=1 and (parentCode is null or parentCode = -1)
+	</select>
+	
+	<select id="getTreeByParentCode" resultMap="ZtreeNodeDTOMapper">
+	 	select * from  <include refid="tabName"/>  where yn=1 and parentCode=#{parentCode}
+	</select>
+	
+	
+	<select id="getAddressesWithPage" resultMap="AddressbaseDTOMapper">
+	 	select * from  <include refid="tabName"/>  where yn=1 and parentCode = #{parentCode}  limit #{start},#{maxRow}
+	</select>
+	
+	<select id="getAddressesCountByParent"  resultType="Long">
+	 	select count(*) from  <include refid="tabName"/>  where yn=1 and parentCode=#{parentCode}
+	</select>
+	
+	<select id="isAddressesCodeExist"  resultType="int">
+	    SELECT COUNT(*) FROM  <include refid="tabName"/>  WHERE yn=1 and code = #{code} 
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+</mapper>

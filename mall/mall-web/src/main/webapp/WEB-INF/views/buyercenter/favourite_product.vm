@@ -1,0 +1,113 @@
+#set($layout = "/buyer_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<link href="$staticPath/css/Details.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">
+	$("document").ready(function(){
+		$("#leftBuyer").load("$request.contextPath/leftBuyer");
+	});
+	//到指定的分页页面
+	function topage(page){
+		var form = document.getElementById("favouriteProduct");
+		form.page.value=page;
+		form.submit();
+	}
+	
+	function delItemFavourite(id){
+		var result = confirm("确定删除?");
+		if(result){
+			var ids = [id];
+			$.ajax({
+				url: "$request.contextPath/favourite/delItem",
+				type:"post",
+				data:{ "ids[]": ids },
+				dataType: "json",
+				success: function(data){
+					if( data.success ){
+						location.href = "$request.contextPath/buyercenter/favouriteProducts";
+					}else{
+						alert(data.result);
+					}
+				}
+			});
+		}
+	}
+	//满减
+	function showManJian(itemId){
+		var len = $("div."+itemId).length;
+		$("#"+itemId).css({
+			top:"233px",
+			left:"-4px"
+		})
+		$("#"+itemId).show();
+	}
+	function hideManJian(itemId){
+		$("#"+itemId).hide();
+	}
+</script>
+
+
+<div id="main">
+	<div id="leftBuyer">&nbsp;</div>
+	<form id="favouriteProduct" action="$request.contextPath/buyercenter/favouriteProducts">
+		<input type="hidden" name="page">
+	</form>
+	<div id="right" class="bg_06 border-4">
+	<h3>收藏商品</h3>
+		<div class="att_con1">
+			#foreach( $product in $pager.records )
+    			<ul class="po_re">
+    				<li class="att_pro">
+    					<a href="$request.contextPath/productController/details?id=$product.itemId&skuId=$product.skuId" class="att_new">
+    						<img src="$!imageServerAddr$product.picUrl"/>
+    					</a>
+            		</li>
+            		<li class="att_name over_ell">
+            			<a class="style_a_s fl" href="$request.contextPath/productController/details?id=$product.itemId&skuId=$product.skuId" title="$!product.itemName">$product.itemName</a>
+            			<span style="float: right; margin-right: 10px;">
+            				<a href="javascript:delItemFavourite($product.id);">删除</a>
+            			</span>
+           			</li>
+            		<li>
+	            		#if($product.hasPrice)
+	            			#set($key = $product.skuId)
+	            			#set($str = "")
+	            			#if(${downVal.get($str.valueOf($key))})
+								<div class="ship icon-service-sales $!product.skuId"></div><strong class="font_e3">￥${downVal.get($str.valueOf($key))}</strong>
+							#else
+								<strong class="font_e3"> ￥$!product.price </strong>
+			                #end
+			            #else 
+			            	<strong>暂无报价</strong>
+			            #end
+						#foreach($full in $fulljsonArray)
+							#if($!full.shopId == $!product.shopId && $!full.itemId == $!product.itemId)
+								<div class="ship icon-service-marketing cursor" style="margin-top:0" onmouseenter="showManJian($!product.skuId)" onmouseleave="hideManJian($!product.skuId)"></div>
+							#end
+						#end
+           			</li>
+           		<!--  满减详情页 -->
+						<div  id="$!product.skuId"  class="open_active box-shadow1 none">
+							<h4 class="mar_lr10 border-5" style="font-size:15px;text-indent:10px;">
+								<a><span class="mar_r20 font_12b font_fe ">满减</span><span id="promotionTime"></span></a>
+							</h4>
+							#foreach($full in $fulljsonArray)
+								#if(${full.promotionFullReduction})
+									#if($!full.shopId == $!product.shopId && $!full.itemId == $!product.itemId)
+										#foreach($fullReduction in $!full.promotionFullReduction)
+											<div class="mar_l10" id="promotionList_manjian" style="line-height:24px;">
+												<span class="over_ell" title="">商品总额满 $!{fullReduction.meetPrice}减 $!{fullReduction.discountPrice}元</span> 
+											</div>
+										#end
+									#end
+								#end
+							#end
+						</div>
+        		</ul>
+    		#end
+		</div>	
+		#pageVelocity($pager)
+	</div>
+	
+</div>
+	
+</div>

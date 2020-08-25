@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.goodscenter.dao.ItemSalesVolumeDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="itemSalesVolumeMap" type="com.camelot.goodscenter.dto.ItemSalesVolumeDTO" >
+		<result property="sellerId" column="seller_id"/>
+		<result property="shopId" column="shop_id"/>
+		<result property="itemId" column="item_id"/>
+		<result property="skuId" column="sku_id"/>
+		<result property="salesVolume" column="sales_volume"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+	<!-- 分页查询 -->
+	<insert id="addList">
+		<![CDATA[
+			INSERT INTO item_sales_volume (
+			  seller_id,
+			  shop_id,
+			  item_id,
+			  sku_id,
+			  sales_volume
+			) 
+			VALUES
+		]]>
+		<foreach collection="inList" item="sv" open="" separator="," close="">
+			(
+			    #{sv.sellerId},
+			    #{sv.shopId},
+			    #{sv.itemId},
+			    #{sv.skuId},
+			    #{sv.salesVolume}
+			  ) 
+		</foreach>
+	</insert>
+	<delete id="deleteAll">
+		delete from item_sales_volume
+	</delete>
+	
+</mapper>

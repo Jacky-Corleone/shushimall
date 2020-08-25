@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.cmscenter.dao.CMSArticleDAO">
+	<resultMap id="CmsArticleMapper" type="com.camelot.cmscenter.dto.CmsArticleDTO">
+			<result property="id" column="id" />
+			<result property="categoryid" column="categoryid" />
+			<result property="categoryName" column="name" />
+			<result property="title" column="title" />
+			<result property="link" column="link" />
+			<result property="color" column="color" />
+			<result property="image" column="image" />
+			<result property="keywords" column="keywords" />
+			<result property="description" column="description" />
+			<result property="weight" column="weight" />
+			<result property="weight_date" column="weight_date" />
+			<result property="hits" column="hits" />
+			<result property="posid" column="posid" />
+			<result property="customContentView" column="custom_content_view" />
+			<result property="viewConfig" column="view_config" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			<result property="delFlag" column="del_flag" />
+			<result property="createBy" column="create_by" />
+			
+			<result property="title2" column="title2" />
+			<result property="cityid" column="cityid" />
+			<result property="acateid" column="acateid" />
+			<result property="cateid" column="cateid" />
+			<result property="brandid" column="brandid" />
+			<result property="expcate" column="expcate" />
+			<result property="imglist" column="imglist" />
+			<result property="theme" column="theme" />
+			<result property="viewnum" column="viewnum" />
+			<result property="addview" column="addview" />
+			<result property="extend" column="extend" />
+			<result property="hotnum" column="hotnum" />
+	
+			<result property="praisenum" column="praisenum" />
+			<result property="addpraise" column="addpraise" />
+			<result property="template" column="template" />
+			<result property="cstate" column="cstate" />
+			<result property="isybj" column="isybj" />
+			<result property="isset" column="isset" />
+			<result property="isrss" column="isrss" />
+			<result property="ishtml" column="ishtml" />
+			<result property="ishide" column="ishide" />
+			<result property="iscomment" column="iscomment" />
+			<result property="iswork" column="iswork" />
+			<result property="outid" column="outid" />
+			<result property="content" column="content" />
+			<result property="copyfrom" column="copyfrom" />
+			<result property="relation" column="relation" />
+			<result property="allowComment" column="allow_comment" />
+	</resultMap>
+
+	<select id="queryById" resultMap="CmsArticleMapper" >
+		select a.*,b.*,c.name from cms_article a inner join cms_article_data b on a.id=b.id left join cms_category c on a.id =c.id where a.id = #{id}
+	</select>
+	
+	
+
+	<select id="queryCount" resultType="long">
+		select count(1) from cms_article a inner join cms_article_data b on a.id=b.id
+		<include refid="where_fragement" />
+	</select>
+
+	<!-- 查询 -->
+	<select id="queryArticleList" resultMap="CmsArticleMapper">
+		select a.*,b.*,c.name from cms_article a inner join cms_article_data b on a.id=b.id left join cms_category c on a.id =c.id
+		<include refid="where_fragement" />
+		ORDER BY create_date DESC
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+
+	<sql id="where_fragement">
+		where 1 = 1
+		<if test="cmsArticleDTO.id!=null and cmsArticleDTO.id!=''">
+			and a.id = #{cmsArticleDTO.id}
+		</if>
+		<if test="cmsArticleDTO.categoryid!=null and cmsArticleDTO.categoryid!=''">
+			and a.categoryid = #{cmsArticleDTO.categoryid}
+		</if>
+		<if test="cmsArticleDTO.delFlag!=null and cmsArticleDTO.delFlag!=''">
+			and a.del_flag = #{cmsArticleDTO.delFlag}
+		</if>
+		<if test="cmsArticleDTO.acateid!=null and cmsArticleDTO.acateid!=''">
+			and a.acateid = #{cmsArticleDTO.acateid}
+		</if>
+		<if test="cmsArticleDTO.cityid!=null and cmsArticleDTO.cityid!=''">
+			and a.cityid = #{cmsArticleDTO.cityid}
+		</if>
+		<if test="cmsArticleDTO.cateid!=null and cmsArticleDTO.cateid!=''">
+			and a.cateid = #{cmsArticleDTO.cateid}
+		</if>
+		<if test="cmsArticleDTO.brandid!=null and cmsArticleDTO.brandid!=''">
+			and a.brandid = #{cmsArticleDTO.brandid}
+		</if>
+		<if test="cmsArticleDTO.iswork!=null and cmsArticleDTO.iswork!=''">
+			and a.iswork = #{cmsArticleDTO.iswork}
+		</if>
+		 <if test="cmsArticleDTO.idList != null and cmsArticleDTO.idList.size() > 0 ">
+                 AND a.id IN 
+                <foreach collection="cmsArticleDTO.idList" open="(" separator="," close=")" item="id">
+                    #{id}
+                </foreach>
+            </if>
+	</sql>
+
+	<sql id="pagination_tail">
+		limit #{page.pageOffset} , #{page.rows}
+	</sql>
+</mapper>

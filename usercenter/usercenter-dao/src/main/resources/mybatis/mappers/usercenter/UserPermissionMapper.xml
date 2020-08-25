@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.usercenter.dao.UserPermissionDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="userPermissionMap" type="com.camelot.usercenter.dto.UserPermissionDTO">
+				<result property="id" column="id"/>
+				<result property="resourceId" column="resource_id"/>
+				<result property="userId" column="user_id"/>
+				<result property="userName" column="user_name"/>
+				<result property="userType" column="user_type"/>
+				<result property="shopId" column="shop_id"/>
+				<result property="created" column="created"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,resource_id
+ 			,user_id
+ 			,user_name
+ 			,user_type
+ 			,shop_id
+ 			,created
+		FROM 
+		user_permission user_permission_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.id != null  and entity.id !=''">
+				<![CDATA[ and user_permission_.id  = #{entity.id} ]]>
+			</if>
+			<if test="entity.resourceId != null  and entity.resourceId !=''">
+				<![CDATA[ and user_permission_.resource_id  = #{entity.resourceId} ]]>
+			</if>
+			<if test="entity.userId != null  and entity.userId !=''">
+				<![CDATA[ and user_permission_.user_id  = #{entity.userId} ]]>
+			</if>
+			<if test="entity.userName != null  and entity.userName !=''">
+				<![CDATA[ and user_permission_.user_name  = #{entity.userName} ]]>
+			</if>
+			<if test="entity.userType != null  and entity.userType !=''">
+				<![CDATA[ and user_permission_.user_type  = #{entity.userType} ]]>
+			</if>
+			<if test="entity.shopId != null  and entity.shopId !=''">
+				<![CDATA[ and user_permission_.shop_id  = #{entity.shopId} ]]>
+			</if>
+			<if test="entity.created != null  and entity.created !=''">
+				<![CDATA[ and user_permission_.created  = #{entity.created} ]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="userPermissionMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where user_permission_.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="selectList" resultMap="userPermissionMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectCount" resultType="long">
+		<include refid="count_Tail" />
+		user_permission user_permission_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="com.camelot.usercenter.dto.UserPermissionDTO">
+		<![CDATA[
+		insert into user_permission (
+		    	 resource_id
+		    	 ,user_id
+		    	 ,user_name
+		    	 ,user_type
+		    	 ,shop_id
+		    	 ,created
+		   )values(
+		    	#{resourceId}
+		    	,#{userId}
+		    	,#{userName}
+		    	,2
+		    	,#{shopId}
+		    	,now()
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.usercenter.dto.UserPermissionDTO">
+		<![CDATA[
+		update user_permission set
+   			id = #{id}
+   			,resource_id = #{resourceId}
+   			,user_id = #{userId}
+   			,user_name = #{userName}
+   			,user_type = #{userType}
+   			,shop_id = #{shopId}
+   			,created = #{created}
+		 where id = #{id}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from user_permission where user_id = #{id}
+		]]>
+	</delete>
+	
+	<delete id="deleteByType" parameterType="long">
+		<![CDATA[
+		delete from user_permission where user_id = #{userId} 
+		and  resource_id in (
+				SELECT A.* FROM (select m.id from user_permission p,user_mall_resource m 
+			where p.resource_id=m.id and m.modular_type=#{modularType} and p.user_id=#{userId}
+			) A
+		)
+		]]>
+	</delete>
+	
+</mapper>

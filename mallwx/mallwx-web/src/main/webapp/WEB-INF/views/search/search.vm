@@ -1,0 +1,172 @@
+#set($layout = "common/blanklayout.vm")
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<base href="${request.getContextPath()}/"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>印刷家</title>
+<link href="assets/css/detail.css" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" src="assets/css/detail.js" />
+<script type="text/javascript" src="assets/js/iscroll.js"></script>
+##<script type="text/javascript" src="assets/js/iscroll-probe.js"></script>
+<script src="assets/js/jquery-2.1.4.min.js" type="text/javascript"></script>
+##<script src="assets/js/modernizr-custom-v2.7.1.min.js" type="text/javascript"></script>
+##<script src="assets/js/jquery-finger-v0.1.0.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="assets/js/handlebars-v3.0.3.js"></script>
+<script type="text/javascript" src="assets/handlebars/hbs_helpers.js"></script>
+<style >
+#wrapper {
+	position: absolute;
+	z-index: 1;
+	top: 75px;
+	bottom: 50px;
+	left: 0;
+	width: 100%;
+	background: #f6f6f6;
+	overflow: hidden;
+}
+#scroller {
+	position: absolute;
+	z-index: 1;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+	width: 100%;
+	-webkit-transform: translateZ(0);
+	-moz-transform: translateZ(0);
+	-ms-transform: translateZ(0);
+	-o-transform: translateZ(0);
+	transform: translateZ(0);
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	-webkit-text-size-adjust: none;
+	-moz-text-size-adjust: none;
+	-ms-text-size-adjust: none;
+	-o-text-size-adjust: none;
+	text-size-adjust: none;
+}
+
+
+</style>
+<script type="text/x-handlebars-template" id="searchResultTplt">
+	#include("search/searchResult.hbs")
+</script>
+<script type="text/x-handlebars-template" id="searchShopResultTplt">
+	#include("search/searchShopResult.hbs")
+</script>
+<script src="assets/js/search/search.js" type="text/javascript"></script>
+<script>
+	var _searchItemId='$!{searchItemId}';
+	var searchType='$!{searchType}';
+</script>
+</head>
+<body class="bg_02">
+    <div id="main" class="po_ab">
+
+        <!-- 中间内容 -->
+        #*<div class="content" id="" style="bottom:0px;">
+			<!-- 头部 -->
+            <div class="purchase hei_50 bg_02" style="top:0px;">
+            <p class="fl mar_lr4 font_cen">
+                <i class="fa fa-list-ul font_1_5" onclick="toggleMenu();return false;"></i>
+            </p>
+            <p class="fl po_re mar_t10 wid_75">
+                <input id="keyWord" style="" onchange="changeKeyWord();" value="$!content" type="text" class="form-contro2 wid_95" />
+                <i onclick="changeKeyWord();" class="fa-search fr font_1_2 fa-user2 po_ab"></i>
+            </p>
+        </div><!-- 头部 -->*#
+
+
+
+            <div class="purchase" style="height:75px;">
+                <div id="unseebg" class="unseebg none" onclick="changeType(1)">
+					##拦截点击事件的
+                </div>
+                <p class="fl mar_lr4 font_cen" style="line-height: 14px;  padding-top: 12px;" onclick="toggleMenu();">
+                    <i class="fa fa-list-ul font_1_5" ></i>
+                    <br/>
+                    <i class="font_7_5" style="margin-left: -4px;">频道</i>
+                </p>
+                <div class="fl po_ab " style="left: 46px;right:10px;top:0;bottom: 0;">
+					<div class="select_1 fl po_ab bg_01"  style="top:16px;left:20px;z-index: 102">
+						#if($searchType == 0)
+							<span id="typeTitle" onclick="changeType(0)" style="font-size: 1.25em">商品</span><i class="fa fa-sort-desc po_ab" style="top: 5px;height:5px;line-height: 5px;"></i>
+						#else
+							<span id="typeTitle" onclick="changeType(0)" style="font-size: 1.25em">店铺</span><i class="fa fa-sort-desc po_ab" style="top: 5px;height:5px;line-height: 5px;"></i>
+						#end
+						<ul id="typePanel" class="typePanel block_bg none">
+							<li onclick="typeClick(0);">商品</li>
+							<li onclick="typeClick(1);">店铺</li>
+						</ul>
+					</div>
+                    <div class="po_ab form-contro3" style="">
+                        <input type="text" id="keyWord" onchange="" value="$!content" class="form-contro2 po_ab" style="left:62px;top:5px;width:75%;"/>
+                    </div>
+                    <i onclick="" class="fa-search font_1_2 fa-user2 po_ab" style="top:0px;"></i>
+                    <i onclick="changeKeyWord()" class="font_1_2 po_ab" style="right: 12px;">搜索</i>
+                </div>
+
+				<div id="searchProductSortPanel" class="searchSort #if($searchType == 1) none #end">
+					<div searchflag="1" onclick="orderSortEvent(this)" class="rightline">销售数量<div class="arrowdown"></div></div>
+					<div searchflag="2" onclick="orderSortEvent(this)" class="rightline">评价分数<div class="arrowdown"></div></div>
+					<div searchflag="3" onclick="orderSortEvent(this)" class="rightline">上传时间<div class="arrowdown"></div></div>
+					<div searchflag="4" onclick="orderSortEvent(this)">商品价格<div class="arrowdown"></div></div>
+				<!-- old代码
+					<div searchflag="1" onclick="orderSortEvent(this)" class="rightline">上传时间<div class="arrowdown"></div></div>
+					<div searchflag="2" onclick="orderSortEvent(this)" class="rightline">评价分数<div class="arrowdown"></div></div>
+					<div searchflag="3" onclick="orderSortEvent(this)" class="rightline">销售数量<div class="arrowdown"></div></div>
+					<div searchflag="4" onclick="orderSortEvent(this)">商品价格<div class="arrowdown"></div></div>
+				 -->
+				</div>
+				<div id="searchShopSortPanel" class="searchSort #if($searchType == 0) none #end">
+					<div searchflag="1" style="width:32%" onclick="orderShopSortEvent(this)" class="rightline">更新时间<div class="arrowdown"></div></div>
+					<div searchflag="2"  style="width:32%" onclick="orderShopSortEvent(this)" class="rightline">评价分数<div class="arrowdown"></div></div>
+					<div searchflag="3"  style="width:32%" onclick="orderShopSortEvent(this)">销售数量<div class="arrowdown"></div></div>
+				</div>
+            </div><!-- 头部 -->
+
+            <div id="navigation" class="" style="z-index:500;position:absolute;top:50px; #if($showMenu == $0)display:none;#end">
+            	<ul id="list">
+            		#foreach($item1 in $itemList)
+            		<li><a href="#" onclick="showItem(this,2);return false;"  categoryCid="$item1.categoryCid"><span class="font_e5 mar_r2">|</span>$item1.categoryCName</a>
+                        <ul class="myHide" isItem2 parentId="$item1.categoryCid">
+            				#foreach($item2 in $item1.children)
+                            <li><a href="#" onclick="return false;" class="font_e5 font_8_5">$item2.categoryCName</a></li>
+                            <li class="border_2" isItem3 parentId="$item2.categoryCid">
+            					<a>
+            						#foreach($item3 in $item2.children)
+            						<span style="" onclick="loadItem('$item3.categoryCid')">$item3.categoryCName</span>
+            						#end
+            					</a>
+            				</li>
+            				#end
+                        </ul>
+            		</li>
+            		#end
+                </ul>
+             </div>
+			
+			
+			<div id="wrapper" >
+            	<div id="scroller">
+            		<div id="pullDown" class="font_cen">
+            			<span id="pullDownLabel" class="pullDownLabel">下拉刷新...</span>
+            		</div>
+            		<div class="pad_lr5 shop_present" id="searchGoodsList" style="padding-bottom: 0px;">
+						
+                    </div>
+            		<div id="pullUp" class="font_cen">
+            			<span class="pullUpLabel" id="pullUpLabel">上拉加载更多...</span>
+            		</div>
+            	</div>
+            </div>
+        </div><!-- 中间内容 end-->
+	</div>
+
+	#parse("common/footer.vm")
+</body>
+</html>

@@ -1,0 +1,61 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<script type="text/javascript">
+	$(function(){
+		//加载左侧菜单
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+		
+		$("button[name='viewBtn']").bind("click", function(){
+			var shopTempleName = $(this).attr("shopTempleName");
+			window.open("$request.contextPath/shopItemListIndexController/templeView?templateName="+shopTempleName, "_blank");
+		});
+		
+		$("button[name='editBtn']").bind("click", function(){
+			var status = $(this).attr("status");
+			if(status==2){
+				var retVal = window.confirm("您确定要将店铺切换到该套模版吗？");
+				if(!retVal){
+					return;
+				}
+			}
+			var shopTempleName = $(this).attr("shopTempleName");
+			//正式使用的模版的模版id
+			var templeId = $(this).attr("templeId");
+			window.open("$request.contextPath/shopItemListIndexController/templeEdit?templateName="+shopTempleName+"&templeId="+templeId, "_blank");
+		});
+
+        $("button[name='previewBtn']").bind("click", function(){
+            var shopTempleName = $(this).attr("shopTempleName");
+            //正式使用的模版的模版id
+            var templeId = $(this).attr("templeId");
+            window.open("$request.contextPath/shopItemListIndexController/templePreview?templateName="+shopTempleName+"&templeId="+templeId, "_blank");
+        });
+	});
+</script>
+<div id="main">
+<!-- left start -->
+<div id="leftSeller" class="border-4"></div>
+<!--left end -->
+<!--右边部分开始-->
+<div id="right" class="bg_06 border-4 po_re" >
+    <div class="select_add_shop po_ab">
+       <!-- 选择上传 -->
+        #foreach($entity in $!shopTempleList)
+        <dl class="fl #if($velocityCount%2==1) mar_r30 #end">
+          <dt class="bg_02"><img src="$staticPath/images/template_${velocityCount}.jpg" width="220" height="300" alt=""/></dt>
+          <dd class="font_cen mar_t10 font_14b">$entity.templatesInfo</dd>
+          <dd class="font_cen mar_t10">
+          	  #if($entity.status==1)
+	              <button type="button" class="button_2 hei_30 fl mar_l7" name="editBtn" shopTempleName="$entity.templatesName" templeId="$entity.id" status="$entity.status">编辑中</button>
+			  #else          	  
+          	  	  <button type="button" class="button_2 hei_30 fl mar_l7" name="editBtn" shopTempleName="$entity.templatesName" templeId="$entity.id" status="$entity.status">选择</button>
+          	  #end
+              <button type="button" class="button_2 hei_30 fl mar_l7" name="previewBtn" shopTempleName="$entity.templatesName" templeId="$entity.id">预览</button>
+              <button type="button" class="button_2 hei_30 fl mar_l7" name="viewBtn" shopTempleName="$entity.templatesName">浏览</button>
+          </dd>
+        </dl>
+        #end
+      </div>      
+</div> 
+<!--右边部分结束-->
+</div><!--#main end -->

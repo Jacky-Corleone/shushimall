@@ -1,0 +1,54 @@
+#set($layout="common/order.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>买家认证</title> 
+#parse("common/scriptAndCss.vm")
+<link href="$request.contextPath/assets/css/basic.css" rel="stylesheet" type="text/css"/>
+<link href="$request.contextPath/assets/css/register.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="$request.contextPath/assets/js/jquery-2.1.4.min.js"></script>
+<title>注册成功</title>
+</head>
+<script type="text/javascript">
+	$(function(){
+		$("#uname_id").html(" 恭喜您，" + "$!userDTO.uname");
+		$(".information").html("注册完成");
+	});
+</script>
+<body>
+   <div id="main" class="po_re">
+   
+      <!-- 中间内容 -->
+			<div class="content" id="wrapper">
+ <!--头部开始-->
+ <div id="header">
+   <div class="left_img"><img src="$request.contextPath/assets/images/logo-ke.png"/></div><!--left_img （放logo的div） end-->
+	<div class="right_img mar_lr20">
+
+   </div><!--right_img end-->
+</div>
+ <!--头部结束-->
+<!--内容start-->
+    <div class="news bg_01">
+    	<div class="register_nav bg_3">
+        	
+        </div><!--register_nav-->
+        <div class="register">
+        	<div class="register_box_mid">
+                <p class="font_24"><i class="fa-check-circle mar_r10 font_7a"></i><b id="uname_id"></b><b class="information"></b></p>
+                <div class="register_state font_14b" style="margin:40px auto">您已完成了基础信息注册，可直接点击<a href="$request.getContextPath()" class="font_fe"> 首页 </a>浏览，如需实现交易，请您认证买家！
+                <div class='font_cen'>
+                	<button class="button_1 pad_lr10 hei_34 wid_87"><i class="fa-check-square-o demo-icons"></i><a href="$request.getContextPath()/buyerAuthentication">买家认证</a></button>
+                    <button class="button_1 pad_lr10 hei_34 wid_87"><a href="$request.getContextPath()">以后再说</a></button>          
+                </div>
+            </div><!--register_box-->
+            </div><!--register-->
+    </div><!--register_content-->
+<!--内容end-->
+</div>
+</div>
+ </div>
+ #parse("common/footer.vm")
+ </body>
+</html>

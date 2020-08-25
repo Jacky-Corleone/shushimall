@@ -1,0 +1,323 @@
+#set( $staticPath = "$request.contextPath/assets" )
+#set($layout = "/categoryitems_layout.vm")
+<link href="$staticPath/css/product.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$staticPath/js/tab.js"></script>
+<script type="text/javascript" src="$staticPath/js/all_classify.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#categoryDetail").attr("action","$request.contextPath/productController/categoryItemDetail?itemId=$!itemId");
+		
+		// 图片上下滚动
+		var count = $("#imageMenu li").length - 5; /* 显示 6 个 li标签内容 */
+		var interval = $("#imageMenu li:first").width();
+		var curIndex = 0;
+		
+		
+		$('.scrollbutton').click(function(){
+			if( $(this).hasClass('disabled') ) return false;
+			if(count <= 1){
+				$('.smallImgUp').addClass('disabled');
+				$('.smallImgDown').addClass('disabled');
+				return false;
+			}
+			if ($(this).hasClass('smallImgUp')) --curIndex;
+			else ++curIndex;
+			
+			$('.scrollbutton').removeClass('disabled');
+			if (curIndex == 0) $('.smallImgUp').addClass('disabled');
+			if (curIndex == count-1) $('.smallImgDown').addClass('disabled');
+			
+			$("#imageMenu ul").stop(false, true).animate({"marginLeft" : -curIndex*interval + "px"}, 600);
+		});
+	
+	    //点击到中图
+	    var midChangeHandler = null;
+		
+	    $("#imageMenu li img").bind("click", function(){
+			if ($(this).attr("id") != "onlickImg") {
+				midChange($(this).attr("src").replace("small", "mid"));
+				$("#imageMenu li").removeAttr("id");
+				$(this).parent().attr("id", "onlickImg");
+			}
+		}).bind("mouseover", function(){
+			if ($(this).attr("id") != "onlickImg") {
+				window.clearTimeout(midChangeHandler);
+				midChange($(this).attr("src").replace("small", "mid"));
+				$(this).css({ "border": "2px solid #E50011" });
+			}
+		}).bind("mouseout", function(){
+			if($(this).attr("id") != "onlickImg"){
+				$(this).removeAttr("style");
+				midChangeHandler = window.setTimeout(function(){
+					midChange($("#onlickImg img").attr("src").replace("small", "mid"));
+				}, 1000);
+			}
+		});
+	
+	    function midChange(src) {
+	        $("#midimg").attr("src", src).load(function() {
+	            changeViewImg();
+	        });
+	    }
+	
+	    //大视窗看图
+	    function mouseover(e) {
+	        if ($("#winSelector").css("display") == "none") {
+	            $("#winSelector,#bigView").show();
+	        }
+	
+	        $("#winSelector").css(fixedPosition(e));
+	        e.stopPropagation();
+	    }
+	
+	
+	    function mouseOut(e) {
+	        if ($("#winSelector").css("display") != "none") {
+	            $("#winSelector,#bigView").hide();
+	        }
+	        e.stopPropagation();
+	    }
+	
+	
+	    $("#midimg").mouseover(mouseover); //中图事件
+	    $("#midimg,#winSelector").mousemove(mouseover).mouseout(mouseOut); //选择器事件
+	
+	    var $divWidth = $("#winSelector").width(); //选择器宽度
+	    var $divHeight = $("#winSelector").height(); //选择器高度
+	    var $imgWidth = $("#midimg").width(); //中图宽度
+	    var $imgHeight = $("#midimg").height(); //中图高度
+	    var $viewImgWidth = $viewImgHeight = $height = null; //IE加载后才能得到 大图宽度 大图高度 大图视窗高度
+	
+	    function changeViewImg() {
+	        $("#bigView img").attr("src", $("#midimg").attr("src").replace("mid", "big"));
+	    }
+	
+	    changeViewImg();
+	
+	    $("#bigView").scrollLeft(0).scrollTop(0);
+	    function fixedPosition(e) {
+	        if (e == null) {
+	            return;
+	        }
+	        var $imgLeft = $("#midimg").offset().left; //中图左边距
+	        var $imgTop = $("#midimg").offset().top; //中图上边距
+	        X = e.pageX - $imgLeft - $divWidth / 2; //selector顶点坐标 X
+	        Y = e.pageY - $imgTop - $divHeight / 2; //selector顶点坐标 Y
+	        X = X < 0 ? 0 : X;
+	        Y = Y < 0 ? 0 : Y;
+	        X = X + $divWidth > $imgWidth ? $imgWidth - $divWidth : X;
+	        Y = Y + $divHeight > $imgHeight ? $imgHeight - $divHeight : Y;
+	
+	        if ($viewImgWidth == null) {
+	            $viewImgWidth = $("#bigView img").outerWidth();
+	            $viewImgHeight = $("#bigView img").height();
+	            if ($viewImgWidth < 200 || $viewImgHeight < 200) {
+	                $viewImgWidth = $viewImgHeight = 800;
+	            }
+	            $height = $divHeight * $viewImgHeight / $imgHeight;
+	            $("#bigView").width($divWidth * $viewImgWidth / $imgWidth);
+	            $("#bigView").height($height);
+	        }
+	
+	        var scrollX = X * $viewImgWidth / $imgWidth;
+	        var scrollY = Y * $viewImgHeight / $imgHeight;
+	        $("#bigView img").css({ "left": scrollX * -1, "top": scrollY * -1 });
+	        $("#bigView").css({ "top": 260, "left": $(".left_pic").offset().left + $(".left_pic").width() + 15 });
+	
+	        return { left: X, top: Y };
+	    }
+	
+	});
+	function topage(page){
+		var form = document.getElementById("categoryDetailForm");
+		form.page.value=page;
+		form.submit();
+	}
+</script>
+<style type="text/css">
+	.aButton {
+	    background: none repeat scroll 0 0 #e50011;
+	    border-radius: 2px;
+	    color: white;
+	    display: block;
+	    font-family: Microsoft Yahei;
+	    height: 32px;
+	    line-height: 32px;
+	    margin: 20px 5px;
+	    text-align: center;
+	}
+	.aButton:HOVER {
+	    color: white;
+	}
+</style>
+<!--内容开始-->
+<div id="content">
+	<div class="wid_auto mar_tb20 bg_05 pad_tb20 box-shadow1">
+    	<div class="wid_1160 bg_06 border-4">
+    		<!--面包屑开始
+        	<div class="mic">
+        		<a href="#"><span>食品饮料、保健食品</span></a> > 
+        		<a href="#">中外名酒</a> > 
+        		<a href="#">葡萄酒</a> >
+        		<a href="#">买2送2 法国波尔多AOC红酒 百元性价..</a>
+        	</div>-->
+         	<!--面包屑结束-->
+         	
+     		<!--左侧图片开始-->
+        	<div class="left_pic">
+	            <div id="vertical" class="bigImg">
+	                <img src="$!imageServerAddr$!item.picUrls[0]" width="398" height="398" id="midimg"/>
+	                <div style="display:none;" id="winSelector"></div>
+            	</div>
+            
+        		<div class="smallImg">
+            		<div class="scrollbutton smallImgUp disabled"><i class="fa-angle-left font_20"></i></div>
+            		<div id="imageMenu">
+	                	<ul>
+	                		#foreach($pic in $!item.picUrls)
+	                    		<li><img src="$!imageServerAddr$pic"/></li>
+	                		#end
+	                	</ul>
+            		</div>
+            		<div class="scrollbutton smallImgDown"><i class="fa-angle-right font_20"></i></div>
+        		</div><!--smallImg end-->  
+        		
+            	<div id="bigView" style="display:none;"><img width="800" height="800" alt="" src="" /></div>
+            	
+            	<!--下图片下面的分享信息 商品信息 开始 -->
+	            <div class="mar_t10">
+	                <span class="fl">商品编号：$!item.itemId</span>
+<!-- 	                <span class="mar_l10 fr"><i class="demo-icons fa-share-alt font_ffd font_14"></i>分享</span>
+	                <span class="mar_l10 fr"><i class="demo-icons fa-heart font_ffd font_14"></i>关注商品</span> -->
+	            </div>
+            	
+         	</div><!--left_pic end -->
+     		<!--左侧图片结束-->
+     		
+     		<!--中间文字购买信息开始-->
+    		<div class="mid po_re"> 
+        		<div class="mid_tit">$!item.itemName</div><!-- mid_font1 end-->
+        		<div class="mid_font2 border-4">
+        			<!--标题 开始 -->
+		            <ul class="font_14b bg_05 border-3">
+		            	<li class="wid_230">卖家信息</li>
+		                <li class="wid_110">价格</li>
+		                <li class="wid_230 font_cen">店铺评价</li>
+		                <li class="wid_110 font_cen">操作</li>
+		            </ul>
+          			<!--标题结束 -->
+          			
+          			#foreach( $item in $pager.records )
+	            		<ul class="border-6">
+			            	<li class="wid_230">
+			                    <p>卖家：<i>$item.shopName</i></p>
+			                    <!--<p>店铺评分：
+		                    		<i><span class="heart-red heart_icon0"></span></i>
+		                    		<strong>$!item.scope</strong>
+		                    	</p>-->
+			                    <p>库存：<i>$!item.inventory</i></p>
+			                </li>
+			                <li class="wid_110">#if($!item.hasPrice == 1)
+								<strong class="font_fe font_16" ><span id="itemPrice_js">#if($!item.guidePrice > 0) ￥$!item.guidePrice #end</span></strong>
+								#else
+									#if($!logging_status == "true")
+								<span id="doAskPrice" class="font_fe font_14b">欢迎询价</span>
+									#else
+								<div style="margin-left: 5px; color:#005AA0;">登录后可询价</div>
+									#end
+								#end</li>
+			                <li class="wid_230 font_cen">
+			    			#set($Double=0.0)
+							#if($Double.parseDouble($!item.scope)>4.4)
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        					#elseif($Double.parseDouble($!item.scope)>4.2)
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-half" style="width: 16px;float: none;"></span>
+        					#elseif($Double.parseDouble($!item.scope)>3.4)
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        					#elseif($Double.parseDouble($!item.scope)>3.2)
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-half" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        					#elseif($Double.parseDouble($!item.scope)>2.4)
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        					#elseif($Double.parseDouble($!item.scope)>2.2)
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-half" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        					#elseif($Double.parseDouble($!item.scope)>1.4)
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        					#elseif($Double.parseDouble($!item.scope)>1.2)
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-half" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        					#elseif($Double.parseDouble($!item.scope)>0.4)
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        					#elseif($Double.parseDouble($!item.scope)>0.2)
+        						<span class="heart-half" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        					#else
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        					#end						
+        					</li>
+			                <li class="wid_110">
+			                	<a class="aButton" href="$request.contextPath/productController/details?id=$!item.itemId">查看详情</a>
+			                </li>
+	            		</ul>
+          			#end
+		          	
+        		</div><!--mid_font2 end-->
+        		<form id="categoryDetailForm" method="post">
+        			<input name="page" type="hidden">
+        		</form>
+				<!-- 分页 -->
+				#pageVelocity($pager)
+		        
+       		</div><!-- 右侧div结束-->
+    	</div><!--1160 -->
+    </div><!--1200的外围盒子 -->
+    
+	<!--下面内容开始-->
+<!-- 	<div class="product_pic border-4"> -->
+<!-- 		<h3 class="bg_05 hei_40 pad_l10 font_14 border-6">商品详细信息</h3> -->
+<!-- 	</div> -->
+	<!--下面内容结束-->
+	
+</div><!--#content end内容结束-->

@@ -1,0 +1,29 @@
+{{#each itemSkus}}
+<dl onclick="window.location='product/toDetail?id={{itemId}}&skuId={{skuId}}&keyword={{../keyword}}'">
+    <dt class="fl">
+       <img src="{{../gix}}{{picUrl}}" >
+    </dt>
+    <dd class="fr" style="position: relative;">
+        <p>{{itemName}}</p>
+        {{#each attributes}}
+        <div>
+            {{name}}：
+            {{#each values}}
+                {{name}}
+            {{/each}}
+        </div>
+        {{/each}}
+        <h4 style="" class="font_e5">
+			{{#if skuInquiryPirce}}
+	                           询价价格: {{skuInquiryPirce}} 
+            {{else}} 
+        	{{#compare hasPrice "==" "1"}}
+            	价格：{{skuPrice}}
+            {{else}}  
+            	欢迎询价
+          {{/compare}}
+        {{/if}}
+        </h4>
+    </dd>
+</dl>
+{{/each}}

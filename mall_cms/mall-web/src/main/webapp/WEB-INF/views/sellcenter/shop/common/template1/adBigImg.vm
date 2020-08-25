@@ -1,0 +1,26 @@
+<!--
+<div class="mar_t10 po_re advert_1">
+					<a href="$!shopRenovationMap.get('4a').chainUrl" target="_blank">
+			    		<img src="$!imageServerAddr$!shopRenovationMap.get('4a').pictureUrl" id="proHot1_pictureUrlName" width="770" height="260">
+			    	</a> 
+			    	#if($!flag && $!flag=='decorate')
+			    	<div class="po_ab img_edit1" >
+						<div class=" bg_03 img_opacity img_edit1">
+						</div>
+						<div class="hei_40 po_ab pa_01 bg_03 cursor wid_100">
+							<p class="fr mar_r20 font_ff banner_edit" id="proHot1">
+								<input type="hidden" id="proHot1_title" value="推荐位编辑" />
+								<input type="hidden" id="proHot1_picUrl" value="$!shopRenovationMap.get('4a').pictureUrl" />
+								<input type="hidden" id="proHot1_id" value="$!shopRenovationMap.get('4a').id" />
+								<input type="hidden" id="proHot1_chainUrl" value="$!shopRenovationMap.get('4a').chainUrl" />
+								<input type="hidden" id="proHot1_position" value="a" />
+								<input type="hidden" id="proHot1_modultType" value="4" />
+								<input type="hidden" id="proHot1_width" value="770" />
+		        				<input type="hidden" id="proHot1_height" value="260" />
+								<i class="demo-icons fa-pencil"></i>编 辑
+							</p>
+						</div>
+					</div>
+					#end
+                </div>
+		-->	

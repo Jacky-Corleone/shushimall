@@ -1,0 +1,226 @@
+#set($assetsPath="$request.contextPath/assets")
+<link href="$assetsPath/css/manage_style.css" rel="stylesheet" type="text/css"/>
+<link href="$assetsPath/css/basic.css" rel="stylesheet" type="text/css"/>
+<link href="$assetsPath/css/Details.css" rel="stylesheet" type="text/css"/>
+<link href="$assetsPath/mycss/mymanage_style.css" rel="stylesheet" type="text/css"/>
+<script src="$assetsPath/js/star.js"></script>
+<script type="text/javascript">
+$(function(){
+	//头部搜索框选中：店铺
+	$(".mid_search .big_class span").removeClass("focus_class font_ff");
+	$("span[type='s']").addClass("focus_class font_ff");
+	//搜索关键词
+	var keyword = $("input[name='keyword_hidden']").val();
+	$("#keyword_searchForm").val(keyword);
+});
+//到指定的分页页面
+function topage(page){
+	$("input[name='page']").val(page);
+	$("#queryForm").submit();
+}
+	//按时间排序
+	function orderSort(obj){
+		
+		$("input[name='orderSort']").val(obj);
+		$("#queryForm").submit();
+	}
+</script>
+<style type="text/css">
+.Search_Shopping .fr li{
+    border-right: 1px solid #e8e8e8;
+    cursor: pointer;
+    display: block;
+    float: left;
+    height: 35px;
+    line-height: 35px;
+    margin: 0;
+    overflow: hidden;
+    padding: 0 15px;
+    text-align: center;
+    width: auto;
+}
+.Search_Shopping .fr li:hover {
+	background-color: #fafafa;
+	color: #747474;
+}
+</style>
+<div id="main">
+ <!--搜索面包屑开始开始-->
+	<div class="wid_1160 mar">
+ 		<div class="breadcrumb">
+            <i class="fa-th-large demo-icons fl mar_r10 font_14"></i><!--全部前面图标所占位置 -->
+             <span class="fl"><a class="level" href=" # "> 搜索出的店铺共<i class="font_fe demo-icons">$!pager.totalCount</i>家 </a></span>
+        </div><!--breadcrumb end-->
+	</div>
+  <!--搜索面包屑开始开始-->
+     <!--排序开始-->
+    <div class="Search_Shopping border-4">
+            <ul class="fl">
+				<a href="javascript:void(0);">
+					<li onclick="orderSort(#if($!orderSort==1)2#else 1#end);" #if($!orderSort==1)style="background: #e50011 none repeat;color: #fff;"#end>
+						更新时间<i class="#if($!orderSort==1)arrow_up#else arrow_down#end"></i>
+					</li>
+				</a>
+				
+	            <a href="javascript:void(0);">
+	            	<li onclick="orderSort(#if($!orderSort==3)4#else 3#end);" #if($!orderSort==3)style="background: #e50011 none repeat;color: #fff;"#end>
+	            		评价分数<i class="#if($!orderSort==3)arrow_up#else arrow_down#end"></i>
+	            	</li>
+	            </a>
+				
+	            <a href="javascript:void(0);">
+	            	<li onclick="orderSort(#if($!orderSort==5)6#else 5#end);" #if($!orderSort==5)style="background: #e50011 none repeat;color: #fff;"#end>
+	            		销售数量<i class="#if($!orderSort==5)arrow_up#else arrow_down#end"></i>
+	            	</li>
+	            </a>
+            </ul>	
+			<div class="fr">
+				<ul>
+					<li>共<strong>$!pager.totalCount</strong>家</li>
+					<li ><b class="font_fe"><a href="#">$!pager.page</a></b>/$!pager.totalPage</li>
+					<li class="bl"><a href="javascript:topage($pager.previewPage)">上一页</a></li>
+					<li class="bl" style="border-right:none;"><a href="javascript:topage($pager.nextPage)">下一页</a></li>    
+				</ul>
+			</div>             
+    </div>
+	<form id="queryForm" action="$request.getContextPath()/searchController/searchShop" method="post">
+		<input type="hidden" name="keyword_hidden" value="$!keyword" />
+		<input type="hidden" name="keyword" value="$!keyword" />
+		<input type="hidden" name="page" value="$!pager.page" />
+		<input type="hidden" name="orderSort" value="$!orderSort" />
+	</form>
+		
+		<!--排序结束 Search_Sort-->
+        <div class="collect_Shop">
+		
+        <dl>
+			#foreach( $shop in $!pager.records )
+            <dd class="border-6">
+				<div class="collect_Shop_left">
+					<!--serviceScore   shopLogoUrl -->
+					<!--放logo的位置-->
+                    <div class="photograph">
+						<a href="$request.getContextPath()/shopItemListIndexController/toIndex?shopId=$!shop.shopId" target="_blank">
+						#if($!shop.shopLogoUrl == '' || !$shop.shopLogoUrl)
+	    					<img src="$!assetsPath/images/head.png" class="shop_logo"/>
+	    				#else
+	    					<img src="$!imageServerAddr$!shop.shopLogoUrl"  class="shop_logo"/>
+	    				#end
+						</a>
+					</div>
+                    <ul>
+						<li class="font_14b over_ell cursor" style="width:180px; height:22px" title="$shop.shopName">
+							<input type="hidden" name="shopId" value="$!shop.shopId"/>
+							<a href="$request.getContextPath()/shopItemListIndexController/toIndex?shopId=$!shop.shopId" target="_blank">
+								$shop.shopName
+							</a>
+						</li>
+						<!--<li>卖家：$shop.sellerName<i class="demo-icons fa-qq font_7a"></i></li>-->
+                        <li>
+							<i class="fl">服务评价：</i> 
+							#set($Double=0.0)
+							#if($Double.parseDouble($!shop.serviceScore)>4.4)
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        					#elseif($Double.parseDouble($!shop.serviceScore)>4.2)
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-half" style="width: 16px;float: none;"></span>
+        					#elseif($Double.parseDouble($!shop.serviceScore)>3.4)
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        					#elseif($Double.parseDouble($!shop.serviceScore)>3.2)
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-half" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        					#elseif($Double.parseDouble($!shop.serviceScore)>2.4)
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        					#elseif($Double.parseDouble($!shop.serviceScore)>2.2)
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-half" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        					#elseif($Double.parseDouble($!shop.serviceScore)>1.4)
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        					#elseif($Double.parseDouble($!shop.serviceScore)>1.2)
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-half" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        					#elseif($Double.parseDouble($!shop.serviceScore)>0.4)
+        						<span class="heart-on" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        					#elseif($Double.parseDouble($!shop.serviceScore)>0.2)
+        						<span class="heart-half" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        					#else
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        						<span class="heart-off" style="width: 16px;float: none;"></span>
+        					#end
+							<!--服务星级也是 图标heart_icon5，heart_icon4，heart_icon3到0为止 -->
+							<i class="evaluate-grade">
+								<strong title="$!shop.serviceScore">$!shop.serviceScore</strong>分
+							</i>
+							<s></s>
+                        </li>
+                    </ul>
+                </div>
+				#foreach( $recommendItem in $shop.recommendItems)
+				<ul>
+					<!--itemId itemName    itemPicUrl-->
+					<li class="att_pro">
+						<a class="att_new" href="$request.getContextPath()/productController/details?id=$!recommendItem.itemId&skuId=$!recommendItem.skuId" target="_blank">
+							<img src="$!imageServerAddr$!recommendItem.picUrl" class="border-4"/>
+						</a>
+                    </li>
+					<li class="font_14b font_cen over_ell cursor" style="height: 26px; line-height: 26px;" title="$!recommendItem.itemName">
+                        <a class="att_new" href="$request.getContextPath()/productController/details?id=$!recommendItem.itemId&skuId=$!recommendItem.skuId" target="_blank">$!recommendItem.itemName</a>
+                    </li>
+					
+					#if($!recommendItem.skuInquiryPirce)
+						<li class=" font_fe font_14b font_cen" style="height: 22px; line-height: 22px;">￥$!recommendItem.skuInquiryPirce</li>
+					#else
+						#if($!recommendItem.hasPrice == 1)
+							<li class=" font_fe font_14b font_cen" style="height: 22px; line-height: 22px;">￥$!recommendItem.skuPrice</li>
+						#else
+							<li class=" font_fe font_14b font_cen" style="height: 22px; line-height: 22px;">暂无报价</li>
+						#end
+					#end
+					
+				</ul>
+				#end
+            </dd>
+			#end
+        </dl>
+      </div><!--att_con1 end -->
+	  #pageVelocity($pager)
+ </div><!--main end -->

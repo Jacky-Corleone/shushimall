@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.goodscenter.dao.ItemEvaluationShowDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="itemEvaluationShowMap" type="com.camelot.goodscenter.dto.ItemEvaluationShowDTO">
+		<result property="id" column="id"/>
+		<result property="evaluationId" column="evaluation_id"/>
+		<result property="skuId" column="sku_id"/>
+		<result property="imgUrl" column="imgUrl"/>
+		<result property="isDelete" column="is_delete"/>
+	</resultMap>
+	
+	
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		SELECT
+		  t.id,
+		  t.evaluation_id,
+		  t.sku_id,
+		  t.imgUrl,
+		  t.is_delete
+		  FROM 
+		  item_evaluation_show t
+		 ]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1 = 1
+		<if test="entity!=null">
+			<if test="entity.id!=null and entity.id !=''">
+				<![CDATA[ and t.id = #{entity.id}]]>
+			</if>
+			<if test="entity.evaluationId!=null and entity.evaluationId !=''">
+				<![CDATA[ and t.evaluation_id = #{entity.evaluationId}]]>
+			</if>
+			<if test="entity.skuId!=null and entity.skuId !=''">
+				<![CDATA[ and t.sku_id = #{entity.skuId}]]>
+			</if>
+			<if test="entity.imgUrl!=null and entity.imgUrl !=''">
+				<![CDATA[ and t.imgUrl = #{entity.imgUrl}]]>
+			</if>
+			<if test="entity.isDelete!=null and entity.isDelete !=''">
+				<![CDATA[ and t.is_delete = #{entity.isDelete}]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法 -->
+    <!-- =========================================================== -->
+	<!-- 保存商品评价 -->
+	<insert id="add" parameterType="com.camelot.goodscenter.dto.ItemEvaluationShowDTO">
+		<![CDATA[
+		insert into item_evaluation_show(
+				evaluation_id,
+				sku_id,
+				imgUrl,
+				is_delete
+		)values(
+				#{evaluationId},
+				#{skuId},
+				#{imgUrl},
+				#{isDelete}
+		)
+	    ]]>	
+	</insert>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="itemEvaluationShowMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		item_evaluation_show t
+		<include refid="where_fragement" />
+	</select>
+	
+</mapper>

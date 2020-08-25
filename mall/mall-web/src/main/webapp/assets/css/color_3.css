@@ -1,0 +1,41 @@
+@charset "utf-8";
+/* CSS Document */
+body{background:#3d7dcd;}
+#shop_header .mid_search .search{border:2px solid #075fcc;}
+#shop_header .left_img h3{color:#fff;}
+/*选中背景颜色*/
+.shop_color0{background:#075fcc;}
+.shop_color1{background:#2d2d2d;}
+.nav ul .focus_li{background:#004898;color:#fff;}
+/* 小广告条*/
+.ban{width:100%;background:#000;}
+.ban_img img{width:980px;min-height:100px; background:#000; overflow:hidden;}
+/*分页选中颜色*/
+.page ul li a.curr{display:block;background:#3d7dcd; height:30px; color:#fff;border:1px solid #4c9c00;}
+.page ul li a:hover.curr{ background:#4c9c00;border:1px solid #3d7dcd;}
+/*文字选中颜色*/
+.shop_font0,.shop_font0 a{color:#3d7dcd;}
+/*tab切换效果中选择的颜色*/
+#shop_left .nTab .TabTitle .active {
+	background-color:#FFF;
+	border:1px solid #e8e8e8;
+	border-top:2px solid #3d7dcd;
+	color:#3d7dcd;
+}
+/*左侧序列号背景颜色*/
+#shop_left .left_content3 .icon_1{
+	background:#3d7dcd;
+	border:1px solid #3d7dcd;
+	color:#fff;}
+/*左侧菜单 背景颜色*/
+#shop_left dl dt,#shop_left dl dd,#shop_left .left_top{height:35px;line-height:35px;border-bottom:1px solid #e8e8e8;text-align:left; font-weight:bold; font-size:14px; background:#f9f9f9;color:#747474;}
+#shop_left dl dt{background:#f0f0f0;text-indent:5px; }
+
+/*公告列表title背景颜色*/
+.shop_Notice_tit{ background:#f1f1f1;}
+
+/*搜索条件选中背景*/
+.search_condition_box .right_list .focusbg {
+	background-color:#3d7dcd;
+}	
+.border-10{border-top:2px solid #075fcc;}

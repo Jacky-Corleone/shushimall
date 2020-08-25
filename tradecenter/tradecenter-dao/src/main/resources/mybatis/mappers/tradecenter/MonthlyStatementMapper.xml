@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.tradecenter.dao.MonthlyStatementDAO">
+	<resultMap id="monthlyStatementMapper" type="com.camelot.tradecenter.dto.MonthlyStatementDTO">
+			<result property="id" column="id" />
+			<result property="statementId" column="statement_id" />
+			<result property="tradeName" column="trade_name" />
+			<result property="orderCode" column="order_code" />
+			<result property="orderStates" column="order_states" />
+			<result property="paidAmount" column="paid_amount" />
+			<result property="npaidAmount" column="npaid_amount" />
+			<result property="amount" column="amount" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="activeFlag" column="active_flag" />
+	</resultMap>
+	<resultMap id="tradeOrdersDTOMap" type="com.camelot.tradecenter.dto.TradeOrdersDTO" >
+		<result property="orderId" column="order_id" />
+		<result property="parentOrderId" column="parent_order_id" />
+		<result property="sellerId" column="seller_id" />
+		<result property="buyerId" column="buyer_id" />
+		<result property="shopId" column="shop_id" />
+		<result property="name" column="name" />
+		<result property="provinceId" column="province_id" />
+		<result property="cityId" column="city_id" />
+		<result property="countyId" column="county_id" />
+		<result property="detailAddress" column="detail_address" />
+		<result property="fullAddress" column="full_address" />
+		<result property="mobile" column="mobile" />
+		<result property="phone" column="phone" />
+		<result property="email" column="email" />
+		<result property="totalPrice" column="total_price" />
+		<result property="totalDiscount" column="total_discount" />
+		<result property="freight" column="freight" />
+		<result property="paymentPrice" column="payment_price" />
+		<result property="state" column="state" />
+		<result property="invoice" column="invoice" />
+		<result property="invoiceTitle" column="invoice_title" />
+		<result property="shipmentType" column="shipment_type" />
+		<result property="logisticsNo" column="logistics_no" />
+		<result property="logisticsCompany" column="logistics_company" />
+		<result property="memo" column="memo" />
+		<result property="paymentMethod" column="payment_method"/>
+		<result property="paymentType" column="payment_type" />
+		<result property="paymentTime" column="payment_time" />
+		<result property="deleted" column="deleted" />
+		<result property="deleteTime" column="delete_time" />
+		<result property="locked" column="locked" />
+		<result property="lockTime" column="lock_time" />
+		<result property="refund" column="refund" />
+		<result property="refundTime" column="refund_time" />
+		<result property="delay" column="delay" />
+		<result property="delayOverTime" column="delay_over_time" />
+		<result property="afterService" column="after_service" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="cancelTime" column="cancel_time" />
+		<result property="changePaymentPriceTime" column="change_payment_price_time" />
+		<result property="sellerEvaluate" column="seller_evaluate" />
+		<result property="evaluate" column="evaluate" />
+		<result property="yn" column="yn" />
+		<result property="paid" column="paid"/>
+		<result property="payPeriod" column="pay_period"/>
+		<result property="promoCode" column="promo_code"/>
+		<result property="deliverTime" column="deliver_time"/>
+		<result property="orderType" column="orderType"/>
+		<result property="confirmReceiptTime" column="confirm_receipt_time"/>
+	</resultMap>
+	<sql id="where">
+		<where>
+			<if test="monthlyStatement.id != null and monthlyStatement.id != '' ">
+				and  monthly_Statement.id = #{monthlyStatement.id}
+			</if>
+			<if test="monthlyStatement.statementId != null and monthlyStatement.statementId != '' ">
+				and  monthly_Statement.statement_id = #{monthlyStatement.statementId}
+			</if>
+			<if test="monthlyStatement.tradeName != null and monthlyStatement.tradeName != '' ">
+				and  monthly_Statement.trade_name = #{monthlyStatement.tradeName}
+			</if>
+			<if test="monthlyStatement.orderCode != null and monthlyStatement.orderCode != '' ">
+				and  monthly_Statement.order_code = #{monthlyStatement.orderCode}
+			</if>
+			<if test="monthlyStatement.orderStates != null and monthlyStatement.orderStates != '' ">
+				and  monthly_Statement.order_states = #{monthlyStatement.orderStates}
+			</if>
+			<if test="monthlyStatement.paidAmount != null and monthlyStatement.paidAmount != '' ">
+				and  monthly_Statement.paid_amount = #{monthlyStatement.paidAmount}
+			</if>
+			<if test="monthlyStatement.npaidAmount != null and monthlyStatement.npaidAmount != '' ">
+				and  monthly_Statement.npaid_amount = #{monthlyStatement.npaidAmount}
+			</if>
+			<if test="monthlyStatement.amount != null and monthlyStatement.amount != '' ">
+				and  monthly_Statement.amount = #{monthlyStatement.amount}
+			</if>
+			<if test="monthlyStatement.createBy != null and monthlyStatement.createBy != '' ">
+				and  monthly_Statement.create_by = #{monthlyStatement.createBy}
+			</if>
+			<if test="monthlyStatement.createDate != null and monthlyStatement.createDate != '' ">
+				and  monthly_Statement.create_date = #{monthlyStatement.createDate}
+			</if>
+			<if test="monthlyStatement.updateBy != null and monthlyStatement.updateBy != '' ">
+				and  monthly_Statement.update_by = #{monthlyStatement.updateBy}
+			</if>
+			<if test="monthlyStatement.updateDate != null and monthlyStatement.updateDate != '' ">
+				and  monthly_Statement.update_date = #{monthlyStatement.updateDate}
+			</if>
+			<if test="monthlyStatement.activeFlag != null and monthlyStatement.activeFlag != '' ">
+				and  monthly_Statement.active_flag = #{monthlyStatement.activeFlag}
+			</if>
+			<if test="monthlyStatement.alternateField1 != null and monthlyStatement.alternateField1 != '' ">
+				<if test="monthlyStatement.alternateField1==2">
+					<![CDATA[ and  monthlyStatement.alternate_field1 = #{monthlyStatement.alternateField1} or monthlyStatement.alternate_field1 is null]]>
+				</if>
+				<if test="monthlyStatement.alternateField1==3">
+					<![CDATA[ and  monthlyStatement.alternate_field1 = #{monthlyStatement.alternateField1} or monthlyStatement.alternate_field1 is null]]>
+				</if>
+			</if>
+		</where>
+	</sql>
+	
+	<select id="queryPage" resultMap="monthlyStatementMapper">
+		select * from monthly_statement monthlyStatement
+		<include refid="where"/>
+		limit #{pager.pageOffset},#{pager.rows}
+	</select>
+	
+	<select id="queryPageCount" resultType="long">
+		select count(0) from monthly_statement monthlyStatement
+		<include refid="where"/>
+	</select>
+	
+	<select id="findById" resultMap="monthlyStatementMapper" >
+		select * from monthly_statement monthlyStatement
+		where id = #{id}
+	</select>
+	<select id="findByMonthlyStatementDTO" resultMap="monthlyStatementMapper">
+		select * from monthly_statement monthlyStatement
+		<include refid="where"/>
+	</select>
+
+	<insert id="insert" parameterType="com.camelot.tradecenter.dto.MonthlyStatementDTO" useGeneratedKeys="true" keyProperty="id">
+		insert into monthly_statement(
+				id,
+				statement_id,
+				trade_name,
+				order_code,
+				order_states,
+				paid_amount,
+				npaid_amount,
+				amount,
+				create_by,
+				create_date,
+				update_by,
+				update_date,
+				active_flag,
+				alternate_field1
+		)values(
+				#{id},
+				#{statementId},
+				#{tradeName},
+				#{orderCode},
+				#{orderStates},
+				#{paidAmount},
+				#{npaidAmount},
+				#{amount},
+				#{createBy},
+				#{createDate},
+				#{updateBy},
+				#{updateDate},
+				#{activeFlag},
+				#{alternateField1}
+		)
+
+	</insert>
+	
+	<update id="update">
+		update monthly_statement set
+				id = #{id},
+				statement_id=#{statementId},
+				trade_name = #{tradeName},
+				order_code = #{orderCode},
+				order_states = #{orderStates},
+				paid_amount = #{paidAmount},
+				npaid_amount = #{npaidAmount},
+				amount = #{amount},
+				create_by = #{createBy},
+				create_date = #{createDate},
+				update_by = #{updateBy},
+				update_date = #{updateDate},
+				active_flag = #{activeFlag}
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from monthly_statement
+		<if test=" codes != null and codes.size() > 0 ">
+			where id in
+			<foreach collection="codes" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test=" codes == null or codes.size() == 0 ">
+			where 1 = 3
+		</if>
+	</delete>
+	
+	<select id="findAll" resultType="map">
+		select *, from monthly_statement monthlyStatement
+		<include refid="where"/>
+	</select>
+
+	<select id="queryPageGroupByUid" resultMap="monthlyStatementMapper">
+		SELECT
+		id,
+		statement_id,
+		trade_name,
+		order_code,
+		order_states,
+		SUM(paid_amount) paid_amount,
+		SUM(npaid_amount) npaid_amount,
+		SUM(amount) amount,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		active_flag
+		FROM monthly_statement
+		<where>
+			<if test="monthlyStatement.id != null and monthlyStatement.id != '' ">
+				and  monthly_Statement.id = #{monthlyStatement.id}
+			</if>
+			<if test="monthlyStatement.statementId != null and monthlyStatement.statementId != '' ">
+				and  monthly_Statement.statement_id = #{monthlyStatement.statementId}
+			</if>
+			<if test="monthlyStatement.tradeName != null and monthlyStatement.tradeName != '' ">
+				and  monthly_Statement.trade_name = #{monthlyStatement.tradeName}
+			</if>
+			<if test="monthlyStatement.orderCode != null and monthlyStatement.orderCode != '' ">
+				and  monthly_Statement.order_code = #{monthlyStatement.orderCode}
+			</if>
+			<if test="monthlyStatement.orderStates != null and monthlyStatement.orderStates != '' ">
+				and  monthly_Statement.order_states = #{monthlyStatement.orderStates}
+			</if>
+			<if test="monthlyStatement.paidAmount != null and monthlyStatement.paidAmount != '' ">
+				and  monthly_Statement.paid_amount = #{monthlyStatement.paidAmount}
+			</if>
+			<if test="monthlyStatement.npaidAmount != null and monthlyStatement.npaidAmount != '' ">
+				and  monthly_Statement.npaid_amount = #{monthlyStatement.npaidAmount}
+			</if>
+			<if test="monthlyStatement.amount != null and monthlyStatement.amount != '' ">
+				and  monthly_Statement.amount = #{monthlyStatement.amount}
+			</if>
+			<if test="monthlyStatement.createBy != null and monthlyStatement.createBy != '' ">
+				and  monthly_Statement.create_by = #{monthlyStatement.createBy}
+			</if>
+			<if test="monthlyStatement.createDate != null and monthlyStatement.createDate != '' ">
+				and  date(monthly_Statement.create_date) = date(#{monthlyStatement.createDate})
+			</if>
+			<if test="monthlyStatement.updateBy != null and monthlyStatement.updateBy != '' ">
+				and  monthly_Statement.update_by = #{monthlyStatement.updateBy}
+			</if>
+			<if test="monthlyStatement.updateDate != null and monthlyStatement.updateDate != '' ">
+				and  monthly_Statement.update_date = #{monthlyStatement.updateDate}
+			</if>
+			<if test="monthlyStatement.activeFlag != null and monthlyStatement.activeFlag != '' ">
+				and  monthly_Statement.active_flag = #{monthlyStatement.activeFlag}
+			</if>
+			<if test="monthlyStatement.alternateField1 != null and monthlyStatement.alternateField1 != '' ">
+				<if test="monthlyStatement.alternateField1==2">
+					<![CDATA[ and  (monthly_Statement.alternate_field1 = #{monthlyStatement.alternateField1} or monthly_Statement.alternate_field1 is null)]]>
+				</if>
+				<if test="monthlyStatement.alternateField1==3">
+					<![CDATA[ and  (monthly_Statement.alternate_field1 = #{monthlyStatement.alternateField1} or monthly_Statement.alternate_field1 is null)]]>
+				</if>
+			</if>
+		</where>
+		GROUP BY statement_id
+		ORDER BY monthly_statement.id DESC
+		limit #{pager.pageOffset},#{pager.rows}
+	</select>
+	<select id="queryPageGroupByUidCount" resultType="Long">
+		select count(1) from (SELECT 1 FROM monthly_statement
+		<where>
+			<if test="monthlyStatement.id != null and monthlyStatement.id != '' ">
+				and monthly_Statement.id = #{monthlyStatement.id}
+			</if>
+			<if test="monthlyStatement.statementId != null and monthlyStatement.statementId != '' ">
+				and monthly_Statement.statement_id = #{monthlyStatement.statementId}
+			</if>
+			<if test="monthlyStatement.tradeName != null and monthlyStatement.tradeName != '' ">
+				and monthly_Statement.trade_name = #{monthlyStatement.tradeName}
+			</if>
+			<if test="monthlyStatement.orderCode != null and monthlyStatement.orderCode != '' ">
+				and monthly_Statement.order_code = #{monthlyStatement.orderCode}
+			</if>
+			<if test="monthlyStatement.orderStates != null and monthlyStatement.orderStates != '' ">
+				and monthly_Statement.order_states = #{monthlyStatement.orderStates}
+			</if>
+			<if test="monthlyStatement.paidAmount != null and monthlyStatement.paidAmount != '' ">
+				and monthly_Statement.paid_amount = #{monthlyStatement.paidAmount}
+			</if>
+			<if test="monthlyStatement.npaidAmount != null and monthlyStatement.npaidAmount != '' ">
+				and monthly_Statement.npaid_amount = #{monthlyStatement.npaidAmount}
+			</if>
+			<if test="monthlyStatement.amount != null and monthlyStatement.amount != '' ">
+				and monthly_Statement.amount = #{monthlyStatement.amount}
+			</if>
+			<if test="monthlyStatement.createBy != null and monthlyStatement.createBy != '' ">
+				and monthly_Statement.create_by = #{monthlyStatement.createBy}
+			</if>
+			<if test="monthlyStatement.createDate != null and monthlyStatement.createDate != '' ">
+				and date(monthly_Statement.create_date) = #{monthlyStatement.createDate}
+			</if>
+			<if test="monthlyStatement.updateBy != null and monthlyStatement.updateBy != '' ">
+				and monthly_Statement.update_by = #{monthlyStatement.updateBy}
+			</if>
+			<if test="monthlyStatement.updateDate != null and monthlyStatement.updateDate != '' ">
+				and monthly_Statement.update_date = #{monthlyStatement.updateDate}
+			</if>
+			<if test="monthlyStatement.activeFlag != null and monthlyStatement.activeFlag != '' ">
+				and monthly_Statement.active_flag = #{monthlyStatement.activeFlag}
+			</if>
+			<if test="monthlyStatement.alternateField1 != null and monthlyStatement.alternateField1 != '' ">
+				<if test="monthlyStatement.alternateField1==2">
+					<![CDATA[ and  (monthly_Statement.alternate_field1 = #{monthlyStatement.alternateField1} or monthly_Statement.alternate_field1 is null)]]>
+				</if>
+				<if test="monthlyStatement.alternateField1==3">
+					<![CDATA[ and  (monthly_Statement.alternate_field1 = #{monthlyStatement.alternateField1} or monthly_Statement.alternate_field1 is null)]]>
+				</if>
+			</if>
+		</where>
+		 GROUP BY statement_id) aaaa
+	</select>
+
+	<select id="queryOrderByStatementId" resultType="string">
+		SELECT order_code FROM monthly_statement WHERE statement_id= #{statementId}
+	</select>
+
+
+
+	<!-- 以下  查询订单的相关信息，定制 -->
+	<sql id="where_fragement">
+		from trade_orders trade_orders_,trade_order_items trade_order_items_
+		where trade_orders_.order_id = trade_order_items_.order_id
+		and trade_orders_.parent_order_id != '0'
+		and not EXISTS(SELECT 1 FROM monthly_statement hgfd WHERE hgfd.order_code =trade_orders_.order_id
+			<if test="entity.userType ==1">
+				<![CDATA[ and hgfd.alternate_field1 IS NOT NULL and hgfd.alternate_field1 = '2']]>
+			</if>
+			<if test="entity.userType ==2">
+				<![CDATA[ and hgfd.alternate_field1 IS NOT NULL and hgfd.alternate_field1 = '3']]>
+			</if>
+		)
+		<if test="entity!=null">
+			<if test="entity.shipmentType != null">
+				<![CDATA[ and trade_orders_.shipment_type = #{entity.shipmentType} ]]>
+			</if>
+			<if test="entity.deleted != null">
+				<![CDATA[ and trade_orders_.deleted = #{entity.deleted} ]]>
+			</if>
+			<if test="entity.orderId != null">
+				<![CDATA[ and trade_orders_.order_id  = #{entity.orderId} ]]>
+			</if>
+			<if test="entity.parentOrderId != null and entity.parentOrderId != ''">
+				<![CDATA[ and (trade_orders_.parent_order_id  = #{entity.parentOrderId} or trade_orders_.order_id  = #{entity.parentOrderId} )]]>
+			</if>
+			<if test="entity.sellerId != null">
+				<![CDATA[ and trade_orders_.seller_id  = #{entity.sellerId} ]]>
+			</if>
+			<if test="entity.buyerId != null">
+				<![CDATA[ and trade_orders_.buyer_id  = #{entity.buyerId} ]]>
+			</if>
+			<if test="entity.shopId != null ">
+				<![CDATA[ and trade_orders_.shop_id  = #{entity.shopId} ]]>
+			</if>
+			<if test="entity.state != null ">
+				<![CDATA[ and trade_orders_.state  = #{entity.state} ]]>
+			</if>
+			<if test="entity.cancelFlag != null">
+				<![CDATA[ and trade_orders_.yn  = #{entity.cancelFlag}]]>
+			</if>
+			<if test="entity.locked != null">
+				<![CDATA[ and trade_orders_.locked = #{entity.locked}]]>
+			</if>
+			<if test="entity.createStart != null">
+				<![CDATA[
+				and DATE_FORMAT(trade_orders_.order_time, '%Y-%m-%d') >=  DATE_FORMAT(#{entity.createStart}, '%Y-%m-%d')
+				]]>
+			</if>
+			<if test="entity.createEnd != null">
+				<![CDATA[
+				and date_format(trade_orders_.order_time,'%Y-%m-%d')  <= date_format(#{entity.createEnd},'%Y-%m-%d')
+				]]>
+			</if>
+			<if test="entity.updateStart != null">
+				<![CDATA[
+				and DATE_FORMAT(trade_orders_.update_time, '%Y-%m-%d') >=  DATE_FORMAT(#{entity.updateStart}, '%Y-%m-%d')
+				]]>
+			</if>
+			<if test="entity.updateEnd != null">
+				<![CDATA[
+				and date_format(trade_orders_.update_time,'%Y-%m-%d')  <= date_format(#{entity.updateEnd},'%Y-%m-%d')
+				]]>
+			</if>
+
+			<if test="entity.paymentTimeStart != null">
+				<![CDATA[
+				and DATE_FORMAT(trade_orders_.payment_time, '%Y-%m-%d') >=  DATE_FORMAT(#{entity.paymentTimeStart}, '%Y-%m-%d')
+				]]>
+			</if>
+			<if test="entity.paymentTimeEnd != null">
+				<![CDATA[
+				and date_format(trade_orders_.payment_time,'%Y-%m-%d')  <= date_format(#{entity.paymentTimeEnd},'%Y-%m-%d')
+				]]>
+			</if>
+			<if test="entity.paymentType != null" >
+				<![CDATA[
+				AND trade_orders_.payment_type = #{entity.paymentType}
+				]]>
+			</if>
+			<if test="entity.paymentMethod != null" >
+				<![CDATA[
+				AND trade_orders_.payment_method = #{entity.paymentMethod}
+				]]>
+			</if>
+
+			<if test="entity.evaluate != null" >
+				<![CDATA[
+				AND trade_orders_.evaluate = #{entity.evaluate}
+				]]>
+			</if>
+			<if test="entity.sellerEvaluate != null">
+				<![CDATA[
+				AND trade_orders_.seller_evaluate = #{entity.sellerEvaluate}
+				]]>
+			</if>
+
+			<if test="entity.sellerIdList != null and entity.sellerIdList.size()>0">
+				<![CDATA[
+					AND trade_orders_.seller_id in
+					]]>
+				<foreach collection="entity.sellerIdList" item="sellerId" open="(" separator="," close=")">
+					#{sellerId}
+				</foreach>
+			</if>
+			<if test="entity.buyerIdList != null and entity.buyerIdList.size()>0">
+				<![CDATA[
+					AND trade_orders_.buyer_id in
+					]]>
+				<foreach collection="entity.buyerIdList" item="buyerId" open="(" separator="," close=")">
+					#{buyerId}
+				</foreach>
+			</if>
+			<if test="entity.shopIdList != null and entity.shopIdList.size()>0">
+				<![CDATA[
+					AND trade_orders_.shop_id in
+					]]>
+				<foreach collection="entity.shopIdList" item="shopId" open="(" separator="," close=")">
+					#{shopId}
+				</foreach>
+			</if>
+			<if test="entity.itemIdList != null and entity.itemIdList.size()>0">
+				<![CDATA[
+					AND trade_order_items_.item_id in
+					]]>
+				<foreach collection="entity.itemIdList" item="itemId" open="(" separator="," close=")">
+					#{itemId}
+				</foreach>
+			</if>
+			<if test="entity.stateList != null and entity.stateList.size()>0">
+				<![CDATA[
+					AND trade_orders_.state in
+					]]>
+				<foreach collection="entity.stateList" item="st" open="(" separator="," close=")">
+					#{st}
+				</foreach>
+			</if>
+
+			<if test="entity.refund!= null ">
+				<![CDATA[
+					AND trade_orders_.refund = #{entity.refund}
+				]]>
+			</if>
+			<if test=" entity.delay!=null and entity.delay==3 ">
+				<![CDATA[
+					and( (delay=2 and delay_over_time<=now() )
+						or
+						(delay=1 and trade_orders_.update_time <= DATE_SUB(NOW(),INTERVAL 7 DAY) )
+					)
+				]]>
+
+			</if>
+		</if>
+		order by trade_orders_.create_time desc
+	</sql>
+
+	<sql id="pagination_tail">
+		limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- 分页查询 -->
+	<select id="queryTradeOrders" resultMap="tradeOrdersDTOMap" >
+		<![CDATA[
+		select distinct trade_orders_.*
+			 ]]>
+		<include refid="where_fragement"></include>
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+
+	<select id="queryTradeOrdersCount"  resultType="long">
+		<![CDATA[
+		select count(*)
+		from (
+		select distinct trade_orders_.*
+			 ]]>
+		<include refid="where_fragement"></include>
+		<![CDATA[
+		) tt
+			 ]]>
+	</select>
+
+
+
+</mapper>

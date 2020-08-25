@@ -1,0 +1,316 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+<link href="$staticPath/css/manage_style.css" rel="stylesheet" type="text/css" />
+<link href="$staticPath/css/basic.css" rel="stylesheet" type="text/css" />
+<script language="javascript" type="text/javascript" src="$staticPath/js/tab.js"></script>
+<script language="javascript" type="text/javascript" src="$staticPath/js/xiaoguo.js"></script>
+<script language="javascript" type="text/javascript" src="$staticPath/js/order/refundOrcservice.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<input type="hidden" id="contextPath" value="$request.contextPath" />
+<div id="main">
+	<!--中间部分开始-->
+	<!--左边部分开始-->
+	<div id="leftBuyer" class="border-4"></div>
+	<!--左边部分结束-->
+	<!--右边部分开始-->
+	<div id="right">
+		<div class="nTab">
+			<!-- 标题开始 -->
+			<div class="TabTitle">
+				<ul id="myTab0">
+					<li class="active" onclick="nTabs(this,0);">申请退款/退货</li>
+					<!-- <li class="normal" onclick="nTabs(this,1);">查看退货记录</li> -->
+				</ul>
+			</div>
+			<!-- 内容开始 -->
+			<div class="TabContent">
+				<!-- 全部订单 下的内容开始 -->
+				<div id="myTab0_Content0">
+					<!--每一个下面的内容复制开始================================ -->
+					<form id="queryForm" action="$request.getContextPath()/order/refundOrcservice" method="post">
+					<div id="right_top" class="right_top">
+						<div class="right_top_l">
+							<ul class="list">
+								<li class="wid_220">
+									<span class="font_wid">订单号：</span>
+									<input class="input_Style2 wid_120 hei_30" type="text" name="orderId" onkeyup="this.value=this.value.replace(/\D/g,'')" value="$!tradeOrdersQueryInDTO.orderId"/>
+								</li>
+								<li class="wid_220">
+									<span class="font_wid">商品名称：</span>
+									<input type="text" class="input_Style2 wid_120 hei_30" name="itemName" value="$!tradeOrdersQueryInDTO.itemName"/>
+								</li>
+								<li class="wid_400">
+									<span class="font_wid">下单时间：</span>
+									<!-- <input class="input_Style2 wid_120 hei_30" type="text" /> -->
+									<input name="createStart" id="createStart" readonly="readonly"  type="text"  
+									value="$!date.format('yyyy-MM-dd ',$!tradeOrdersQueryInDTO.createStart )"
+									class="wid_130 hei_30 input_Style2" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/>
+									<i class="demo-icons">至</i>
+									<!-- <input class="input_Style2 wid_120 hei_30" type="text" /> -->
+									<input name="createEnd"  type="text" readonly="readonly"   id="createEnd"
+									value="$!date.format('yyyy-MM-dd ',$!tradeOrdersQueryInDTO.createEnd )"
+									class="wid_130 hei_30 input_Style2" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});" />
+								</li>
+								<li>
+									<span class="font_wid fl hei_40">订单状态：</span>
+									<ul class="fl hei_30 dingdan">
+										<li>
+											<a href="javascript: void(0);" #if(!$pageState) class="border-3" #end onclick="changeState(this, 0);">全部</a>
+										</li>
+										<li>
+											<a href="javascript: void(0);"	#if($!pageState==2) class="border-3" #end  onclick="changeState(this, 2);">等待卖家发货($!stayDelivery)</a>
+										</li>
+										<li>
+											<a href="javascript: void(0);" #if($!pageState==3) class="border-3" #end onclick="changeState(this, 3);">等待买家确认收货($!stayReceipt)</a>
+										</li>
+										<li>
+											<a href="javascript: void(0);" #if($!pageState==5) class="border-3" #end onclick="changeState(this, 5);">已完成（$!complete）</a>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</div>
+						<div class="right_top_r">
+							<input type="hidden" name="state" id="state" value="$!pageState" />
+							<input type="hidden" name="page" value="$!pager.page">
+							<button type="button" onclick="submitGoodsForm();" class="button_4 but_cx3">
+								查 询
+							</button>
+						</div>
+					</div>
+					</form>
+					<!-- right结束 -->
+					<div id="right_bot" class="right_bot">
+						<!-- 商品列表开头 -->
+						<div class="right_xinxi mar_l14">
+							<ul class="list_top bg_08 font_14b mar_b10">
+								<li class="wid_300 font_cen hei_40">商品信息</li>
+								<li class="wid_110 font_cen hei_40">单价</li>
+								<li class="wid_95 font_cen hei_40">数量</li>
+								<li class="wid_120 font_cen hei_40">商品操作</li>
+								<li class="wid_120 font_cen hei_40">总金额</li>
+								<li class="wid_90 font_cen hei_40">订单状态</li>
+								<li class="wid_100 font_cen hei_40">交易操作</li>
+							</ul>
+							#foreach($entity in $pager.records)
+							<div class="mar_b10">
+								<ul class="list_top bg_08 font_14b mar_b10 border">
+									<li class="wid_300 hei_40 mar_20">订单号： 
+										<a href="$request.getContextPath()/order/queryOrderInfoBuyer?orderId=$!entity.orderId&passKey=$!entity.passKey" target="_blank">$!entity.orderId</a>
+									</li>
+									<li class="wid_220 hei_40">下单时间：$!date.format('yyyy-MM-dd HH:mm:ss ',$!entity.createTime )</li>
+									<li class="wid_180 hei_40 over_ell">
+									#foreach($json in $!jsonArray)
+										#if($!entity.orderId == $!json.orderId)
+											<a href="$request.getContextPath()/shopItemListIndexController/toIndex?shopId=$!json.shopId" target="_blank" title="$!json.shopName">$!json.shopName</a>
+										#end
+									#end
+									</li>
+									
+								</ul>
+								
+								<table class="information" id="information">
+									<tr>
+										<td class="wid_300 border-1 orderItems_js">
+											#set($count=0)
+											#foreach($entityItem in $!entity.items)
+												#set($count=$count+1)
+												#foreach($json in $!jsonArray)
+													#if($!entity.orderId == $!json.orderId)
+														#foreach($jsonItem in $!json.items)
+															#if($!entityItem.skuId == $!jsonItem.skuId)
+											<ul class="Refund_one #if($count<$!entity.items.size()) border-6 #end" style="width:618px">
+												<li class="wid_300">
+													<a href="$request.getContextPath()/productController/details?id=$!entityItem.itemId&skuId=$!entityItem.skuId" target="_blank">
+														<img class="fl mar_l10 skuPicUrl_js" src="$!imageServerAddr$!jsonItem.skuPicUrl" name="" width="82" height="82" />
+													</a>
+                                                    <div class="fl wid_150" style="line-height:20px;padding:30px 0px 0px 5px;position: relative;" >
+                                                        <a href="$request.getContextPath()/productController/details?id=$!entityItem.itemId&skuId=$!entityItem.skuId" target="_blank">
+                                                            $!jsonItem.itemName
+                                                        </a>
+                                                    </div>
+												</li>
+												<li class="wid_110 font_cen font_e3 hei_80 payPrice_js">
+													#if($entity.paymentMethod == 3)
+														<span class="hei_30 font_e3">$!jsonItem.payPrice积分</span>
+													#else
+														<span class="hei_30 font_e3">￥$!jsonItem.payPrice</span>
+													#end
+												</li>
+												<li class="wid_80 font_cen font_e3 hei_80 num_js">$!jsonItem.num</li>
+												<li class="wid_120 font_cen font_e3 hei_80 payPrice_js">
+												#if($!entity.locked == 1)
+													#if(!$!jsonItem.refundFlag)
+														#if($entity.state == 2 || $entity.state == 3)
+															#if($entity.state == 3)
+																#if($!jsonItem.addSource <= 3)
+																	<a href="$request.getContextPath()/order/refundAgreement?orderId=$!entity.orderId&skuId=$!entityItem.skuId&passKey=$!jsonItem.passKey" class="font_1c cursor">申请退款/退货</a><br/>
+																#end
+															#else
+																<a href="$request.getContextPath()/order/refundAgreement?orderId=$!entity.orderId&skuId=$!entityItem.skuId&passKey=$!jsonItem.passKey" class="font_1c cursor">申请退款/退货</a><br/>
+															#end
+														#elseif($entity.state > 3 && $entity.state < 6 )
+															#if($!jsonItem.addSource <= 3)
+																<a href="$request.getContextPath()/order/refundAgreement?orderId=$!entity.orderId&skuId=$!entityItem.skuId&passKey=$!jsonItem.passKey" class="font_1c cursor">申请售后</a><br/>
+															#end
+														#end
+													#else
+														<a href="$request.getContextPath()/order/refundSubmitSucc?returnId=$!jsonItem.refundId&skuId=$!entityItem.skuId&passKey=$!jsonItem.passKey" target="_blank" class="font_1c cursor">查看退款/退货进度</a><br/>
+													#end
+												#end
+											</li>
+											</ul>
+															#end
+														#end
+													#end
+												#end
+											#end
+										</td>
+										<td class="wid_120 border-1 font_cen">
+											#if($entity.paymentMethod == 3)
+												<span class="hei_30 font_e3">$entity.integral积分</span>
+											#else
+												<span class="hei_30 font_e3">￥$entity.paymentPrice</span>
+											#end
+										</td>
+										<td class="wid_90 border-1 font_cen">
+											#if($entity.state == '1' )  待付款
+												#elseif ($entity.state == '2' )
+													<!--  判断是纯服务还是其他商品-->
+													#foreach($entityItem in $!entity.items)
+															#foreach($json in $!jsonArray)
+																#if($!entity.orderId == $!json.orderId)
+																	#foreach($jsonItem in $!json.items)
+																		#if($!entityItem.skuId == $!jsonItem.skuId)
+																			#if($!jsonItem.addSource > 3)
+																				待服务
+																			#else
+																				待配送
+																			#end
+																		#end
+																	#end
+																#end
+															#end
+														#end
+												#elseif ($entity.state == '3' )
+													<!--  判断是纯服务还是其他商品-->
+													#foreach($entityItem in $!entity.items)
+															#foreach($json in $!jsonArray)
+																#if($!entity.orderId == $!json.orderId)
+																	#foreach($jsonItem in $!json.items)
+																		#if($!entityItem.skuId == $!jsonItem.skuId)
+																			#if($!jsonItem.addSource > 3)
+																				待验收
+																			#else
+																				待收货
+																			#end
+																		#end
+																	#end
+																#end
+															#end
+														#end
+												#elseif ($entity.state == '4' )待评价
+												#elseif ($entity.state == '5' )已完成
+												#elseif ($entity.state == '6' )已取消
+												#elseif ($entity.state == '7' )已关闭
+												#else &nbsp;
+											#end
+										</td>
+										<td class="wid_100 border-1 font_cen">
+										#if($!entity.locked == 1)
+											<a class="font_1c cursor" href="$request.getContextPath()/order/queryOrderInfoBuyer?orderId=$!entity.orderId&passKey=$!entity.passKey" target="_blank">订单详情</a><br/>
+										#else
+											<span>订单已被冻结</span><br/>
+										#end		
+										</td>
+									</tr>
+								</table>
+							</div>
+							#end
+							
+							<div class="clear"></div>
+						</div>
+					</div>
+					#pageVelocity($pager)
+				</div>
+				<!--myTab0_Content0 end -->
+				<div id="myTab0_Content1" class="none">
+					<!--每一个下面的内容复制开始================================ -->
+					<div id="right_bot" class="right_bot mar_t10">
+						<!-- 商品列表开头 -->
+						<ul class="list_top bg_08 font_14b wid_950 mar">
+							<li class="wid_130 font_cen hei_40">退款编号</li>
+							<li class="wid_150 font_cen hei_40">订单编号</li>
+							<li class="wid_160 font_cen hei_40">退款商品金额</li>
+							<li class="wid_110 font_cen hei_40">退款运费金额</li>
+							<li class="wid_160 font_cen hei_40">申请时间</li>
+							<li class="wid_120 font_cen hei_40">退款状态</li>
+							<li class="wid_110 font_cen hei_40">操作</li>
+						</ul>
+						<!--每一笔订单可以循环一下内容 开始-->
+						<table class="information mar_t10 font_cen mar" id="information">
+							<tr class="border-1">
+								<td class="wid_130">123456789</td>
+								<td class="wid_150">123456789</td>
+								<td class="wid_160">7855.00元</td>
+								<td class="wid_110">7855.00元</td>
+								<td class="wid_160">2014-05-23</td>
+								<td class="wid_120">退款协议等待卖家确认</td>
+								<td class="wid_110">
+									<a href="#">查看</a>
+								</td>
+							</tr>
+							<tr class="border-1">
+								<td class="wid_130">123456789</td>
+								<td class="wid_150">123456789</td>
+								<td class="wid_160">7855.00元</td>
+								<td class="wid_110">7855.00元</td>
+								<td class="wid_160">2014-05-23</td>
+								<td class="wid_120">退款协议等待卖家确认</td>
+								<td class="wid_110">
+									<a href="#">查看</a>
+								</td>
+							</tr>
+							<tr class="border-1">
+								<td class="wid_130">123456789</td>
+								<td class="wid_150">123456789</td>
+								<td class="wid_160">7855.00元</td>
+								<td class="wid_110">7855.00元</td>
+								<td class="wid_160">2014-05-23</td>
+								<td class="wid_120">退款协议等待卖家确认</td>
+								<td class="wid_110">
+									<a href="#">查看</a>
+								</td>
+							</tr>
+							<tr class="border-1">
+								<td class="wid_130">123456789</td>
+								<td class="wid_150">123456789</td>
+								<td class="wid_160">7855.00元</td>
+								<td class="wid_110">7855.00元</td>
+								<td class="wid_160">2014-05-23</td>
+								<td class="wid_120">退款协议等待卖家确认</td>
+								<td class="wid_110">
+									<a href="#">查看</a>
+								</td>
+							</tr>
+						</table>
+						<!--每一笔订单可以循环一下内容 结束-->
+					</div>
+					<!--right_bot end -->
+				</div>
+				<!--myTab0_Content1 end -->
+			</div>
+			<!--TabContent end-->
+		</div>
+		<!--nTab end -->
+	</div>
+	<!--id="right" end-->
+	<!-- 弹出层 迁移类目 -->
+	<div class="po_fai js_choice" style="display:none">
+		<div class="po_fai_bg"></div>
+		<div class="po_main0 pad_t10" id="boxContent">
+			
+		</div>
+	</div>
+	<!-- 迁移类目 end -->
+</div>

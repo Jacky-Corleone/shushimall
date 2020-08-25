@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.tradecenter.dao.TradeOrderItemsDiscountExportDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="tradeOrderItemsDTOMap" type="com.camelot.tradecenter.dto.TradeOrderItemsDiscountDTO" >
+		<id property="id" column="id" />
+		<result property="orderItemsId" column="order_items_id"/>
+		<result property="orderId" column="order_id" />
+		<result property="skuId" column="sku_id" />
+		<result property="markdownId" column="markdown_id" />
+		<result property="markdownType" column="markdown_type" />
+		<result property="markdownDiscount" column="markdown_discount" />
+		<result property="fullReductionId" column="full_reduction_id" />
+		<result property="fullReductionType" column="full_reduction_type" />
+		<result property="fullReductionDiscount" column="full_reduction_discount" />
+		<result property="couponId" column="coupon_id" />
+		<result property="couponType" column="coupon_type" />
+		<result property="couponDiscount" column="coupon_discount" />
+		<result property="integral" column="integral"/>
+		<result property="integralDiscount" column="integral_discount" />
+		<result property="integralType" column="integral_type" />
+	</resultMap>
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,order_items_id
+ 			,order_id
+ 			,sku_id
+ 			,markdown_id
+ 			,markdown_type
+ 			,markdown_discount
+ 			,full_reduction_id
+ 			,full_reduction_type
+ 			,full_reduction_discount
+ 			,coupon_id
+ 			,coupon_type
+ 			,coupon_discount
+ 			,integral
+ 			,integral_discount
+ 			,integral_type
+		FROM 
+		trade_order_items_discount  trade_order_items_discount_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.id != null  and entity.id !=''">
+				<![CDATA[ and trade_order_items_discount_.id  = #{entity.id} ]]>
+			</if>
+			<if test="entity.orderItemsId != null  and entity.orderItemsId !=''">
+				<![CDATA[ and trade_order_items_discount_.order_items_id  = #{entity.orderItemsId} ]]>
+			</if>
+			<if test="entity.orderId != null  and entity.orderId !=''">
+				<![CDATA[ and trade_order_items_discount_.order_id  = #{entity.orderId} ]]>
+			</if>
+			<if test="entity.skuId != null  and entity.skuId !=''">
+				<![CDATA[ and trade_order_items_discount_.sku_id  = #{entity.skuId} ]]>
+			</if>
+			<if test="entity.markdownId != null  and entity.markdownId !=''">
+				<![CDATA[ and trade_order_items_discount_.markdown_id  = #{entity.markdownId} ]]>
+			</if>
+			<if test="entity.markdownType != null  and entity.markdownType !=''">
+				<![CDATA[ and trade_order_items_discount_.markdown_type  = #{entity.markdownType} ]]>
+			</if>
+			<if test="entity.markdownDiscount != null  and entity.markdownDiscount !=''">
+				<![CDATA[ and trade_order_items_discount_.markdown_discount  = #{entity.markdownDiscount} ]]>
+			</if>
+			<if test="entity.fullReductionId != null  and entity.fullReductionId !=''">
+				<![CDATA[ and trade_order_items_discount_.full_reduction_id  = #{entity.fullReductionId} ]]>
+			</if>
+			<if test="entity.fullReductionType != null  and entity.fullReductionType !=''">
+				<![CDATA[ and trade_order_items_discount_.full_reduction_type  = #{entity.fullReductionType} ]]>
+			</if>
+			<if test="entity.fullReductionDiscount != null  and entity.fullReductionDiscount !=''">
+				<![CDATA[ and trade_order_items_discount_.full_reduction_discount  = #{entity.fullReductionDiscount} ]]>
+			</if>
+			<if test="entity.couponId != null  and entity.couponId !=''">
+				<![CDATA[ and trade_order_items_discount_.coupon_id  = #{entity.couponId} ]]>
+			</if>
+			<if test="entity.couponType != null  and entity.couponType !=''">
+				<![CDATA[ and trade_order_items_discount_.coupon_type  = #{entity.couponType} ]]>
+			</if>
+			<if test="entity.couponDiscount != null  and entity.couponDiscount !=''">
+				<![CDATA[ and trade_order_items_discount_.coupon_discount  = #{entity.couponDiscount} ]]>
+			</if>
+			<if test="entity.integral != null  and entity.integral !=''">
+				and trade_order_items_discount_.integral = #{entity.integral}
+			</if>
+			<if test="entity.integralDiscount != null  and entity.integralDiscount !=''">
+				and trade_order_items_discount_.integral_discount = #{entity.integralDiscount}
+			</if>
+			<if test="entity.integralType != null and entity.integralType !=''">
+				and trade_order_items_discount_.integral_type = #{entity.integralType}
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="tradeOrderItemsDTOMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where trade_order_items_discount_.id = #{id}
+		]]>
+	</select>
+	
+	<select id="queryByOrderItemsId" resultMap="tradeOrderItemsDTOMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where trade_order_items_discount_.order_items_id = #{orderItemsId}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="tradeOrderItemsDTOMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		trade_order_items_discount trade_order_items_discount_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="com.camelot.tradecenter.dto.TradeOrderItemsDiscountDTO">
+		<![CDATA[
+		insert into trade_order_items_discount (
+		    order_items_id
+ 			,order_id
+ 			,sku_id
+ 			,markdown_id
+ 			,markdown_type
+ 			,markdown_discount
+ 			,full_reduction_id
+ 			,full_reduction_type
+ 			,full_reduction_discount
+ 			,coupon_id
+ 			,coupon_type
+ 			,coupon_discount
+ 			,integral
+ 			,integral_discount
+ 			,integral_type
+		   )values(
+	    		#{orderItemsId}
+		    	,#{orderId}
+		    	,#{skuId}
+		    	,#{markdownId}
+		    	,#{markdownType}
+		    	,#{markdownDiscount}
+		    	,#{fullReductionId}
+		    	,#{fullReductionType}
+		    	,#{fullReductionDiscount}
+		    	,#{couponId}
+		    	,#{couponType}
+		    	,#{couponDiscount}
+		    	,#{integral}
+		    	,#{integralDiscount}
+		    	,#{integralType}
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.tradecenter.dto.TradeOrderItemsDiscountDTO">
+		update trade_order_items_discount set
+			id  = #{id}
+			<if test="orderItemsId != null  and orderItemsId !=''">
+				,order_items_id  = #{orderItemsId} 
+			</if>
+			<if test="orderId != null  and orderId !=''">
+				,order_id  = #{orderId}
+			</if>
+			<if test="skuId != null  and skuId !=''">
+				,sku_id  = #{skuId}
+			</if>
+			<if test="markdownId != null  and markdownId !=''">
+				,markdown_id  = #{markdownId} 
+			</if>
+			<if test="markdownType != null  and markdownType !=''">
+				,markdown_type  = #{markdownType}
+			</if>
+			<if test="markdownDiscount != null  and markdownDiscount !=''">
+				,markdown_discount  = #{markdownDiscount}
+			</if>
+			<if test="fullReductionId != null  and fullReductionId !=''">
+				,full_reduction_id  = #{fullReductionId}
+			</if>
+			<if test="fullReductionType != null  and fullReductionType !=''">
+				,full_reduction_type  = #{fullReductionType}
+			</if>
+			<if test="fullReductionDiscount != null  and fullReductionDiscount !=''">
+				,full_reduction_discount  = #{fullReductionDiscount} 
+			</if>
+			<if test="couponId != null  and couponId !=''">
+				,coupon_id  = #{couponId}
+			</if>
+			<if test="couponType != null  and couponType !=''">
+				,coupon_type  = #{couponType}
+			</if>
+			<if test="couponDiscount != null  and couponDiscount !=''">
+				,coupon_discount  = #{couponDiscount} 
+			</if>
+			<if test="integral != null  and integral !=''">
+				,integral = #{integral}
+			</if>
+			<if test="integralDiscount != null  and integralDiscount !=''">
+				,integral_discount = #{integralDiscount}
+			</if>
+			<if test="integralType != null and integralType !=''">
+				,integral_type = #{integralType}
+			</if>
+		 where id = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from trade_order_items_discount where id = #{id}
+		]]>
+	</delete>
+</mapper>

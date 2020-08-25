@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.basecenter.dao.PlatformServiceRuleDAO">
+	<resultMap id="platformServiceRuleDTOMapper" type="com.camelot.basecenter.dto.PlatformServiceRuleDTO">
+			<result property="ruleId" column="rule_id" />
+			<result property="platformId" column="platform_id" />
+			<result property="ruleName" column="rule_name" />
+			<result property="iconImageSrc" column="icon_image_src" />
+			<result property="simpleIntro" column="simple_intro" />
+			<result property="details" column="details" />
+			<result property="createTime" column="create_time" />
+			<result property="updateTime" column="update_time" />
+			<result property="createUserId" column="create_user_id" />
+			<result property="helpDocId" column="help_doc_id" />
+			<result property="status" column="status"></result>
+	</resultMap>
+	
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	
+	<sql id="where_fragement">
+	  where 1=1
+	  <if test="entity!=null">
+	     <if test="entity.ruleId != null  and entity.ruleId !=''" >
+	         and rule_id=#{entity.ruleId}
+	     </if>
+	     <if test="entity.platformId != null  and entity.platformId !=''" >
+	         and platform_id=#{entity.platformId}
+	     </if>
+	     <if test="entity.ruleName != null  and entity.ruleName !=''" >
+	         and rule_name=#{entity.ruleName}
+	     </if>
+	     <if test="entity.iconImageSrc != null  and entity.iconImageSrc !=''" >
+	         and icon_image_src=#{entity.iconImageSrc}
+	     </if>
+	      <if test="entity.simpleIntro != null  and entity.simpleIntro !=''" >
+	         and simple_intro=#{entity.simpleIntro}
+	     </if>
+	      <if test="entity.details != null  and entity.details !=''" >
+	         and details=#{entity.details}
+	     </if>
+	      <if test="entity.createTime != null  and entity.createTime !=''" >
+	         and create_time=#{entity.createTime}
+	     </if>
+	      <if test="entity.updateTime != null  and entity.updateTime !=''" >
+	         and update_time=#{entity.updateTime}
+	     </if>
+	      <if test="entity.createUserId != null  and entity.createUserId !=''" >
+	         and create_user_id=#{entity.createUserId}
+	     </if>
+	      <if test="entity.helpDocId != null  and entity.helpDocId !=''" >
+	         and help_doc_id=#{entity.helpDocId}
+	     </if>
+	     <if test="entity.status !=null and entity.status != ''">
+	     	and status=#{entity.status}
+	     </if>
+	     <if test="entity.status ==null or entity.status == ''">
+	     	and status!=0
+	     </if>
+	  </if>
+	</sql>
+	<select id="queryPage" >
+		select * from platform_service_rule
+	</select>
+	
+	<select id="queryById" resultMap="platformServiceRuleDTOMapper" >
+		select * from platform_service_rule
+		where rule_id = #{ruleId}
+	</select>
+	
+	<select id="queryByIds" resultMap="platformServiceRuleDTOMapper" >
+	   select * from platform_service_rule
+		where rule_id in
+		<foreach collection="ruleIds" item="item" index="index" open="(" separator="," close=")">
+		  #{item}
+		</foreach>
+	</select>
+	
+	<insert id="add" keyProperty="rule_id" useGeneratedKeys="true" parameterType="com.camelot.basecenter.dto.PlatformServiceRuleDTO">
+		insert into platform_service_rule(
+				platform_id,
+				rule_name,
+				icon_image_src,
+				simple_intro,
+				details,
+				create_time,
+				create_user_id,
+				help_doc_id
+		)values(
+				#{platformId},
+				#{ruleName},
+				#{iconImageSrc},
+				#{simpleIntro},
+				#{details},
+				now(),
+				#{createUserId},
+				#{helpDocId}
+		)
+	</insert>
+	
+	<update id="updateBySelect">
+		update platform_service_rule set
+				rule_id = #{ruleId},
+				platform_id = #{platformId},
+				rule_name = #{ruleName},
+				icon_image_src = #{iconImageSrc},
+				simple_intro = #{simpleIntro},
+				details = #{details},
+				create_time = #{createTime},
+				update_time = now(),
+				create_user_id = #{createUserId},
+				help_doc_id = #{helpDocId}
+		where rule_id = #{ruleId}
+	</update>
+	<update id="deleteRuleByid">
+		update platform_service_rule set
+				rule_id = #{ruleId},
+				status = #{status}
+		where rule_id = #{ruleId}
+	</update>
+	
+	<select id="queryList" resultMap="platformServiceRuleDTOMapper" >
+		select * from platform_service_rule platform_service_rule_
+		<include refid="where_fragement" />
+		<include refid="pagination_tail" />
+	</select>
+	<select id="queryCount" resultType="java.lang.Long">
+	   select count(*) from platform_service_rule 
+		<include refid="where_fragement" />
+	</select>
+	
+</mapper>

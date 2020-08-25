@@ -1,0 +1,382 @@
+#set($staticPath="$request.contextPath/assets")
+<link href="$staticPath/css/Details.css" rel="stylesheet" type="text/css" />
+<link href="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/jquery-validation/1.11.1/messages_zh.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/common/newtimer.js"></script>
+<script type="text/javascript" src="$staticPath/js/centralPurchasing/signUp.js"></script>
+<style type="text/css">
+	.Search_list .Product_box{
+		width:280px;
+		height:415px;
+	}
+	.Search_list .Product_box .big_img {
+		width:278px;
+	}
+	.Search_list .Product_box .n_font {
+		width:273px;
+		height:35px;
+	}
+    .Search_list .Product_box .pingfen {
+    	width:273px;
+    	height:22px;
+    	text-align:left;
+    	padding-left:5px;
+    	line-height:22px;
+    	overflow:hidden;
+    	margin:auto;
+    	font-size:14px;
+    	background:#fff;
+    }
+    .Search_list .Product_box .status {
+    	height:35px;
+    	line-height:35px;
+    }
+	.Search_list .Product_box .pingfen .j_timeLeft{
+		font-family: tahoma,'Hiragino Sans GB','\5b8b\4f53',sans-serif;
+		color: #000;
+		padding-left: 10px;
+		font-weight: 700;
+	}
+	.Search_list .Product_box .Product_box_1 {
+    	border:1px solid #eee;
+    }
+	.footer-section {
+		overflow:hidden;
+    	margin:auto;
+    	font-size:14px;
+    	background:#fff;
+        border-top: 1px solid #eee;
+        width: 273px;
+        height: 36px;
+        line-height: 36px;
+    }
+	.footer-section .num-apply, .footer-section .num-auction {
+        color: #999;
+        float: left;
+        padding-left: 5px;
+        width: 126px;
+    }
+    .footer-section .num-auction {
+        border-right: 1px solid #eee;
+    }
+    .footer-section .num-auction em, .footer-section .num-apply em {
+        color: #666;
+        padding-right: 4px;
+        font-weight: 700;
+		font-style: normal;
+    }
+	.Search_list .Product_box .pingfen .currency {
+        font-family: arial,tahoma,'Hiragino Sans GB','\5b8b\4f53',sans-serif;
+        font-weight: 400;
+        font-size: 16px;
+        padding-right: 4px;
+		font-style: normal;
+		color:#D91615;
+    }
+	.Search_list .Product_box .pingfen .price {
+        font-family: tahoma,'Hiragino Sans GB','\5b8b\4f53',sans-serif;
+        font-size: 15px;
+		font-weight: 200;
+		color:#D91615;
+    }
+</style>
+<script type="text/javascript">
+	var CENTRALPURCHASE = {
+    	init:function(){
+    		//初始化类目信息
+			this.category.initCategory();
+			//活动状态
+			$(".search_condition_box .detailedStatus ul li").bind("click",function(){
+				var detailedStatus = $(this).attr("type");
+				$("input[name='page']").val(1);
+			    $("input[name='detailedStatus']").val(detailedStatus);
+			    CENTRALPURCHASE.submitQuery();
+			});
+    	},
+		//提交查询
+		submitQuery:function(){
+			$("#queryForm").submit();
+		},
+		category: {
+			//存放一级类目的元素id
+			ELE_LEV_ONE_ID:"levOneCid",
+			//存放二级类目的元素id
+			ELE_LEV_TWO_ID:"levTwoCid",
+			//存放三级类目的元素id
+			ELE_LEV_THREE_ID:"levThreeCid",
+			//初始化类目信息
+			initCategory:function(){
+				//加载一级类目
+				var catlev1 = "$!levOneCid";
+				this.loadCategory(0, this.ELE_LEV_ONE_ID, catlev1);
+
+				var catlev2 = "$!levTwoCid";
+				if(catlev1 != ""){//加载二级类目
+					this.loadCategory(catlev1, this.ELE_LEV_TWO_ID, catlev2);
+				}
+
+				var catlev3 = "$!levThreeCid";
+				if(catlev2 != ""){//加载三级类目
+					this.loadCategory(catlev2, this.ELE_LEV_THREE_ID, catlev3);
+				}
+
+				//选中一级类目时加载二级类目
+				$("#"+this.ELE_LEV_ONE_ID).delegate("li", "click",function(){
+                    //清空二三级类目
+                    $("input[name='"+CENTRALPURCHASE.category.ELE_LEV_TWO_ID+"']").val("");
+                    $("input[name='"+CENTRALPURCHASE.category.ELE_LEV_THREE_ID+"']").val("");
+                    var catId = $(this).attr("code");
+					//选中不限时:不限类目查询
+					if(catId==""){
+						CENTRALPURCHASE.category.noneCategory(CENTRALPURCHASE.category.ELE_LEV_ONE_ID);
+					}else{
+					//选中其他一级类目时
+						CENTRALPURCHASE.category.loadCategory(catId, CENTRALPURCHASE.category.ELE_LEV_TWO_ID, "");//加载二级类目
+						CENTRALPURCHASE.category.highLight(CENTRALPURCHASE.category.ELE_LEV_ONE_ID, this);//高亮显示已选中的一级类目
+						CENTRALPURCHASE.category.queryByCatId(this.ELE_LEV_ONE_ID, catId);//查询列表
+					}
+				});
+
+				//选中二级类目时加载三级类目
+				$("#"+this.ELE_LEV_TWO_ID).delegate("li", "click", function(){
+                    //清空三级类目
+                    $("input[name='"+CENTRALPURCHASE.category.ELE_LEV_THREE_ID+"']").val("");
+                    //选中不限时
+                    var catId = $(this).attr("code");
+                    if(catId==""){
+                        CENTRALPURCHASE.category.noneCategory(CENTRALPURCHASE.category.ELE_LEV_TWO_ID);
+                    }else{
+                        CENTRALPURCHASE.category.loadCategory(catId, CENTRALPURCHASE.category.ELE_LEV_THREE_ID, "");
+                        CENTRALPURCHASE.category.highLight(CENTRALPURCHASE.category.ELE_LEV_TWO_ID, this);
+                        CENTRALPURCHASE.category.queryByCatId(this.ELE_LEV_TWO_ID, catId);
+                    }
+				});
+
+				//选中三级类目时重新加载商品列表数据并根据三级类目过滤查询
+				$("#"+this.ELE_LEV_THREE_ID).delegate("li", "click", function(){
+					var catId = $(this).attr("code");
+					//选中不限时
+					if(catId==""){
+						CENTRALPURCHASE.category.noneCategory(CENTRALPURCHASE.category.ELE_LEV_THREE_ID);
+					}else{
+						CENTRALPURCHASE.category.highLight(CENTRALPURCHASE.category.ELE_LEV_THREE_ID, this);
+						CENTRALPURCHASE.category.queryByCatId(CENTRALPURCHASE.category.ELE_LEV_THREE_ID, catId);
+					}
+				});
+			},
+			highLight: function(lev, ele){
+				if(!lev)return;
+				//将当前选中类目的id存到隐藏域中
+				$("input[name='"+lev+"']").val($(ele).attr("code"));
+				//移除指定级次类目下的所有元素的高亮效果
+				$("#"+lev).find("li").removeClass("focusbg");
+				//为当前选中的元素添加高亮效果
+				$(ele).addClass("focusbg");
+			},
+			//根据类目id查询
+			queryByCatId: function(lev, catId){
+				$("input[name='page']").val(1);
+			    $("input[name='"+lev+"']").val(catId);
+			    CENTRALPURCHASE.submitQuery();
+			},
+			//不限类目
+			noneCategory: function(lev){
+				switch(lev){
+					case this.ELE_LEV_ONE_ID:
+						$("input[name='levOneCid']").val("");
+						$("input[name='levTwoCid']").val("");
+						break;
+					case this.ELE_LEV_TWO_ID:
+						$("input[name='levTwoCid']").val("");
+						break;
+					case this.ELE_LEV_ONE_ID:
+						break;
+				};
+				$("input[name='levThreeCid']").val("");
+				this.queryByCatId(CENTRALPURCHASE.category.ELE_LEV_THREE_ID, "");
+			},
+			/**
+			 * 加载类目
+			 * @param parentId 父级类目id
+			 * @param eleId 需要加载类目的元素id
+			 * @param selectedEleCode 默认高亮显示的类目
+			 */
+			loadCategory: function(parentId, eleId, selectedEleCode){
+				$.get("$request.getContextPath()/usedMarket/getCategoryByParentId",{parentCode:parentId},function(data){
+					$("#"+eleId).html("<li code=''>全部</li>");
+					var flag = true;
+					$.each(data, function (n, cat) {
+						var code = cat["categoryCid"];
+						var name = cat["categoryCName"];
+						var liEle = $("<li code='"+code+"'>"+name+"</li>");
+						if(code && selectedEleCode && code==selectedEleCode){//默认高亮显示的类目
+							liEle.addClass("focusbg");
+							flag = false;
+						}
+						$("#"+eleId).append(liEle);
+					});
+					//如果没有选择过类目默认给第一个选项加上高亮
+					if(flag){
+						$("#"+eleId).find("li:eq(0)").addClass("focusbg");
+					}
+				},"json");
+			}
+		}
+	}
+	$(document).ready(function(){
+		CENTRALPURCHASE.init();
+	});
+	
+	//到指定的分页页面
+	function topage(page){
+		$("input[name='page']").val(page);
+		$("#queryForm").submit();
+	}
+	
+	/**
+	 * 倒计时回调
+     *
+     * @param {o} 倒计时对象
+     * @param {status} 要修改的最新状态
+     * @param {activitesDetailsId} 活动详情ID
+     * @returns void
+     *
+     * @date 2015-12-12
+     * @author 宋文斌
+     */
+	function setCentralPurchasingState(o,activitesDetailsId){
+		$.ajax({
+            type: 'post',
+            url: $("#contextPath").val() + "/centralPurchasing/queryByActivitesDetailsId",
+			data: {activitesDetailsId:activitesDetailsId},
+            dataType: 'html',
+            success: function(data){
+            	var pNode = $(o.element).parents(".Product_box");
+            	$(pNode).html(data);
+            	var timeSpan = pNode.find(".countDown");
+            	
+           		if($(timeSpan)[0].getAttribute('countDown')=="true"){
+           			// 服务器时间
+           			serverTime = new Date($(timeSpan)[0].getAttribute('serverTime'));
+           			var startTime = $(timeSpan)[0].getAttribute('startTime');
+           			var noStartTip = $(timeSpan)[0].getAttribute('noStartTip');
+           			var endTime = $(timeSpan)[0].getAttribute('endTime');
+           			var endTip = $(timeSpan)[0].getAttribute('endTip');
+           			var callBackFunction = $(timeSpan)[0].getAttribute('callBack');
+           			(new Timer($(timeSpan)[0],startTime,noStartTip,endTime,endTip,callBackFunction)).countDown();
+           		}
+            		
+            },
+    		error:function(data){
+    			alert("请求超时!");
+			}
+        });
+	}
+</script>
+<!-- 中间内容 -->
+<div id="content">
+	<input type="hidden" value="$request.contextPath" id="contextPath"/>
+	<input type="hidden" value="" id="signUpTargetUrl"/>
+	<!--下面内容开始-->
+	<div class="wid_10">
+		<!-- 右侧开始-->
+		<div id="right" style="width:100%;">
+    	<!--搜索面包屑开始开始-->
+     	<!--筛选条件开始-->
+    	<div class="border-4 search_condition">
+    		<!--每一行开始-->
+    		<div class="search_condition_box" style="border: none;">
+    			<div class="left_class bl">一级类目</div>
+    			<div class="right_list">
+    				<div class="right_list cat1">
+                   	<ul id="levOneCid"></ul>
+               		</div>
+    			</div>
+    		</div>
+    		<!--每一行结束-->
+    		<!--每一行开始-->
+            <div class="search_condition_box">
+                <div class="left_class bl">二级类目</div>
+                <div class="right_list cat2">
+                    <ul id="levTwoCid"></ul>
+                </div>
+            </div>
+            <!--每一行结束-->
+            <!--每一行开始-->
+            <div class="search_condition_box">
+                <div class="left_class bl">三级类目</div>
+                <div class="right_list cat3">
+                    <ul id="levThreeCid"></ul>
+                </div>
+            </div>
+            <!--每一行结束-->
+            <!--每一行开始-->
+            <div class="search_condition_box">
+                <div class="left_class bl">活动状态</div>
+                <div class="right_list detailedStatus">
+                    <ul>
+                        <li #if(!$queryCentralPurchasingDTO.detailedStatus) class="focusbg" #end type="0">全部</li>
+                        <li #if($!queryCentralPurchasingDTO.detailedStatus==100) class="focusbg" #end type="100">未开始</li>
+                        <li #if($!queryCentralPurchasingDTO.detailedStatus==200) class="focusbg" #end type="200">进行中</li>
+                        <li #if($!queryCentralPurchasingDTO.detailedStatus==300) class="focusbg" #end type="300">已结束</li>
+                    </ul>
+                </div>
+            </div>
+            <!--每一行结束-->
+        </div>
+    	<!--筛选条件结束-->
+		<form id="queryForm" action="$request.getContextPath()/centralPurchasing" method="post">
+    		<input type="hidden" name="page" value="$!pager.page" />
+    		<input type="hidden" name="levOneCid" value="$!levOneCid" />
+            <input type="hidden" name="levTwoCid" value="$!levTwoCid" />
+            <input type="hidden" name="levThreeCid" value="$!levThreeCid" />
+			<input type="hidden" name="detailedStatus" value="$!queryCentralPurchasingDTO.detailedStatus" />
+			#if(!$centralPurchasingActivitys || $centralPurchasingActivitys.size() == 0)
+            	<div class="wid">
+            		<div class="mar_b20" style="width: 680px; margin: 0 auto;">
+            			<img src="$staticPath/images/jd.jpg">
+            			<p class="font_cen hei_60 font_16">十分抱歉，没有找到您想要的集采商品</p>
+            		</div>
+            	</div>
+			#else
+			<!--排序开始-->
+            <div class="Search_Sort border-4">
+                <div class="fr">
+        			<ul>
+        				<li>共<strong>$!pager.totalCount</strong>个商品</li>
+        				<a href="#"><li >$!pager.page/$!pager.totalPage</li></a>
+        				<li class="bl" onclick="javascript:topage($pager.previewPage)">上一页</li>
+        				<li class="bl" style="border-right:none;" onclick="javascript:topage($pager.nextPage)">下一页</li>
+        			</ul>
+        		</div>
+             </div>
+			 <!--排序结束 Search_Sort-->
+             <!--右边产品列表开始-->
+			 <div class="Search_list">
+        		#foreach($entity in $!centralPurchasingActivitys)
+					<!--每个产品的div开始-->
+					<div class="Product_box">
+						#parse("/centralPurchasing/product_box.vm")
+					</div>
+					<!--每个产品的div结束-->
+				#end
+			 </div>
+        	<!--右边产品列表结束-->
+			#end
+    		</form>
+	</div>
+	<!-- 右侧right结束-->
+    </div>
+	#if($centralPurchasingActivitys && $centralPurchasingActivitys.size() > 0)
+        <!--分页-->
+        #pageVelocity($pager)
+        <!--分页end-->
+	#end
+</div>
+ <!--内容结束-->
+<!-- 报名信息 开始-->
+#parse("/centralPurchasing/sign_up.vm")
+<!-- 报名信息 end -->
+#set($layout = "/layout.vm")

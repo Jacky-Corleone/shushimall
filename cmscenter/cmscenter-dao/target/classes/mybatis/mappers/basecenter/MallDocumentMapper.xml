@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.basecenter.dao.MallDocumentDAO">
+	<resultMap id="mallDocumentMapper" type="com.camelot.basecenter.domain.MallDocument">
+			<result property="id" column="id" />
+			<result property="classifyId" column="classify_id" />
+			<result property="title" column="title" />
+			<result property="status" column="STATUS" />
+			<result property="contentUrl" column="content_url" />
+			<result property="created" column="created" />
+			<result property="modified" column="modified" />
+			<result property="isDeleted" column="is_deleted" />
+			<result property="sortNum" column="sort_num" />
+			<result property="startTime" column="start_time" />
+			<result property="endTime" column="end_time" />
+			<result property="platformId" column="platform_id" />
+	</resultMap>
+	<resultMap id="mallDocumentDTOMapper" type="com.camelot.basecenter.dto.MallDocumentDTO">
+			<result property="mallId" column="id" />
+			<result property="mallClassifyId" column="classify_id" />
+			<result property="mallClassifyTitle" column="classify_title" />
+			<result property="mallType" column="type" />
+			<result property="mallTitle" column="title" />
+			<result property="mallStatus" column="STATUS" />
+			<result property="mallContentUrl" column="content_url" />
+			<result property="mallCreated" column="created" />
+			<result property="mallBeginCreated" column="begin_created" />
+			<result property="mallEndCreated" column="end_created" />
+			<result property="mallModified" column="modified" />
+			<result property="mallIsDeleted" column="is_deleted" />
+			<result property="mallSortNum" column="sort_num" />
+			<result property="mallStartTime" column="start_time" />
+			<result property="mallBeginStartTime" column="begin_start_time" />
+			<result property="mallEndStartTime" column="end_start_time" />
+			<result property="mallEndTime" column="end_time" />
+			<result property="mallPlatformId" column="platform_id" />
+	</resultMap>
+	<resultMap id="mallTypeDTOMapper" type="com.camelot.basecenter.dto.MallTypeDTO">
+		<result property="mallClassifyId" column="id" />
+		<result property="mallClassifyTitle" column="title" />
+		<result property="mallType" column="type" />
+	</resultMap>
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                        -->
+    <!-- =========================================================== -->
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+			id,
+			classify_id,
+			title,
+			STATUS,
+			content_url,
+			created,
+			modified,
+			is_deleted,
+			sort_num,
+			start_time,
+			end_time,
+			platform_id
+		from 
+			mall_help_document mall_help_document_
+		]]>
+	</sql>
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity != null">
+			<if test="entity.id != null and entity.id != ''">
+			and id = #{entity.id}
+			</if>
+			<if test="entity.classifyId != null and entity.classifyId != ''">
+			and classify_id = #{entity.classifyId}
+			</if>
+			<if test="entity.created != null and entity.created != ''">
+			and created = #{entity.created}
+			</if>
+			<if test="entity.title != null and entity.title != ''">
+			and title = #{entity.title}
+			</if>
+			<if test="entity.startTime != null and entity.startTime != ''">
+			and start_time = #{entity.startTime}
+			</if>
+		</if>
+	</sql>
+	<sql id="where_fragement_dto">
+		where 1=1
+		<if test="entity != null">
+			<if test="entity.mallId != null and entity.mallId != ''">
+			and id = #{entity.mallId}
+			</if>
+			<if test="entity.mallClassifyId != null and entity.mallClassifyId != ''">
+			and classify_id = #{entity.mallClassifyId}
+			</if>
+			<if test="entity.mallCreated != null and entity.mallCreated != ''">
+			and created = #{entity.mallCreated}
+			</if>
+			<if test="entity.mallTitle != null and entity.mallTitle != ''">
+			and title like '%${entity.mallTitle}%'
+			</if>
+			<if test="entity.mallStartTime != null and entity.mallStartTime != ''">
+			and start_time = #{entity.mallStartTime}
+			</if>
+		</if>
+	</sql>
+	<!-- 	关联文档分类表查询条件 -->
+	<sql id="where_fragementmall_dto">
+		<if test="entity != null">
+			<if test="entity.mallTitle != null and entity.mallTitle != ''">
+			and mhd.title like '%${entity.mallTitle}%'
+			</if>
+			<if test="entity.mallType != null and entity.mallType != ''">
+			and mhc.type = #{entity.mallType}
+			</if>
+			<if test="entity.mallBeginCreated != null and entity.mallBeginCreated != ''">
+			and date_format(mhd.created,'%Y-%m-%d') >= date_format(#{entity.mallBeginCreated},'%Y-%m-%d')
+			</if>
+			<if test="entity.mallEndCreated != null and entity.mallEndCreated != ''">
+			<![CDATA[
+			and date_format(mhd.created,'%Y-%m-%d') <= date_format(#{entity.mallEndCreated},'%Y-%m-%d')
+			]]>
+			</if>
+			<if test="entity.mallBeginStartTime != null and entity.mallBeginStartTime != ''">
+			and date_format(mhd.start_time,'%Y-%m-%d') >= date_format(#{entity.mallBeginStartTime},'%Y-%m-%d')
+			</if>
+			<if test="entity.mallEndStartTime != null and entity.mallEndStartTime != ''">
+			<![CDATA[
+			and date_format(mhd.start_time,'%Y-%m-%d') <= date_format(#{entity.mallEndStartTime},'%Y-%m-%d')
+			]]>
+			</if>
+			<if test="entity.mallStatus != null and entity.mallStatus != ''">
+			and mhd.status = #{entity.mallStatus}
+			</if>
+			<if test="entity.mallClassifyId != null and entity.mallClassifyId != ''">
+			 and mhc.id = #{entity.mallClassifyId}
+			</if>
+			<if test="entity.mallClassfyTitle != null and entity.mallClassfyTitle != ''">
+			 and mhc.title like '%${entity.mallClassfyTitle}%'
+			</if>
+		</if>
+	</sql>
+	<!-- mysql 分页尾 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- =========================================================== -->
+    <!-- Dao方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+    <!-- 插入记录 -->
+	<insert id="add" keyColumn="id" useGeneratedKeys="true">
+		insert into mall_help_document(
+				classify_id,
+				title,
+				STATUS,
+				content_url,
+				created,
+				modified,
+				is_deleted,
+				sort_num,
+				start_time,
+				end_time,
+				platform_id
+		)values(
+				#{classifyId},
+				#{title},
+				#{status},
+				#{contentUrl},
+				now(),
+				now(),
+				#{isDeleted},
+				#{sortNum},
+				#{startTime},
+				#{endTime},
+				#{platformId}
+		)
+		
+	</insert>
+	
+	<update id="update">
+		update mall_help_document 
+		
+		<set>
+			<trim suffix="" suffixOverrides=",">
+				<if test="classifyId != null">
+					classify_id = #{classifyId},
+				</if>
+				<if test="title != null">
+					title = #{title},
+				</if>
+				<if test="status != null">
+					STATUS = #{status},
+				</if>
+				<if test="contentUrl != null">
+					content_url = #{contentUrl},
+				</if>
+				<if test="sortNum != null">
+					sort_num = #{sortNum},
+				</if>
+				modified = now(),
+				<if test="startTime != null">
+					start_time = #{startTime},
+				</if>
+			</trim>
+		</set>
+		where id = #{id}
+	</update>
+	<select id="queryById" resultMap="mallDocumentMapper" >
+		select * from mall_help_document
+		where id = #{id}
+	</select>
+	
+	<!-- 删除记录 -->
+	<delete id="delete" parameterType="Object">
+		<![CDATA[
+		delete from mall_help_document where id = #{id}
+		]]>
+	</delete>
+	
+	<!-- 查询总数 -->
+	<select id="queryCount" resultType="java.lang.Long">
+		select count(1) from mall_help_document
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="mallDocumentMapper">
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<!-- order by 手工添加 -->
+		<include refid="pagination_tail" />
+	</select>
+	
+	<!-- 分页查询返回dto-->
+	<select id="queryMallDocumentList" resultMap="mallDocumentDTOMapper">
+		select
+		  mhd.*,
+		  mhc.title as classify_title,
+		  mhc.type  as type
+		from mall_help_document mhd,
+		  mall_help_classify mhc
+		where mhd.classify_id = mhc.id and mhc.STATUS=2
+		<include refid="where_fragementmall_dto" />
+		order by mhd.classify_id asc<!-- 用于页尾文档查询  -->
+		<include refid="pagination_tail" />
+	</select>
+	
+	<!-- 根据Id查询返回dto-->
+	<select id="getMallDocumentById" resultMap="mallDocumentDTOMapper">
+		select 
+		  mhd.*,
+		  mhc.title as classify_title,
+		  mhc.type  as type
+		from mall_help_document mhd,
+		  mall_help_classify mhc
+		where mhd.classify_id = mhc.id
+	    and mhd.id = #{mallId}
+	</select>
+	
+	<!-- 查询总数参数为dto类型 -->
+	<select id="queryMallDocumentCount" resultType="java.lang.Long">
+		select
+		  count(*)
+		from mall_help_document mhd,
+		  mall_help_classify mhc
+		where mhd.classify_id = mhc.id and mhc.STATUS=2
+		<include refid="where_fragementmall_dto" />
+	</select>
+	
+	<!-- 根据类型查询分类 -->
+	<select id="queryMallDocumentListByType" resultMap="mallTypeDTOMapper" parameterType="java.lang.Integer">
+		select id,title,type from mall_help_classify where type = #{type}
+	</select>
+</mapper>

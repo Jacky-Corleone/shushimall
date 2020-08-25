@@ -1,0 +1,1113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.usercenter.dao.UserMybatisDAO">
+
+    <!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+    <resultMap id="userDTOMap" type="userDTO">
+        <result property="uid" column="id"/>
+        <result property="uname" column="username"/>
+        <result property="umobile" column="mobile"/>
+        <result property="usertype" column="type"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="userEmail" column="email"/>
+        <result property="nickname" column="nickname"/>
+        <result property="userstatus" column="status"/>
+        <result property="shopId" column="shop_id"/>
+        <result property="securityLevel" column="security_level"/>
+        <result property="auditor" column="auditor"/>
+        <result property="auditRemark" column="audit_remark"/>
+        <result property="quickType" column="quick_type"/>
+        <result property="created" column="created_time"/>
+        <result property="updated" column="updated_time"/>
+        <result property="paymentStatus" column="payment_status"/>
+        <result property="linkMan" column="link_man"/>
+        <result property="department" column="department"/>
+        <result property="linkPhoneNum" column="link_phone_num"/>
+        <result property="platformId" column="platform_id"/>
+
+
+        <result property="companyName" column="company_name"/>
+        <result property="companyAddr" column="company_address"/>
+        <result property="auditStatus" column="result"/>
+        <result property="auditTime" column="time"/>
+        <result property="password" column="password"/>
+        <result property="deleted" column="deleted"/>
+        <result property="growthValue" column="growth_value"/>
+        <result property="vipLevel" column="vip_level"/>
+
+
+
+    </resultMap>
+
+    <!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                        -->
+    <!-- =========================================================== -->
+    <sql id="selectAllColumns">
+		<![CDATA[
+
+
+		select
+ 			user_.id
+ 			,user_.username
+ 			,user_.password
+ 			,user_.mobile
+ 			,user_.type
+ 			,user_.deleted
+ 			,user_.parent_id
+ 			,user_.email
+ 			,user_.nickname
+ 			,user_.created_time
+ 			,user_.updated_time
+ 			,user_.status
+ 			,user_.shop_id
+ 			,user_.security_level
+ 			,user_.link_man
+ 			,user_.department
+ 			,user_.link_phone_num
+ 			,user_.auditor
+ 			,user_.audit_remark
+ 			,user_.quick_type
+ 			,user_.created_time
+ 			,user_.updated_time
+ 			,user_.payment_status
+ 			,user_.platform_id
+ 			,user_extends_.company_name
+ 			,user_extends_.company_address
+ 			,user_audit_.result
+ 			,user_audit_.time
+ 			,user_.growth_value
+ 			,case
+				when growth_value < 50000	then '1'
+				when growth_value < 150000	then '2'
+				when growth_value < 300000	then '3'
+				when growth_value < 500000	then '4'
+				else '5' end as vip_level
+		FROM 
+		user user_ left join user_extends user_extends_ on user_.id=user_extends_.user_id
+					left join  user_audit user_audit_ on  user_.id=user_audit_.context_id 
+
+
+        ]]>
+	</sql>
+
+
+    <sql id="where_fragement">
+        where 1=1
+        <if test="entity!=null">
+            <if test="entity.uid != null">
+                <![CDATA[ and user_.id LIKE CONCAT('%',#{entity.uid},'%') ]]>
+            </if>
+            <if test="entity.uname != null  and entity.uname !=''">
+                <![CDATA[ and user_.username  LIKE CONCAT('%',#{entity.uname},'%') ]]>
+            </if>
+            <if test="entity.umobile != null">
+                <![CDATA[ and user_.mobile  =#{entity.umobile} ]]>
+            </if>
+            <if test="entity.userEmail != null">
+                <![CDATA[ and user_.email  =#{entity.userEmail} ]]>
+            </if>
+            <if test="entity.usertype != null">
+                <![CDATA[ and user_.type =#{entity.usertype} ]]>
+            </if>
+            <if test="entity.parentId != null">
+                <if test="entity.parentId == -1">
+                    <![CDATA[ and user_.parent_id is null ]]>
+                </if>
+                <if test="entity.parentId != -1">
+                    <![CDATA[ and user_.parent_id =#{entity.parentId} ]]>
+                </if>
+            </if>
+            <if test="entity.nickname != null  and entity.nickname !=''">
+                <![CDATA[ and user_.nickname  LIKE CONCAT('%',#{entity.nickname},'%') ]]>
+            </if>
+            <if test="entity.userstatus != null">
+                <![CDATA[ and user_.status  =#{entity.userstatus} ]]>
+            </if>
+
+            <if test="entity.auditStatus != null">
+                <![CDATA[ and user_audit_.result  =#{entity.auditStatus} ]]>
+            </if>
+            <if test="entity.shopId != null">
+                <![CDATA[ and user_.shop_id  =#{entity.shopId} ]]>
+            </if>
+            <if test="entity.securityLevel != null  and entity.securityLevel !=''">
+                <![CDATA[ and user_.security_level =#{entity.securityLevel} ]]>
+            </if>
+            <if test="entity.quickType != null">
+                <![CDATA[ and user_.quick_type =#{entity.quickType} ]]>
+            </if>
+            <if test="entity.paymentStatus != null">
+                <![CDATA[ and user_.payment_status =#{entity.paymentStatus} ]]>
+            </if>
+
+            <if test="entity.companyName != null  and entity.companyName !=''">
+                <![CDATA[ and user_extends_.company_name LIKE CONCAT('%',#{entity.companyName},'%') ]]>
+            </if>
+            <if test="entity.companyAddr != null  and entity.companyAddr !=''">
+                <![CDATA[ and user_extends_.company_address  LIKE CONCAT('',#{entity.companyAddr},'%')  ]]>
+            </if>
+            <if test="entity.auditStatus != null">
+                <![CDATA[ and user_audit_.result =#{entity.auditStatus} ]]>
+            </if>
+            <!-- 改为查询 用户查询记录 时间范围内 -->
+            <if test="entity.auditorBegin != null  and entity.auditorBegin !=''">
+                <![CDATA[ and user_.created_time >DATE_FORMAT(#{entity.auditorBegin},'%Y-%m-%d') ]]>
+            </if>
+            <if test="entity.auditorEnd != null  and entity.auditorEnd !=''">
+                <![CDATA[ and user_.created_time <DATE_FORMAT(#{entity.auditorEnd},'%Y-%m-%d')]]>
+            </if>
+
+            <if test="entity.createTimeBegin != null  and entity.createTimeBegin !=''">
+                <![CDATA[ and user_.created_time >DATE_FORMAT(#{entity.createTimeBegin},'%Y-%m-%d') ]]>
+            </if>
+            <if test="entity.createTimeEnd != null  and entity.createTimeEnd !=''">
+                <![CDATA[ and user_.created_time <DATE_FORMAT(#{entity.createTimeEnd},'%Y-%m-%d')]]>
+            </if>
+            <if test="entity.growthValue != null  and entity.growthValue !=''">
+                <![CDATA[ and user_.growth_value =#{entity.growthValue}]]>
+            </if>
+
+            <if test="entity.shopIds != null and entity.shopIds != '' ">
+                <![CDATA[ and user_.shop_id in]]>
+                <foreach collection="entity.shopIds" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="entity.idList != null and entity.idList != '' ">
+                <![CDATA[ and user_.id in]]>
+                <foreach collection="entity.idList" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="entity.platformId!=null">
+		      <if test="entity.platformId==0">
+		      and user_.platform_id is null
+		      </if>
+		      <if test="entity.platformId !=0">
+		      and user_.platform_id =#{entity.platformId}
+		      </if>
+		    </if>
+            <if test="entity.userStatusList != null and entity.userStatusList != '' ">
+                <![CDATA[ and user_.status in]]>
+                <foreach collection="entity.userStatusList" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+           	 <!-- 1-红象会员：<50000 成长值  2-铜象会员：<150000 成长值   3-银象会员：<300000 成长值   4-金象会员：<500000 成长值  5-钻石象会员：>500000 成长值-->
+            <if test="entity.vipLevel !=null and entity.vipLevel != '' ">
+		      <if test="entity.vipLevel ==1">
+		      	<![CDATA[ and user_.growth_value < 50000]]>
+		      </if>
+		      <if test="entity.vipLevel ==2">
+		     	<![CDATA[ and user_.growth_value >=50000 and user_.growth_value <150000]]>
+		      </if>
+		      <if test="entity.vipLevel ==3">
+		      	<![CDATA[ and user_.growth_value >=150000 and user_.growth_value <300000]]>
+		      </if>
+		      <if test="entity.vipLevel ==4">
+		      	<![CDATA[ and user_.growth_value >=300000 and user_.growth_value <500000]]>
+		      </if>
+		      <if test="entity.vipLevel ==5">
+		      	<![CDATA[ and user_.growth_value >=500000 ]]>
+		      </if>
+		    </if>
+        </if>
+        order by user_.updated_time desc,user_.status asc
+    </sql>
+    
+    
+    
+        <sql id="where_fragement_parent_id">
+        where 1=1 and user_.parent_id is NULL
+        <if test="entity!=null">
+            <if test="entity.uid != null">
+                <![CDATA[ and user_.id LIKE CONCAT('%',#{entity.uid},'%') ]]>
+            </if>
+            <if test="entity.uname != null  and entity.uname !=''">
+                <![CDATA[ and user_.username  LIKE CONCAT('%',#{entity.uname},'%') ]]>
+            </if>
+            <if test="entity.umobile != null">
+                <![CDATA[ and user_.mobile  =#{entity.umobile} ]]>
+            </if>
+            <if test="entity.userEmail != null">
+                <![CDATA[ and user_.email  =#{entity.userEmail} ]]>
+            </if>
+            <if test="entity.usertype != null">
+                <![CDATA[ and user_.type =#{entity.usertype} ]]>
+            </if>
+            <if test="entity.parentId != null">
+                <if test="entity.parentId == -1">
+                    <![CDATA[ and user_.parent_id is null ]]>
+                </if>
+                <if test="entity.parentId != -1">
+                    <![CDATA[ and user_.parent_id =#{entity.parentId} ]]>
+                </if>
+            </if>
+            <if test="entity.nickname != null  and entity.nickname !=''">
+                <![CDATA[ and user_.nickname  LIKE CONCAT('%',#{entity.nickname},'%') ]]>
+            </if>
+            <if test="entity.userstatus != null">
+                <![CDATA[ and user_.status  =#{entity.userstatus} ]]>
+            </if>
+
+            <if test="entity.auditStatus != null">
+                <![CDATA[ and user_audit_.result  =#{entity.auditStatus} ]]>
+            </if>
+            <if test="entity.shopId != null">
+                <![CDATA[ and user_.shop_id  =#{entity.shopId} ]]>
+            </if>
+            <if test="entity.securityLevel != null  and entity.securityLevel !=''">
+                <![CDATA[ and user_.security_level =#{entity.securityLevel} ]]>
+            </if>
+            <if test="entity.quickType != null">
+                <![CDATA[ and user_.quick_type =#{entity.quickType} ]]>
+            </if>
+            <if test="entity.paymentStatus != null">
+                <![CDATA[ and user_.payment_status =#{entity.paymentStatus} ]]>
+            </if>
+
+            <if test="entity.companyName != null  and entity.companyName !=''">
+                <![CDATA[ and user_extends_.company_name LIKE CONCAT('%',#{entity.companyName},'%') ]]>
+            </if>
+            <if test="entity.companyAddr != null  and entity.companyAddr !=''">
+                <![CDATA[ and user_extends_.company_address  LIKE CONCAT('',#{entity.companyAddr},'%')  ]]>
+            </if>
+            <if test="entity.auditStatus != null">
+                <![CDATA[ and user_audit_.result =#{entity.auditStatus} ]]>
+            </if>
+            <!-- 改为查询 用户查询记录 时间范围内 -->
+            <if test="entity.auditorBegin != null  and entity.auditorBegin !=''">
+                <![CDATA[ and user_.created_time >DATE_FORMAT(#{entity.auditorBegin},'%Y-%m-%d') ]]>
+            </if>
+            <if test="entity.auditorEnd != null  and entity.auditorEnd !=''">
+                <![CDATA[ and user_.created_time <DATE_FORMAT(#{entity.auditorEnd},'%Y-%m-%d')]]>
+            </if>
+
+            <if test="entity.createTimeBegin != null  and entity.createTimeBegin !=''">
+                <![CDATA[ and user_.created_time >DATE_FORMAT(#{entity.createTimeBegin},'%Y-%m-%d') ]]>
+            </if>
+            <if test="entity.createTimeEnd != null  and entity.createTimeEnd !=''">
+                <![CDATA[ and user_.created_time <DATE_FORMAT(#{entity.createTimeEnd},'%Y-%m-%d')]]>
+            </if>
+            <if test="entity.growthValue != null  and entity.growthValue !=''">
+                <![CDATA[ and user_.growth_value =#{entity.growthValue}]]>
+            </if>
+
+            <if test="entity.shopIds != null and entity.shopIds != '' ">
+                <![CDATA[ and user_.shop_id in]]>
+                <foreach collection="entity.shopIds" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="entity.idList != null and entity.idList != '' ">
+                <![CDATA[ and user_.id in]]>
+                <foreach collection="entity.idList" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="entity.platformId!=null">
+		      <if test="entity.platformId==''">
+		      and user_.platform_id is null
+		      </if>
+		      <if test="entity.platformId !=''">
+		      and user_.platform_id =#{entity.platformId}
+		      </if>
+		    </if>
+            <if test="entity.userStatusList != null and entity.userStatusList != '' ">
+                <![CDATA[ and user_.status in]]>
+                <foreach collection="entity.userStatusList" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+           	 <!-- 1-红象会员：<50000 成长值  2-铜象会员：<150000 成长值   3-银象会员：<300000 成长值   4-金象会员：<500000 成长值  5-钻石象会员：>500000 成长值-->
+            <if test="entity.vipLevel !=null and entity.vipLevel != '' ">
+		      <if test="entity.vipLevel ==1">
+		      	<![CDATA[ and user_.growth_value < 50000]]>
+		      </if>
+		      <if test="entity.vipLevel ==2">
+		     	<![CDATA[ and user_.growth_value >=50000 and user_.growth_value <150000]]>
+		      </if>
+		      <if test="entity.vipLevel ==3">
+		      	<![CDATA[ and user_.growth_value >=150000 and user_.growth_value <300000]]>
+		      </if>
+		      <if test="entity.vipLevel ==4">
+		      	<![CDATA[ and user_.growth_value >=300000 and user_.growth_value <500000]]>
+		      </if>
+		      <if test="entity.vipLevel ==5">
+		      	<![CDATA[ and user_.growth_value >=500000 ]]>
+		      </if>
+		    </if>
+        </if>
+        order by user_.updated_time desc,user_.status asc
+    </sql>
+    
+    
+    
+    
+    <!-- mysql 分页尾 -->
+    <sql id="pagination_tail">
+	  limit #{pager.pageOffset} , #{pager.rows}
+	</sql>
+    <!-- mysql 查询总数 -->
+    <sql id="count_Tail">
+		select count(1) from 
+	</sql>
+    <!-- =========================================================== -->
+    <!-- Dao方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+
+    <!-- 分页查询 -->
+    <select id="selectList" resultMap="userDTOMap">
+        <include refid="selectAllColumns"/>
+        <include refid="where_fragement"/>
+        <if test="pager!=null">
+            <include refid="pagination_tail"/>
+        </if>
+    </select>
+    <!-- 查询主账号信息 -->
+    <select id="selectparentId" resultMap="userDTOMap">
+        <include refid="selectAllColumns"/>
+        <include refid="where_fragement_parent_id"/>
+        <if test="pager!=null">
+            <include refid="pagination_tail"/>
+        </if>
+    </select>
+    
+    
+    
+    
+    
+
+    <!-- 查询总数 -->
+    <select id="selectCount" resultType="java.lang.Long">
+        <include refid="count_Tail"/>
+        user user_ left join user_extends user_extends_ on user_.id=user_extends_.user_id
+        left join user_audit user_audit_ on user_.id=user_audit_.context_id
+        <include refid="where_fragement"/>
+    </select>
+    
+    
+      <!-- 查询总数 -->
+    <select id="selectCountPid" resultType="java.lang.Long">
+        <include refid="count_Tail"/>
+        user user_ left join user_extends user_extends_ on user_.id=user_extends_.user_id
+        left join user_audit user_audit_ on user_.id=user_audit_.context_id
+        <include refid="where_fragement_parent_id"/>
+    </select>
+
+
+    <!-- ============================================================================================================= -->
+    <select id="getUserIdFun" resultType="String">
+        SELECT get_user_id()
+    </select>
+    <!-- 插入记录 -->
+    <insert id="registerUser" parameterType="Object" useGeneratedKeys="true" keyProperty="uid">
+
+		<![CDATA[
+
+
+		insert into user
+		  (
+		        id,
+		  		username,
+				password,
+				mobile,
+				type,
+				email,
+				created_time,
+				updated_time,
+				status,
+				quick_type,
+				payment_status,
+				nickname,
+				deleted,
+				link_man,
+				department,
+				link_phone_num,
+				platform_id,
+				growth_value
+		   )
+		values
+		  (
+		        #{uid}
+		  		,#{loginname}
+				,#{loginpwd}
+				,#{userMobile}
+				,#{userType}
+				,#{userEmail}
+				,now()
+				,now()
+				,1
+				,#{quickType}
+				,1
+				,#{nickName}
+				,0
+				,#{linkMan}
+				,#{department}
+				,#{linkPhoneNum}
+				,#{platformId}
+				,0
+		   )
+
+
+        ]]>
+	</insert>
+
+    <insert id="registerChildUser" parameterType="Object" useGeneratedKeys="true" keyProperty="uid">
+		<![CDATA[
+
+
+		insert into user
+		  (
+		        id,
+		  		username,
+				password,
+				nickname,
+				shop_id,
+				parent_Id,
+				type,
+				created_time,
+				updated_time,
+				status,
+				quick_type,
+				payment_status,
+				platform_id,
+				growth_value
+		   )
+		values
+		  (
+		        #{uid},
+		  		#{loginname},
+				#{loginpwd},
+				#{nickName},
+				#{shopId},
+				#{parentId},
+				#{userType},
+				NOW(),
+				NOW(),
+				#{status},
+				#{quickType},
+				#{paymentStatus},
+				#{platformId},
+				0
+		   )
+
+
+        ]]>
+	</insert>
+
+    <!-- 根据用户名和密码，修改密码 -->
+    <update id="modifyUserPw" parameterType="Object">
+        update user
+        set
+        oldPassword = password,
+        password = #{newPassword},
+        updated_time = now()
+        where
+        username = #{username}
+        <if test="oldPassword != null  ">
+            and password = #{oldPassword}
+        </if>
+    </update>
+
+    <!-- 根据邮箱，修改密码 -->
+    <update id="modifyUserPwdByEmail" parameterType="Object">
+ 		update user 
+ 		    set 
+ 				oldPassword = password,
+ 				password = #{newPassword}, 
+ 				updated_time = now()
+   		where 
+   			email = #{email}
+	</update>
+
+    <!-- 根据用户名，修改密码 -->
+    <update id="modifyUserPwdByUsername" parameterType="Object">
+ 		update user 
+ 		    set 
+ 				oldPassword = password,
+ 				password = #{newPassword}, 
+ 				updated_time = now()
+   		where 
+   			username = #{username}
+	</update>
+
+    <!-- 校验用户名密码，返回昵称  -->
+    <select id="login" resultType="com.camelot.usercenter.dto.RegisterDTO" parameterType="Object">
+        select
+        id uid,
+        username loginname,
+        mobile userMobile,
+        email userEmail,
+        type userType,
+        shop_id shopId,
+        status uStatus,
+        deleted,
+        platform_id platformId
+        from user
+        where (username = #{username}
+        and password = #{password})
+        OR (mobile = #{username} and password = #{password} )
+        OR (email= #{username} and password = #{password} )
+    </select>
+    <select id="findUserByLonginName" resultType="com.camelot.usercenter.dto.RegisterDTO" parameterType="Object">
+        select
+        id uid,
+        username loginname,
+        mobile userMobile,
+        email userEmail,
+        type userType,
+        shop_id shopId,
+        status uStatus,
+        deleted,
+        platform_id platformId
+        from user
+        where username = #{username}
+    </select>
+
+    <!-- 修改用户信息 -->
+    <update id="modifyUserInfo" parameterType="Object">
+        update user
+        set updated_time = now()
+
+        <if test="userEmail != null  ">
+            , email = #{userEmail}
+        </if>
+        <if test="userstatus != null  ">
+            , status = #{userstatus}
+        </if>
+        <if test="password != null  ">
+            , password = #{password}
+        </if>
+        <if test="uname != null  ">
+            , username = #{uname}
+        </if>
+        <if test="nickname != null  ">
+            , nickname = #{nickname}
+        </if>
+        <if test="umobile != null  ">
+            , mobile = #{umobile}
+        </if>
+        <if test="shopId != null  ">
+            , shop_id = #{shopId}
+        </if>
+        <if test="securityLevel != null  ">
+            , security_level = #{securityLevel}
+        </if>
+        <if test="parentId != null  ">
+            , parent_id = #{parentId}
+        </if>
+        <if test="paymentStatus != null  ">
+            , payment_status = #{paymentStatus}
+        </if>
+
+        <if test="usertype != null  ">
+            , type = #{usertype}
+        </if>
+        <if test="deleted != null  ">
+            , deleted = #{deleted}
+        </if>
+
+        <if test="linkMan != null  ">
+            , link_man = #{linkMan}
+        </if>
+        <if test="department != null  ">
+            , department = #{department}
+        </if>
+        <if test="linkPhoneNum != null  ">
+            , link_phone_num = #{linkPhoneNum}
+        </if>
+        <if test="growthValue != null  ">
+            , growth_value = #{growthValue}
+        </if>
+        where
+        id = #{uid}
+    </update>
+	<!-- 修改用户信息 -->
+    <update id="modifyChildUserInfo" parameterType="Object">
+        update user
+        set updated_time = now()
+        
+        <if test="userstatus != null  ">
+            , status = #{userstatus}
+        </if>
+        <if test="shopId != null  ">
+            , shop_id = #{shopId}
+        </if>
+        <if test="paymentStatus != null  ">
+            , payment_status = #{paymentStatus}
+        </if>
+
+        <if test="usertype != null  ">
+            , type = #{usertype}
+        </if>
+        where 1 = 3 
+        <if test="uidList != null and uidList.size() > 0">
+        	or id in 
+        	<foreach collection="uidList" item="uid" index="index" open="(" separator="," close=")">
+			   	<![CDATA[   #{uid } ]]>
+			  </foreach>
+        </if>
+    </update>
+        
+    <select id="verifyRegisterName" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM user
+        WHERE username = #{uname}
+    </select>
+
+    <select id="verifyEmail" resultType="java.lang.Integer">
+		SELECT COUNT(*) 
+		FROM user 
+		WHERE email = #{email}
+	</select>
+
+    <select id="verifyMobile" resultType="java.lang.Integer" parameterType="Object">
+		SELECT COUNT(*) 
+		FROM user 
+		WHERE mobile = #{mobile}
+	</select>
+
+    <!-- 根据ID查询 用户信息  -->
+    <select id="queryUserById" resultType="com.camelot.usercenter.dto.UserDTO" parameterType="Object">
+		SELECT 
+			user.id uid,
+			username uname,
+			password,
+		   mobile umobile,
+		   type usertype,
+		   parent_id parentId,
+			email userEmail,
+			nickname nickname,
+			status userstatus,
+			shop_id shopId,
+			user.deleted,
+			security_level securityLevel,
+			auditor auditor,
+			audit_remark auditRemark,
+			quick_type quickType,
+			created_time created,
+			updated_time updated,
+			payment_status paymentStatus ,
+			user_extends_.company_name companyName,
+			user_audit_.result auditStatus,
+			link_man linkMan,
+            department department,
+            platform_id platformId,
+            link_phone_num linkPhoneNum,
+            <![CDATA[
+            	case
+			  	when growth_value is null then 1
+				when growth_value < 50000 then 1
+				when growth_value < 150000 then 2
+				when growth_value < 300000 then 3
+				when growth_value < 500000 then 4
+				else 5  END  vipLevel ,
+			]]>
+            growth_value growthValue,
+		 	case 
+      		 when paymentCode is  null then 0
+      		 when paymentCode ='' then 0
+      		 else 1 END isHavePayPassword
+		FROM user 
+		left join user_extends user_extends_ on user.id=user_extends_.user_id
+
+		left join  user_audit user_audit_ on  user.id=user_audit_.context_id 
+		WHERE user.id = #{uid}
+	</select>
+	
+	
+	
+	   <!-- 根据父ID查询 用户信息  -->
+    <select id="queryUserByfId" resultType="com.camelot.usercenter.dto.UserDTO" parameterType="Object">
+		SELECT 
+			user.id uid,
+			user.growth_value growthValue,
+			username uname,
+			password,
+		   mobile umobile,
+		   type usertype,
+		   parent_id parentId,
+			email userEmail,
+			nickname nickname,
+			status userstatus,
+			shop_id shopId,
+			user.deleted,
+			security_level securityLevel,
+			auditor auditor,
+			audit_remark auditRemark,
+			quick_type quickType,
+			created_time created,
+			updated_time updated,
+			payment_status paymentStatus ,
+			user_extends_.company_name companyName,
+			user_audit_.result auditStatus,
+			link_man linkMan,
+            department department,
+            platform_id platformId,
+            link_phone_num linkPhoneNum,
+			 case 
+       		 when paymentCode is  null then 0
+       		 when paymentCode ='' then 0
+       		 else 1 END isHavePayPassword
+		FROM user 
+		left join user_extends user_extends_ on user.parent_id=user_extends_.user_id
+		left join  user_audit user_audit_ on  user.id=user_audit_.context_id 
+		WHERE user.id = #{uid}
+	</select>
+	
+	
+
+    <!-- 修改用户支付密码 -->
+    <update id="modifyPaypwdById" parameterType="Object">
+        update user
+        set updated_time = now()
+        , paymentCode = #{paypwd}
+        , security_level=#{securityLevel}
+        where
+        id = #{uid}
+        <if test="oldpwd != null  ">
+            and paymentCode = #{oldpwd}
+        </if>
+    </update>
+
+    <!-- 修改用户手机号码 -->
+    <update id="modifyUserInfoByMobile" parameterType="Object">
+        update user
+        set mobile = #{umobile}
+        where
+        id = #{uid}
+    </update>
+
+    <select id="queryUserByCondtion" resultType="com.camelot.usercenter.dto.UserDTO" parameterType="Object">
+        SELECT
+        id uid,
+        username uname,
+        mobile umobile,
+        deleted,
+        type usertype,
+        parent_id parentId,
+        email userEmail,
+        nickname nickname,
+        status userstatus,
+        shop_id shopId,
+        security_level securityLevel,
+        auditor auditor,
+        audit_remark auditRemark,
+        quick_type quickType,
+        created_time created,
+        updated_time updated,
+        payment_status paymentStatus,
+        platform_id platformId
+        FROM user user_
+        WHERE 1=1
+        <if test="entity.uid != null">
+            <![CDATA[ and user_.id  =#{entity.uid} ]]>
+        </if>
+        <if test="entity.uname != null  and entity.uname !=''">
+            <![CDATA[ and user_.username  LIKE CONCAT('%',#{entity.uname},'%') ]]>
+        </if>
+        <if test="entity.usertype != null">
+            <![CDATA[ and user_.type =#{entity.usertype} ]]>
+        </if>
+        <if test="entity.parentId != null">
+            <![CDATA[ and user_.parent_id =#{entity.parentId} ]]>
+        </if>
+        <if test="entity.nickname != null  and entity.nickname !=''">
+            <![CDATA[ and user_.nickname  LIKE CONCAT('%',#{entity.nickname},'%') ]]>
+        </if>
+        <if test="entity.userstatus != null">
+            <![CDATA[ and user_.status  =#{entity.userstatus} ]]>
+        </if>
+        <if test="entity.shopId != null">
+            <![CDATA[ and user_.shop_id  =#{entity.shopId} ]]>
+        </if>
+        <if test="entity.securityLevel != null  and entity.securityLevel !=''">
+            <![CDATA[ and user_.security_level =#{entity.securityLevel} ]]>
+        </if>
+        <if test="entity.umobile != null  and entity.umobile !=''">
+            <![CDATA[ and user_.mobile =#{entity.umobile} ]]>
+        </if>
+    </select>
+
+
+    <select id="findUserListByUserIds" resultType="com.camelot.usercenter.dto.UserDTO">
+        SELECT
+        id uid,
+        username uname,
+        mobile umobile,
+        type usertype,
+        deleted,
+        parent_id parentId,
+        email userEmail,
+        nickname nickname,
+        status userstatus,
+        shop_id shopId,
+        security_level securityLevel,
+        auditor auditor,
+        audit_remark auditRemark,
+        quick_type quickType,
+        created_time created,
+        updated_time updated,
+        payment_status paymentStatus,
+        platform_id platformId
+        FROM user
+        WHERE id in
+        <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </select>
+    <select id="queryChildUserList" resultType="com.camelot.usercenter.dto.UserDTO">
+        SELECT
+        id uid,
+        username uname,
+        mobile umobile,
+        type usertype,
+        deleted,
+        parent_id parentId,
+        email userEmail,
+        nickname nickname,
+        status userstatus,
+        shop_id shopId,
+        security_level securityLevel,
+        auditor auditor,
+        audit_remark auditRemark,
+        quick_type quickType,
+        created_time created,
+        updated_time updated,
+        platform_id platformId,
+        payment_status paymentStatus
+        FROM user
+        WHERE parent_id=#{parentId}
+        <if test="pager!=null">
+            <include refid="pagination_tail"></include>
+        </if>
+    </select>
+    <select id="queryChildUserCount" resultType="Long" parameterType="Long">
+		SELECT 
+			count(1)
+			FROM user 
+			WHERE parent_id=#{parentId}
+	</select>
+    <delete id="delete" parameterType="long">
+		<![CDATA[
+
+
+		delete from user where id = #{id}
+
+
+        ]]>
+	</delete>
+
+    <select id="validatePayPassword" resultType="Long">
+		SELECT 
+			count(1)
+			FROM user 
+			WHERE id=#{uid} and paymentCode=#{paypassword}
+	</select>
+	
+    <select id="validateExistPaymentCode" resultType="Long">
+		SELECT 
+			count(1)
+			FROM user 
+			WHERE id=#{uid} and paymentCode is not null
+	</select>
+	
+	<select id="validateLoginPassword" resultType="Long">
+		SELECT 
+			count(1)
+			FROM user 
+			WHERE id=#{uid} and password=#{loginpassword}
+	</select>
+
+    <update id="resetUserPassword" parameterType="Object">
+ 		update user 
+ 		    set 
+ 				password = #{resetPassword},
+ 				updated_time = now()
+   				where id = #{uid}
+   	
+	</update>
+
+    <!--用户 相关报表  -->
+    <!-- 商家入驻统计 -->
+    <!-- 校验用户名密码，返回昵称  -->
+    <select id="getCustomerAndShopReportSum" resultType="com.camelot.usercenter.dto.report.UserAndShopReportDTO"
+            parameterType="Object">
+       <![CDATA[
+          select sum(case when status >2 then 1 else 0 end) authCustomerNum ,sum(case when status >=2 then 1 else 0 end) activeCustomerNum
+        ,sum(case when status >=2 and type=2 then 1 else 0 end) buyerNum ,sum(case when status >=2 and type=3 then 1 else 0 end) sellerNum,
+        sum(case when status =3 or status =5  then 1 else 0 end) auditCustomer,sum(case when status =3   then 1 else 0 end) auditBuyerNum,
+        sum(case when status =5   then 1 else 0 end) auditSellerNum
+
+        from user
+
+        ]]>
+    </select>
+
+    <select id="getCustomerAndShopReportByCondition" resultType="com.camelot.usercenter.dto.report.UserAndShopReportDTO"
+            parameterType="Object">
+        <![CDATA[    select sum(case when status >2 then 1 else 0 end) authCustomerNum ,sum(case when status >=2 then 1 else 0 end) activeCustomerNum
+	,sum(case when status >=2 and type=2 then 1 else 0 end) buyerNum ,sum(case when status >=2 and type=3 then 1 else 0 end) sellerNum,
+    sum(case when status =3 or status =5  then 1 else 0 end) auditCustomer,sum(case when status =3   then 1 else 0 end) auditBuyerNum,
+    sum(case when status =5   then 1 else 0 end) auditSellerNum,date_format(created_time,'%Y-%m-%d') createDt
+    from user
+    where 1=1
+    ]]>
+        <if test="beginDate != null  ">
+            and created_time >= #{beginDate}
+        </if>
+        <if test="endDate != null  ">
+            <![CDATA[ and created_time < #{endDate} ]]>
+        </if>
+        group by date_format(created_time,'%Y-%m-%d')
+    </select>
+
+    <select id="getUserCreateReportByCreateDt" resultType="com.camelot.usercenter.dto.report.UserAndShopReportDTO"
+            parameterType="Object">
+        <![CDATA[    select sum(case when status >2 then 1 else 0 end) authCustomerNum ,sum(case when status >=2 then 1 else 0 end) activeCustomerNum
+        ,sum(case when status >=2 and type=2 then 1 else 0 end) buyerNum ,sum(case when status >=2 and type=3 then 1 else 0 end) sellerNum,
+        sum(case when status =3 or status =5  then 1 else 0 end) auditCustomer,sum(case when status =3   then 1 else 0 end) auditBuyerNum,
+        sum(case when status =5   then 1 else 0 end) auditSellerNum,date_format(created_time,'%Y-%m-%d') createDt
+        from user
+        where 1=1
+           ]]>
+        <if test="beginDate != null  ">
+            and created_time >= #{beginDate}
+        </if>
+        <if test="endDate != null  ">
+            <![CDATA[ and created_time < #{endDate} ]]>
+        </if>
+        group by date_format(created_time,'%Y-%m-%d')
+    </select>
+    
+    <select id="queryUserIds" resultType="java.lang.Long" parameterType="Object">
+    	select id from user user_ where 1 = 3
+    	<if test="uid != null">
+    		or user_.id	in (select id from user user_c where user_c.id = #{uid } or user_c.parent_id = #{uid })
+    		or user_.id	in (select parent_id from user user_c where user_c.id = #{uid } or user_c.parent_id = #{uid })
+    		or user_.parent_id	in (select parent_id from user user_c where user_c.id = #{uid } or user_c.parent_id = #{uid })
+    		or user_.parent_id	in (select id from user user_c where user_c.id = #{uid } or user_c.parent_id = #{uid })
+    	</if>
+    </select>
+    
+    
+    
+    <!-- 根据用户名查询 用户信息  -->
+    <select id="selectUserByUname" resultType="com.camelot.usercenter.dto.UserDTO" parameterType="Object">
+		SELECT 
+			user.id uid,
+			username uname,
+			password,
+		   mobile umobile,
+		   type usertype,
+		   parent_id parentId,
+			email userEmail,
+			nickname nickname,
+			status userstatus,
+			shop_id shopId,
+			user.deleted,
+			security_level securityLevel,
+			auditor auditor,
+			audit_remark auditRemark,
+			quick_type quickType,
+			created_time created,
+			updated_time updated,
+			payment_status paymentStatus ,
+			user_extends_.company_name companyName,
+			user_audit_.result auditStatus,
+			link_man linkMan,
+            department department,
+            platform_id platformId,
+            link_phone_num linkPhoneNum,
+			 case 
+       		 when paymentCode is  null then 0
+       		 when paymentCode ='' then 0
+       		 else 1 END isHavePayPassword
+		FROM user 
+		left join user_extends user_extends_ on user.id=user_extends_.user_id
+		left join  user_audit user_audit_ on  user.id=user_audit_.context_id 
+		WHERE user.username = #{uname}
+	</select>
+	
+	 <!-- 根据用户邮箱查询 用户信息  -->
+    <select id="selectUserByUserEmail" resultType="com.camelot.usercenter.dto.UserDTO" parameterType="Object">
+		SELECT 
+			user.id uid,
+			username uname,
+			password,
+		   mobile umobile,
+		   type usertype,
+		   parent_id parentId,
+			email userEmail,
+			nickname nickname,
+			status userstatus,
+			shop_id shopId,
+			user.deleted,
+			security_level securityLevel,
+			auditor auditor,
+			audit_remark auditRemark,
+			quick_type quickType,
+			created_time created,
+			updated_time updated,
+			payment_status paymentStatus ,
+			user_extends_.company_name companyName,
+			user_audit_.result auditStatus,
+			link_man linkMan,
+            department department,
+            platform_id platformId,
+            link_phone_num linkPhoneNum,
+			 case 
+       		 when paymentCode is  null then 0
+       		 when paymentCode ='' then 0
+       		 else 1 END isHavePayPassword
+		FROM user 
+		left join user_extends user_extends_ on user.id=user_extends_.user_id
+		left join  user_audit user_audit_ on  user.id=user_audit_.context_id 
+		WHERE user.email = #{userEmail}
+	</select>
+	
+	<!-- 根据用户邮箱查询 用户信息  -->
+    <select id="selectUserByUmobile" resultType="com.camelot.usercenter.dto.UserDTO" parameterType="Object">
+		SELECT 
+			user.id uid,
+			username uname,
+			password,
+		   mobile umobile,
+		   type usertype,
+		   parent_id parentId,
+			email userEmail,
+			nickname nickname,
+			status userstatus,
+			shop_id shopId,
+			user.deleted,
+			security_level securityLevel,
+			auditor auditor,
+			audit_remark auditRemark,
+			quick_type quickType,
+			created_time created,
+			updated_time updated,
+			payment_status paymentStatus ,
+			user_extends_.company_name companyName,
+			user_audit_.result auditStatus,
+			link_man linkMan,
+            department department,
+            platform_id platformId,
+            link_phone_num linkPhoneNum,
+			 case 
+       		 when paymentCode is  null then 0
+       		 when paymentCode ='' then 0
+       		 else 1 END isHavePayPassword
+		FROM user 
+		left join user_extends user_extends_ on user.id=user_extends_.user_id
+		left join  user_audit user_audit_ on  user.id=user_audit_.context_id 
+		WHERE user.mobile = #{umobile}
+	</select>
+	
+</mapper>

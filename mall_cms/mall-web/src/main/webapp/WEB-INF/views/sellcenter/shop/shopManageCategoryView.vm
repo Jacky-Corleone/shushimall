@@ -1,0 +1,64 @@
+#set($layout = "/none_layout.vm")
+<script type="text/javascript">
+	$(function(){
+		$("#categorySaveBtn").bind("click",function(){
+			window.location.href = "$request.getContextPath()/shopBaseInfoController/toView";
+		});
+	});
+	//删除类目
+	function deleteCategory(cid){
+		if(confirm("确定要删除该类目吗？")){
+			$.ajax({
+                url: "$request.getContextPath()/shopManageCategoryController/deleteCategory",
+                dataType:"json",
+                data:{cid:cid},
+                success: function(data){
+                    if(data.result=='success'){
+                        alert("删除成功");
+						nTabs(1);
+                    }else{
+                    	alert(data.msg);
+                    }
+                },error:function(data){
+                    alert("系统繁忙，请稍后再试");
+                }
+            }); 
+		}
+	}
+</script>
+<div id="main">
+<!--中间部分开始-->
+<!--右边部分开始-->
+<div id="right" class="border-4 bg_06 box-shadow1">
+    <!--文字段落开始-->
+    <div class="Notice pad_tb20">
+            <dl>
+              <dt>店铺经营类目：</dt>
+              <dd>
+                <ol>
+                #foreach($entity in $!busCategoryNameList.entrySet())
+                  <li>$entity.value&nbsp;<i class="my_icon-del" title="删除" onclick="deleteCategory($entity.key)">&nbsp;&nbsp;&nbsp;&nbsp;</i></li>
+                #end
+              </dd>
+            </dl>
+            <dl>
+               <dt>申请新类目： </dt>
+               <dd><i class="demo-icons font_fe"> 审核中</i></dd>
+            </dl>
+			<dl>
+              <dt>待审核类目：</dt>
+              <dd>
+                <ol>
+                #foreach($entity in $!auditCategoryNameList.entrySet())
+                  <li>$entity.value</li>
+                #end
+              </dd>
+            </dl>
+            <div class="wid_460" style="margin:20px auto">
+                <input class="button_2 hei_35 font_14b" type="button" value="返回" onclick="forwardToShopIndex()" />
+            </div>
+    </div><!--Notice end-->
+    <!--文字段落结束-->         
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->

@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.usercenter.dao.UserComDeviceMybatisDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="userCompanyDeviceMap" type="userCompanyDevice">
+			<result property="deviceId" column="device_id"/>
+			<result property="postpressEquipmentNumber" column="postpress_equipment_number"/>
+			<result property="postpressBrand" column="postpress_brand"/>
+			<result property="postpressSeparate" column="postpress_separate"/>
+			<result property="postpressStandard" column="postpress_standard"/>
+			<result property="postpressDescribe" column="postpress_describe"/>
+			<result property="prepressEquipmentNumber" column="prepress_equipment_number"/>
+			<result property="prepressBrand" column="prepress_brand"/>
+			<result property="prepressSeparate" column="prepress_separate"/>
+			<result property="prepressStandard" column="prepress_standard"/>
+			<result property="prepressDescribe" column="prepress_describe"/>
+			<result property="printingEquipmentNumber" column="printing_equipment_number"/>
+			<result property="printingBrand" column="printing_brand"/>
+			<result property="printingSeparate" column="printing_separate"/>
+			<result property="printingColorGroupNumber" column="printing_color_group_number"/>
+			<result property="printingYear" column="printing_year"/>
+			<result property="printingOrigin" column="printing_origin"/>
+			<result property="printingOtherConfiguration" column="printing_other_configuration"/>
+			<result property="printingDescribe" column="printing_describe"/>
+			<result property="printingBreadth" column="printing_breadth"/>
+			<result property="deviceType" column="device_type"/>
+			<result property="companyinfoId" column="companyinfo_id"/>
+	</resultMap>
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			user_buyer_company_device_.device_id
+ 			,user_buyer_company_device_.user_id
+ 			,user_buyer_company_device_.postpress_equipment_number
+ 			,user_buyer_company_device_.postpress_brand
+ 			,user_buyer_company_device_.postpress_separate
+ 			,user_buyer_company_device_.postpress_standard
+ 			,user_buyer_company_device_.postpress_describe
+ 			,user_buyer_company_device_.prepress_equipment_number
+ 			,user_buyer_company_device_.prepress_brand
+ 			,user_buyer_company_device_.prepress_separate
+ 			,user_buyer_company_device_.prepress_standard
+ 			,user_buyer_company_device_.prepress_describe
+ 			,user_buyer_company_device_.printing_equipment_number
+ 			,user_buyer_company_device_.printing_brand
+ 			,user_buyer_company_device_.printing_separate
+ 			,user_buyer_company_device_.printing_color_group_number
+ 			,user_buyer_company_device_.printing_year
+ 			,user_buyer_company_device_.printing_origin
+ 			,user_buyer_company_device_.printing_other_configuration
+ 			,user_buyer_company_device_.printing_describe
+ 			,user_buyer_company_device_.printing_breadth
+ 			,user_buyer_company_device_.device_type
+ 			,user_buyer_company_device_.companyinfo_id
+		FROM 
+		user_buyer_company_device user_buyer_company_device_,user_buyer_company user_buyer_company_
+		]]>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+	<select id="selectListByCondition" resultMap="userCompanyDeviceMap">
+		<include refid="selectAllColumns" />
+		<![CDATA[  where user_buyer_company_.id=user_buyer_company_device_.companyinfo_id ]]>
+	 	<if test="uid != null">
+			<![CDATA[ and user_buyer_company_.user_id = #{uid} ]]>
+		</if>
+		<if test="deviceType != null">
+			<![CDATA[ and user_buyer_company_device_.device_type=#{deviceType} ]]>
+		</if>	
+	</select>
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="userComDeviceDTO" useGeneratedKeys="true" keyProperty="device_id">
+		<![CDATA[
+		insert into user_buyer_company_device (
+		    	 postpress_equipment_number
+		    	 ,postpress_brand
+		    	 ,postpress_separate
+		    	 ,postpress_standard
+		    	 ,postpress_describe
+		    	 ,prepress_equipment_number
+		    	 ,prepress_brand
+		    	 ,prepress_separate
+		    	 ,prepress_standard
+		    	 ,prepress_describe
+		    	 ,printing_equipment_number
+		    	 ,printing_brand
+		    	 ,printing_separate
+		    	 ,printing_color_group_number
+		    	 ,printing_year
+		    	 ,printing_origin
+		    	 ,printing_other_configuration
+		    	 ,printing_describe
+		    	 ,printing_breadth
+		    	 ,device_type
+		    	 ,companyinfo_id
+		)values
+		]]>	
+		<foreach collection="listPrePress" item="prePress" index="index" separator="," >  
+			<![CDATA[ 
+		 		(
+			    	null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,#{prePress.prepressEquipmentNumber}
+			    	,#{prePress.prepressBrand}
+			    	,#{prePress.prepressSeparate}
+			    	,#{prePress.prepressStandard}
+			    	,#{prePress.prepressDescribe}
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,#{prePress.deviceType}
+			    	,#{prePress.companyinfoId}
+				)
+			]]>	
+		</foreach> 
+		<if test="listPrinting.size>0">
+		,
+		</if> 
+		<foreach collection="listPrinting" item="printing" index="index" separator="," >  
+			<![CDATA[ 
+		 		(
+			    	null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,#{printing.printingEquipmentNumber}
+			    	,#{printing.printingBrand}
+			    	,#{printing.printingSeparate}
+			    	,#{printing.printingColorGroupNumber}
+			    	,#{printing.printingYear}
+			    	,#{printing.printingOrigin}
+			    	,#{printing.printingOtherConfiguration}
+			    	,#{printing.printingDescribe}
+			    	,#{printing.printingBreadth}
+			    	,#{printing.deviceType}
+			    	,#{printing.companyinfoId}
+				)
+			]]>	
+		</foreach> 
+		<if test="listPrinting.size>0">
+		,
+		</if> 
+		<foreach collection="listPostPress" item="postPress" index="index" separator="," >  
+			<![CDATA[ 
+		 		(
+			    	#{postPress.postpressEquipmentNumber}
+			    	,#{postPress.postpressBrand}
+			    	,#{postPress.postpressSeparate}
+			    	,#{postPress.postpressStandard}
+			    	,#{postPress.postpressDescribe}
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,null
+			    	,#{postPress.deviceType}
+			    	,#{postPress.companyinfoId}
+				)
+			]]>	
+		</foreach> 
+	</insert>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from user_buyer_company_device where user_id = #{id}
+		]]>
+	</delete>
+</mapper>

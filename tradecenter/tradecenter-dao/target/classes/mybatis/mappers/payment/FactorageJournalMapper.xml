@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.payment.dao.FactorageJournalDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="factorageJournalMap" type="factorageJournal">
+		<result property="id" column="id"/>
+		<result property="orderNo" column="order_no"/>
+		<result property="factorage" column="factorage"/>
+		<result property="status" column="status"/>
+		<result property="remark1" column="remark1"/>
+		<result property="remark2" column="remark2"/>
+		<result property="created" column="created"/>
+		<result property="updated" column="updated"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,order_no
+ 			,factorage
+ 			,repro_no
+ 			,status
+ 			,remark1
+ 			,remark2
+ 			,created
+ 			,updated
+		FROM 
+		factorage_journal factorage_journal_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.orderNo != null and entity.orderNo !=''">
+				<![CDATA[ and factorage_journal_.order_no = #{entity.orderNo} ]]>
+			</if>
+			<if test="entity.reproNo != null and entity.reproNo !=''">
+				<![CDATA[ and factorage_journal_.repro_no = #{entity.reproNo} ]]>
+			</if>
+			<if test="entity.status != null">
+				<![CDATA[ and factorage_journal_.status  = #{entity.status} ]]>
+			</if>
+			<if test="entity.createdBegin != null and entity.createdBegin != ''">
+				<![CDATA[ and factorage_journal_.created >DATE_FORMAT(#{entity.createdBegin},'%Y-%m-%d')]]>
+			</if>
+			<if test="entity.createdEnd != null and entity.createdEnd != ''">
+				<![CDATA[ and factorage_journal_.created <DATE_FORMAT(#{entity.createdEnd},'%Y-%m-%d')]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="selectById" resultMap="factorageJournalMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where factorage_journal_.id = #{id}
+		]]>
+	</select>
+	
+	<select id="selectByOrderNoAndStatus" resultMap="factorageJournalMap">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+			where 1 = 1
+		]]>
+		<if test="orderNo != null and orderNo !=''">
+				<![CDATA[ and factorage_journal_.order_no = #{orderNo} ]]>
+		</if>
+		<if test="status != null and status !=''">
+				<![CDATA[ and factorage_journal_.status = #{status} ]]>
+		</if>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="factorageJournalMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		factorage_journal factorage_journal_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="factorageJournal" useGeneratedKeys="true" keyProperty="id">
+		<![CDATA[
+		insert into factorage_journal (
+		    	 order_no
+		    	 ,factorage
+		    	 ,repro_no
+		    	 ,status
+		    	 ,remark1
+ 				 ,remark2
+		    	 ,created
+		   )values(
+		    	#{orderNo}
+		    	,#{factorage}
+		    	,#{reproNo}
+		    	,#{status}
+		    	,#{remark1}
+ 				,#{remark2}
+		    	,now()
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="updateStatusById" parameterType="factorageJournal">
+		update factorage_journal set 
+			updated = now()
+   			,status = #{status}
+		 where id = #{id}
+	</update>
+	
+</mapper>

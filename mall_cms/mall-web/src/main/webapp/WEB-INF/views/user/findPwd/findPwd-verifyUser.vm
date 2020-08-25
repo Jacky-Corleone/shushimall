@@ -1,0 +1,178 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/configuration_layout.vm")
+<style type="text/css">
+    .msg_span{
+        font-size: 12px;
+        margin-left: 155px;
+        color: red;
+    }
+</style>
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<div>
+    <!--内容start-->
+    <div class="stepflex">
+        <dl class="first done"><!--流程已走完就加入 done 这个样式 -->
+            <dt class="s-num">1</dt>
+            <dd class="s-text">填写账户名<s></s><b></b></dd>
+        </dl>
+        <dl class="normal doing"><!--正在哪个流程就加入 doing 这个样式 -->
+            <dt class="s-num">2</dt>
+            <dd class="s-text">验证身份<s></s><b></b></dd>
+        </dl>
+        <dl class="normal">
+            <dt class="s-num">3</dt>
+            <dd class="s-text">设置新密码<s></s><b></b></dd>
+        </dl>
+        <dl class="last">
+            <dt class="s-num"><i class="fa-check"></i></dt>
+            <dd class="s-text">完成<s></s><b></b></dd>
+        </dl>
+    </div><!--stepflex end -->
+    <div class="clear"></div>
+    <!--流程结束 -->
+    <form method="post" action="$request.contextPath/findpwd/editpwd" id="userVerifyForm">
+        <div class="register_content"><!--register_nav-->
+            <input type="hidden" name="logname" value="$!userinfo.uname" />
+            <div class="register_box_mid" style="margin-top:40px">
+                <!--如需增加可循环dl开始-->
+                <dl>
+                    <dt>请选择验证身份方式：</dt>
+                    <dd style="border:none">
+                        <!--第一个下拉选 -->
+                        <select name="" id="select_contact_id" class="input_Style1 wid_200">
+                            <option value="请选择" > 请选择 </option>
+                            <option value="2" selected="selected"> 手机 </option>
+                            <option value="1"> 邮箱 </option>
+                        </select>
+                    </dd>
+                </dl>
+                <!--如需增加可循环dl结束-->
+                <dl>
+                    <dt>昵称：</dt>
+                    <dd id="loginname_id" style="border:none">$!userinfo.nickname</dd>
+                </dl>
+                <dl>
+                    <dt>已验证手机/邮箱：</dt>
+                    <dd id="contact_id" style="border:none">$!userinfo.umobile</dd>
+                </dl>
+                <dl>
+                    <dt>请填写手机/邮箱校验码：</dt>
+                    <dd style="border:none"><input name="captcha" type="text" id="captcha_id" class="input_Style1" style="width: 80px" maxlength="10" /><span><a href="#" id="captcha_send">发送验证码</a></span></dd>
+                    <input type="hidden" id="code_key" name="codeKey">
+                </dl>
+                <div class="clear"></div>
+                <span id="captcha_span" class="msg_span"></span>
+                <div id="submit_id" style="width: 280px;" class="button_1 hei_40 font_16">提 交</div>
+            </div><!--register_box-->
+        </div><!--register_content-->
+    </form>
+    <!--内容end-->
+</div>
+
+<script type="text/javascript">
+    $(function(){
+        var loginname = "$!userinfo.nickname";	//昵称
+        var mobile = "$!userinfo.umobile";
+        $("#contact_id").html(mobile);
+        if(mobile == ''){
+            var eamil = "$!userinfo.userEmail";
+            $("#contact_id").html(eamil);
+        }
+        $("#loginname_id").html(loginname);
+    });
+
+    $("#select_contact_id").change(function(){
+        $("#captcha_send").html("发送验证码");
+        window.clearInterval(timer);//去掉定时器
+        time = 90;
+        var val = $("#select_contact_id").val();
+        var mobileOrEamil;
+        if(val == 2){
+            mobileOrEamil = "$!userinfo.umobile";
+            if(mobileOrEamil == ''){
+                mobileOrEamil = "您未绑定手机";
+            }
+        } else {
+            mobileOrEamil = "$!userinfo.userEmail";
+            if(mobileOrEamil == ''){
+                mobileOrEamil = "您未绑定邮箱";
+            }
+        }
+        $("#contact_id").html(mobileOrEamil);
+    });
+
+    $("#captcha_send").click(function(){
+        var smsType = '';
+        if($("#captcha_send").html() != "发送验证码"){
+            return;
+        }
+        var contact = $("#contact_id").html();
+        if(contact == "您未绑定手机"){
+            $("#captcha_span").html("您未绑定手机");
+            return;
+        } else if(contact == "您未绑定邮箱"){
+            $("#captcha_span").html("您未绑定邮箱");
+            return;
+        }
+        var val = $("#select_contact_id").val();
+        if(val != 1 && val != 2){
+            $("#captcha_span").html("请选择验证身份的方式");
+            return;
+        }
+        if(val == 1){
+            smsType = 'EMAIL_UP_LOGIN_PWD';
+        }else if(val == 2){
+            smsType = 'UPLOGINPWD';
+        }
+        $("#captcha_send").html("请稍等···");
+        var data = {type:val,userId:$!userinfo.uid,smsType:smsType};
+        $.ajax({
+            url:"$request.contextPath/captcha/send",
+            type:"post",
+            data:data,
+            success:function(data){
+                if(data.isOK==2){
+                    $("#code_key").val(data.codeKey);
+                    $("#captcha_send").html("重新发送(<span id='span_time'>90</span>)");
+                    sand_timer();
+                } else if(data.isOK==1){
+					if(data.message!=''){
+    					alert(data.message);
+    				}else{
+    					alert("验证码发送失败");
+    				}
+					$("#captcha_send").removeAttr("disabled");
+                    $("#captcha_send").html("发送验证码");
+                }
+            }
+        });
+    });
+
+    var time = 90;
+    var timer;
+    function sand_timer(){
+        timer = window.setInterval(showalert, 1000);
+    }
+
+    function showalert()
+    {
+        time--;
+        if(time > 0){
+            $("#span_time").html(time);
+        } else {
+            $("#captcha_send").html("发送验证码");
+            window.clearInterval(timer);//去掉定时器
+            time = 90;
+        }
+    }
+
+    $("#submit_id").click(function(){
+        $("#submit_id").loadingMsg();
+        var capcha = $("#captcha_id").val();
+        if(!capcha){
+            alert("验证码不能为空");
+            return;
+        }
+        $("#userVerifyForm").submit();
+    });
+</script>

@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.goodscenter.dao.SearchDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="itemSkuDTOMap" type="com.camelot.goodscenter.dto.ItemSkuDTO">
+		<result property="itemId"  column="item_id" />
+		<result property="sellerId"  column="seller_id" />
+		<result property="shopCid"  column="shop_cid" />
+		<result property="itemName"  column="item_name" />
+		<result property="ad"  column="ad" />
+		<result property="cid"  column="cid" />
+		<result property="brand"  column="brand" />
+		<result property="brandName"  column="brand_name" />
+		<result property="hasPrice"  column="has_price" />
+		<result property="productId"  column="product_id" />
+		<result property="describeUrl"  column="describe_url" />
+		<result property="itemStatus"  column="item_status" />
+		<result property="shopId"  column="shop_id" />
+		<result property="itemPrice"  column="guide_price" />
+		<result property="skuId"  column="sku_id" />
+		<result property="skuInventory"  column="total_inventory" />
+		<result property="skuAttributeStr"  column="attributes" />
+		<result property="skuScope"  column="sku_scope" />
+	</resultMap>
+	<resultMap id="searchConditionMap" type="com.camelot.goodscenter.domain.Item" >
+		<result property="cid" column="cid"/>
+		<result property="attributes" column="attributes"/>
+		<result property="brand" column="brand"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+	<!-- 分页查询 -->
+	<sql id="where_fragement">
+		<![CDATA[ 
+			item item_,
+			item_brand item_brand_,
+			item_category item_category_ ,
+			item_sku item_sku_
+			LEFT JOIN (SELECT 
+				t.sku_id sku_id,
+				IFNULL(ROUND(AVG(t.sku_scope), 0),0) sku_scope 
+			FROM
+				item_evaluation t 
+			GROUP BY t.sku_id) item_evaluation_ ON item_evaluation_.sku_id = item_sku_.sku_id
+		]]>
+		<if test="entity!=null and (entity.orderSort==5 or entity.orderSort==6)">
+			<![CDATA[ 
+				LEFT JOIN item_sales_volume item_sales_volume_ 
+  				ON item_sales_volume_.sku_id = item_sku_.sku_id
+			]]>
+		</if>
+		<if test="entity!=null and (entity.orderSort==7 or entity.orderSort==8 or entity.minPrice != null or entity.maxPrice != null) ">
+			<![CDATA[ 
+				LEFT JOIN trade_sku_price trade_sku_price_ 
+			    ON trade_sku_price_.sku_id = item_sku_.sku_id 
+			    	AND FIND_IN_SET(#{entity.areaCode}, trade_sku_price_.area_id)
+					AND trade_sku_price_.min_num<=1
+					AND trade_sku_price_.max_num>=1
+				LEFT JOIN trade_sku_price trade_sku_price_2 
+			    ON trade_sku_price_2.sku_id = item_sku_.sku_id 
+			    	AND trade_sku_price_2.area_id = 0
+					AND trade_sku_price_2.min_num<=1
+					AND trade_sku_price_2.max_num>=1
+				LEFT JOIN item_sku_inquiry_price item_sku_inquiry_price_ 
+			    ON item_sku_inquiry_price_.sku_id = item_sku_.sku_id 
+					and item_sku_inquiry_price_.buyer_id =#{entity.buyerId}
+			  
+			]]>
+		</if>
+		,
+		trade_inventory trade_inventory_
+		
+		WHERE item_.cid = item_category_.cid 
+			AND item_brand_.brand_id = item_.brand 
+			AND item_sku_.item_id = item_.item_id
+			AND  trade_inventory_.sku_id=item_sku_.sku_id
+			AND item_.item_status = 4 
+			AND item_category_.status = 1 
+			AND item_brand_.brand_status = 1 
+			AND item_sku_.sku_status = 1
+			and item_.operator=1
+		<if test="entity.minPrice != null or entity.maxPrice != null">
+			AND item_.has_price = 1
+		</if>
+		<if test="entity!=null">
+			<if test="entity.keyword != null  and entity.keyword !=''">
+				<![CDATA[ and item_.item_name like CONCAT('%',#{entity.keyword},'%')]]>
+			</if>
+			<if test="entity.shopId != null  and entity.shopId !=''">
+				<![CDATA[ and item_.shop_id = #{entity.shopId}]]>
+			</if>
+			<if test="entity.brandIds!=null and entity.brandIds.size()>0">
+				<![CDATA[ and item_.brand  in ]]>
+				<foreach collection="entity.brandIds" item="brandId" open="(" separator="," close=")">
+					#{brandId}
+				</foreach>
+			</if>
+			<if test="entity.categoryIds!=null and entity.categoryIds.size()>0">
+				<![CDATA[ and item_.cid  in ]]>
+				<foreach collection="entity.categoryIds" item="cid" open="(" separator="," close=")">
+					#{cid}
+				</foreach>
+			</if>
+			<if test="entity.attrList!=null and entity.attrList.size()>0">
+				<foreach collection="entity.attrList" item="attrKv" open="" separator="" close="">
+					<![CDATA[ and item_.attributes  like CONCAT('%',#{attrKv},'%')]]>
+				</foreach>
+			</if>
+			<if test="entity.shopCid != null  and entity.shopCid !=''">
+                <![CDATA[ and item_.shop_cid = #{entity.shopCid}]]>
+            </if>
+            <if test="entity.platformId != null  and entity.platformId !=''">
+                <![CDATA[ and item_.platform_id = #{entity.platformId}]]>
+            </if>
+            <if test="entity.minPrice != null">
+            	<![CDATA[and IFNULL(trade_sku_price_.sell_price, trade_sku_price_2.sell_price) >= #{entity.minPrice}]]>
+            </if>
+            <if test="entity.maxPrice != null">
+            	<![CDATA[and IFNULL(trade_sku_price_.sell_price, trade_sku_price_2.sell_price) <= #{entity.maxPrice}]]>
+            </if>
+            <if test="entity.addSources != null">
+            	and item_.add_source in
+            	<foreach collection="entity.addSources" item="addSource"
+            		open="(" separator="," close=")">
+            		<choose>
+            			<when test="addSource == 4">4,5,6</when><!-- 前台服务商品是4，DB里服务商品有4,5,6 -->
+            			<otherwise>#{addSource}</otherwise>
+            		</choose>
+            	</foreach>
+            </if>
+            <if test="entity.houseType != null and entity.houseType != ''">
+            	and item_.house_type LIKE CONCAT('%', #{entity.houseType}, '%')
+            </if>
+			<if test="entity.searched!=null">
+				<if test="entity.searched==1">
+					<![CDATA[ AND (item_.searched=#{entity.searched} or item_.searched is null)]]>
+				</if>
+				<if test="entity.searched!=1">
+					<![CDATA[ AND item_.searched=#{entity.searched}]]>
+				</if>
+			</if>
+			<if test="entity.searched==null">
+				<![CDATA[ AND (item_.searched=1 or item_.searched is null)]]>
+			</if>
+			
+		</if>
+	</sql>
+	<select id="queryItemSkus" resultMap="itemSkuDTOMap">
+		<![CDATA[
+		select *
+		from (
+		SELECT
+			item_.item_id,
+			item_.seller_id,
+			item_.shop_cid,
+			item_.item_name,
+			item_.ad,
+			item_.cid,
+			item_.brand,
+			item_brand_.brand_name,
+			item_.has_price,
+			item_.product_id,
+			item_.describe_url,
+			item_.item_status,
+			item_.shop_id,
+			item_.guide_price,
+			item_sku_.sku_id,
+			item_sku_.attributes,
+			trade_inventory_.total_inventory,
+			ifnull(item_evaluation_.sku_scope,0) sku_scope,
+			IFNULL(item_.placed_top,2) placed_top
+		]]>
+			<if test="entity!=null and (entity.orderSort==7 or entity.orderSort==8) ">
+			,cast(CASE
+		      WHEN item_.has_price = 2 
+		      AND item_sku_inquiry_price_.inquiry_price IS NOT NULL 
+		      THEN item_sku_inquiry_price_.inquiry_price 
+		      WHEN item_.has_price = 2 
+		      AND item_sku_inquiry_price_.inquiry_price IS NULL 
+		      <if test="entity.orderSort==7">
+		      THEN 999999999999999 
+		      </if>
+		      <if test="entity.orderSort==8">
+		      THEN 0
+		      </if>
+		      ELSE IFNULL(
+		        item_sku_inquiry_price_.inquiry_price,
+		        IFNULL(trade_sku_price_.sell_price,trade_sku_price_2.sell_price)
+		      ) 
+		    END as DECIMAL(14,2)) show_price 
+			</if>
+			<if test="entity!=null and (entity.orderSort==5 or entity.orderSort==6)">
+			, item_sales_volume_.sales_volume
+			</if>
+		FROM
+		<include refid="where_fragement"></include>
+		) tt
+		<!--1.置顶商品一定会排在最前面（哪怕是暂无报价），
+			2.按价格排序时，暂无报价商品会被放在最后，
+			3.然后按各种排序条件排序 -->
+		ORDER BY tt.placed_top
+		<if test="entity.orderSort==7 or entity.orderSort==8">
+			, tt.has_price
+		</if>
+		<if test="entity.orderSort==3">
+			, tt.sku_scope 
+		</if>
+		<if test="entity.orderSort==4">
+			, tt.sku_scope desc
+		</if>
+		<if test="entity.orderSort==5">
+			, tt.sales_volume
+		</if>
+		<if test="entity.orderSort==6">
+			, tt.sales_volume desc
+		</if>
+		<if test="entity.orderSort==7">
+			, tt.show_price
+		</if>
+		<if test="entity.orderSort==8">
+			, tt.show_price desc
+		</if>
+		<if test="page!=null">
+			<include refid="pagination_tail"></include>
+		</if>
+		
+	</select>
+	<select id="queryItemSkusCount" resultType="long">
+	<![CDATA[
+		SELECT
+			count(*)
+		FROM 
+		]]>
+		<include refid="where_fragement"></include>
+	</select>
+	
+	<select id="queryConditionIds" resultMap="searchConditionMap">
+		SELECT
+			item_.attributes,
+			item_.cid,
+			item_.brand
+		FROM
+		<include refid="where_fragement"></include>
+	</select>
+</mapper>

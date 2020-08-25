@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+	<!-- 使用dubbo协议暴露服务 -->
+
+
+	<dubbo:service interface="com.camelot.basecenter.service.BaseSmsConfigService"
+		owner="basecenter" ref="baseSmsConfigService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		
+	<dubbo:service interface="com.camelot.basecenter.service.MallClassifyService"
+		owner="basecenter" ref="mallClassifyService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+	
+	<dubbo:service interface="com.camelot.basecenter.service.AddressBaseService"
+		owner="basecenter" ref="addressBaseService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+	
+	<dubbo:service interface="com.camelot.basecenter.service.AddressInfoService"
+		owner="basecenter" ref="addressInfoService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+	
+	<dubbo:service interface="com.camelot.basecenter.service.BaseWebSiteMessageService"
+		owner="basecenter" ref="baseWebSiteMessageService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		
+	<!-- 使用dubbo协议暴露帮助文档服务 -->
+	<dubbo:service interface="com.camelot.basecenter.service.MallDocumentService"
+		owner="camelot" ref="mallDocumentService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		
+	<!-- 使用dubbo协议暴露平台服务规则 -->
+	<dubbo:service interface="com.camelot.basecenter.service.PlatformServiceRuleExportService"
+		owner="camelot" ref="platformServiceRuleExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+	
+	<!-- 使用dubbo协议暴露咨询 -->
+	<dubbo:service interface="com.camelot.basecenter.service.BaseConsultingSmsService"
+		owner="camelot" ref="baseConsultingSmsService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />	
+		
+	<!-- 使用dubbo协议暴露tdk设置 -->
+	<dubbo:service interface="com.camelot.basecenter.service.BaseTDKConfigService"
+		owner="camelot" ref="baseTDKConfigService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />	
+		
+	<!-- 使用dubbo协议暴露短信/邮件 发送数据获取接口 -->
+	<dubbo:service interface="com.camelot.basecenter.service.BaseSendMessageService"
+		owner="camelot" ref="baseSendMessageService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />	
+		
+	<dubbo:service interface="com.camelot.basecenter.service.ActiveMQFactoryService"
+		owner="camelot" ref="activeMQFactoryService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+
+		<!--使用dubbo协议暴露类型接口-->
+	<dubbo:service interface="com.camelot.basecenter.service.TypeService"
+		owner="camelot" ref="typeService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />	
+		<!--使用dubbo协议暴露字典接口-->
+	<dubbo:service interface="com.camelot.basecenter.service.DictionaryService"
+		owner="camelot" ref="dictionaryService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+	
+	<dubbo:service interface="com.camelot.basecenter.service.GrowthService"
+		owner="camelot" ref="growthService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />	
+			
+</beans>

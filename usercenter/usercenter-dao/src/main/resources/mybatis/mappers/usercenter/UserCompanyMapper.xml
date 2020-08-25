@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.usercenter.dao.UserCompanyMybatisDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="userBuyerCompanyMap" type="userCompanyDTO">
+			<result property="id" column="id"/>
+			<result property="userId" column="user_id"/>
+			<result property="createTime" column="create_time"/>
+			<result property="serviceType" column="service_type"/>
+			<result property="companyScale" column="company_scale"/>
+			<result property="deliveryAddress" column="delivery_address"/>
+			<result property="invoiceInformation" column="invoice_information"/>
+			<result property="status" column="status"/>
+	</resultMap>
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,user_id
+ 			,create_time
+ 			,service_type
+ 			,company_scale
+ 			,delivery_address
+ 			,invoice_information
+ 			,status
+		FROM 
+		user_buyer_company user_buyer_company_
+		]]>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+   <select id="selectByUId" resultMap="userBuyerCompanyMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		  where user_buyer_company_.user_id = #{uid}
+		]]>
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="userCompanyDTO" useGeneratedKeys="true" keyProperty="id">
+		<![CDATA[
+		insert into user_buyer_company (
+		    	 user_id
+		    	 ,create_time
+		    	 ,service_type
+		    	 ,company_scale
+		    	 ,delivery_address
+		    	 ,invoice_information
+		    	 ,status
+		   )values(
+		    	#{userId}
+		    	,now()
+		    	,#{serviceType}
+		    	,#{companyScale}
+		    	,#{deliveryAddress}
+		    	,#{invoiceInformation}
+		    	,#{status}
+		   )
+	    ]]>	
+	</insert>
+	
+	<update id="update" parameterType="userCompanyDTO">
+		<![CDATA[
+		update user_buyer_company set
+   			service_type = #{serviceType}
+   			,company_scale = #{companyScale}
+   			,delivery_address = #{deliveryAddress}
+   			,invoice_information = #{invoiceInformation}
+		 where id = #{id}
+		]]>
+	</update>
+	
+	<update id="updateUserCompanyStatus" parameterType="userCompanyDTO">
+		<![CDATA[
+		update user_buyer_company set
+   			status = #{status}
+		 where id = #{id}
+		]]>
+	</update>
+	
+</mapper>

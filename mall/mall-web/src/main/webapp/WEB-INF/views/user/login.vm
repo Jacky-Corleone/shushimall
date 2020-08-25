@@ -1,0 +1,330 @@
+#set($layout = "/user/login_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="$request.getContextPath()/assets/css/register.css" rel="stylesheet" type="text/css"/>
+<link href="$request.getContextPath()/assets/css/basic.css" rel="stylesheet" type="text/css"/>
+<link href="$request.getContextPath()/assets/css/manage_style.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/jquery.cookie.js"></script>
+
+<title>欢迎登录</title>
+<style type="text/css">
+.msg_span{
+	font-size: 12px;
+	float: left;
+	margin-left: 16px;
+}
+</style>
+<script type="text/javascript">
+
+var JPlaceHolder = {
+    //检测
+    _check : function(){
+        return 'placeholder' in document.createElement('input');
+    },
+    //初始化
+    init : function(){
+        if(!this._check()){
+            this.fix();
+        }
+    },
+    //修复
+    fix : function(){
+        jQuery(':input[placeholder]').each(function(index, element) {
+
+            var self = $(this), txt = self.attr('placeholder');
+			if(this.value!=''&&this.value!=null){
+				return ;
+			}
+            self.wrap($('<div></div>').css({position:'relative', zoom:'1', border:'none', background:'none', padding:'none', margin:'none'}));
+            var pos = self.position(), h = self.outerHeight(true), paddingleft = self.css('padding-left');
+            var holder = $('<span></span>').text(txt).css({position:'absolute', left:pos.left, top:pos.top+10, height:h, lienHeight:h, paddingLeft:paddingleft, color:'#aaa'}).appendTo(self.parent());
+            self.focusin(function(e) {
+                holder.hide();
+            }).focusout(function(e) {
+                if(!self.val()){
+                    holder.show();
+                }
+            });
+            holder.click(function(e) {
+                holder.hide();
+                self.focus();
+            });
+        });
+    }
+
+};
+
+
+$(function(){
+	var uname = "$!logname"=="" ? $.cookie('logname') : "$!logname";
+	$("#loginname_id").val(uname);
+
+	if("$!url" != ""){
+		$("#url_id").val("$!url");
+	}
+	//验证用户名
+	$("#loginname_id").focusout(checkLogName).focusout(checkLoginErrCount);
+	//验证密码格式
+	$("#loginpwd_id").focus(checkPwdIn).focusout(checkPwdOut);
+	//处理ie登录页面中，用户名和密码框没有提示语
+	JPlaceHolder.init();
+	//提交
+	
+	$("#btn_submit").click(function(){
+	
+        var loginname = $.trim($("#loginname_id").val());
+        if(loginname.length == 0){
+            $("#loginname_span").html("请输用户名");
+            $("#loginname_span").css("color", "red");
+            return false;
+        }
+
+        var pwd = $("#loginpwd_id").val();
+        if(pwd.length == 0){
+            $("#loginpwd_span").html("请输入登录密码");
+            $("#loginpwd_span").css("color","red");
+            return false;
+        }
+        if(pwd.length < 6){
+            $("#loginpwd_span").html("密码不得少于六位，请重新输入");
+            $("#loginpwd_span").css("color","red");
+            return false;
+        }
+
+		// 是否对验证码格式进行校验
+		if($('#captcha_container').is(":visible")){
+			var captcha = $("#captcha_id").val();
+            var captchaFormat = /^[a-zA-Z0-9]{4}$/;
+            if(!captchaFormat.test(captcha)){
+                $("#captcha_span").html("验证码不正确");
+                $("#captcha_span").css("color", "red");
+                _chage();
+                return false;
+            }
+		}
+		login();
+    });
+});
+
+function login(){
+	$("#btn_submit").html("正在登录...");
+	$('#btn_submit').attr("disabled","true");
+	$.ajax({
+        type: "post",
+        dataType: "json",
+        url:"$request.contextPath/user/homepage",
+        data:$("#login_form").serializeArray(),
+        success: function(data){
+            if(data.message != ''){
+                if(data.message == '可以登录'){
+                    window.location.href = data.retUrl;
+                }else if(data.message == 'needcode'){
+					$("#login_form .msg").html("");
+					$("#captcha_container").show();
+				}else if(data.message == 'errcode'){
+					$("#captcha_span").html("验证码不正确");
+        			$("#captcha_span").css("color", "red");
+        			$("#captcha_span").show();
+        			_chage();
+				}else{
+                    $("#login_form .msg").html("用户名或密码错误！");
+                    $("#login_form .msg").css("color", "red");
+                    $("#loginpwd_id").val("");
+					_chage();
+					$("#captcha_id").val("");
+					$("#captcha_span").html("");
+                }
+				$("#btn_submit").html("登  录");
+				$('#btn_submit').removeAttr("disabled");
+            }
+        }
+    });
+}
+
+function checkLoginErrCount(){
+	$.ajax({
+        type: "post",
+        dataType: "json",
+        url:"$request.contextPath/user/verifyLoginErrCount",
+        data:{},
+		cache:true,
+        success: function(data){
+            if(data.message){
+				$("#captcha_container").show();
+            }
+        }
+    });
+}
+
+function checkLogName(){
+	var loginname = $("#loginname_id").val();
+    if(loginname.length < 1){
+        $("#loginname_span").html("不能为空");
+        $("#loginname_span").css("color", "red");
+        return false;
+    } else {
+        $("#loginname_span").html("");
+    }
+	return true;
+}
+
+function checkPwdIn(){
+	$("#loginpwd_span").html("");
+	$("#loginpwd_span").css("color", "#dedede");
+}
+
+function checkPwdOut(){
+	var pwd = $("#loginpwd_id").val();
+	if(pwd.length == 0){
+		$("#loginpwd_span").html("请输入登录密码");
+		$("#loginpwd_span").css("color","red");
+		return false;
+	}
+	if(pwd.length < 6){
+		$("#loginpwd_span").html("密码不得少于六位，请重新输入");
+		$("#loginpwd_span").css("color","red");
+		return false;
+	} else {
+		return true;
+	}
+}
+
+function _chage(){
+	var img = document.getElementById("vc");
+	img.src="$request.contextPath/user/acquire?a=" + new Date().getTime();
+}
+
+//function checkCaptcha(){
+//	$("#login_form").submit();
+//}
+
+function checkCaptcha(){
+		var captcha = $("#captcha_id").val();
+		var captchaFormat = /^[a-zA-Z0-9]{4}$/;
+		if(!captchaFormat.test(captcha)){
+			$("#captcha_span").html("验证码不正确");
+			$("#captcha_span").css("color", "red");
+			$("#captcha_span").show();
+			_chage();
+		}
+		var data = {captcha:captcha};
+		$.ajax({
+			url:"$request.contextPath/user/verifyCaptcha",
+			type:"post",
+			data:data,
+			success:function(data){
+				if(!data.message){
+					$("#captcha_span").html("验证码不正确");
+					$("#captcha_span").css("color", "red");
+					_chage();
+				} else {
+					$("#captcha_span").html("");
+                    $.ajax({
+                        type: "post",
+                        dataType: "json",
+                        url:"$request.contextPath/user/homepage",
+                        data:$("#login_form").serializeArray(),
+                        success: function(data){
+                            if(data.message != ''){
+                                if(data.message == '可以登录'){
+                                    window.location.href =  data.retUrl;
+                                }else{
+                                    $("#login_form .msg").html("用户名或密码错误！");
+                                    $("#login_form .msg").css("color", "red");
+                                    $("#loginpwd_id").val("");
+                                }
+                            }
+                        }
+                    });
+				}
+			}
+		});
+}
+
+function updef(){
+	$("#def_id").val(0);
+}
+
+function submit_form(){
+	if(checkLogName() && checkPwdOut()){
+        $("#btn_submit").click();
+	}
+}
+
+
+
+
+//火狐中是 window.event
+document.onkeydown = function(e){
+		if(!e){
+			e = window.event;
+		}
+		if((e.keyCode || e.which) == 13){
+			submit_form();
+		}
+	};
+</script>
+</head>
+
+
+<body>
+<!--头部开始-->
+#parse("/common/search.vm")
+#parse("/common/index_head.vm")
+<!--头部结束-->
+
+<!--内容开始-->
+<div class="register_content" >
+<div class="register">
+	<div class="register_box">
+	<form id="login_form" method="post">
+		<input type="hidden" name="url" id="url_id"/>
+		<ul>
+			<!--如需增加可循环li开始-->
+			<li class="msg font_14 font_e3 hei_20"></li>
+			<li>
+				<input name="loginname" id="loginname_id" type="text" class="input_Style1 wid_220" placeholder="会员名/手机号/邮箱" maxlength="35"/>
+				<span class="register-icon"><img src="$staticPath/images/icon-user.png"></span>
+				<span id="loginname_span" class="msg_span"></span>
+			</li>
+			<li class="mar_tb20">
+				<input name="loginpwd" id="loginpwd_id" type="password" onchange="updef()" class="input_Style1 wid_220" placeholder="登录密码" maxlength="35"/>
+				<span class="register-icon"><img src="$staticPath/images/icon-lock.png"></span>
+				<span id="loginpwd_span" class="msg_span"></span>
+			</li>
+			<li id="captcha_container" style="display: none">
+				<input name="captcha" type="text" id="captcha_id" class="input_Style1 wid_120" placeholder="验证码" maxlength="6"/>
+				<span class="wid_120">
+					<img id="vc" style="" src="$request.contextPath/user/acquire" />
+					<a href="javascript:_chage();">换一张</a>
+				</span>
+				<span id="captcha_span" class="mar_t5"></span>
+			</li>
+			<li class="mar_t10">
+					<a href="$request.contextPath/information/register/initRegister" class="mar_r10 font_82 fl">免费注册</a>
+					<a href="$request.contextPath/findpwd/editusername" class="font_82 fr mar_r20">忘记密码？</a>
+					<button type="button" class="button_1 hei_40 font_18" style="width:98%" id="btn_submit">登  录</button>
+			</li>
+		</ul>
+	</form>
+	</div>
+	<div class="register_pic">
+		#if($!mallAd.adSrc)
+			<a href="$request.contextPath/adVisit?id=$!mallAd.id&type=1&url=$!mallAd.adURL" target="_blank" title="$!mallAd.title">
+            <img src="$!imageServerAddr$!mallAd.adSrc" style="width: 500px; height: 380px;"/>
+        </a>
+		#else
+			<img src="$request.getContextPath()/assets/images/login_pic.png" style="width: 500px; height: 380px;"/>
+		#end
+	</div>
+</div></div>
+<!--内容结束-->
+<!-- #if($!bout)
+<img src="http://$bbs_url/go.php?o=$!bout" width="0" height="0" border="0">
+#end -->
+</body>
+</html>

@@ -1,0 +1,19 @@
+<script type="text/javascript">
+    var message = "$!message";
+    var siteUrl = "$!siteUrl";
+    var indexUrl = "$!indexUrl";
+    var runType = "$!runType";
+    if(message){
+        alert(message);
+    }
+    if(siteUrl){
+        if(runType == 'login'){
+            window.location.href = siteUrl;
+        }else{
+            window.location.href = "$request.contextPath"+siteUrl;
+        }
+    }
+    if(indexUrl){
+        window.location.href = "$!siteDomain";
+    }
+</script>

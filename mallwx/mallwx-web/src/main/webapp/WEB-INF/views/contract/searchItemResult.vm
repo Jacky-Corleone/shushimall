@@ -1,0 +1,30 @@
+#set($layout = "common/order.vm")
+#foreach($itemsku in $items)
+<dl class="shop_present pad_tb5">
+
+    <dt class="fl">
+		<!--  
+        <a href="$request.contextPath/product/toDetail?id=$itemsku.itemId&skuId=$itemsku.skuId"> 
+         -->
+        <img src="$gix$itemsku.picUrl">
+        <!--  
+        </a>
+        -->
+    </dt>
+    <dd class="fr">
+        <p class="hei_24 over_ell"><input type="checkbox" name="itemOrder" onclick="checkIsChosen(this)">商品编号：$itemsku.skuId</p>
+
+        <p class="hei_24 over_ell">商品名称：$!itemsku.itemName</p>
+
+        <p class="hei_24 over_ell">原价：<span>$!itemsku.skuPrice</span></p>
+
+        <p class="hei_24 over_ell">商品属性：$!itemsku.skuAttributeStr</p>
+    </dd>
+    <input type="hidden" name="itemName" value="$itemsku.itemName">
+    <input type="hidden" name="itemSkuId" value="$itemsku.skuId">
+    <input type="hidden" name="itemPrice" value="$itemsku.skuPrice">
+    <input type="hidden" name="salerAttr" value="$itemsku.skuAttributeStr">
+</dl>
+<div class="clear"></div>
+#end
+

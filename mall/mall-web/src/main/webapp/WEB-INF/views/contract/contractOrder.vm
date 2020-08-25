@@ -1,0 +1,260 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/${sourcePage}_layout.vm")
+<script language="javascript" type="text/javascript" src="$staticPath/js/js.js"></script>
+<script type="text/javascript" src="$staticPath/js/common.js"></script>
+<script language="javascript" type="text/javascript" src="$staticPath/js/tab.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="$staticPath/js/contract/contract.js"></script>
+<input id="contextPath" type="hidden" value="$request.contextPath">
+<input id="sourcePage" type="hidden" value="$sourcePage">
+<script type="text/javascript">
+    $(document).ready(function () {
+        //加载左侧菜单
+        if ("${sourcePage}" == "buyer") {
+            $("#leftBuyer").load("$request.contextPath/leftBuyer");
+        }
+        if ("${sourcePage}" == "seller") {
+            $("#leftSeller").load("$request.contextPath/leftSeller");
+        }
+    });
+</script>
+<div id="main">
+    #if(${sourcePage}=="buyer")
+        <!-- left start -->
+        <div id="leftBuyer" style="width: 198px; float: left;">&nbsp;</div>
+        <!-- left end -->
+    #end
+    #if($sourcePage=="seller")
+        <!-- left start -->
+        <div id="leftSeller" style="width: 198px; float: left;">&nbsp;</div>
+        <!-- left end -->
+    #end
+
+    <div id="right">
+        <div class="mar_lr10 pad_tb20">
+            <p class="font_16 hei_32 pad_l10 bg_05">协议状态：<span class="font_e5">$!statusMap.get($contract.status)</span>
+            </p>
+            <ul class="list mar_t10 mar_l10 ">
+                <li class="wid_460 mar_tb10 ">
+                    <span class="font_wid mar_r10"> 协议编号 : </span>
+                    <span>$!contract.contractNo</span>
+                </li>
+                <li class="wid_460 mar_tb10">
+                    <span class="font_wid mar_r10"> 协议名称 : </span>
+                    <span>$!contract.contractName</span>
+                </li>
+            </ul>
+            <div class="clear"></div>
+            <!-- 联系方式 开始 -->
+            <p class="font_16 hei_32 pad_l10 bg_05">联系方式</p>
+            <!-- 印刷厂信息start -->
+            <div style="float:left;width:460px">
+                <ul class="list mar_t10 mar_l10 ">
+                    <li class="wid_460 mar_tb10 ">
+                        <span class="font_wid mar_r10">买方 : </span>
+                        <span>$!buyer.companyName</span>
+                    </li>
+                    <li class="wid_460 mar_tb10">
+                        <span class="font_wid mar_r10">联系人: </span>
+                        <span>$!buyer.uname</span>
+                    </li>
+                    <li class="wid_460 mar_tb10 ">
+                        <span class="font_wid mar_r10">联系电话 : </span>
+                        <span>$!buyer.umobile</span>
+                    </li>
+                    <li class="wid_460 mar_20 mar_tb10">
+                        <span class="font_wid mar_r10">电子邮箱 : </span>
+                        <span>$!buyer.userEmail</span>
+                    </li>
+                </ul>
+            </div>
+            <!-- 印刷厂信息end -->
+            <!-- 供货商信息start -->
+            <div style="float:left;width:460px">
+                <ul class="list mar_t10 mar_l10 ">
+                    <li class="wid_460 mar_tb10">
+                        <span class="font_wid mar_r10">卖方 : </span>
+                        <span>$!seller.companyName</span>
+                    </li>
+                    <li class="wid_460 mar_20 mar_tb10">
+                        <span class="font_wid mar_r10">联系人 : </span>
+                        <span>$!seller.uname</span>
+                    </li>
+                    <li class="wid_460 mar_tb10 ">
+                        <span class="font_wid mar_r10">联系电话 : </span>
+                        <span>$!seller.umobile</span>
+                    </li>
+                    <li class="wid_460 mar_20 mar_tb10">
+                        <span class="font_wid mar_r10">电子邮箱 : </span>
+                        <span>$!seller.userEmail</span>
+                    </li>
+                </ul>
+            </div>
+            <!--  供货商信息end -->
+            <!-- 联系方式 end -->
+            <div class="clear"></div>
+            <!-- 合同条件 开始 -->
+            <p class="font_16 hei_32 pad_l10 bg_05 mar_t20">合同条件</p>
+            <ul class="list mar_t10 mar_l10 " id="orderContract">
+                <!--合同有效期 开始-->
+                <li class="wid_920 mar_tb10">
+                    <span class="font_wid mar_r10">协议有效期 : </span>
+                    <input type='hidden'  maxlength='8' value="$!contract.protocolType" name='protocolType' id="protocolType" />   
+                    <input type="hidden" value="$contract.contractNo" name="contractNo">
+                    <input type="hidden" value="$!date.format('yyyy-MM-dd',$contract.beginDate)" name="contractBeginDate">
+                    <input type="hidden" value="$!date.format('yyyy-MM-dd',$contract.endDate)" name="contractEndDate">
+                    <span>$!date.format('yyyy-MM-dd',$contract.beginDate)</span>
+                    <i class=" mar_lr10">至</i>
+                    <span>$!date.format('yyyy-MM-dd',$contract.endDate)</span>
+                </li>
+                <!--合同有效期 end-->
+                <li class="wid_920 mar_tb10">
+                    <p>
+                        <span class="font_wid mar_r10">协议账期 : </span>
+                        #if($contractPayment.paymentType==1)
+                            $!contractPayment.paymentDays月
+                        #else
+                            $!contractPayment.paymentDays天
+                        #end
+                    </p>
+                </li>
+                <li class="wid_920 mar_20 mar_tb10">
+                    <span class="font_wid mar_r10">备注 : </span>
+                        <textarea cols="" rows="" readonly="true"
+                                  class="wid_500 input_Style2 hei_100">$!contract.remark</textarea>
+                </li>
+            </ul>
+            <!-- 合同条件 end -->
+            <div class="clear"></div>
+            <!-- 合同物品 开始 -->
+            <p class="font_16 hei_32 pad_l10 bg_05 mar_t20">合同物品</p>
+
+            <div class=" mar_t20 mar_cen" id="itemList">
+                <!-- 合同物品 开头 -->
+                <ul class="list_top bg_08 font_cen font_14b">
+                    <li class="wid_50 font_cen">
+                        <input type="checkbox" class="mar_l10 hei_22" id="all_select" onclick="selectAll()"/></li>
+                    </li>
+                  
+                     #if("1"==$!contract.protocolType)
+		                    <li class="wid_200">所属类目</li>
+		                    <li class="wid_150">物品名称</li>
+		                    <li class="wid_200">销售属性</li>
+		                    <li class="wid_150">数量</li>
+		                    <li class="wid_200">单价</li>
+                     #end
+                     #if("2"==$!contract.protocolType)
+                        <li class="wid_120">所属类目</li>
+	                    <li class="wid_150">物品名称</li>
+	                    <li class="wid_110">销售属性</li>
+	                    <li class="wid_110">数量</li>
+	                    <li class="wid_140">单价</li>
+	                    <li class="wid_120">总数量</li>
+	                    <li class="wid_150">已购买数量</li>
+                     #end
+                     #if("3"==$!contract.protocolType)
+                          <li class="wid_120">所属类目</li>
+	                    <li class="wid_150">物品名称</li>
+	                    <li class="wid_110">销售属性</li>
+	                    <li class="wid_110">数量</li>
+	                    <li class="wid_140">单价</li>
+	                    <li class="wid_120">总价值</li>
+	                    <li class="wid_150">已购买金额</li>
+                    #end
+                </ul>
+                #foreach($contractMat in $contract.contractMatDTOs)
+                    <ul class="list_top">
+                        <input type="hidden" value="$contract.supplierId" name="sellerId">
+                        <input type="hidden" name="shopId" value="$!contractMat.get('shopId')">
+                        <input type="hidden" name="skuId" value="$!contractMat.get('skuId')">
+                        <input type="hidden" name="itemId" value="$!contractMat.get('itemId')">
+                        <input type="hidden" name="skuPrice" value="$!contractMat.get('matPrice')">
+                        <input type="hidden" name="matId" value="$contractMat.get('id')">
+                        <li class="wid_50 font_cen"><input type="checkbox" id="subCheck" class="mar_l10 hei_22" onclick="setSelectAll()"
+                                                           name="contractId" value="$conInfo.id"/>
+                        </li>
+                        #if("1"==$!contractMat.contractType) 
+                        <li class="wid_200 over_ell font_cen" title="$!contractMat.get('cName')">$!contractMat.get("cName")&nbsp;</li>
+                        <li class="wid_150 over_ell font_cen" title="$!contractMat.get('itemName')">$!contractMat.get("itemName")&nbsp;</li>
+                        <li class="wid_200 over_ell font_cen" title="$!contractMat.get('salerAttr')">$!contractMat.get("salerAttr")&nbsp;</li>
+                        <li class="wid_150 over_ell font_cen" ><input class="wid_50 input_Style2 hei_24" name="quantity"
+                                                            onkeyup="numInput(this,0)"
+                                                            onblur="if(this.value=='')value=1;accounts(this);"
+                                                            onfocus="if(this.value==1)value='';" value=1
+                                                            class="wid_11 input_3"></li>
+                        <li class="wid_200 over_ell font_cen" title="$!contractMat.get('matPrice')">￥$!contractMat.get("matPrice")&nbsp;</li>
+                       #end
+                        #if("2"==$!contractMat.contractType) 
+                        <li class="wid_120 over_ell font_cen" title="$!contractMat.get('cName')">$!contractMat.get("cName")&nbsp;</li>
+                        <li class="wid_150 over_ell font_cen" title="$!contractMat.get('itemName')">$!contractMat.get("itemName")&nbsp;</li>
+                        <li class="wid_110 over_ell font_cen" title="$!contractMat.get('salerAttr')">$!contractMat.get("salerAttr")&nbsp;</li>
+                        <li class="wid_110 over_ell font_cen" ><input class="wid_50 input_Style2 hei_24" name="quantity"
+                                                            onkeyup="numInput(this,0)"
+                                                            onblur="if(this.value=='')value=1;"
+                                                            onfocus="if(this.value==1)value='';" value=1
+                                                            class="wid_11 input_3">
+                       <input type='hidden' maxlength='8' class='form-control wid_30 hei_24' value="$!contractMat.get('number')" name='number' id='numberec'/>
+                       	#foreach($countCostList in $countCostList)
+  	  						 #if($!contractMat.get('skuId')==$!countCostList.skuId)
+                       		
+                       			 <input type='hidden'  maxlength='8' class='form-control wid_30 hei_24' value="$!countCostList.number" name='countNumber' id="countNumber" />   
+                         	#end
+        		    	 #end
+                       
+                       <li class="wid_140 over_ell font_cen" title="$!contractMat.get('matPrice')">￥$!contractMat.get("matPrice")&nbsp;</li>
+                       <li class="wid_120 over_ell font_cen" title="$!contractMat.get('number')">$!contractMat.get('number')&nbsp;
+                       </li>
+           					#foreach($countCostList in $countCostList)
+		                          #if($!contractMat.get('skuId')==$!countCostList.skuId)
+		                              <li class="wid_150 over_ell font_cen" title="$!countCostList.get('number')">$!countCostList.number&nbsp;</li>
+		                          #end
+	                        #end
+                       #end
+                       #if("3"==$!contractMat.contractType) 
+                        <li class="wid_120 over_ell font_cen" title="$!contractMat.get('cName')">$!contractMat.get("cName")&nbsp;</li>
+                        <li class="wid_150 over_ell font_cen" title="$!contractMat.get('itemName')">$!contractMat.get("itemName")&nbsp;</li>
+                        <li class="wid_110 over_ell font_cen" title="$!contractMat.get('salerAttr')">$!contractMat.get("salerAttr")&nbsp;</li>
+                        
+                        
+                        <!--计算剩余价值的accounts(this); -->
+                        <li class="wid_110 over_ell font_cen" ><input class="wid_50 input_Style2 hei_24" name="quantity"
+                                                            onkeyup="numInput(this,0)"
+                                                            onblur="if(this.value=='')value=1;"
+                                                            onfocus="if(this.value==1)value='';" value=1
+                                                            class="wid_11 input_3">
+                         <input type='hidden'  maxlength='8' class='form-control wid_30 hei_24' value="$!contractMat.get('matPrice')" name='matPriceec' id="matPriceec" />   
+                         <input type='hidden'  maxlength='8' class='form-control wid_30 hei_24' value="$!contractMat.cost" name='cost' id="costec" />         
+                       	#foreach($countCostList in $countCostList)
+  	  						 #if($!contractMat.get('skuId')==$!countCostList.skuId)
+                       			 <input type='hidden'  maxlength='8' class='form-control wid_30 hei_24' value="$!countCostList.pay" name='countpay' id="countpay" />   
+                         	#end
+        		    	 #end                       
+                        </li>
+                        <li class="wid_140 over_ell font_cen" title="$!contractMat.get('matPrice')">￥$!contractMat.get("matPrice")&nbsp;</li>
+                         <li class="wid_120 over_ell font_cen" title="$!contractMat.get('cost')">￥$!contractMat.get('cost')&nbsp;</li>
+	                         	#foreach($countCostList in $countCostList)
+		                          #if($!contractMat.get('skuId')==$!countCostList.skuId)
+		                             <li class="wid_150 over_ell font_cen" title="$!countCostList.get('pay')">￥$!countCostList.pay&nbsp;</li>
+		                          #end
+	                          #end
+                       #end
+                    </ul>
+                #end
+            </div>
+            <div class="clear"></div>
+            <div class="wid_200 mar_cen">
+                <button class="button_2 hei_35" onclick="orderItem()">
+                    确定
+                </button>
+                <button class="button_3  hei_35" onclick="closeDiv1('$sourcePage')">
+                    取消
+                </button>
+            </div>
+            <!--right_xinxi end-->
+        </div>
+        <form action="$request.contextPath/shopCart/toOrderView" id="contractOrderForm" method="post">
+            <input type="hidden" name="orderType" id="orderType"/>
+            <input type="hidden" name="contractNo" id="orderContractNo"/>
+        </form>
+    </div>
+</div>

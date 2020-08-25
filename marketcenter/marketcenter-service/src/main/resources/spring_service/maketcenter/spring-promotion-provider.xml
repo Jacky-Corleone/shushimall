@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+	<!-- 使用dubbo协议暴露服务 -->
+	<dubbo:service interface="com.camelot.maketcenter.service.PromotionService"
+		owner="camelot" ref="promotionService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		
+		<dubbo:service interface="com.camelot.maketcenter.service.PromotionInfoExportService"
+		owner="camelot" ref="promotionInfoExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		
+		<dubbo:service interface="com.camelot.maketcenter.service.PromotionFrExportService"
+		owner="camelot" ref="promotionFrExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		
+		<dubbo:service interface="com.camelot.maketcenter.service.PromotionMdExportService"
+		owner="camelot" ref="promotionMdExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		
+		<dubbo:service interface="com.camelot.maketcenter.service.VipCardService"
+		owner="camelot" ref="vipCardService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+
+		<dubbo:service interface="com.camelot.maketcenter.service.CentralPurchasingExportService"
+		owner="camelot" ref="centralPurchasingServiceImpl" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		
+		<!-- 优惠券 -->
+		<dubbo:service interface="com.camelot.maketcenter.service.CouponsExportService"
+		owner="camelot" ref="couponsExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		
+		<!-- 积分配置 -->
+		<dubbo:service interface="com.camelot.maketcenter.service.IntegralConfigExportService"
+		owner="camelot" ref="integralConfigService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		
+		<!-- 集采订单 -->
+		<dubbo:service interface="com.camelot.maketcenter.service.CentralPurchasingRefOrderExportService"
+		owner="camelot" ref="centralPurchasingRefOrderExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		
+		
+</beans>

@@ -1,0 +1,88 @@
+#set($layout="common/order.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>收货地址管理</title>
+#parse("common/scriptAndCss.vm")
+<script type="text/javascript">
+	$(document).ready(function(){
+		changeIconToRed(2);
+	});
+	//编辑地址
+	function editAddress(id){
+		window.location.href = "$request.contextPath/user/toEditAddress?cus=$!{cus}&address="+id;
+	}
+	//删除地址
+	function editdel(uid){
+		//	window.location.href = "$request.contextPath/user/toEditAddress?cus=$!{cus}&address="+id;
+			kltconfirm("是否确认删除收货地址？",function(){
+		   	    //跑后台删除询价信息
+		   	    $.ajax({
+		   	        type: "POST",
+		   	        dataType: "html",
+		   	        url: "../orderWx/deladdr",
+		   	        data: {
+		   	        	uid: uid
+		   	        },
+		   	        success: function (data) {
+		   	            toast(data);
+		   	            window.location = "../user/queryAddress";
+		   	        }
+		   	    });
+			});
+		}
+	//新增地址
+	function addNewAddress(){
+		window.location.href = "$request.contextPath/user/toEditAddress?cus=$!{cus}";
+	}
+</script>
+</head>
+<body>
+	<div id="main" class="po_re">
+		<form action="" id="form" method="post">
+		
+			<!-- 	页面必须的其他数据     start	 -->
+<!-- 			<input id="invoiceType" name="invoiceType" value="$!{invoiceType}" type="hidden"/> -->
+<!-- 			<input id="invoiceTitle" name="invoiceTitle" value="$!{invoiceTitle}" type="hidden"/> -->
+<!-- 			<input id="contractFlag" name="contractFlag" value="$!{contractFlag}" type="hidden"/> -->
+			<!-- 	页面必须的其他数据     end	 -->
+			
+		    <!-- 中间内容 -->
+		    <div class="content" id="wrapper">
+		        <div class="mar_lr5 mar_t10">
+			        #if(${addresses})
+			        	#foreach($address in $addresses)
+			        	 	<!-- 发货地址 -->
+			        		<div class="border_2 shop_order pad_tb5">
+<!-- 				                <p class="fl mar_t20"><input type="radio" name="address" id="${address.id}" value="${address.id}" onclick="selectedAddress('${address.id}')"/></p> -->
+						                <div class="wid_75 fl shop_order_p">
+<!-- 						                	<a href="javascript:selectedAddress('${address.id}');"> -->
+							                    <p>${address.provicename} &nbsp; ${address.cityname} &nbsp; ${address.countryname} &nbsp; ${address.fulladdress}<br/>
+							                       ${address.contactperson} &nbsp; ${address.contactphone} &nbsp; $!{address.contacttel}</p>
+<!-- 							                </a> -->
+						                </div>
+						                <div class="fl mar_l5">
+				                			<a href="javascript:editAddress('${address.id}');">
+						                    	<p class="hei_10"><i class="fa fa-pencil"></i></p>
+					                		</a>&nbsp;
+					                	
+					                		 <span class="po_ab pa_05">
+	                      			        <i class=" demo-icons  font_14 fa-trash"></i>
+	                      			             <a href="javascript:editdel('${address.id}');">删除</a>
+	         </span>
+						                </div>
+						                <div class="clear"></div>
+			            	</div>
+			        	#end
+			        #end
+		        </div>          
+		       <ul class="individual bg_02 pad_lr5">
+		            <a href="javascript:addNewAddress()"><li class="border_2"><p class="fl">新增收货地址</p><p class="fa fa-plus-circle fr"></p></li></a>
+		        </ul>
+		    </div><!-- 中间内容 end-->
+		</form>
+	</div>
+    #parse("common/footer.vm")
+</body>
+</html>

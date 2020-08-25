@@ -1,0 +1,198 @@
+#set($layout = "common/order.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>退款/售后管理</title>
+#parse("common/scriptAndCss.vm")
+<script type="text/javascript">
+$(document).ready(function(){
+	//pageSize,url,totalItem, appendId,selectElement,data, ,callback
+	var Num = 0;
+	var url = "$request.getContextPath()/orderWx/refundOrcservice?type="+Num;
+	var totalItem = '$!{totalItem}';
+	$.dropDownFresh('3',url, totalItem , "myTab0_Content" + Num,"wrapper");
+	
+});
+$(document).ready(function(){
+	changeIconToRed(2);
+	
+	var selectindex=sessionStorage.getItem("aaaa");
+	if(selectindex){
+		changeOrderStatus( $("#myTab0 :eq(" + selectindex + ")")[0], parseInt(selectindex));
+		sessionStorage.removeItem("aaaa");
+	}
+});
+
+function changeOrderStatus(thisObj, Num){
+// 	if (thisObj.className == "active")
+// 		return;
+	var tabObj = thisObj.parentNode.id;
+	var tabList = document.getElementById(tabObj).getElementsByTagName("li");
+	for (i = 0; i < tabList.length; i++) {
+		if (i == Num && Num == 0) {//选中
+			$.ajax({
+			   type: "POST",
+			   url: "$request.getContextPath()/orderWx/refundOrcservice?type="+Num,
+			   dataType: "html",
+			   success: function(data){
+				   $("#"+tabObj + "_Content" + Num).empty().append(data);
+				   
+				   var url = "$request.getContextPath()/orderWx/refundOrcservice?type="+Num;
+				   var totalItem = $("#totalItem").val();
+				   $.dropDownFresh('3',url, totalItem , "myTab0_Content" + Num,"wrapper");
+			   }
+			});
+			thisObj.className = "active";
+			document.getElementById(tabObj + "_Content" + i).style.display = "block";
+		}else if(i == Num && Num == 1){
+			$.ajax({
+			   type: "POST",
+			   url: "$request.getContextPath()/orderWx/cserviceManager?type="+Num,
+			   dataType: "html",
+			   success: function(data){
+				   $("#"+tabObj + "_Content" + Num).empty().append(data);
+					   
+				   var url = "$request.getContextPath()/orderWx/cserviceManager?type="+Num;
+				   var total = $("#total").val();
+				   $.dropDownFresh('3',url, total , "myTab0_Content" + Num,"wrapper");
+			   }
+			});
+			thisObj.className = "active";
+			document.getElementById(tabObj + "_Content" + i).style.display = "block";
+		}else if(i == Num && Num == 2){
+			$.ajax({
+			   type: "POST",
+			   url: "$request.getContextPath()/orderWx/gocomplainlist?type="+Num,
+			   dataType: "html",
+			   success: function(data){
+				   $("#"+tabObj + "_Content" + Num).empty().append(data);
+					   
+				   var url = "$request.getContextPath()/orderWx/gocomplainlist?type="+Num;
+				   var total1 = $("#total1").val();
+				   console.debug(total1);
+				   $.dropDownFresh('3',url, total1 , "myTab0_Content" + Num,"wrapper");
+			   }
+			});
+			
+			thisObj.className = "active";
+			document.getElementById(tabObj + "_Content" + i).style.display = "block";
+		}else {//未选中
+			tabList[i].className = "normal";
+			document.getElementById(tabObj + "_Content" + i).style.display = "none";
+			$("#"+tabObj + "_Content" + Num).empty();
+		}
+	}
+}
+//订单详情
+function orderDetail(orderId){
+	window.sessionStorage.setItem("aaaa",'0');
+	window.location.href="$request.getContextPath()/orderWx/queryOrderInfoBuyer?orderId="+orderId+"&orderSource=buyers";
+}
+//查看退款退货进度
+function refundSubmitSucc(returnId,tab){
+	window.sessionStorage.setItem("aaaa",tab);
+	window.location.href="$request.getContextPath()/orderWx/refundSubmitSucc?returnId="+returnId;
+}
+//申请退换货/申请售后
+function refundAgreement(orderId){
+	window.sessionStorage.setItem("aaaa",'0');
+	window.location.href="$request.getContextPath()/orderWx/refundAgreement?orderId="+orderId;
+}
+//查看退款/退货详情
+function refundInfoBuyer(returnGoodId){
+	window.sessionStorage.setItem("aaaa",'1');
+	window.location.href="$request.getContextPath()/orderWx/refundInfoBuyer?returnGoodId="+returnGoodId;
+}
+
+//查看退款申请
+function toSeeRetrunInfo(id,skuid){
+	window.sessionStorage.setItem("aaaa",'1');
+	window.location.href="$request.getContextPath()/orderWx/refundSubmitSucc?returnId="+id+"&skuId="+skuid;
+}
+//查看退款/退货进度
+function toSeeReturnPro(orderId,id,skuid){
+	window.sessionStorage.setItem("aaaa",'1');
+	window.location.href="$request.getContextPath()/orderWx/refundAgreementSeeWx?orderId="+orderId+"&skuId="+skuid+"&returnGoodId="+id;
+}
+
+
+
+//查看投诉协议
+function gocomplaindetail(complainid){
+	window.sessionStorage.setItem("aaaa",'2');
+	window.location.href="$request.getContextPath()/orderWx/gocomplaindetail?complainid="+complainid;
+}
+//取消投诉
+function canclecomplain(id){
+	if(confirm("确定取消投诉么？")){
+		$.ajax({
+	        url:"$request.contextPath/orderWx/complaincancle",
+	        type:"post",
+	        data:{
+	            id:id
+	        },
+	        dataType:'json',
+	        success:function(data){
+	            if(data.success){
+	            	var obj = $("#myTab0 :eq(" + 2 + ")")[0];
+            		changeOrderStatus(obj, 2);
+	            }else{
+	                $("#lierror").html("取消失败");
+	            }
+	        },error:function(){
+	            alert("系统繁忙，请稍后再试");
+	        }
+	    });
+	}
+}
+</script>
+<script type="text/javascript" src="$request.contextPath/assets/js/dropDownFresh/dropDownFresh.js"></script>
+</head>
+<body>
+<div id="main" class="bg_02 po_re">
+
+	##parse("common/headerWx.vm")
+    <!-- 中间内容 -->
+    <div class="content" id="wrapper" style="overflow-x:hidden;">
+        <div class="nTab">
+            <!-- 标题开始 -->
+            <div class="TabTitle bg_01">
+              <ul id="myTab0" class="myTab2 ">
+                <li class="active" onclick="changeOrderStatus(this,0);" style="width: 34%">退款售后申请</li>
+                <li class="normal" onclick="changeOrderStatus(this,1);" style="width: 34%">退款售后管理</li>
+                <li class="normal" onclick="changeOrderStatus(this,2);" style="width: 32%">投诉管理</li>
+              </ul>
+            </div><!-- 标题开始 end-->
+            <!-- 内容开始 -->
+            <div class="TabContent mar_t10">
+                <!-- 切换内容    1   -->     
+                <div id="myTab0_Content0">
+                    #if("0"==${type} || "" == ${type})
+	                    #parse("order/refundOrcserviceDetail.vm")
+                    #end
+                </div>
+                <!-- 切换内容    1   -->  
+                <!-- 切换内容    1   -->     
+                <div id="myTab0_Content1" class="none">
+                    #if("1"==${type})
+	                    #parse("order/refundOrcserviceManagerDetail.vm")
+                    #end
+                </div>
+                <!-- 切换内容    1   -->
+                <!-- 切换内容    1   -->     
+                <div id="myTab0_Content2" class="none">
+                    #if("2"==${type})
+	                    #parse("order/complainlist.vm")
+                    #end
+                </div>
+                <!-- 切换内容    1   -->
+            </div>
+        </div>
+    </div><!-- 中间内容 end-->
+</div>
+    #parse("common/footer.vm")
+</body>
+</html>

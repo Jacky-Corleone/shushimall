@@ -1,0 +1,573 @@
+#set($layout = "common/blanklayout.vm")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>买家认证信息</title>
+<link href="$request.contextPath/assets/css/detail.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="$request.contextPath/assets/js/iscroll.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/tab.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        changeIconToRed(2);
+        var url = window.location.href;
+        if(url.substr(url.length-1,1) == '2'){
+        	queryTranslationInfo($("#myTab0").find('li')[1],1);
+        }
+    });
+    $(document).ready(function(){
+    	//隐藏框
+    	 $("#province").hide();
+    	 $("#city").hide();
+    	 $("#area").hide();
+    	 
+    	 if($("#isFinancing_hide").val() != '1' ){
+    		 $("#financingNumLi").hide();
+    	 }
+    	 
+    	//加载省
+    	var companyAddress ;
+    	if($("#companyAddress").val()){
+    		companyAddress = $("#companyAddress").val().split(",");
+    	}
+    	
+    	getAddressChecked(0, "province",companyAddress[0]);
+    	getAddressChecked(companyAddress[0], "city",companyAddress[1]);	
+    	getAddressChecked(companyAddress[1], "area",companyAddress[2]);	
+    	
+    	$("#province").change( function() {
+    		$('#city option:first').siblings().remove();
+    		$('#area option:first').siblings().remove();
+    		getAddress($("#province").val(), "city");		
+    	});
+    	//获取区/县
+    	$("#city").change( function() {
+    		$('#area option:first').siblings().remove();
+    		getAddress($("#city").val(), "area");		
+    	});
+    	
+    	//加载经营范围
+    	setButtonValues();
+    });
+    
+  //点击经营范围触发事件
+    function chooseAttr(_this) {
+    	if($(_this).attr("_selected") == "true"){
+    		$(_this).attr("_selected","false").removeClass("border_e3").addClass("border_ee");
+    	}else{
+    		$(_this).attr("_selected", "true").removeClass("border_ee").addClass("border_e3");
+    	}
+    }
+    
+    function setButtonValues(){
+    	var attrs = $(".js_attr");
+    	var _length = attrs.length;
+    	for ( var i = 0; i < _length; i++) {
+    		var _attr = $(attrs[i]);
+    		if(isCheckButtonValues(_attr.html())){
+    			_attr.attr("_selected", "true").removeClass("border_ee").addClass("border_e3");
+    		}
+    	}
+    }
+    
+    function isCheckButtonValues(value){
+    	var businessScope = $("#businessScope").val().split(",");
+    	for ( var i = 0; i < businessScope.length; i++) {
+    		if(value == businessScope[i]){
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
+    function getButtonValues(){
+    	//找到所有_selected为true的button拼接成字符串
+    	var businessScope ='';
+    	var attrs = $(".js_attr");
+    	var _length = attrs.length;
+    	for ( var i = 0; i < _length; i++) {
+    		var _attr = $(attrs[i]);
+    		var selected = _attr.attr("_selected");
+    		if (selected === "true") {
+    			if(businessScope == null || businessScope ==''){
+    				businessScope = _attr.html();
+    			}else{
+    				businessScope += "," +  _attr.html();
+    			}
+    		}
+    	}
+    	return businessScope;
+    }
+    
+    function getAddressChecked(addressId, domId,checkValue){
+    	$.ajax({
+    	   type: "POST",
+    	   dataType: "json",
+    	   url: "$request.contextPath/orderWx/query",
+    	   data: {
+    			id: addressId
+    	   },
+    	   success: function(data){
+    		   $(data).each(function(i,obj){
+    				$("#"+domId).append('<option value="'+obj.code+'">'+obj.name+'</option>');
+    		   });
+    		   $("#"+domId).val(checkValue);
+    		   if($("#auditStatus").val()=='0'){
+    			   $("#"+domId+"_input").hide();
+    			   $("#"+domId).show();
+    		   }else{
+    			   $("#"+domId+"_input").val($("#"+domId).find("option:selected").text());
+    			   $("#"+domId).hide();
+    		   }
+    	   }
+    	});
+    }
+
+    function getAddress(addressId, domId){
+    	$.ajax({
+    	   type: "POST",
+    	   dataType: "json",
+    	   url: "$request.contextPath/orderWx/query",
+    	   data: {
+    			id: addressId
+    	   },
+    	   success: function(data){
+    		   $(data).each(function(i,obj){
+    				$("#"+domId).append('<option value="'+obj.code+'">'+obj.name+'</option>');
+    		   });
+    	   }
+    	});
+    }
+function queryTranslationInfo(thisObj, Num) {
+	if (thisObj.className == "active"){
+		return false;
+	}
+	//切换时让显示驳回的div隐藏
+	$("#po_fai").hide();	
+	var tabObj = thisObj.parentNode.id;
+	var tabList = document.getElementById(tabObj).getElementsByTagName("li");
+	
+	for (i = 0; i < tabList.length; i++) {
+		if (i == Num) {
+			if(Num == 2){
+	            $.ajax({
+	                url: '$request.contextPath/user/checkLogin?_='+new Date(),
+	                dataType: 'json',
+	                success: function (res) {
+	                	if((res.userStatus == "4" || res.userStatus == "6") && res.auditStatus == '2'){
+	                		var data = "<i class='fa-check-circle font_7a font_16 mar_r10' style='margin-left:110px'></i>"
+	                				 + "<span style='font-size: 28px;text-align: center;'> 审核通过</span>";
+	                		$("#myTab0_Content2 .bg_01 .TabContent").html(data);
+	                	}else if((res.userStatus == "3" || res.userStatus == "2" || res.userStatus == "5") && res.auditStatus == '1'){
+	                		var data = "<i class='fa-pencil-square  font_16 mar_r10' style='margin-left:128px'></i>"
+                				 + "<span style='font-size: 28px;text-align: center;'>	待审核...</span>";
+	                		$("#myTab0_Content2 .bg_01 .TabContent").html(data);
+	                	}else if((res.userStatus == "3" || res.userStatus == "2" || res.userStatus == "5") && res.auditStatus == '0'){
+	                		var sj = "onclick=show('"+res.auditRemark+"');"
+	                		var data = "<i class='fa-pencil-square  font_16 mar_r10' style='margin-left:128px'></i>"
+               				 	 + "<span style='font-size: 28px;text-align: center;'>	已驳回</span>";
+	                		$("#myTab0_Content2 .bg_01 .TabContent").html(data);
+	                		//显示驳回信息
+	                		show(res.auditRemark);
+	                	}
+	                }
+	            });
+			}
+			
+			thisObj.className = "active";
+			document.getElementById(tabObj + "_Content" + i).style.display = "block";
+		} else {
+			tabList[i].className = "normal";
+			document.getElementById(tabObj + "_Content" + i).style.display = "none";
+		}
+	}
+}
+
+function showOrHideFinancingNum(){
+	if($("#isFinancingCheckbox").is(':checked')){
+		$("#financingNumLi").show();
+	}else{
+		$("#financingNumLi").hide();
+		$("#financingNum").val('');
+	}
+}
+
+function secondSubmit(){
+	window.location.href = "$request.contextPath/buyerAuthentication?submit=2";
+}
+
+//提交认证
+function submitAddress(){
+	
+	var companyName = $('#companyName').val();//公司名称
+	if(companyName==null || companyName==""){
+		$("#errorMsg").html("请输入公司名称");
+		return false;
+	}
+	
+	var province = $("#province").val();//省
+	if(province==null || province=="" || province=="请选择"){
+		$("#errorMsg").html("请选择省");
+		return false;
+	}
+	
+	var city = $("#city").val();//市
+	if(city==null || city=="" || city=="请选择"){
+		$("#errorMsg").html("请选择市");
+		return false;
+	}
+	var area = $("#area").val();//县、区
+	if(area==null || area=="" || area=="请选择"){
+		$("#errorMsg").html("请选择区");
+		return false;
+	}
+	
+	var companyDeclinedAddress = $("#companyDeclinedAddress").val();//县、区
+	if(companyDeclinedAddress==null || companyDeclinedAddress==""){
+		$("#errorMsg").html("请输入详细地址");
+		return false;
+	}
+	
+	$("#companyAddress").val( province +","+ city +","+ area);
+	
+	var businessScope = getButtonValues();//经营范围
+	if(businessScope==null || businessScope==""){
+		$("#errorMsg").html("请选择经营范围");
+		return false;
+	}else{
+		$("#businessScope").val(businessScope);
+	}
+	
+	//是否融资
+	if($("#isFinancingCheckbox").is(':checked')){
+		$("#isFinancing").val('1');
+		//如果需要融资则验证融资额度
+		var financingNum = $("#financingNum").val();
+		regTel = /^[1-9][0-9]{0,8}$/;
+		if( financingNum != null && financingNum != "" ){
+			if( !regTel.test(financingNum) ){
+				$("#errorMsg").html("融资额度为最多不超过9位的正整数");
+				return false;
+			}
+		}else{
+			$("#errorMsg").html("请输入期望融资额度");
+			return false;
+		}
+	}else{
+		$("#isFinancing").val('0');
+	}
+	modifyBuyerWx();
+	return false;
+}
+
+function modifyBuyerWx(){
+	$.ajax({
+		   type: "POST",
+		   dataType: "json",
+		   url: "$request.contextPath/information/register/modifyBuyerWx",
+		   data: $("#businessForm").serialize(),
+		   success: function(data){
+			   if( data.result != '修改失败'){
+				   $("#errorMsg").html("提交中，请等待...");
+				 	//跳转页面   网络原因，提交到后台修改数据刷新页面，回显时候数据不刷新，状态不修改，做延时处理0.8m
+				   setTimeout(function(){
+					   $("#errorMsg").html("操作成功");
+					   setTimeout(function(){
+						   window.location.href = "$request.contextPath/buyerAuthentication";
+					 	},100);
+				 	},800);
+			   }else{
+				   $("#errorMsg").html("提交中，请重新提交");
+			   }
+		   },
+		   error: function(XMLHttpRequest, textStatus, errorThrown){
+			   alert("系统繁忙,稍后再试......");
+		   }
+		});
+}
+
+//驳回原因
+function show(auditRemark){
+	$("#auditRemark").val(auditRemark);
+	$("#po_fai").show();
+}
+function closePo(){
+	$("#po_fai").hide();
+}
+</script>
+<!--求购相关js方法-->
+<script type="text/javascript" src="$request.contextPath/assets/js/askItemInfo/askItemInfo.js"></script>
+</head>
+<input type="hidden" id="contextPath" value="$request.getContextPath()"/>
+<body class="bg_02">
+<div id="main" class="po_re">
+    <!-- 中间内容 -->
+    <div class="content" id="wrapper">
+        <div class="nTab">
+            <!-- 标题开始 -->
+            <div class="TabTitle bg_01 ">
+              <ul id="myTab0" class="myTab0">
+                <li class="active" onclick="queryTranslationInfo(this,0);" style="width: 33%">个人信息</li>
+                <li class="normal" onclick="queryTranslationInfo(this,1);" style="width: 33%">公司信息</li>
+                <li class="normal" onclick="queryTranslationInfo(this,2);" style="width: 33%">审核状态</li>
+              </ul>
+            </div><!-- 标题开始 end-->
+            <!-- 内容开始 -->
+            <div class="TabContent" >
+				  <!-- 个人信息    1  start   -->     
+                <div id="myTab0_Content0">
+                    <div  class="bg_01">
+                        <ul class="font_t pad_lr5">
+                        <li class="hei_32">
+                         <p class="wid_27 fl font_right pad_r5">用户编号：</P>
+							<input name="userId" id="userId" value="$!userInfoDTO.userId" class="form-control wid_50 hei_20" readonly="readonly" style="border:0" />
+						</li>
+                        <li class="hei_32">
+                         <p class="wid_27 fl font_right pad_r5">用户名：</P>
+							<input class="form-control wid_50 hei_20" id="uname" value="$!userInfoDTO.userDTO.uname" name="uname"  readonly="readonly" style="border:0"/></li>
+                        <!-- 
+                        <li class="hei_32">
+                         <p class="wid_27 fl font_right pad_r5">用户昵称：</P>
+                         <input class="form-control wid_50 hei_20" id="nickname" value="$!userInfoDTO.userDTO.nickname" name="nickname"  readonly="readonly" style="border:0"/></li>
+                             -->
+                          <li class="hei_32">
+                         <p class="wid_27 fl font_right pad_r5">固定电话：</P>
+                         <input class="form-control wid_50 hei_20" id="linkPhoneNum" value="$!userDTO.linkPhoneNum" name="linkPhoneNum"  readonly="readonly" style="border:0"/></li>
+                            <li class="hei_32">
+                         <p class="wid_27 fl font_right pad_r5">联系人姓名：</P>
+                         <input class="form-control wid_50 hei_20" id="linkMan" value="$!userDTO.linkMan"  name="linkMan" readonly="readonly" style="border:0"/></li>
+					 	 <li class="hei_32">
+                         	<p class="wid_27 fl font_right pad_r5">所在部门：</P>
+                         	<span id="departMentVal_view" class="basic_class_show"></span>
+							<div class="basic_class_hide">
+									#foreach($departMent in $departMents)
+									#if($!userDTO.department==$!departMent)
+									 <input class="form-control wid_50 hei_20" id="department" value="$!departMent.label" name="department"  readonly="readonly" style="border:0"/>
+									#end
+									#end
+				          	</div></li>
+                      	<li class="hei_32">
+					 		 <p class="wid_27 fl font_right pad_r5"> 绑定手机：</p>
+							 <input class="form-control wid_50 hei_20" id="umobile" value="$!userInfoDTO.userDTO.umobile" name="umobile"  readonly="readonly" style="border:0"/></li>
+				     	</li>
+						<li class="hei_32">
+							<p class="wid_27 fl font_right pad_r5"> 绑定邮箱：</p>
+							<input class="form-control wid_50 hei_20" id="userEmail" value="$!userInfoDTO.userDTO.userEmail" name="userEmail" readonly="readonly" style="border:0"/></li>
+						</li>
+                    </ul>
+                    </div>
+                </div><!-- 个人信息    1 end  -->  
+                <!-- 公司信息    2  start -->  
+                <div id="myTab0_Content1" class="none">
+                <form id="businessForm" method="post">
+                <input id="companyAddress" name="userBusinessDTO.companyAddress" value="$!userInfoDTO.userBusinessDTO.companyAddress" type="hidden" />
+         		<input id="businessScope" name="userBusinessDTO.businessScope" value="$!userInfoDTO.userBusinessDTO.businessScope" type="hidden" />
+				<input name="userId" type="hidden" value="$!userInfoDTO.userId"/>
+				<input name="extendId" type="hidden" value="$!userInfoDTO.extendId"/>
+				<input id="auditStatus" name="auditStatus" type="hidden" value="$!userInfoDTO.userDTO.auditStatus"/>
+				<input id="isFinancing" name="userBusinessDTO.isFinancing" type="hidden" value="$!userInfoDTO.userBusinessDTO.isFinancing" />
+				<input id="isFinancing_hide" type="hidden" value="$!userInfoDTO.userBusinessDTO.isFinancing"/>
+                	<div  class="bg_01">
+                        <ul class="font_t pad_lr5">
+	                        <li class="hei_32">
+	                         <p class="wid_27 fl font_right pad_r5">公司名称</P>
+								<input id="companyName" name="userBusinessDTO.companyName" value="$!userInfoDTO.userBusinessDTO.companyName"
+									#if($!userInfoDTO.userDTO.auditStatus == 0)#else readonly="readonly" style="border:0" #end
+									class="form-control wid_50 hei_20" maxlength="30"/>
+							</li>
+	                         
+	                        <li class="hei_32">
+	                        	<p class="wid_27 fl font_right pad_r5">公司所在地</p>
+	                        </li>
+	                        
+							<li class="hei_32">
+								<p class="wid_27 fl font_right pad_r5">
+									<span class="font_e5 mar_lr2">*</span>省
+								</p>
+								<select id="province" class="wid_63 input_3" name="business_provinces" #if($!userInfoDTO.userDTO.auditStatus == 0) #else disabled="disabled" #end>
+									<option>请选择</option>
+								</select>
+								<input id="province_input" readonly="readonly" style="border:0" type="text" class="form-control wid_50 hei_20"/>
+							</li>
+							<li class="hei_32">
+								<p class="wid_27 fl font_right pad_r5">
+									<span class="font_e5 mar_lr2">*</span>市
+								</p>
+								<select id="city" class="wid_63 input_3" name="business_city" #if($!userInfoDTO.userDTO.auditStatus == 0) #else disabled="disabled" #end>
+									<option>请选择</option>
+								</select>
+								<input id="city_input" readonly="readonly" style="border:0" type="text" class="form-control wid_50 hei_20"/>
+							</li>
+							
+							<li class="hei_32">
+								<p class="wid_27 fl font_right pad_r5">
+								<span class="font_e5 mar_lr2">*</span>区
+								</p>
+								<select id="area" class="wid_63 input_3" name="business_area" #if($!userInfoDTO.userDTO.auditStatus == 0) #else disabled="disabled" #end>
+									<option>请选择</option>
+								</select>
+								<input id="area_input" readonly="readonly" style="border:0" type="text" class="form-control wid_50 hei_20"/>
+							</li>
+							<li class="hei_32">
+								<p class="wid_27 fl font_right pad_r5">
+									<span class="font_e5 mar_lr2">*</span>详细地址
+								</p>
+								<input id="companyDeclinedAddress" name="userBusinessDTO.companyDeclinedAddress" class="form-control wid_50 hei_20"
+									    value="$!userInfoDTO.userBusinessDTO.companyDeclinedAddress" 
+									    #if($!userInfoDTO.userDTO.auditStatus == 0) #else readonly="readonly" style="border:0" #end
+									    maxlength="256"  type="text"/>
+									
+							</li>
+	                         
+	                        <li class="hei_32"><p class="wid_27 fl font_right pad_r5"><span class="font_e5 mar_lr2">*</span>经营范围</p></b>
+							</li>
+							<li class="hei_32"><p class="wid_11 fl font_right pad_r5">&nbsp;</p>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" #if($!userInfoDTO.userDTO.auditStatus == 0) onclick="chooseAttr(this);return false;" #else onclick="return false;" #end >书刊印刷</button>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" #if($!userInfoDTO.userDTO.auditStatus == 0) onclick="chooseAttr(this);return false;" #else onclick="return false;" #end >包装印刷</button>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" #if($!userInfoDTO.userDTO.auditStatus == 0) onclick="chooseAttr(this);return false;" #else onclick="return false;" #end >数字印刷</button>
+							</li>
+							
+							<li class="hei_32"><p class="wid_11 fl font_right pad_r5">&nbsp;</p>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" #if($!userInfoDTO.userDTO.auditStatus == 0) onclick="chooseAttr(this);return false;" #else onclick="return false;" #end >专项印刷</button>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" #if($!userInfoDTO.userDTO.auditStatus == 0) onclick="chooseAttr(this);return false;" #else onclick="return false;" #end >商业印刷</button>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" #if($!userInfoDTO.userDTO.auditStatus == 0) onclick="chooseAttr(this);return false;" #else onclick="return false;" #end >报业印刷</button>
+							</li>
+							<li class="hei_32"><p class="wid_11 fl font_right pad_r5">&nbsp;</p>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" #if($!userInfoDTO.userDTO.auditStatus == 0) onclick="chooseAttr(this);return false;" #else onclick="return false;" #end >标签印刷</button>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" #if($!userInfoDTO.userDTO.auditStatus == 0) onclick="chooseAttr(this);return false;" #else onclick="return false;" #end >票据印刷</button>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" #if($!userInfoDTO.userDTO.auditStatus == 0) onclick="chooseAttr(this);return false;" #else onclick="return false;" #end >特种印刷</button>
+							</li>
+							<li class="hei_32"><p class="wid_11 fl font_right pad_r5">&nbsp;</p> 
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" #if($!userInfoDTO.userDTO.auditStatus == 0) onclick="chooseAttr(this);return false;" #else onclick="return false;" #end >广告设计</button>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" #if($!userInfoDTO.userDTO.auditStatus == 0) onclick="chooseAttr(this);return false;" #else onclick="return false;" #end >其他</button>
+							</li>
+	                         
+	                         
+	                         <li class="hei_32"><p class="wid_27 fl font_right pad_r5">企业人数</p></b> 
+								#if($!userInfoDTO.userDTO.auditStatus == 0)
+								<select id="companyPeoNum" name="companyPeoNum" class="wid_63 input_3" #if($!userInfoDTO.userDTO.auditStatus == 0) #else disabled="disabled" #end>
+									<option value="" >请选择</option>
+										#foreach($companyPeopleNum in $companyPeopleNums)
+											<option value="$!companyPeopleNum" #if("$!userInfoDTO.userBusinessDTO.companyPeoNum"=="$!companyPeopleNum") selected="selected" #else ""  #end> $!companyPeopleNum.label </option>
+										#end
+								</select>
+								#else 
+									#foreach($companyPeopleNum in $companyPeopleNums)
+									#if("$!userInfoDTO.userBusinessDTO.companyPeoNum"=="$!companyPeopleNum") 
+									<input readonly="readonly" style="border:0" type="text" class="form-control wid_50 hei_20"
+										value="$!companyPeopleNum.label"/>
+									#else #end
+									#end
+								#end
+							</li>
+							
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5">经营规模</p></b> 
+								#if($!userInfoDTO.userDTO.auditStatus == 0) 
+								<select id="businessScale" name="businessScale" class="wid_63 input_3">
+									<option value="" selected="selected">请选择</option>
+									#foreach($businessScale in $businessScales)
+									<option value="$!businessScale" #if("$!userInfoDTO.userBusinessDTO.businessScale"=="$!businessScale") selected="selected" #else ""  #end> $!businessScale.label </option>
+									#end
+								</select>
+								#else 
+									#foreach($businessScale in $businessScales)
+									#if("$!userInfoDTO.userBusinessDTO.businessScale"=="$!businessScale") 
+									<input readonly="readonly" style="border:0" type="text" class="form-control wid_50 hei_20"
+										value="$!businessScale.label"/>
+									#else #end
+									#end
+								#end
+							</li>
+							
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5">公司性质</p></b> 
+							#if($!userInfoDTO.userDTO.auditStatus == 0) 
+								<select id="companyQualt" name="companyQualt" class="wid_63 input_3">
+									<option value="" selected="selected">请选择</option>
+									#foreach($companyQualt in $companyQualts)
+									<option value="$!companyQualt" #if("$!userInfoDTO.userBusinessDTO.companyQualt"=="$!companyQualt") selected="selected" #else "" #end>$!companyQualt.label</option>
+									#end
+								</select>
+							#else 
+								#foreach($companyQualt in $companyQualts)
+								#if("$!userInfoDTO.userBusinessDTO.companyQualt"=="$!companyQualt") 
+								<input readonly="readonly" style="border:0" type="text" class="form-control wid_50 hei_20"
+									value="$!companyQualt.label"/>
+								#else #end
+								#end
+							#end
+							</li>
+							
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5">是否融资需求</p>
+								
+								#if($!userInfoDTO.userDTO.auditStatus == 0) 
+									<input class="hei_20" id="isFinancingCheckbox" name="isFinancingCheckbox" 
+									#if("$!userInfoDTO.userBusinessDTO.isFinancing"=="1") checked #else "" #end
+									type="checkbox" value="1" onclick="showOrHideFinancingNum()"/>
+								#else 
+									<input type="text" class="form-control wid_50 hei_20" 
+										#if("$!userInfoDTO.userBusinessDTO.isFinancing"=="1") value="是" #else value="否" #end
+										readonly="readonly" style="border:0"/>
+								#end 
+							</li>
+							
+							<li class="hei_32" id="financingNumLi"><p class="wid_27 fl font_right pad_r5">期望融资额度</p>
+								<input  id="financingNum" name="userBusinessDTO.financingNum"
+										#if($!userInfoDTO.userDTO.auditStatus == 0) value="$!userInfoDTO.userBusinessDTO.financingNum"
+										#else readonly="readonly" style="border:0" value="$!userInfoDTO.userBusinessDTO.financingNum 万元" #end 
+										type="text" class="form-control wid_30 hei_20"/>
+										#if($!userInfoDTO.userDTO.auditStatus == 0) 万元 #else #end 
+							</li>
+                    	</ul>
+                    </div>
+                    #if($!userInfoDTO.userDTO.auditStatus == 0)
+                    <dd style="color:red;" id="errorMsg"></dd>
+                    <div class="font_right"> 
+                    	<button class="hei_32 pad_lr10 button_1" onclick="return submitAddress()">提交认证</button>
+                    </div>
+                     #else #end 
+                </form>
+                </div>
+                <!-- 公司信息    2  end  -->
+                
+                 <!-- 审核状态    3  start -->    
+                <div id="myTab0_Content2" class="none">
+	                <div  class="bg_01">
+						<div style="height: 50px"></div>
+						<div class="TabContent">
+							
+						</div>
+	                </div>
+           	 	</div>
+           	 	<!-- 审核状态    3  end   -->  
+        </div>
+    </div><!-- 中间内容 end-->
+	 <!-- 审批-驳回：弹出层 start -->
+	<div class="po_fai" id="po_fai" style="display:none">
+		<div class="po_fai_bg"></div>
+		<div class="po_main" style="text-align: center;">
+			<div class="mar_l30 mar_r30 mar_t10">
+				<div class="clear"></div>
+					<p class="hei_30" style="font-size:15px;text-align:left;margin-left: 15px">驳回原因:</p>
+					<div class="clear"></div>
+					<div class="user">
+					<br/>
+					<textarea style="width:330px; height:80px" id="auditRemark" disabled="disabled"></textarea>
+				</div>
+				<div class="clear"></div>
+				<div class="font_right">
+					<input type="button" class="hei_32 pad_lr10 button_1"  onclick="secondSubmit();" value="再次认证"/>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 审批-驳回：弹出层 end -->
+</div>
+    #parse("common/footer.vm")
+</body>
+
+</html>
+

@@ -1,0 +1,254 @@
+#set($layout="common/order.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>订单管理</title>
+#parse("common/scriptAndCss.vm")
+<script type="text/javascript">
+var productList = new Array();
+
+//查询
+function queryContract(){
+	$("#form").submit();
+}
+//选中协议
+function selectContract(contract){
+	$("#contractNo").val(contract);
+	$.ajax({
+	   type: "POST",
+	   url: "$request.contextPath/orderWx/getContractDetail?contractNo="+contract,
+	   dataType: "html",
+	   success: function(data){
+		   $("h3").remove();
+		   $("#contractForm").remove();
+		   $("#divButton").remove();
+		   $("table").after(data);
+	   },
+	   error:function(){
+		   alert("系统错误,稍后再试......");
+	   }
+	});
+}
+//全选(全不选)
+function changeCheck(obj){
+	var checked = obj.checked;
+	//版本兼容  用  prop
+	$("#checkAll").prop("checked",checked);
+	$("input[name='matCd']").prop("checked",checked);
+
+	//-----------------------------------------------------//
+	if($("#checkAll").prop("checked")){
+		productList.splice(0,productList.length);
+		//如果全选则全部加入数组
+		$("[name='matCd']").each(function(i,obj){
+			var product = getProduct(obj);
+			productList.push(product);
+		});
+		
+	}else{
+		//全不选则将数组清空
+		productList.splice(0,productList.length);
+	}
+	
+	var jsonProducts = JSON.stringify(productList);
+	console.debug(jsonProducts);
+	$("#jsonProducts").val(jsonProducts);
+	//-----------------------------------------------------//
+	
+}
+function autoCheckAll(obj){
+	var matCds = document.getElementsByName("matCd");
+	var flag = true;
+	for(var i = 0; i < matCds.length; i++){
+		var matCd = matCds[i];
+		if(!matCd.checked){
+			flag = false;
+			break;
+		}
+	}
+	$("#checkAll").prop("checked",flag);
+	
+	//-------------------------------------------------------------//
+	if(obj.checked){
+		//修改数量时将已选中的删除
+		for(var i = 0; i < productList.length; i++){
+			var product = productList[i];
+			if(obj.value==product.skuId){
+				productList.splice(i,1);
+				break;
+			}
+		}
+		
+		
+		//选中
+		var product = getProduct(obj);
+		productList.push(product);
+	}else{
+		//不选中
+		for(var i = 0; i < productList.length; i++){
+			var product = productList[i];
+			if(obj.value==product.skuId){
+				productList.splice(i,1);
+				break;
+			}
+		}
+	}
+	
+	var jsonProducts = JSON.stringify(productList);
+	console.debug(jsonProducts);
+	$("#jsonProducts").val(jsonProducts);
+	//-------------------------------------------------------------//
+}
+
+function getProduct(obj){
+// 	console.debug($(obj).parent().parent().children(":last").children(":last").parent());
+// 	$(obj).parent().last().find("[name='quantity']").val();
+// 	$(obj).parent().parent().children(":last").children(":last").parent().find("[name='quantity']").val();
+	
+	var dom = $(obj).parent().parent().children(":last").children(":last").parent();
+	var quantity = dom.find("[name='quantity']").val();
+	var skuPrice = dom.find("[name='skuPrice']").val();
+	var skuId = dom.find("[name='skuId']").val();
+	var itemId = dom.find("[name='itemId']").val();
+	var shopId = dom.find("[name='shopId']").val();
+	var sellerId = dom.find("[name='sellerId']").val();
+	var regionId = dom.find("[name='regionId']").val();
+	
+// 	console.debug(quantity);
+// 	console.debug(skuPrice);
+// 	console.debug(itemId);
+// 	console.debug(shopId);
+// 	console.debug(sellerId);
+	
+	var product = {};
+	product.quantity = quantity;
+	product.skuPrice = skuPrice;
+	product.skuId = skuId;
+	product.itemId = itemId;
+	product.shopId = shopId;
+	product.sellerId = sellerId;
+	product.regionId = regionId;
+	
+	return product;
+}
+//修改数量
+function changeQuantity(obj){
+	
+	var patrn=/^[0-9]{1,3}$/;
+	if(!patrn.exec(obj.value) || obj.value==""){
+		alert("请输入0~999的整数！");
+		obj.value = 1;
+		return false;
+	}
+	
+	
+	var dom = $(obj).parent().parent().children(":first").children(":first");
+	if(!dom.prop("checked")){
+		alert("此行没有选择,请选择后在操作...");
+		$(obj).val("1");
+		return false;
+	}else{
+		autoCheckAll(dom[0]);
+	}
+}
+
+//订购
+function toOrder(){
+	if($("[name='matCd']:checked").length<=0){
+		alert("请选择要提交的商品");
+		return false;
+	}
+	
+	var flag = true;
+	
+	$("[name='matCd']:checked").each(function(i,dom){
+		console.debug("i="+i);
+		if($(dom).prop("checked")){//如果选中    则校验后边的数量
+			console.debug(dom);
+			var quantity = $(dom).parent().parent().children(":last").children(":last").parent().find("[name='quantity']").val();
+			console.debug("quantity=="+quantity+"    "+!quantity);
+			if(!quantity){
+				alert("请输入数量");
+				flag = false;
+				return false;
+			}
+		
+			if(isNaN(quantity)){
+				alert("请输入数字");
+				flag = false;
+				return false;
+			}
+		}
+	});
+	
+	if(!flag){
+		return false;
+	}
+	
+	$("#contractForm").submit();
+}
+</script>
+</head>
+<body>
+	<div id="main" class="po_re">
+	    <!-- 头部 -->
+	    ##parse("common/headerWx.vm")
+	    <!-- 头部 end-->
+	    <!-- 中间内容 -->
+	    <div class="content" id="wrapper">
+	        <!-- 内容开始 -->
+	        <div class="mar_t20">
+	        
+			    <form action="$request.contextPath/orderWx/toContract" id="form" method="post">
+		            <ul class="pass">
+		                <li><p class="wid_25 fl font_right pad_r5"><span class="font_e5">*</span>协议编号</p><input type="text" name="contractNo" class="wid_50 input_3" value="$!{contractNo}"/></li>
+		                <li><p class="wid_25 fl font_right pad_r5"><span class="font_e5">*</span>供应商</p><input type="text" name="supplierName" class="wid_50 input_3" value="$!{supplierName}"/></li>
+		            </ul>
+	            	<div><button class="button_1 pad_lr10 hei_32 fr" onclick="queryContract()"/>搜索</button> </div>
+	           		<div class="clear"></div>
+	           	</form>
+	           	
+	            <!-- table -->
+	            <p class="hei_32"><span class="fl pad_l5">合同信息</span>
+	            	<span class="fr pad_r5">共
+		            	#if(${contracts})
+		            		$contracts.size()
+		            	#else
+		            		0
+		            	#end
+	            	条</span>
+	            </p>
+	            <table class="font_cen mar_lr5 border_1">
+	                <!-- 头部列表 -->
+	                <tr class="bg_02 hei_32">
+	                    <td class="wid_26">编号</td>
+	                    <td class="wid_26">名称</td>
+	                    <td class="wid_26">供应商</td>
+	                    <td class="wid_26">状态</td>
+	                </tr>
+	                <!-- 头部列表 end-->
+	                #if(${contracts})
+	                	#foreach($contract in ${contracts})
+			                <!-- 每条信息 -->
+			                <tr class="hei_32">
+			                    <td class="wid_26"><input type="radio" name="contractNo" value="$contract.contractNo" onclick="selectContract(this.value)"/>$contract.contractNo</td>
+			                    <td class="wid_26">$!contract.contractName</td>
+			                    <td class="wid_26">$!contract.supplierName</td>
+			                    <td class="wid_26">$!contract.status</td>
+			                </tr>
+			                <!-- 每条信息 end-->
+	                	#end
+	                #end
+	            </table> <!-- table -->
+	            
+	            
+	            
+	        </div>
+	    </div>
+	    <!-- 中间内容 end-->
+
+	</div>
+		#parse("common/footer.vm")
+</body>
+</html>

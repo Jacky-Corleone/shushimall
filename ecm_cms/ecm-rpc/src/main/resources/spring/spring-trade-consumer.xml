@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+	
+    <!--金融帐号设置-->
+   <dubbo:reference id="dualAccountInfoService" registry="qingdaoRegistry"
+                     owner="zhangfan" interface="com.camelot.payment.DualAccountInfoService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+                     
+                     
+    <!-- 退款记录 -->           
+   <dubbo:reference id="refundTransationsService" registry="qingdaoRegistry"
+                     owner="zhangfan" interface="com.camelot.aftersale.service.RefundTransationsService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />     
+      <!-- 优惠活动结算单 -->
+	<dubbo:reference id="activityStatementSerice" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.activity.service.ActivityStatementSerice"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />                
+     <!-- 提现记录 -->           
+   <dubbo:reference id="financeWithdrawRecordService" registry="qingdaoRegistry"
+                     owner="camelot" interface="com.camelot.payment.FinanceWithdrawRecordExportService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />                     
+</beans>

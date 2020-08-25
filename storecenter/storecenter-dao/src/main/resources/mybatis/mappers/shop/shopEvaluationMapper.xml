@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.storecenter.dao.ShopEvaluationDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	
+	<resultMap id="shopEvaluationTotalMap" type="java.util.HashMap">
+		<result column="total_type" javaType="java.lang.String" property="key" />
+		<collection property="value" javaType="java.util.ArrayList" resultMap="shopEvaluationTotalQueryDTO"></collection>  
+	</resultMap>
+	
+	<resultMap id="shopEvaluationTotalQueryDTO" type="com.camelot.storecenter.dto.ShopEvaluationTotalQueryDTO">
+		<result property="scopeVal" column="scope_val"/>
+		<result property="scopeCount" column="scope_count"/>
+		<result property="scopeSum" column="scope_sum"/>
+	</resultMap>
+	
+	<resultMap id="shopEvaluationDTO" type="com.camelot.storecenter.dto.ShopEvaluationDTO">
+		<result property="id" column="id"/>
+		<result property="userId" column="user_id"/>
+		<result property="userShopId" column="user_shop_id"/>
+		<result property="byShopId" column="by_shop_id"/>
+		<result property="resource" column="by_shop_id"/>
+		<result property="orderId" column="order_id"/>
+		<result property="shopDescriptionScope" column="shop_description_scope"/>
+		<result property="shopServiceScope" column="shop_service_scope"/>
+		<result property="shopArrivalScope" column="shop_arrival_scope"/>
+		<result property="createTime" column="create_time"/>
+		<result property="modifyTime" column="modify_time"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	
+	
+	<sql id="where_fragement">
+		where 1 = 1
+		<if test="entity!=null">
+			<if test="entity.byShopId!=null and entity.byShopId !=''">
+				<![CDATA[and by_shop_id = #{entity.byShopId}]]>
+			</if>
+			<if test="entity.resource!=null and entity.resource !=''">
+				<![CDATA[and resource = #{entity.resource}]]>
+			</if>
+			<if test="entity.orderId!=null and entity.orderId !=''">
+				<![CDATA[and order_id = #{entity.orderId}]]>
+			</if>
+			<if test="entity.userId!=null and entity.userId !=''">
+				<![CDATA[and user_id = #{entity.userId}]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<!-- 插入记录 -->
+	<insert id="insertShopEvaluation" keyProperty="id" useGeneratedKeys="true" parameterType="com.camelot.storecenter.dto.ShopEvaluationDTO">
+		INSERT INTO shop_evaluation
+            (
+             user_id,
+             user_shop_id,
+             by_shop_id,
+             shop_description_scope,
+             shop_service_scope,
+             shop_arrival_scope,
+             resource,
+             order_id,
+             create_time,
+             modify_time
+		   )values(
+	          #{userId}
+	         ,#{userShopId}
+	         ,#{byShopId}
+	         ,#{shopDescriptionScope}
+	         ,#{shopServiceScope}
+	         ,#{shopArrivalScope}
+	         ,#{resource}
+	         ,#{orderId}
+	    	,now()
+	    	,now()
+		   )
+	   <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+		 select @@IDENTITY
+	   </selectKey>
+	</insert>
+	
+	<!-- 查询总数量 -->
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		shop_evaluation t
+		<include refid="where_fragement" />
+	</select>
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	
+	<select id="queryShopEvaluationList" resultMap="shopEvaluationDTO">
+		SELECT
+		  id,
+		  user_id,
+		  user_shop_id,
+		  by_shop_id,
+		  order_id,
+		  shop_description_scope,
+		  shop_service_scope,
+		  shop_arrival_scope,
+		  create_time,
+		  modify_time
+		FROM shop_evaluation
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<!-- 店铺评价统计 -->
+	<select id="queryShopEvaluationTotal" resultMap="shopEvaluationTotalMap">
+		<!-- 店铺评价总统计 -->
+		SELECT 
+		'all' total_type,
+		'0' scope_val,
+		COUNT(1) scope_count,
+		SUM(shop_description_scope)+SUM(shop_service_scope)+SUM(shop_arrival_scope) scope_sum
+		FROM shop_evaluation
+		<include refid="where_fragement" />
+		UNION ALL
+		<!-- 店铺描述统计 -->
+		SELECT 
+		'shopDescription' total_type,
+		shop_description_scope scope_val,
+		COUNT(shop_description_scope) scope_count,
+		(SELECT SUM(shop_description_scope) FROM shop_evaluation <include refid="where_fragement" />) scope_sum
+		FROM shop_evaluation
+		<include refid="where_fragement" />
+		GROUP BY shop_description_scope
+		UNION ALL
+		<!-- 店铺服务统计 -->
+		SELECT 
+		'shopService' total_type,
+		shop_service_scope scope_val,
+		COUNT(shop_service_scope) scope_count,
+		(SELECT SUM(shop_service_scope) FROM shop_evaluation <include refid="where_fragement" />) scope_sum
+		FROM shop_evaluation
+		<include refid="where_fragement" />
+		GROUP BY shop_service_scope
+		UNION ALL
+		<!-- 发货速度统计 -->
+		SELECT 
+		'shopArrival' total_type,
+		shop_arrival_scope scope_val,
+		COUNT(shop_arrival_scope) scope_count,
+		(SELECT SUM(shop_arrival_scope) FROM shop_evaluation <include refid="where_fragement" />) scope_sum
+		FROM shop_evaluation
+		<include refid="where_fragement" />
+		GROUP BY shop_arrival_scope
+	</select>
+	
+	
+</mapper>

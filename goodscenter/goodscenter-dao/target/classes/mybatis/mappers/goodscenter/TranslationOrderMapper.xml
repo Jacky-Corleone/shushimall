@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.goodscenter.dao.TranslationOrderDAO">
+	<resultMap id="translationOrderMapper" type="com.camelot.goodscenter.dto.TranslationOrderDTO">
+			<result property="id" column="id" />
+			<result property="translationNo" column="translation_no" />
+			<result property="orderNo" column="order_no" />
+			<result property="state" column="state" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="activeFlag" column="active_flag" />
+			<result property="remark" column="remark" />
+	</resultMap>
+	
+	<sql id="where">
+		<where>
+			<if test="translationOrder.id != null and translationOrder.id != '' ">
+				and  translationOrder.id = #{translationOrder.id}
+			</if>
+			<if test="translationOrder.translationNo != null and translationOrder.translationNo != '' ">
+				and  translationOrder.translation_no = #{translationOrder.translationNo}
+			</if>
+			<if test="translationOrder.orderNo != null and translationOrder.orderNo != '' ">
+				and  translationOrder.order_no = #{translationOrder.orderNo}
+			</if>
+			<if test="translationOrder.state != null and translationOrder.state != '' ">
+				and  translationOrder.state = #{translationOrder.state}
+			</if>
+			<if test="translationOrder.createBy != null and translationOrder.createBy != '' ">
+				and  translationOrder.create_by = #{translationOrder.createBy}
+			</if>
+			<if test="translationOrder.createDate != null and translationOrder.createDate != '' ">
+				and  translationOrder.create_date = #{translationOrder.createDate}
+			</if>
+			<if test="translationOrder.updateBy != null and translationOrder.updateBy != '' ">
+				and  translationOrder.update_by = #{translationOrder.updateBy}
+			</if>
+			<if test="translationOrder.updateDate != null and translationOrder.updateDate != '' ">
+				and  translationOrder.update_date = #{translationOrder.updateDate}
+			</if>
+			<if test="translationOrder.activeFlag != null and translationOrder.activeFlag != '' ">
+				and  translationOrder.active_flag = #{translationOrder.activeFlag}
+			</if>
+			<if test="translationOrder.remark != null and translationOrder.remark != '' ">
+				and  translationOrder.remark = #{translationOrder.remark}
+			</if>
+		</where>
+	</sql>
+	
+	<select id="queryPage" resultMap="translationOrderMapper">
+		select * from translation_order translationOrder
+		<include refid="where"/>
+		limit #{pager.pageOffset},#{pager.rows}
+	</select>
+	
+	<select id="queryPageCount" resultType="long">
+		select count(0) from translation_order translationOrder
+		<include refid="where"/>
+	</select>
+	
+	<select id="findById" resultMap="translationOrderMapper" >
+		select * from translation_order translationOrder
+		where id = #{id}
+	</select>
+	<select id="findByTranslationOrderDTO" resultMap="translationOrderMapper">
+		select * from translation_order translationOrder
+		<include refid="where"/>
+	</select>
+
+	<insert id="insert" parameterType="com.camelot.goodscenter.dto.TranslationOrderDTO" useGeneratedKeys="true" keyProperty="id">
+		insert into translation_order(
+				id,
+				translation_no,
+				order_no,
+				state,
+				create_by,
+				create_date,
+				update_by,
+				update_date,
+				active_flag,
+				remark
+		)values(
+				#{id},
+				#{translationNo},
+				#{orderNo},
+				#{state},
+				#{createBy},
+				SYSDATE(),
+				#{updateBy},
+				#{updateDate},
+				#{activeFlag},
+				#{remark}
+		)
+	</insert>
+	
+	<update id="update">
+		update translation_order set
+				id = #{id},
+				translation_no = #{translationNo},
+				order_no = #{orderNo},
+				state=#{state},
+				create_by = #{createBy},
+				create_date = #{createDate},
+				update_by = #{updateBy},
+				update_date = #{updateDate},
+				active_flag = #{activeFlag},
+				remark = #{remark}
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from translation_order
+		<if test=" codes != null and codes.size() > 0 ">
+			where id in
+			<foreach collection="codes" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test=" codes == null or codes.size() == 0 ">
+			where 1 = 3
+		</if>
+	</delete>
+	
+	<select id="findAll" resultType="map">
+		select * from translation_order translationOrder
+		<include refid="where"/>
+	</select>
+</mapper>

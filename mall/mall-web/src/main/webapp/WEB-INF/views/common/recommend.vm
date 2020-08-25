@@ -1,0 +1,72 @@
+#set($layout = "/none_layout.vm")
+<script type="text/javascript">
+	function tabChange(tab_name,tab_no,tab_all,class_hove,class_out){
+		var i;
+		for(i=1;i<=tab_all;i++){
+	    	if(i==tab_no){
+	        	$("#"+tab_name+"_"+i).attr("class","hover");
+	        	$("#"+tab_name+"_"+i+"_content").show();
+	    	}else{
+	        	$("#"+tab_name+"_"+i).attr("class","");
+	        	$("#"+tab_name+"_"+i+"_content").hide();
+	    	}
+		}
+	}
+	
+	function openUrl(url){
+		var url = ( url != "" && url != null ) ? ( url.indexOf("http") != -1 ? url : ( "http://" + url ) ) : "/";
+		window.open(url);
+	}
+</script>
+<div class="att mar_b10">
+	<div class="att_top">
+		<ul>
+			<li class="hover" id="opt_1" onClick="tabChange('opt',1,3,'hover','');">集采商品</li>
+			<li id="opt_2" class="" onClick="tabChange('opt',2,3,'hover','');">热销商品</li>
+    	</ul>
+	</div>
+	<div class="clear"></div>
+	<!--集采商品-->
+	<div class="att_con0 att_webwrap border-1" id="opt_1_content">
+		#foreach($centralPurchase in $centralPurchase.records)
+			<ul>
+				<li class="att_pro">
+					#set($fullAttVal="")
+					#foreach($atts in $!centralPurchase.attributes)
+						#foreach($attvalue in $!atts.values)
+							#set($fullAttVal = $fullAttVal + $!attvalue.name)
+						#end
+					#end
+					<a class="att_new cursor" href="$request.getContextPath()/productController/details?id=$!centralPurchase.itemId&skuId=$!centralPurchase.skuId&centralPurchasingId=$!centralPurchase.centralPurchasingId" title="$!centralPurchase.activityName &nbsp; $!fullAttVal" alt="$!centralPurchase.activityName &nbsp; $!fullAttVal" target="_blank">
+						<img src="$!imageServerAddr$!centralPurchase.activityImg"/>
+					</a>
+				</li>
+				<li class="att_name">
+					<a class="over_ell fl" href="$request.getContextPath()/productController/details?id=$!centralPurchase.itemId&skuId=$!centralPurchase.skuId&centralPurchasingId=$!centralPurchase.centralPurchasingId" title="$!centralPurchase.activityName &nbsp; $!fullAttVal" alt="$!centralPurchase.activityName &nbsp; $!fullAttVal" target="_blank">
+						$!centralPurchase.activityName&nbsp;
+						$!fullAttVal
+					</a>
+				</li>
+			</ul>
+		#end
+		<div class="clear"></div>
+	</div>
+	<!--集采商品-->
+	
+	<!--热销商品-->
+	<div class="att_con0 border-1" id="opt_2_content" style="display:none; width: 1198px">
+		#foreach($product in $jcProducts)
+	   		<ul>
+	    		<li class="att_pro">
+	    			<a onclick="openUrl('$!product.adURL')" class="att_new cursor" target="_Blank">
+	    				<img src="$!imageServerAddr$product.adSrc"/>
+	    			</a>
+	    		</li>
+	    		<li class="att_name"><a href="$product.adURL">$product.title</a></li>
+	    		<!--<li class="att_price"><strong>￥ 1199</strong><i>(5.8折)</i><em>￥  2399</em></li>-->
+	    	</ul>
+		#end
+    	<div class="clear"></div>
+	</div>
+	<!--热销商品-->
+</div>

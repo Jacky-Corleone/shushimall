@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+	<!-- 使用dubbo协议暴露服务 -->
+	<dubbo:service interface="com.camelot.goodscenter.service.ItemExportService"
+		owner="zhangfan" ref="itemExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry"/>
+		
+	<dubbo:service interface="com.camelot.goodscenter.service.ItemBrandExportService"
+		owner="zhangfan" ref="itemBrandService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry"/>
+	
+	<dubbo:service interface="com.camelot.goodscenter.service.ItemPriceExportService"
+		owner="camelot" ref="itemPriceExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry"/>
+	<dubbo:service interface="com.camelot.goodscenter.service.ItemOldExportService"
+		owner="camelot" ref="itemOldExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry"/>
+		
+	<dubbo:service interface="com.camelot.goodscenter.service.ItemAttrValueItemExportService"
+		owner="camelot" ref="itemAttrValueItemExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry"/>
+
+	<dubbo:service interface="com.camelot.goodscenter.service.ProtocolExportService"
+		owner="camelot" ref="protocolExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry"/>
+
+	<dubbo:service interface="com.camelot.goodscenter.service.InquiryExportService"
+		owner="camelot" ref="inquiryExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry"/>
+
+	<dubbo:service interface="com.camelot.goodscenter.service.TranslationExportService"
+				   owner="camelot" ref="translationExportService" version="1.0" protocol="dubbo"
+				   delay="-1" registry="qingdaoRegistry"/>
+	<dubbo:service interface="com.camelot.goodscenter.service.ItemSkuPackageService"
+				   owner="camelot" ref="itemSkuPackageService" version="1.0" protocol="dubbo"
+				   delay="-1" registry="qingdaoRegistry"/>			   
+</beans>

@@ -1,0 +1,679 @@
+<style type="text/css">
+    .messageInput{background-color:transparent;width: 1px;}
+</style>
+<script type="text/javascript" src="$request.contextPath/assets/plugin/jquery-validation/1.11.1/additional-methods.js"></script>
+<script type="text/javascript">
+$(function(){
+    //初始化验证
+    initValidPluginShopApply();
+    //初始化页面
+    initShopApply();
+
+    //一级类目改变时，加载二级类目
+    $("#categoryLev1").bind("change",function(){
+        $("#categoryLev2").empty().append($("<option>").text("请选择").val(""));
+        optionItems("$request.getContextPath()/shopManageCategoryController/getCategoryByParentId",$(this).val(),"categoryLev2","","categoryCName","categoryCid");
+        //清空三级类目
+        $("#categoryLev3").empty().append($("<option>").text("请选择").val(""));
+    });
+    //二级类目改变时，加载三级类目
+    $("#categoryLev2").bind("change",function(){
+        //清空三级类目
+        $("#categoryLev3").empty().append($("<option>").text("请选择").val(""));
+        optionItems("$request.getContextPath()/shopManageCategoryController/getCategoryByParentId",$(this).val(),"categoryLev3","","categoryCName","categoryCid");
+    });
+    //增加新类目
+    $("#addNewCategory").bind("click",function(){
+        var newCategoryName = $("#categoryLev1 option:selected").text() + ">" + $("#categoryLev2 option:selected").text() + ">" + $("#categoryLev3 option:selected").text();
+        //未选择类目时提示
+        if(isCategoryNull()){
+            alert("请选择品类信息");
+            return false;
+        }
+        var lev3 = $("#categoryLev3").val(); //三级类目
+        //校验该类目是否有返点信息
+        $.get("$request.getContextPath()/shopManageCategoryController/validExistRebate",{cid:lev3},function(response){
+            if(response.result=="success"){
+                //用户新增的经营类目
+                var addCategoryCids = $("#addCategoryCids").val();
+                //验证该店铺是否已经存在该经营类目
+                if(containsId(addCategoryCids, $("#categoryLev3").val())){
+                    alert("已经存在该经营类目，请重新选择！");
+                    return false;
+                }
+                $("#newCategoryLi").show();
+
+                addCategoryCids = addCategoryCids?(addCategoryCids + "," + lev3):lev3;
+                //组装一、二、三级品类信息的字符串
+                var td = $("<td>").append(newCategoryName+"&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='removeCategory(this,"+lev3+")'>删除</a>");
+                var tr = $("<tr>").append(td);
+                $("#newCategory table").append(tr);
+                $("#addCategoryCids").val(addCategoryCids);
+                //隐藏已选择类目的容器
+                $("#newCategory").parent().show();
+                //加载品牌信息
+                loadBrandByCid(lev3);
+            }else{
+                alert(response.msg);
+            }
+        },"json");
+    });
+    //退换货省市区下拉菜单改变事件绑定
+    $("#dp_provinces").change(function(){
+        optionItems("$request.contextPath/shopBaseInfoController/queryAddress",$("#dp_provinces").val(),"dp_city");
+        //清空区域信息
+        /* $("#dp_area").empty().append($("<option>").text("请选择").val("")); */
+    });
+   /*  $("#dp_city").change(function(){
+        optionItems("$request.contextPath/shopBaseInfoController/queryAddress",$("#dp_city").val(),"dp_area");
+    }); */
+    //店铺类型-销售授权书扫描件
+    $("#shopType").change(function(){
+        if("2"==$(this).val()){
+            $("#marketingAuthDiv").attr("class","");
+            $("#marketingAuthPicDiv").attr("class","fl mar_l170");
+        } else {
+            $("#marketingAuthDiv").attr("class","none");
+            $("#marketingAuthPicDiv").attr("class","none");
+        }
+    });
+    //暂存：卖家店铺运营申请
+    $("#shopApplyBtn").bind("click",function(){
+        //给发货退货地址的省、市、地区的名称赋值
+        $("#provinceName").val($("#dp_provinces option:selected").text());
+        $("#cityName").val($("#dp_city option:selected").text());
+        /* $("#districtName").val($("#dp_area option:selected").text()); */
+
+        //暂存操作
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            url:"$request.contextPath/information/registerSeller/stagingInformation",
+            data:$("#shopApplyForm").serializeArray(),
+            success: function(data){
+                alert(data.result);
+            }
+        });
+    });
+  	//店铺名称命名规则关闭按钮
+	$("#shopNameRuleDivClose").click(function(){
+		$('#shopNameRuleDiv').attr('style','display:none');
+	});
+	$("#shopNameRuleDivCloseButton").click(function(){
+		$('#shopNameRuleDiv').attr('style','display:none');
+	});
+  	//店铺域名命名规则关闭按钮
+	$("#shopDomainNameRuleDivClose").click(function(){
+		$('#shopDomainNameRuleDiv').attr('style','display:none');
+	});
+	$("#shopDomainNameRuleDivCloseButton").click(function(){
+		$('#shopDomainNameRuleDiv').attr('style','display:none');
+	});
+});
+
+/*初始化页面*/
+function initShopApply(){
+    //加载平台一级类目
+    optionItems("$request.getContextPath()/shopManageCategoryController/getCategoryByParentId",0,"categoryLev1","","categoryCName","categoryCid");
+    //填充省市县下拉框
+    optionItems("$request.contextPath/shopBaseInfoController/queryAddress",0,"dp_provinces","$shopInfo.provinceCode");//加载省份数据
+    optionItems("$request.contextPath/shopBaseInfoController/queryAddress","$shopInfo.provinceCode","dp_city","$shopInfo.cityCode");//加载市数据
+    /* optionItems("$request.contextPath/shopBaseInfoController/queryAddress","$shopInfo.cityCode","dp_area","$shopInfo.districtCode");//加载县(区)数据 */
+    //域名检测提示信息隐藏
+    initShopUrlTip();
+    //没有类目信息时，隐藏存放类目信息的容器
+    var clist = "$!categoryNameList.entrySet().size()";
+    if(clist > 0){
+        $("#newCategoryLi").show();
+    }else{
+        $("#newCategoryLi").hide();
+    }
+    //店铺类型
+    if("$!shopInfo.shopType" != null && "$!shopInfo.shopType" != ""){
+        $("#shopType").val("$!shopInfo.shopType");
+        if($("#shopType option:selected").val() == '0'){
+            $("#shopType_view").html();
+        }else{
+            $("#shopType_view").html($("#shopType option:selected").text());
+        }
+    }
+    //品牌类型
+    if("$!shopInfo.brandType" != null && "$!shopInfo.brandType" != ""){
+        $("#brandType").val("$!shopInfo.brandType");
+        if($("#brandType option:selected").val() == '0'){
+            $("#brandType_view").html();
+        }else{
+            $("#brandType_view").html($("#brandType option:selected").text());
+        }
+    }
+    //经营类型
+    if("$!shopInfo.businessType" != null && "$!shopInfo.businessType" != ""){
+        $("#businessType").val("$!shopInfo.businessType");
+        if($("#businessType option:selected").val() == '0'){
+            $("#businessType_view").html();
+        }else{
+            $("#businessType_view").html($("#businessType option:selected").text());
+        }
+    }
+    //店铺类型-销售授权书扫描件
+    if("2"=="$!shopInfo.shopType"){
+        $("#marketingAuthDiv").attr("class","");
+        $("#marketingAuthPicDiv").attr("class","fl mar_l170");
+    } else {
+        $("#marketingAuthDiv").attr("class","none");
+        $("#marketingAuthPicDiv").attr("class","none");
+    }
+}
+
+/**初始化域名的提示信息*/
+function initShopUrlTip(){
+    var urlValid = "$validShopUrl";
+    if(urlValid=="true"){
+        $("#shopUrlExist").hide();
+    }else{
+        $("#shopUrlNotExist").hide();
+    }
+    if($("#shopUrl").val()==""){
+        $("#shopUrlExist").hide();
+    }
+}
+
+/**检测品类信息是否选择*/
+function isCategoryNull(){
+    var lev1 = $("#categoryLev1").val(); //一级类目
+    var lev2 = $("#categoryLev2").val(); //二级类目
+    var lev3 = $("#categoryLev3").val(); //三级类目
+    if(lev1=="" || lev1==null
+            ||lev2=="" || lev2==null
+            || lev3=="" || lev3==null){
+        return true;
+    }
+    return false;
+}
+
+/**表单校验字段对象*/
+function FormField(type, name, msg){
+    this.type = type;
+    this.name = name;
+    this.msg = msg;
+}
+
+//加载类目下对应的品牌
+function loadBrandByCid(cid){
+    $.ajax({
+        url:"$request.getContextPath()/shopManageBrandController/queryBrandByCid",
+        type:"get",
+        data:{
+            cid:cid
+        },
+        dataType: "json",
+        success:function(data){
+            var brandList = $("#brands").empty();
+            $.each(data, function (n, brand) {
+                var cid_brandid = cid + ":" + brand.brandId;
+                var cidbrandid= cid+"_"+brand.brandId;
+                //品牌图片
+                var imgEle = $("<img>").attr("title",brand.brandName).attr("src","$!imageServerAddr"+brand.brandLogoUrl).css({width:"120",height:"40"});
+
+                var liEle = $("<span>").attr("id",cidbrandid).addClass("press_pic border-4 mar_r10 mar_b10").bind("click",function(){
+                    //已经选择了该品牌，再次点击时，从已选择列表中移除该品牌
+                    if(containsId($("#addBrandIds").val(),cid_brandid)){
+                        //1、去除图片右下角的红色的勾
+                        $(this).find("b").remove();
+                        //2、从已选择列表中移除该品牌
+                        $("#selectedBrand").find("span[id='"+cidbrandid+"']").remove();
+                        //3、从隐藏域中移除该品牌的品牌id
+                        $("#addBrandIds").val(removeEle($("#addBrandIds").val(),cid_brandid).join(","));
+                    }else{
+                        //还未选择过该品牌
+                        //1、图片右下角挂一个绿色的勾
+                        $(this).append("<b class=\"pa_04 po_ab\"></b>");
+
+                        //2、将图片移动到id为"selectedBrand"的ul标签中
+                        $("#selectedBrand").append($(this).clone());
+                        //3、将图片对应的品牌id放到隐藏域中
+                        var selectedBrandIds = $("#addBrandIds").val();
+                        var brandIds = selectedBrandIds?(selectedBrandIds + "," + cid_brandid):cid_brandid;
+                        $("#addBrandIds").val(brandIds);
+                    }
+                });
+                liEle.append(imgEle);
+                brandList.append(liEle);
+            });
+        }
+    });
+}
+
+/**移除类目*/
+function removeCategory(obj,id){
+    //1、移除类目元素
+    $(obj).parent().parent().remove();
+    //2、移除类目id
+    var newCids = removeEle($("#addCategoryCids").val(),id);
+    if($.trim(newCids)==null){//如果没有元素了则隐藏容器
+        $("#newCategory").parent().hide();
+    }
+    $("#addCategoryCids").val(newCids.join(","));
+
+    //3、移除该类目对应的已选择的品牌的id
+    var addBrandIds = $("#addBrandIds").val();
+    if(!addBrandIds){
+        $("#brands").empty();
+        $("#selectedBrand").empty();
+        return false;
+    }
+    var bids = addBrandIds.split(",");
+    for(var i=0; i<bids.length; i++){
+        var cid = bids[i].split(":")[0];
+        var bid = bids[i].split(":")[1];
+        if(cid == id){
+            delete bids[i];
+        }
+    }
+    var newBids = "";
+    for(var _bid in bids){
+        if(bids[_bid]=="" || bids[_bid]==null || !bids.hasOwnProperty(_bid)){
+            continue;
+        }
+        if(_bid>0){
+            newBids += ",";
+        }
+        newBids += bids[_bid];
+    }
+    $("#addBrandIds").val(newBids);
+    //4、移除该类目对应的已选择的品牌的图片
+    $("#selectedBrand").find("span[id*='"+id+"_']").remove();
+    //5、移除类目id对应的所有品牌信息
+    $("#brands").find("span[id*='"+id+"_']").remove();
+}
+
+/**验证id是否存在于一个数组中*/
+function containsId(idArray, id){
+    var ids = idArray.split(",");
+    for(var i=0; i<ids.length; i++){
+        if(ids[i]==id){
+            return true;
+        }
+    }
+    return false;
+}
+
+/**移除一个数组中的某个元素并返回移除元素后的该数组对象*/
+function removeEle(idArrayStr, id){
+    var ids = idArrayStr.split(",");
+    for(var i=0; i<ids.length; i++){
+        if(ids[i]==id){
+            delete ids[i];
+            return ids;
+        }
+    }
+    return ids;
+}
+
+/*初始化校验控件*/
+function initValidPluginShopApply(){
+    $("#shopApplyForm").validate({
+        rules: {
+            "shopName":{
+                required: true
+            },
+            "shopUrl":{
+                required: true,
+                maxlength:20,
+                letters: true,
+                remote:"$request.getContextPath()/information/registerSeller/checkShopUrl"
+            },
+            "shopType":{
+                required: true
+            },
+            "provinceCode":{
+                required: true
+            },
+            "cityCode":{
+                required: true
+            },
+            "districtCode":{
+                required: true
+            },
+            "streetName":{
+                required: true
+            },
+            "addCategoryCids":{
+                categoryRequired: true,
+            },
+            "addBrandIds":{
+                brandRequired: true
+            }
+        },excludeValidator:['addCategoryCids','addBrandIds'],messages:{shopUrl:{remote:"店铺域名已存在"}}
+    });
+
+//    jQuery.validator.addMethod("shopName", function (value, element) {
+//        var chrnum = /^[\u4e00-\u9fa5a-zA-Z]{2,20}$/;
+//        return this.optional(element) || (chrnum.test(value));
+//    }, "输入2-20个字符，可由中文和英文组成");
+}
+
+/*收集数据：卖家店铺运营申请*/
+function collectDataShopApply(){
+    //给发货退货地址的省、市、地区的名称赋值
+    $("#provinceName").val($("#dp_provinces option:selected").text());
+    $("#cityName").val($("#dp_city option:selected").text());
+    /* $("#districtName").val($("#dp_area option:selected").text()); */
+}
+/*工具方法：上传图片*/
+function startUploadDoc(fileElementId, urlInput){
+    //判断图片格式
+    var fileInput = $("#"+fileElementId).val();
+    var extStart = fileInput.lastIndexOf(".");
+    var ext = fileInput.substring(extStart,fileInput.length).toUpperCase();
+    if(ext!=".doc" && ext!=".DOC"){
+        alert("请上传正确格式文件!");
+        return false;
+    }
+    $.ajaxFileUpload({
+        url: '$request.getContextPath()/fileUpload/upload?date='+new Date(), //用于文件上传的服务器端请求地址
+        secureuri: false, //是否需要安全协议，一般设置为false
+        fileElementId: fileElementId, //文件上传域的ID
+        dataType: 'json', //返回值类型 一般设置为json
+        type:"post",
+        success: function (data, status){  //服务器成功响应处理函数
+            if(!data.success){
+                alert(data.msg);
+                return false;
+            }
+            $("#"+urlInput+"_view").html("已上传").attr("href","$!imageServerAddr"+data.url);
+            $("#"+fileElementId).val("");
+            alert('文件上传成功！');
+        },
+        error: function (data, status, e){//服务器响应失败处理函数
+        }
+    });
+};
+</script>
+
+<!--卖家店铺运营申请 start -->
+<form id="shopApplyForm" method="post">
+<div class="bg_07 border-6">
+<div class="approve_buyer" id="approve_buyer">
+    <h1 class="font_18 mar_20">卖家店铺运营申请：</h1>
+    <input name="stagingType" type="hidden" value="6"/>
+    <ul>
+        <li>
+            <span class="font_span"><i class="demo-icons font_fs">*</i>店铺类型：</span>
+            <span id="shopType_view" class="shopInfo_class_show"></span>
+            <div class="shopInfo_class_hide">
+                <select id="shopType" name="shopType" class="input_Style1 wid_260">
+                    <option value="" selected="selected"> 请选择 </option>
+                    <option value="1" > 品牌商</option>
+                    <option value="2" > 经销商</option>
+                </select>
+            </div>
+        </li>
+        <li>
+            <span class="buyer_left"><i class="demo-icons font_fs">*</i>店铺名称：</span>
+            <span class="shopInfo_class_show">$!shopInfo.shopName</span>
+            <div class="shopInfo_class_hide">
+                <input name="shopName" id="shopName" type="text" value="$!shopInfo.shopName" class="input_Style1 wid_200" placeholder="输入店铺名称..." maxlength="25"/>
+	            <a href="javascript:void(0)" onclick="$('#shopNameRuleDiv').attr('style','');" ><span style="color: red">命名规则</span></a>
+            </div>
+        </li>
+        <li>
+            <span class="font_span">品牌类型：</span>
+            <span id="brandType_view" class="shopInfo_class_show"></span>
+            <div class="shopInfo_class_hide">
+                <select id="brandType" name="brandType" class="input_Style1 wid_260">
+                    <option value="" selected="selected"> 请选择 </option>
+                    <option value="1" > 国内品牌</option>
+                    <option value="2" > 国际品牌</option>
+                </select>
+            </div>
+        </li>
+        <li>
+            <span class="font_span">经营类型：</span>
+            <span id="businessType_view" class="shopInfo_class_show"></span>
+            <div class="shopInfo_class_hide">
+                <select id="businessType" name="businessType" class="input_Style1 wid_220">
+                    <option value="" selected="selected"> 请选择 </option>
+                    <option value="1" > 自有品牌</option>
+                    <option value="2" > 代理品牌</option>
+                </select>
+            </div>
+        </li>
+        <li>
+            <span class="font_span"><i class="demo-icons font_fs">*</i>店铺域名：</span>
+            <span class="shopInfo_class_show">$!shopInfo.shopUrl</span>
+            <div class="shopInfo_class_hide">
+                <input name="shopUrl" id="shopUrl" type="text" value="$!shopInfo.shopUrl" class="input_Style1 wid_130" placeholder="输入店铺域名..."/>
+           		<span>
+           			.shushi100.com
+           		</span>
+           		<a href="javascript:void(0)" onclick="$('#shopDomainNameRuleDiv').attr('style','');" ><span style="color: red">命名规则</span></a>
+            </div>
+        </li>
+    </ul>
+    <ol>
+        <li>
+        	<div>
+	        	<span style="color: red">
+	        		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	        		提示:&nbsp;请下载免责声明模板，填写完整加盖公章后扫描上传，上传图片仅支持JPG、JPEG、PNG、BMP格式，上传图片大小不得超过1M
+	        	</span>
+        	</div>
+            <p class="font_span"><i class="demo-icons font_fs">*</i>免责声明：</p>
+            <img id="disclaimerImg" src="$!imageServerAddr$!shopInfo.disclaimer" alt="" width="55" height="55" class="mar_lr10 fl po_re_img" title="点击查看大图">
+            <div class="shopInfo_class_hide">
+	            <p class="hei_40 fl registere_class_hide z-upload">
+	                <button type="button" class="button_4 font_12 border-1 button_small">上传图片</button>
+	                <input type="file" id="disclaimerFile" class="file-img" name="file" onchange="startUpload('disclaimerFile','disclaimerImg','disclaimer')">
+	            </p>
+            	<a href="$staticPath/template/FreeStatement.doc" class="font_fe" target="_blank">下载免责声明模板</a>
+            </div>
+            <input id="disclaimer" name="disclaimer" type="hidden" value="$!shopInfo.disclaimer"/>
+        </li>
+    </ol>
+    <ol>
+        #if("$!pageState"!="view")
+        <li>
+            <span class="font_span"><i class="demo-icons font_fs">*</i>品类信息选择：</span>
+            <select id="categoryLev1" name="_categoryLev1" class="input_Style1 wid_150">
+                <option value="" selected="selected"> 请选择 </option>
+            </select>
+            <i class="demo-icons">-</i>
+            <select id="categoryLev2" name="_categoryLev2" class="input_Style1 wid_150">
+                <option value="" selected="selected"> 请选择 </option>
+            </select>
+            <i class="demo-icons">-</i>
+            <select id="categoryLev3" name="_categoryLev3" class="input_Style1 wid_150">
+                <option value="" selected="selected"> 请选择 </option>
+            </select>
+            <i class="demo-icons">-</i>
+            <button type="button" id="addNewCategory" class="button_4 hei_24">添加</button>
+            <!-- 店铺最新加的经营类目的类目id -->
+            <input type="text" id="addCategoryCids" class="messageInput" name="addCategoryCids" value="$!existCids" />
+        </li>
+        #end
+        <li id="newCategoryLi">
+            <div class="shopInfo_class_show">
+                <span class="font_span"><i class="demo-icons font_fs">*</i>品类信息选择：</span>
+            </div>
+            <div class="shopInfo_class_hide">
+                <span class="buyer_left">&nbsp;</span>
+            </div>
+			<span id="newCategory">
+				<table>
+					#foreach($entity in $!categoryNameList.entrySet())
+				    	<tr><td>
+				   			&nbsp;$entity.value&nbsp;&nbsp;&nbsp;
+				   			#if("$!pageState"!="view")
+					   		<a href='javascript:void(0)' onclick='removeCategory(this,$entity.key)'>删除</a>
+					   		#end
+						</td></tr>
+					#end
+	        	</table>
+			</span>
+        </li>
+        <div class="shopInfo_class_hide">
+            <li>
+                <span class="buyer_left"><i class="demo-icons font_fs">*</i>经营品牌：</span>
+                <!-- 类目下的所有品牌 -->
+                <span id="brands" class="buyer_content" ></span>
+                <!-- 店铺最新加的经营品牌的品牌id -->
+                <input type="text" id="addBrandIds" name="addBrandIds" class="messageInput" value="$!brandIds" />
+            </li>
+        </div>
+        <li>
+            <div class="font_span">已选择品牌：</div>
+            <div class="buyer_content" id="selectedBrand">
+                <!--每个图片用个span  选中后加上<b></b>标签-->
+                #foreach($entity in $shopBrandList)
+                    <span class="press_pic border-4 mar_r10" id="$entity.brandId">
+                        <img src="$!imageServerAddr$entity.brandLogoUrl" title="$entity.brandName" width="120" height="40"  />
+		             	<b class="pa_04 po_ab" ></b>
+		             	</span>
+                #end
+            </div>
+        </li>
+        <li>
+            <span class="buyer_left"><i class="demo-icons font_fs">*</i>发货(退货)地址：</span>
+            #if("$!pageState"=="view")
+	            $!shopInfo.provinceName$!shopInfo.cityName$!shopInfo.districtName
+            #end
+            <div class="shopInfo_class_hide">
+                <select name="provinceCode" id="dp_provinces" class="input_Style1 wid_120">
+                    <option value="" selected="selected"> 请选择 </option>
+                </select>
+                <input type="hidden" id="provinceName" name="provinceName" />
+                <i class="demo-icons">-</i>
+                <select name="cityCode" id="dp_city" class="input_Style1 wid_120">
+                    <option value="" selected="selected"> 请选择 </option>
+                </select>
+                <input type="hidden" id="cityName" name="cityName" />
+                <!-- <i class="demo-icons">-</i>
+                <select name="districtCode" id="dp_area" class="input_Style1 wid_120">
+                    <option value="" selected="selected"> 请选择 </option>
+                </select> -->
+                <input type="hidden" id="districtName" name="districtName" />
+                <i class="demo-icons">-</i>
+                <input name="streetName" type="text" maxlength="30" class="input_Style2 wid_300 hei_32" placeholder="请详细填写发货地址，如：苏州街20号汇丰大厦A座11层" value="$!shopInfo.streetName" maxlength="170"/>
+            </div>
+        </li>
+        <div class="clear"></div>
+        <span style="color: red">&nbsp;&nbsp;提示:&nbsp;请下载免责声明模板，填写完整加盖公章后扫描上传，
+上传图片仅支持JPEG、JPG、BMP、PNG格式，上传图片大小不得超过500K</span>
+        <div class="clear"></div>
+        <div class="fl">
+            <div id="marketingAuthDiv" class="none"><li>
+                <p class="font_span"><i class="demo-icons font_fs">*</i>销售授权书扫描件：</p>
+                <div id="marketingAuthFileShowContainer">
+					#if($shopInfo.marketingAuth)
+						#if($!shopInfo.marketingAuth.indexOf(".JPG")!=-1 || $!shopInfo.marketingAuth.indexOf(".jpg")!=-1
+							|| $!shopInfo.marketingAuth.indexOf(".JPEG")!=-1 || $!shopInfo.marketingAuth.indexOf(".jpeg")!=-1
+							|| $!shopInfo.marketingAuth.indexOf(".BMP")!=-1 || $!shopInfo.marketingAuth.indexOf(".bmp")!=-1
+							|| $!shopInfo.marketingAuth.indexOf(".PNG")!=-1 || $!shopInfo.marketingAuth.indexOf(".png")!=-1)
+        					<img id="marketingAuthImg" src="$!imageServerAddr$!shopInfo.marketingAuth" alt="销售授权书扫描件" width="55" height="55" style="cursor:pointer;" class="mar_lr10 fl po_re_img" title="点击查看大图">
+						#elseif($!shopInfo.marketingAuth.indexOf(".RAR")!=-1 || $!shopInfo.marketingAuth.indexOf(".rar")!=-1
+    						|| $!shopInfo.marketingAuth.indexOf(".zip")!=-1 || $!shopInfo.marketingAuth.indexOf(".zip")!=-1
+    						|| $!shopInfo.marketingAuth.indexOf(".7Z")!=-1 || $!shopInfo.marketingAuth.indexOf(".7z")!=-1)
+							<a href="$!imageServerAddr$!shopInfo.marketingAuth"><img src="$request.contextPath/assets/images/zip.png" style="width:32px;height:32px"></a>
+        				#end
+					#end
+				</div>
+                <div class="shopInfo_class_hide">
+                    <p class="hei_40 fl registere_class_hide z-upload">
+                        <button type="button" class="button_4 font_12 border-1 button_small">上传附件</button>
+                        <input type="file" id="marketingAuthFile" class="file-img" name="file" onchange="startUpload('marketingAuthFile','marketingAuthImg','marketingAuth')">
+                    </p>
+                </div>
+                <input id="marketingAuth" name="marketingAuth" type="hidden" value="$!shopInfo.marketingAuth"/>
+            </li></div>
+            <li>
+                <p class="font_span">商标注册证/商品注册申请书扫描件：</p>
+                <img id="trademarkRegistCertImg" src="$!imageServerAddr$!shopInfo.trademarkRegistCert"
+                     alt="" width="55" height="55" class="mar_lr10 fl po_re_img" title="点击查看大图">
+                <div class="shopInfo_class_hide">
+                    <p class="hei_40 fl registere_class_hide z-upload">
+                        <button type="button" class="button_4 font_12 border-1 button_small">上传图片</button>
+                        <input type="file" id="trademarkRegistCertFile" class="file-img" name="file" onchange="startUpload('trademarkRegistCertFile','trademarkRegistCertImg','trademarkRegistCert')">
+                    </p>
+                </div>
+                <input id="trademarkRegistCert" name="trademarkRegistCert" type="hidden" value="$!shopInfo.trademarkRegistCert" />
+            </li>
+            <div class="clear"></div>
+            <li>
+                <p class="font_span">质检、检疫、检验报告/报关单类扫描件：</p>
+                <img id="inspectionReportImg" src="$!imageServerAddr$!shopInfo.inspectionReport"
+                     alt="" width="55" height="55" class="mar_lr10 fl po_re_img" title="点击查看大图">
+                <div class="shopInfo_class_hide">
+                    <p class="hei_40 fl registere_class_hide z-upload">
+                        <button type="button" class="button_4 font_12 border-1 button_small">上传图片</button>
+                        <input type="file" id="inspectionReportFile" class="file-img" name="file" onchange="startUpload('inspectionReportFile','inspectionReportImg','inspectionReport')">
+                    </p>
+                </div>
+                <input id="inspectionReport" name="inspectionReport" type="hidden" value="$!shopInfo.inspectionReport"/>
+            </li>
+            <li>
+                <p class="font_span">卫生/生产许可证扫描件：</p>
+                <img id="productionLicenseImg" src="$!imageServerAddr$!shopInfo.productionLicense"
+                     alt="" width="55" height="55" class="mar_lr10 fl po_re_img" title="点击查看大图">
+                <div class="shopInfo_class_hide">
+                    <p class="hei_40 fl registere_class_hide z-upload">
+                        <button type="button" class="button_4 font_12 border-1 button_small">上传图片</button>
+                        <input type="file" id="productionLicenseFile" class="file-img" name="file" onchange="startUpload('productionLicenseFile','productionLicenseImg','productionLicense')">
+                    </p>
+                </div>
+                <input id="productionLicense" name="productionLicense" type="hidden" value="$!shopInfo.productionLicense"/>
+            </li>
+        </div>
+        #if("$!pageState"!="view")
+		<div id="marketingAuthPicDiv" class="none">
+			<p><img src="$request.contextPath/assets/images/marketingAuthPic.jpg" width="150" height="80" class="po_re_img"/></p>
+		</div>
+		#end
+    </ol>
+</div>
+    #if("$!pageState"=="register")
+    <div class="wid_500 mar_cen">
+        <button id="shopApplyBtn" type="button" class="button_2 hei_40 font_14b" >暂 存</button>
+        <!--卖家认证提交使用-->
+        <button id="configurationBtn" type="button" class="button_2 hei_40 font_14b" style="margin-left:50px;" loadMsg="正在保存...">提 交</button>
+    </div>
+    #end
+</div>
+</form>
+<!--卖家店铺运营申请end-->
+<!--店铺名称 命名规则弹出层-->
+<div id="shopNameRuleDiv" class="po_fai" style="display:none" >
+	<div class="po_fai_bg"></div>
+	<div class="po_main">
+		<div class="tit pad_l10 hei_35 bg_05" >
+			<span class="fl font_14b">舒适100店铺命名规则</span><i id="shopNameRuleDivClose" class="fa fa-times-circle fr font_14 mar_r10 cursor"></i>
+		</div>
+		<div class="mar_t20">
+			1.品牌商店铺命名规则：品牌名+旗舰店<br/>
+			2.经销商店铺命名规则：企业简称+旗舰店
+		</div>
+		<div class="mar_cen wid_220">
+			<button id="shopNameRuleDivCloseButton" class="button_1 hei_35 font_14b" type="button" >关闭</button>
+		</div>
+	</div>
+</div>
+
+<!--店铺域名 命名规则弹出层-->
+<div id="shopDomainNameRuleDiv" class="po_fai" style="display:none" >
+	<div class="po_fai_bg"></div>
+	<div class="po_main">
+		<div class="tit pad_l10 hei_35 bg_05" >
+			<span class="fl font_14b">舒适100店铺域名命名规则</span><i id="shopDomainNameRuleDivClose" class="fa fa-times-circle fr font_14 mar_r10 cursor"></i>
+		</div>
+		<div class="mar_t20">
+			1.品牌商域名规则：品牌英文名（或者品牌中文名拼音）<br/>
+			2.经销商域名规则：企业简称全拼域名<br/>
+			3.域名仅支持纯英文<br/>
+			<br/>
+			注：店铺域名由商家注册时自行填写，不允许重复，如遇店铺申请域名已被占用等特殊情况，舒适100有权进行适当调整。
+		</div>
+		<div class="mar_cen wid_220">
+			<button id="shopDomainNameRuleDivCloseButton" class="button_1 hei_35 font_14b" type="button" >关闭</button>
+		</div>
+	</div>
+</div>

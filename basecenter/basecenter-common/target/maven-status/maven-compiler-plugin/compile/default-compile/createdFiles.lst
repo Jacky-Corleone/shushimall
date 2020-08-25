@@ -1,0 +1,16 @@
+com\camelot\openplatform\common\enums\MessageContentTypeEnum.class
+com\camelot\openplatform\common\enums\MessageTypeEnum.class
+com\camelot\openplatform\common\email\SendMailUtil$1.class
+com\camelot\openplatform\common\util\MessageTemplateFileUtil$MessageTemplateFileHandler.class
+com\camelot\openplatform\common\enums\MessageSignatureTypeEnum.class
+com\camelot\openplatform\common\enums\GrowthTypeEnum.class
+com\camelot\openplatform\common\constants\Constants.class
+com\camelot\openplatform\common\util\MessageTemplateFileUtil$1.class
+com\camelot\openplatform\common\sms\SendSmsUtil.class
+com\camelot\openplatform\common\email\SendMailUtil.class
+com\camelot\openplatform\common\email\SendMailUtil$EmailType.class
+com\camelot\openplatform\common\sms\SmsSendResult.class
+com\camelot\openplatform\common\enums\VipLevelEnum.class
+com\camelot\openplatform\common\sms\SendSmsResult.class
+com\camelot\openplatform\common\util\MessageTemplateFileUtil.class
+com\camelot\openplatform\common\enums\PlatformEnum.class

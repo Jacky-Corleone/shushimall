@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.basecenter.dao.AddressInfoDAO">
+
+	<resultMap id="AddressInfoDTOMapper" type="com.camelot.basecenter.dto.AddressInfoDTO">
+			<result property="id" column="id" />
+			<result property="platformid" column="platform_id" />
+			<result property="buyerid" column="buyer_id" />
+			<result property="provicecode" column="provice_code" />
+			<result property="citycode" column="city_code" />
+			<result property="countrycode" column="country_code" />
+			<result property="towncode" column="town_code" />
+			<result property="villagecode" column="village_code" />
+			<result property="attachaddress" column="attach_address" />
+			<result property="fulladdress" column="full_address" />
+			<result property="isdefault" column="is_default" />
+			<result property="yn" column="yn" />
+			<result property="contactperson" column="contact_person" />
+			<result property="contactphone" column="contact_phone" />
+			<result property="contacttel" column="contact_tel" />
+			<result property="contactemail" column="contact_email" />
+			<result property="postalcode" column="postal_code" />
+			<result property="emergencyperson" column="emergency_person" />
+			<result property="emergencyphone" column="emergency_phone" />
+			<result property="createtime" column="create_time" />
+			<result property="updatetime" column="update_time" />
+	</resultMap>
+	
+	<select id="queryPage" >
+		select * from delivery_useful_address_info
+	</select>
+	
+	<select id="queryById" resultMap="AddressInfoDTOMapper" >
+		select * from delivery_useful_address_info
+		where id = #{id} 
+	</select>
+	
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- 查询总数 -->
+	<select id="queryAddressinfoCount" resultType="java.lang.Long">
+		select count(1) from delivery_useful_address_info where buyer_id = #{buyerid} and yn=1
+	</select>
+	<select id="queryAddressinfo" resultMap="AddressInfoDTOMapper">
+	 select * from delivery_useful_address_info
+		where buyer_id = #{buyerid} and yn=1
+	</select>
+	
+	<insert id="add" keyProperty="id" useGeneratedKeys="true">
+		insert into delivery_useful_address_info(
+		        platform_id,
+				buyer_id,
+				provice_code,
+				city_code,
+				country_code,
+				town_code,
+				village_code,
+				attach_address,
+				full_address,
+				is_default,
+				yn,
+				create_time,
+				contact_person,
+				contact_phone,
+				contact_tel,
+				contact_email,
+				postal_code,
+				emergency_person,
+				emergency_phone
+				
+		)values(
+		        #{platformid},
+				#{buyerid},
+				#{provicecode},
+				#{citycode},
+				#{countrycode},
+				#{towncode},
+				#{villagecode},
+				#{attachaddress},
+				#{fulladdress},
+				#{isdefault},
+				1,
+				now(),
+				#{contactperson},
+				#{contactphone},
+				#{contacttel},
+				#{contactemail},
+				#{postalcode},
+				#{emergencyperson},
+				#{emergencyphone}
+				
+		)
+	</insert>
+	
+	<update id="update">
+		update delivery_useful_address_info 
+		<set>
+		    update_time =now(),
+			<if test="id != null and id != 0">
+				id = #{id},
+			</if>
+			<if test="buyerid != null and buyerid != 0">
+				buyer_id = #{buyerid},
+			</if>
+			<if test="provicecode != null and provicecode !=''">
+				provice_code = #{provicecode},
+			</if>	
+			<if test="citycode != null and citycode !=''">
+				city_code = #{citycode},
+			</if>	
+			<if test="countrycode != null and countrycode !=''">
+				country_code = #{countrycode},
+			</if>	
+			<if test="towncode != null and towncode != ''">
+				town_code = #{towncode},
+			</if>	
+			<if test="villagecode != null and villagecode !=''">
+				village_code = #{villagecode},
+			</if>	
+			<if test="attachaddress != null and attachaddress !=''">
+				attach_address = #{attachaddress},
+			</if>		
+			<if test="fulladdress != null and fulladdress !=''">
+				full_address = #{fulladdress},
+			</if>	
+			<if test="isdefault != null and isdefault !=0">
+				is_default = #{isdefault},
+			</if>		
+			<if test="contactperson != null and contactperson !=''">
+				contact_person = #{contactperson},
+			</if>		
+			<if test="contactphone != null and contactphone !=''">
+				contact_phone = #{contactphone},
+			</if>	
+			<if test="contacttel != null and contacttel !=''">
+				contact_tel = #{contacttel},
+			</if>	
+			<if test="contactemail != null and contactemail != ''">
+				contact_email = #{contactemail},
+			</if>	
+			<if test="postalcode != null and postalcode != ''">
+				postal_code = #{postalcode},
+			</if>	
+			<if test="emergencyperson != null and emergencyperson !=''">
+				emergency_person = #{emergencyperson},
+			</if>	
+			<if test="emergencyphone != null and emergencyphone !=''">
+				emergency_phone = #{emergencyphone},
+			</if>	
+			<if test="createtime != null">
+				create_time = #{createtime}
+			</if>	
+			
+	    </set>
+		where id = #{id}
+	</update>
+	<update id="updateIsDefaultById">
+	update delivery_useful_address_info
+	set is_default = 1
+	where id = #{id}
+	</update>
+	<update id="updateIsDefault">
+	  update delivery_useful_address_info
+	  set is_default = 2
+	  where buyer_id = #{buyerid}
+	</update>
+	<delete id="delete">
+		delete from delivery_useful_address_info
+		where id = #{id}
+	</delete>
+	
+	<select id="findAll" >
+		select * from delivery_useful_address_info
+	</select>
+</mapper>

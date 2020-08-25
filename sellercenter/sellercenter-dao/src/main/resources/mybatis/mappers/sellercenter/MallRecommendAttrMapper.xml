@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.sellercenter.dao.MallRecommendAttrDAO">
+	<resultMap id="mallRecommendAttrMapper" type="com.camelot.sellercenter.domain.MallRecommendAttr">
+			<result property="id" column="id" />
+			<result property="itemId" column="item_id" />
+			<result property="skuId" column="sku_id" />
+			<result property="platformId" column="platform_id" />
+			<result property="source" column="source" />
+			<result property="recId" column="rec_id" />
+			<result property="created" column="created" />
+			<result property="modified" column="modified" />
+			<result property="status" column="status" />
+			<result property="startTime" column="start_time" />
+			<result property="endTime" column="end_time" />
+			<result property="recType" column="rec_type" />
+			<result property="picSrc" column="pic_src" />
+			<result property="url" column="url" />
+			<result property="adWords" column="ad_words" />
+			<result property="title" column="title" />
+			<result property="sortNumber" column="sort_number" />
+			<result property="type" column="type" />
+			<result property="themeId" column="theme_id" />
+			<result property="name" column="name" />
+	</resultMap>
+
+	<sql id="where">
+		<where>
+
+			<if test=" entity.id!=null ">
+				AND entity.id = #{entity.id}
+			</if>
+			<if test=" entity.itemId!=null ">
+				AND entity.item_id = #{entity.itemId}
+			</if>
+			<if test=" entity.platformId!=null ">
+				AND entity.platform_id = #{entity.platformId}
+			</if>
+			<if test=" entity.source!=null ">
+				AND entity.source = #{entity.source}
+			</if>
+			<if test=" entity.recId!=null ">
+				AND entity.rec_id = #{entity.recId}
+			</if>
+			<if test=" entity.created!=null ">
+				AND entity.created = #{entity.created}
+			</if>
+			<if test=" entity.modified!=null ">
+				AND entity.modified = #{entity.modified}
+			</if>
+			<if test=" entity.status!=null ">
+				AND entity.status = #{entity.status}
+			</if>
+			<if test=" entity.type!=null ">
+				AND entity.type = #{entity.type}
+			</if>
+			<if test=" entity.themeId!=null ">
+				<if test = "entity.themeId==-1">
+					AND entity.theme_id != 0
+				</if>
+				<if test = "entity.themeId!=-1">
+					AND entity.theme_id = #{entity.themeId}
+				</if>
+			</if>
+			<if test=" entity.timeFlag == 1 ">
+				<if test=" entity.startTime != null ">
+					and entity.created >= date_format(#{entity.startTime},'%Y-%m-%d')
+				</if>
+				<if test=" entity.endTime != null ">
+					<![CDATA[
+					and entity.created <= DATE_ADD(date_format(#{entity.endTime},'%Y-%m-%d'), INTERVAL + 1 DAY)
+					]]>
+				</if>
+			</if>
+			<if test=" entity.timeFlag == 2 ">
+				<if test=" entity.startTime != null ">
+					and entity.start_time >= date_format(#{entity.startTime},'%Y-%m-%d')
+				</if>
+				<if test=" entity.endTime != null ">
+					<![CDATA[
+					and entity.start_time <= DATE_ADD(date_format(#{entity.endTime},'%Y-%m-%d'), INTERVAL + 1 DAY)
+					]]>
+				</if>
+			</if>
+			<if test=" entity.timeFlag == 3 ">
+				<if test=" entity.startTime != null ">
+					and entity.end_time >= date_format(#{entity.startTime},'%Y-%m-%d')
+				</if>
+				<if test=" entity.endTime != null ">
+					<![CDATA[
+					and entity.end_time <= DATE_ADD(date_format(#{entity.endTime},'%Y-%m-%d'), INTERVAL + 1 DAY)
+					]]>
+				</if>
+			</if>
+			<if test=" entity.recType!=null ">
+				AND entity.rec_type = #{entity.recType}
+			</if>
+			<if test=" entity.picSrc!=null ">
+				AND entity.pic_src = #{entity.picSrc}
+			</if>
+			<if test=" entity.url!=null ">
+				AND entity.url = #{entity.url}
+			</if>
+			<if test=" entity.adWords!=null ">
+				AND entity.ad_words = #{entity.adWords}
+			</if>
+			<if test=" entity.title!=null and entity.title!='' ">
+				<if test=" entity.recType == 12 or entity.recType == 1 or entity.recType == 2 ">
+				AND entity.title like concat('%',#{entity.title},'%')
+				</if>
+				<if test=" entity.recType == 34 or entity.recType == 3 or entity.recType == 4 ">
+				AND entity.ad_words like concat('%',#{entity.title},'%')
+				</if>
+                <if test=" entity.recType == null ">
+                    AND ((entity.ad_words like concat('%',#{entity.title},'%'))or(entity.title like concat('%',#{entity.title},'%')))
+                </if>
+			</if>
+			<if test=" entity.sortNumber!=null ">
+				AND entity.sort_number = #{entity.sortNumber}
+			</if>
+		</where>
+	</sql>
+
+	<sql id="pagination_tail">
+	  limit #{ page.pageOffset } , #{page.rows}
+	</sql>
+
+	<select id="queryById" resultMap="mallRecommendAttrMapper" >
+		select * from mall_recommend_attr
+		where id = #{id}
+	</select>
+
+	<insert id="add">
+		insert into mall_recommend_attr(
+				item_id,
+				platform_id,
+				source,
+				rec_id,
+				created,
+				modified,
+				status,
+				start_time,
+				end_time,
+				rec_type,
+				pic_src,
+				url,
+				ad_words,
+				title,
+				sort_number,
+				type,
+				theme_id,
+				sku_id,
+				name
+		)values(
+				#{itemId},
+				#{platformId},
+				#{source},
+				#{recId},
+				NOW(),
+				NOW(),
+				#{status},
+				#{startTime},
+				#{endTime},
+				#{recType},
+				#{picSrc},
+				#{url},
+				#{adWords},
+				#{title},
+				#{sortNumber},
+				#{type},
+				#{themeId},
+				#{skuId},
+				#{name}
+		)
+		<selectKey resultType="long" order="AFTER" keyProperty="id">
+			select @@IDENTITY
+		</selectKey>
+	</insert>
+
+	<update id="update">
+		update mall_recommend_attr set
+				item_id = #{itemId},
+				sku_id = #{skuId},
+				platform_id = #{platformId},
+				source = #{source},
+				rec_id = #{recId},
+				modified = NOW(),
+				start_time = #{startTime},
+				end_time = #{endTime},
+				rec_type = #{recType},
+				pic_src = #{picSrc},
+				url = #{url},
+				ad_words = #{adWords},
+				title = #{title},
+				sort_number = #{sortNumber},
+				type = #{type},
+				theme_id=#{themeId},
+				name =#{name}
+		where id = #{id}
+	</update>
+	<update id="updateBySelect">
+
+	</update>
+
+	<delete id="delete">
+		delete from mall_recommend_attr
+		<if test=" codes != null and codes.size() > 0 ">
+			where id in
+			<foreach collection="codes" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test=" codes == null or codes.size() == 0 ">
+			where 1 = 3
+		</if>
+        <if test=" id !=null ">
+            where id=#{id}
+        </if>
+	</delete>
+
+	<select id="queryCount" resultType="long">
+		select count(0) from mall_recommend_attr entity
+		inner join  mall_recommend mr on entity.rec_id = mr.id
+		<include refid="where"/>
+		<if test=" entity.status!=null ">
+				AND mr.status = #{entity.status}
+		</if>
+	</select>
+
+	<select id="queryPage" resultType="com.camelot.sellercenter.mallrecattr.dto.MallRecAttrDTO">
+		SELECT entity.id,
+		       entity.sort_number sortNum,
+		       entity.item_id     itemId,
+		       entity.sku_id      skuId,
+		       entity.rec_id      recId,
+		       mr.title           recName,
+		       entity.created,
+		       entity.modified,
+		       entity.status,
+		       entity.rec_type    recType,
+		       entity.pic_src     picSrc,
+		       entity.url,
+		       entity.ad_words    adWords,
+		       entity.title,
+		       entity.start_time  startTime,
+		       entity.end_time  endTime,
+		       entity.type type,
+		       entity.theme_id themeId,
+		       entity.name
+		FROM   mall_recommend_attr entity
+		inner join  mall_recommend mr on entity.rec_id = mr.id
+		<include refid="where"/>
+
+		<if test=" entity.status!=null ">
+				AND entity.status = #{entity.status}
+		</if>
+		order by entity.sort_number,entity.modified desc
+		<include refid="pagination_tail"/>
+	</select>
+
+	<select id="queryList" resultMap="mallRecommendAttrMapper">
+		select * from mall_recommend_attr entity
+		<include refid="where"/>
+	</select>
+
+	<update id="modifyMallRecAttrStatus">
+		update mall_recommend_attr set status = #{status}
+		<if test=" status == 0 ">
+			,  start_time = NULL  , end_time = NULL 
+		</if>
+		where id = #{id}
+	</update>
+	<update id="autoBatchPublishMallRec">
+		<![CDATA[
+			UPDATE mall_recommend_attr t SET t.status = 1 WHERE t.start_time <= NOW() AND t.status = 0
+		]]>
+	</update>
+	<update id="autoBatchCancelMallRec">
+		<![CDATA[
+			UPDATE mall_recommend_attr t SET t.status = 0 ,t.start_time = NULL , t.end_time = NULL WHERE t.end_time <= NOW() AND t.status = 1
+		]]>
+	</update>
+
+    <delete id="deleteMallRecAttrById" parameterType="long">
+        <![CDATA[
+		delete from mall_recommend_attr where id = #{id}
+		]]>
+    </delete>
+</mapper>

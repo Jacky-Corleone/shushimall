@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.usercenter.dao.FieldIdentificationPictureMybatisDAO">
+
+    <!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+    <resultMap id="fieldIdentificationPictureDTOMap" type="fieldIdentificationPictureDTO">
+        <result property="userId" column="user_id"/>
+        <result property="extendId" column="extend_id"/>
+        <result property="pictureType" column="picture_type"/>
+        <result property="sortNumber" column="sort_number"/>
+        <result property="pictureSrc" column="picture_src"/>
+        <result property="uploadorId" column="uploador_id"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateDate" column="update_date"/>
+        <result property="deleteFlag" column="delete_flag"/>
+    </resultMap>
+
+    <!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                        -->
+    <!-- =========================================================== -->
+    <sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			picture.id,
+ 			picture.user_id,
+ 			picture.extend_id,
+ 			picture.picture_type,
+ 			picture.sort_number,
+ 			picture.picture_src,
+ 			picture.uploador_id,
+ 			picture.create_date,
+ 			picture.update_date,
+ 			picture.delete_flag
+		from field_identification_picture picture
+        ]]>
+	</sql>
+
+    <sql id="where_fragement">
+        where 1=1
+        <if test="entity!=null">
+            <if test="entity.userId != null">
+                <![CDATA[ and picture.user_id  =#{entity.userId} ]]>
+            </if>
+            <if test="entity.extendId != null">
+                <![CDATA[ and picture.extend_id  =#{entity.extendId} ]]>
+            </if>
+            <if test="entity.pictureType != null">
+                <![CDATA[ and picture.picture_type  =#{entity.pictureType} ]]>
+            </if>
+            <if test="entity.sortNumber != null">
+                <![CDATA[ and picture.sort_number  =#{entity.sortNumber} ]]>
+            </if>
+            <if test="entity.pictureSrc != null">
+                <![CDATA[ and picture.picture_src  =#{entity.pictureSrc} ]]>
+            </if>
+            <if test="entity.uploadorId != null">
+                <![CDATA[ and picture.uploador_id =#{entity.uploadorId} ]]>
+            </if>
+            <if test="entity.createDate != null">
+                <![CDATA[ and picture.create_date =#{entity.createDate} ]]>
+            </if>
+            <if test="entity.updateDate != null">
+                <![CDATA[ and picture.update_date =#{entity.updateDate} ]]>
+            </if>
+            <if test="entity.deleteFlag != null">
+                <![CDATA[ and picture.delete_flag  =#{entity.deleteFlag} ]]>
+            </if>
+        </if>
+        order by picture.create_date desc
+    </sql>
+
+    <!-- mysql 分页尾 -->
+    <sql id="pagination_tail">
+		limit #{pager.pageOffset} , #{pager.rows}
+	</sql>
+
+    <!-- mysql 查询总数 -->
+    <sql id="count_Tail">
+		select count(1) from
+	</sql>
+
+    <!-- =========================================================== -->
+    <!-- Dao方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+
+    <!-- 分页查询 -->
+    <select id="selectList" resultMap="fieldIdentificationPictureDTOMap">
+        <include refid="selectAllColumns"/>
+        <include refid="where_fragement"/>
+        <if test="pager!=null">
+            <include refid="pagination_tail"/>
+        </if>
+    </select>
+
+    <!-- 查询总数 -->
+    <select id="selectCount" resultType="java.lang.Long">
+        <include refid="count_Tail"/>
+        field_identification_picture picture
+        <include refid="where_fragement"/>
+    </select>
+
+    <!-- 插入记录 -->
+    <insert id="addPicture" parameterType="Object" useGeneratedKeys="true" keyProperty="userId">
+		<![CDATA[
+		insert into field_identification_picture(
+	        user_id,
+	  		extend_id,
+			picture_type,
+			sort_number,
+			picture_src,
+			uploador_id,
+			create_date,
+			update_date,
+			delete_flag
+		)values(
+	        #{userId},
+	  		#{extendId},
+			#{pictureType},
+			#{sortNumber},
+			#{pictureSrc},
+			#{uploadorId},
+			now(),
+			now(),
+			0
+		)
+        ]]>
+	</insert>
+
+    <!-- 修改记录 -->
+    <insert id="modifyPicture" parameterType="Object">
+		update field_identification_picture
+		set
+			picture_src = #{pictureSrc},
+			uploador_id = #{uploadorId},
+			update_date = now()
+	 	where id = #{id}
+        and	user_id = #{userId}
+        and	extend_id = #{extendId}
+        and	picture_type = #{pictureType}
+        and	sort_number = #{sortNumber}
+	</insert>
+
+</mapper>

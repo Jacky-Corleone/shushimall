@@ -1,0 +1,31 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/cms/cms_layout.vm")
+<script type="text/javascript" src="$staticPath/js/common.js"></script>
+<script type="text/javascript">
+    function choseCategory(id){
+        window.location = "/designSketchController/list?id=" + id;
+    }
+</script>
+<form>
+<ul>
+    #foreach($platformList in $platformList)
+        <li onclick="choseCategory('$!platformList.categoryCid')">
+
+            $!platformList.categoryCName
+        </li>
+    #end
+</ul>
+</div>
+</form>
+<div style="width: 500px;height: 100px">
+    #foreach($CmsArticle in $pager.records)
+        <tr ondblclick="changeConector(this)">
+           #* <td style="width:150px;height:30px">$!CmsArticle.id</td>*#
+             <div>
+            <td style="width:150px;height:30px">$!CmsArticle.title</td>
+            <td><img src="$!imageServerAddr$!CmsArticle.image"></td>
+             </div>
+        </tr>
+    #end
+</div>
+#pageVelocity($pager)

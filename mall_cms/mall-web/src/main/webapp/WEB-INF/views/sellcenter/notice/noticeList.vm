@@ -1,0 +1,130 @@
+#set($staticPath="$request.contextPath/assets")
+#set($rootPath="$request.scheme://"+"$request.serverName:"+"$request.serverPort")
+#set($layout = "/seller_layout.vm")
+<script type="text/javascript">
+	$(function(){
+		//加载左侧菜单
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+	});
+	//到指定的分页页面
+	function topage(page){
+		$("input[name='page']").val(page);
+		$("#queryForm").submit();
+	}
+	//上移/下移
+	function moveNotice(platformId,noticeId,sortNum,modifyNum){
+//		alert(platformId+"=="+noticeId+"=="+sortNum+"==="+modifyNum);
+		$.ajax({
+			url:'$request.contextPath/sellcenter/sellNotice/updateNoticSortNum',
+			type:'post',
+			data:{
+				"platformId":platformId,
+				"noticeId":noticeId,
+				"sortNum":sortNum,
+				"modifyNum":modifyNum
+			},
+			dataType:'json',
+			success:function(result){
+				alert("修改成功！");
+				$("#queryForm").submit();
+			}
+		  });
+	}
+	function addNotice(){
+		$.cookie('clicked_menu', "$rootPath$request.contextPath/sellcenter/sellNotice", {path:'/'});
+		window.location.href="$request.contextPath/sellcenter/sellNotice/form";
+	}
+	function editNotice(noticeId){
+		$.cookie('clicked_menu', "$rootPath$request.contextPath/sellcenter/sellNotice", {path:'/'});
+		window.location.href="$request.contextPath/sellcenter/sellNotice/form?noticeId="+noticeId;
+	}
+	function deleteNotice(noticeId){	
+		if(confirm("确定要删除该条记录么？")){
+			$.ajax({
+				url:'$request.contextPath/sellcenter/sellNotice/deleteNotice',
+				type:'post',
+				data:'noticeId='+noticeId,
+				dataType:'json',
+				success:function(resule){
+					$("#queryForm").submit();
+					alert("记录已删除");
+				}
+			});
+		}
+	}
+</script>
+
+<form action="$request.getContextPath()/sellcenter/sellNotice" method="post"  id="queryForm">
+		<input type="hidden" name="page" value="$!pager.page" />
+</form>
+
+<div id="main">
+<!--中间部分开始-->
+
+<!--left start -->
+<div id="leftSeller" class="border-4">
+                        
+</div>
+<!--left end -->
+
+<!--右边部分开始-->
+<div id="right" class="bg_06">
+    <h3>公告管理<i class="fr"><a onclick="addNotice()" href="#">+创建公告</a></i></h3>
+    <div class="Notice hei_600">
+     <!--标题开始 -->
+      <ul class="bg_08 font_14b mar_tb10">
+          <li class="wid_40">编号</li>
+          <li class="wid_160">公告标题</li>
+          <!-- 
+          <li class="wid_80">顺序</li>
+           -->
+          <li class="wid_180">创建时间</li>
+          <li class="wid_180">发布时间</li>
+          <li class="wid_150">上移/下移</li>  
+          <li class="wid_110">其他操作</li> 
+      </ul>
+       <!--标题 end -->
+       
+       #foreach($entity in $pager.records)
+       	  <!--内容1行 单双行变背景色 加class="bg_05"开始 -->
+			<ul #if($!velocityCount % 2 != 0 ) class="bg_05" #end>
+					#set($newNum = ( $!pager.page - 1 ) * 10 + $!{velocityCount})
+		        <li class="wid_40">$newNum</li>
+		        <li class="wid_160">$!entity.noticeTitle</li>
+		         <!-- 
+		        <li class="wid_80">$!entity.sortNum</li>
+		        -->
+		        <li class="wid_180">$!date.format('yyyy-MM-dd HH:mm:ss ',$!entity.created)</li>
+		        <li class="wid_180">
+		        	#if($!entity.noticeStatus == 1)
+		        		$!date.format('yyyy-MM-dd HH:mm:ss ',$!entity.modified)
+		        	#end
+		        </li>
+		        <li class="wid_150 font_1c">
+					##<a href="$request.contextPath/sellcenter/sellNotice/updateNoticSortNum?platformId=$!entity.platformId&noticeId=$!entity.noticeId&sortNum=$!entity.sortNum&modifyNum=1">上移</a>
+					##<a href="$request.contextPath/sellcenter/sellNotice/updateNoticSortNum?platformId=$!entity.platformId&noticeId=$!entity.noticeId&sortNum=$!entity.sortNum&modifyNum=-1">下移</a>
+		        <a href="javascript:void(0);" onclick="moveNotice('$!entity.platformId','$!entity.noticeId','$!entity.sortNum','-1');">上移</a>
+				<a href="javascript:void(0);" onclick="moveNotice('$!entity.platformId','$!entity.noticeId','$!entity.sortNum','1');">下移</a>
+				</li>
+		        <li class="wid_110 font_1c">
+		        	#if($!entity.noticeStatus == 1)
+		        		<a href="$request.contextPath/sellcenter/sellNotice/status?noticeId=$!entity.noticeId&noticeStatus=2&page=$!pager.page">下架</a>
+						<a href="$request.contextPath/sellcenter/sellNotice/form?noticeId=$!entity.noticeId&action=view">查看</a>
+		        	#else
+		        		<a href="$request.contextPath/sellcenter/sellNotice/status?noticeId=$!entity.noticeId&noticeStatus=1&page=$!pager.page">发布</a>
+						<a onclick="editNotice($!entity.noticeId)" href="#">编辑</a>
+						<a href="javascript:void(0);" onclick="deleteNotice('$!entity.noticeId');">删除</a>
+						<a href="$request.contextPath/sellcenter/sellNotice/form?noticeId=$!entity.noticeId&action=view">查看</a>
+
+					#end
+		        </li>
+		      </ul>
+		#end
+    <!--内容1行 end -->
+    </div><!--Notice end-->
+    #pageVelocity($pager)
+<!--又底边图标开始-->
+<div class="clear"></div>
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->

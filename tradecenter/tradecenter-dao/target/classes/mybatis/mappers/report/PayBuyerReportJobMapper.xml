@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.report.dao.PayBuyerReportJobDao">
+
+
+	<!-- 从usercenter.user表里更新用户的信息到report_pay_buyer表 -->
+	<insert id="insertReportPayBuyerByUser" >
+		<![CDATA[
+		INSERT INTO report_pay_buyer (
+			id,
+			username,
+			mobile,
+			created_time,
+			email,
+			parent_id,
+			deleted,
+			type,
+			payPriceTotal,
+			orderNum,
+			shopNum
+		)
+		values (
+			#{payBuyerInfo.id},
+			#{payBuyerInfo.userName},
+			#{payBuyerInfo.umobile},
+			#{payBuyerInfo.createTime},
+			#{payBuyerInfo.userEmail},
+			#{payBuyerInfo.parentId},
+			#{payBuyerInfo.deleted},
+			#{payBuyerInfo.userType},
+			#{payBuyerInfo.payPriceTotal},
+			#{payBuyerInfo.orderNum},
+			#{payBuyerInfo.shopNum}
+		)	
+		]]>	
+	</insert>
+
+	<!-- 从tradecenter.trade_orders表里更新订单的信息到report_pay_buyer表 -->
+	<update id="updateReportPayBuyerByOrder" parameterType="String">
+		UPDATE report_pay_buyer r
+			INNER JOIN (
+			SELECT 
+			      t.buyer_id,
+			      COUNT(DISTINCT shop_id) shopNum,
+			      SUM(t.payment_price - t.freight) payPriceTotal,
+			      COUNT(order_id) orderNum 
+			    FROM
+			      trade_orders t 
+			    WHERE t.parent_order_id != '0' 
+			      AND paid = 2 
+			      AND EXISTS 
+			      (SELECT 1 
+			      FROM
+			        trade_orders o 
+			      WHERE t.buyer_id = o.buyer_id 
+			      <if test="dealDate != null  and dealDate !=''">
+					<![CDATA[ AND DATE_FORMAT(o.payment_time, '%Y%m%d') = #{dealDate}  ]]>
+				  </if>
+				  )
+			    GROUP BY t.buyer_id
+			) p ON r.id=p.buyer_id
+			SET r.shopNum=p.shopNum,
+				r.payPriceTotal=p.payPriceTotal,
+				r.orderNum=p.orderNum
+	</update>
+</mapper>

@@ -1,0 +1,80 @@
+#set($layout = "/buyer_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<link href="$staticPath/css/manage_style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+	$("document").ready(function(){
+		$("#leftBuyer").load("$request.contextPath/leftBuyer");
+	});
+	function topage(page){
+		var form = document.getElementById("favouriteShop");
+		form.page.value=page;
+		form.submit();
+	}
+	
+	function delShopFavourite(id){
+		var result = confirm("确定删除?");
+		if(result){
+			var ids = [id];
+			$.ajax({
+				url: "$request.contextPath/favourite/delShop",
+				type:"post",
+				data:{ "ids[]": ids },
+				dataType: "json",
+				success: function(data){
+					if( data.success ){
+						location.href = "$request.contextPath/buyercenter/favouriteShops";
+					}
+				}
+			});
+		}
+	}
+</script>
+
+
+<div id="main">
+	<div id="leftBuyer">&nbsp;</div>
+	
+	<form id="favouriteShop" action="$request.contextPath/buyercenter/favouriteShops">
+		<input type="hidden" name="page">
+	</form>
+	<div id="right" class="bg_06 border-4">
+	<h3>收藏店铺</h3>
+		<div class="manage_collect" >
+			<dl >
+				#foreach( $shop in $pager.records )
+					<dd class="border-6">
+	            		<div class="collect_Shop_left">
+	            			<div class="photograph att_pro">
+	            				<a href="$request.contextPath/shopItemListIndexController/toIndex?shopId=$shop.shopId">
+	            					<img src="$!imageServerAddr$shop.logoUrl" width="90" height="90"/>
+	            				</a>
+	            			</div>
+	            			<ul class="po_re">
+	            				<li class="font_14b" style="width:130px;overflow:hidden; white-space:nowrap; text-overflow:ellipsis; height: 24px;" title="$!shop.shopName">
+	            					<a href="$request.contextPath/shopItemListIndexController/toIndex?shopId=$shop.shopId">$shop.shopName</a>
+	            				</li>
+	                      		<li>用户名: $shop.sellerName</li>
+	                      		<span class="po_ab pa_05">
+	                      			<i class=" demo-icons  font_14 fa-trash"></i>
+	                      			<a href="javascript:delShopFavourite($shop.id);">删除</a>
+	                      		</span>
+	                    	</ul>
+	            		</div>
+	            		#foreach($product in $shop.items)
+	            			#if($!$velocityCount  <= 4)  
+	                		<ul>
+	                			<li class="att_pro">
+	                				<a href="$request.contextPath/productController/details?id=$product.itemId" class="att_new"><img src="$!imageServerAddr$product.pictureUrl" class="border-4"/></a>
+	                    		</li>
+	                    		<li class=" font_fe font_14b font_cen">￥ $product.guidePrice</li>
+	                		</ul>
+	                		#end
+	            		#end
+	            	</dd>
+				#end
+	        </dl>
+		</div>
+	
+		#pageVelocity($pager)
+	</div>
+</div>

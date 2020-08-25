@@ -1,0 +1,3 @@
+<!-- 模版1产品列表start -->
+#parse("/sellcenter/shop/common/template1/proList.vm")
+<!-- 模版1产品列表end -->

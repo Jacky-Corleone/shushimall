@@ -1,0 +1,209 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<script type="text/javascript" src="$request.contextPath/assets/js/common.js"></script>
+<script type="text/javascript" src="$staticPath/js/ajaxfileupload.js"></script>
+<script language="javascript" type="text/javascript" src="$request.contextPath/assets/js/tab.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/askItemInfo/askItemInfo.js"></script>
+<input type="hidden" id="contextPath" value="$request.getContextPath()"/>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+ <script type="text/javascript">
+      $(function(){
+	//加载左侧菜单
+	$("#leftSeller").load("$request.contextPath/leftSeller");
+});
+</script>
+<style>
+.bd {
+border:1px solid green;
+ }
+</style>
+<div id="main">
+<!--中间部分开始-->
+<div id="leftSeller" class="border-4"></div>
+
+<form id="translationForm" method="post">
+<!--右边部分开始-->
+<div id="right" class="bg_06 border-4">    
+    <div class="mar_lr10 pad_tb20">
+    <!-- 联系方式 开始 -->
+      <p class="font_16 hei_32 pad_l10 bg_05">求购信息</p>
+        <ul class="list mar_t10 mar_l10 ">
+            <li class="wid_460 mar_tb10 ">
+              <span class="font_wid mar_r10" ><i class="font_fs mar_l2">*</i>求购编码: </span>
+              <input type="text" class="wid_260  input_Style2 hei_30" id="translationNo" name = "translationNo" value="$!translationNo" readOnly/>
+            </li>
+            <li class="wid_460 mar_20 mar_tb10">
+            <span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>求购名称 : </span>
+            <input type="text" class="wid_260  input_Style2 hei_30" id="translationName" name="translationName" value = "$!translationName" readOnly/></li>
+
+            <li class="wid_460 mar_tb10 ">
+              <span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>求购方 : </span>
+              <input type="text" class="wid_260 input_Style2 hei_30" value="$!printerName" readOnly/>
+            </li>
+            <li class="wid_460 mar_tb10" id="uploadLi" style='white-space: nowrap;text-overflow:ellipsis; overflow:hidden;'>
+                <span class="font_wid mar_r10"> <i class="font_fe mar_l2"></i>附件 : </span>
+                #if($!annex  == "null" )
+                    &nbsp;
+                #else
+                    <span><a href="$!gix$!annex"> $!fileName </a></span>
+                #end
+            </li>
+			
+			  <input type="hidden" id= "annex" name = "annex" value="$!annex" />
+           
+      </ul><!-- 联系方式 end -->
+    <div class="clear"></div>
+
+    <!-- 求购条件 开始 -->
+      <p class="font_16 hei_32 pad_l10 bg_05 mar_t20" >求购条件</p>
+        <ul class="list mar_t10 mar_l10 ">
+        <!--求购有效期 开始-->
+            <li class="wid_920 mar_tb10">
+              <span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>求购日期 : </span>
+              <input class="jcDate wid_170 hei_30 input_Style2" type="text" id="beginDate1" name = "beginDate1" value = "$!date.format('yyyy-MM-dd', $!beginDate)" readOnly />
+		<!--	  <input class="jcDate wid_170 hei_30 input_Style2" type="datetime-local" id="beginDate" name = "beginDate" />-->
+            </li>
+         <!--求购有效期 end-->
+			<li class="wid_920 mar_20 mar_tb10">
+                <span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>截止报价日期  </span>
+               <input class="jcDate wid_170 hei_30 input_Style2" type="text" id="endDate1" name = "endDate1" readOnly value="$!date.format('yyyy-MM-dd', $!endDate)" readOnly/>
+            </li>
+			<li class="wid_920 mar_20 mar_tb10">
+                <span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>交货日期 : </span>
+               <input class="jcDate wid_170 hei_30 input_Style2" type="text" id="deliveryDate1" readOnly value="$!date.format('yyyy-MM-dd', $!deliveryDate)"  name = "deliveryDate1"  readOnly/>
+            </li>
+            <li class="wid_920 mar_20 mar_tb10">
+                <span class="font_wid mar_r10"> <i class="font_fe mar_l2"></i>备注 : </span>
+                <textarea cols="" rows="" class="wid_500 input_Style2 hei_100" id="remarks" readOnly name = "remarks">$!remarks</textarea>
+            </li>
+      </ul> <!-- 求购条件 end -->
+      <div class="clear"></div>
+      <input type = "hidden" id = "deleteId"  name = "deleteId" value="" />
+    <!-- 求购物品 开始 -->
+      <p class="font_16 hei_32 pad_l10 bg_05 mar_t20" >求购物品</p>
+		<div class="right_xinxi mar_t20 mar_cen" id = "detailItem">
+        <!-- 求购物品 开头 -->
+			<ul class="list_top bg_08 font_cen font_14b">
+                <li class="wid_100">类目名称</li>
+				<li class="wid_100">物品名称</li>
+				<li class="wid_100">商品属性</li>
+				<li class="wid_130">数量</li>
+				<li class="wid_130">单价</li>
+				<li class="wid_130">有效时间(始)</li>
+				<li class="wid_130">有效时间(止)</li>
+            </ul>
+			<!--明细物品-->
+			#foreach($detail in $details)
+			<ul class='list_top hei_40 font_cen'>
+                <li class='wid_100' style = "white-space: nowrap;text-overflow:ellipsis; overflow:hidden;">
+                    <input type="hidden" name="category_ids" value="$!detail.get('category_ids')"/>
+                    $!detail.get('category_names')
+                </li>
+				<li class='wid_100'style="white-space: nowrap;text-overflow:ellipsis; overflow:hidden;">
+					<input type='hidden' name = 'ids'  value='$!detail.get("id")'/>
+					<input type='hidden' name = 'addFlag'  value='$!detail.get("addFlag")'/>
+                    <input type='hidden' name = 'matCd1'  value='$!detail.get("matDesc")'/>
+					$!detail.get('matDesc')
+                </li>
+				<li class='wid_100' style = "white-space: nowrap;text-overflow:ellipsis; overflow:hidden;">
+                    <input type='hidden' name = 'matAttributes'  value='$!detail.get("matAttribute")'/>
+					$!detail.get('matAttribute')
+                </li>
+				<li class='wid_130' style = "white-space: nowrap;text-overflow:ellipsis; overflow:hidden;">
+                    <input type='text' name = 'nums' style="width: 80%"  maxlength="11" onkeypress="number()" onkeyup="filterInput()" onchange="filterInput()" onbeforepaste="filterPaste()" onpaste="return false" class='input_Style2' value='$!detail.get("quantity")' readOnly/>
+				</li>
+				<li class='wid_130 font_cen ' > <input type='text' name = 'price' style="width: 80%" class='price input_Style2' onkeyup="value=value.replace(/\.\d{2,}$/,value.substr(value.indexOf('.'),3))" value='$!detail.get("matPrice")'/></li>
+				<li class='wid_130 font_cen ' > <input type='text' name = 'detailstartDate' style="width: 80%" class='input_Style2' value="$!date.format('yyyy-MM-dd', $!detail.get('detailStartDate'))" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});" readOnly/></li>
+				<li class='wid_130 font_cen ' > <input type='text' name = 'detailendDate' style="width: 80%" class='input_Style2' value="$!date.format('yyyy-MM-dd', $!detail.get('detailEndDate'))" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});" readOnly/></li>
+			</ul> 
+			#end
+         </div><!--right_xinxi end-->
+         <div class="clear"></div>
+         <div class="wid_260 mar_cen">
+             <p class="font_cen"><span style="color:red;" class="errorMsg"></span></p>
+             <p>&nbsp;</p>
+         	 <button type="button" class="button_2 hei_35" loadMsg="正在保存..." id="responseButtonSave">保 存</button> 
+        	 <button type="button" class="button_3 hei_35 mar_l14" onclick="goBackPage('response');">取 消</button>
+         </div>
+      <!-- 类型选择 -->
+    </div><!--mar_lr10 end -->
+</div><!--id="right" end--> 
+<!--右边部分结束-->
+</form>
+</div><!--#main end -->
+<style>
+  .city_shi ol li{ float: left; width: 60px; height: 30px; line-height: 30px; text-align: center;  }
+  .city_shi ol li:hover{background: #f00; }
+</style>
+<script type="text/javascript">
+  $("#quanguo").click(function(){
+  $(".all_chain").show();
+})
+ 
+$(".xx").click(function(){
+  $(".all_chain").hide();
+})
+var sccount=0;
+//文件上传
+	function startUpload(){
+       
+        //判断图片格式
+        var fileInput = $("#fileInput").val();
+        var extStart = fileInput.lastIndexOf(".");
+        var ext = fileInput.substring(extStart,fileInput.length).toUpperCase();
+        if(ext!=".JPG" && ext!=".jpg" && ext!=".BMP"&&ext!=".bmp"&& ext!=".PNG"&&ext!=".PNG"&& ext!=".JPEG" && ext!=".jpeg"&&ext!=".gif"&&ext!=".GIF"){
+            alert("图片限于JPG,BMP,PNG,JPEG格式");
+            return false;
+        }
+        $.ajaxFileUpload({
+            url: '$request.getContextPath()/fileUpload/uploadzise?size=1024000', //用于文件上传的服务器端请求地址
+            secureuri: false, //是否需要安全协议，一般设置为false
+            fileElementId: 'fileInput', //文件上传域的ID
+            dataType: 'json', //返回值类型 一般设置为json
+            type:"post",
+            success: function (data, status){  //服务器成功响应处理函数
+                if(data.success){
+                    sccount=sccount+1;
+                    var trid="trid"+sccount;
+                    appendtable(data.url,trid);
+                }else{
+                    alert(data.msg);
+                    $("#fileInput").replaceWith('<input type="file" id="fileInput" class="file-img" name="file" onchange="startUpload();" />');
+                }
+            },
+            error: function (data, status, e){//服务器响应失败处理函数
+                alert("亲系统繁忙，请稍后再试");
+                $("#fileInput").replaceWith('<input type="file" id="fileInput" class="file-img" name="file" onchange="startUpload();" />');
+            }
+        });
+    }
+    function appendtable(url,id){
+	    var imageUrl = '$!imageServerAddr'+url;
+		$("#annex").val(imageUrl);
+        $("#uploadLi").html("<span class='font_wid mar_r10'> <i class='font_fs mar_l2'>*</i>附件 : </span><span>上传成功&nbsp;&nbsp;&nbsp;</span><a href=javascript:cancleimg() >删除</a>");
+       
+    }
+	
+	//清除指定tr
+    function cancleimg(){
+        $("#uploadLi").html("<span class='font_wid mar_r10'> <i class='font_fs mar_l2'>*</i>附件 : </span> <input type='file' id='fileInput' class='file-img' name='file' onchange='startUpload();' />");
+    }
+	
+
+<!--此方法接收商品弹出子页面的参数，给商品明细赋值-->
+function goodsDetailInfo(itemId, itemName, itemName2, itemName3 ){
+var ulLength = $(".right_xinxi ul").length -1;
+//选中的商品信息添加到求购明细中
+   var ulHTML = "<ul class='list_top hei_40' id='ul'> <li class='wid_50'>"+ulLength+"</li>"+
+				"<li class='wid_230'><input type='hidden' name = 'flage' value=''/>  "+itemName+"</li>"+
+				"<li class='wid_130'> <input type='hidden' name = 'matDesc' value='"+itemId+"'/> "+itemName2+"</li>"+
+				"<li class='wid_110 font_cen'> <input type='hidden' name = 'matSpec' value='"+itemId+"'/> <input type='hidden' name = 'matUnit' value='"+itemId+"'/>"+itemName3+"</li>"+
+				"<li class='wid_80 font_cen font_7a'> <input type='hidden' name = 'matCd' value='"+itemId+"'/>删除</li></ul> ";
+   $("#add").before(ulHTML);
+}
+
+
+</script>
+    
+
+

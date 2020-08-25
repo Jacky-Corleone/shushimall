@@ -1,0 +1,14 @@
+#set($layout = "common/blanklayout.vm")
+#foreach($entity in $!itemSkus)
+<dl class="shop_present pad_tb5">
+    <dt class="fl">
+        <img src="$gix$entity.picUrl">
+    </dt>
+    <dd class="fr">
+        <p class="hei_24">$entity.itemName</p>
+        <h4>原价：<span>￥$entity.skuPrice</span></h4>
+        <h4>协议价：<span class="font_2">￥89.00</span></h4>
+    </dd>
+</dl>
+<div class="clear"></div>
+#end

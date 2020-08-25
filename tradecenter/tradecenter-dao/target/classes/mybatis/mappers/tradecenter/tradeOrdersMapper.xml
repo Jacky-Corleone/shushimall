@@ -1,0 +1,727 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.tradecenter.dao.TradeOrdersDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="tradeOrdersMap" type="com.camelot.tradecenter.domain.TradeOrders">
+		<result property="id" column="id"/>
+		<result property="orderId" column="order_id"/>
+		<result property="parentOrderId" column="parent_order_id"/>
+		<result property="sellerId" column="seller_id"/>
+		<result property="buyerId" column="buyer_id"/>
+		<result property="shopId" column="shop_id"/>
+		<result property="name" column="name"/>
+		<result property="provinceId" column="province_id"/>
+		<result property="cityId" column="city_id"/>
+		<result property="countyId" column="county_id"/>
+		<result property="detailAddress" column="detail_address"/>
+		<result property="fullAddress" column="full_address"/>
+		<result property="mobile" column="mobile"/>
+		<result property="phone" column="phone"/>
+		<result property="email" column="email"/>
+		<result property="orderTime" column="order_time"/>
+		<result property="orderFinishTime" column="order_finish_time"/>
+		<result property="totalPrice" column="total_price"/>
+		<result property="totalDiscount" column="total_discount"/>
+		<result property="freight" column="freight"/>
+		<result property="paymentPrice" column="payment_price"/>
+		<result property="state" column="state"/>
+		<result property="yn" column="yn"/>
+		<result property="orderJfsKey" column="order_jfs_key"/>
+		<result property="invoice" column="invoice"/>
+		<result property="invoiceTitle" column="invoice_title"/>
+		<result property="logisticsNo" column="logistics_no"/>
+		<result property="logisticsCompany" column="logistics_company"/>
+		<result property="logisticsRemark" column="logistics_remark"/>
+		<result property="memo" column="memo"/>
+		<result property="paymentMethod" column="payment_method"/>
+		<result property="paymentType" column="payment_type"/>
+		<result property="paymentTime" column="payment_time"/>
+		<result property="shipmentType" column="shipment_type"/>
+		<result property="deleted" column="deleted"/>
+		<result property="deleteTime" column="delete_time"/>
+		<result property="locked" column="locked"/>
+		<result property="lockTime" column="lock_time"/>
+		<result property="refund" column="refund"/>
+		<result property="refundTime" column="refund_time"/>
+		<result property="delay" column="delay"/>
+		<result property="delayOverTime" column="delay_over_time"/>
+		<result property="evaluate" column="evaluate"/>
+		<result property="sellerEvaluate" column="seller_evaluate"/>
+		<result property="afterService" column="after_service"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="cancelTime" column="cancel_time"/>
+		<result property="changePaymentPriceTime" column="change_payment_price_time"/>
+		<result property="paid" column="paid"/>
+		<result property="payPeriod" column="pay_period"/>
+		<result property="promoCode" column="promo_code"/>
+        <result property="deliverTime" column="deliver_time"/>
+        <result property="orderType" column="orderType"/>
+        <result property="confirmReceiptTime" column="confirm_receipt_time"/>
+        <result property="platformId" column="platform_id"/>
+        <result property="discountAmount" column="discount_amount"/>
+        <result property="integral" column="integral"/>
+        <result property="exchangeRate" column="exchange_rate"/>
+        <result property="integralDiscount" column="integral_discount"/>
+        <result property="centralPurchasing" column="central_purchasing"/>
+        <result property="isService" column="is_service"/>
+	</resultMap>
+	<resultMap id="tradeOrdersDTOMap" type="com.camelot.tradecenter.dto.TradeOrdersDTO" >
+		<result property="orderId" column="order_id" />
+		<result property="parentOrderId" column="parent_order_id" />
+		<result property="sellerId" column="seller_id" />
+		<result property="buyerId" column="buyer_id" />
+		<result property="shopId" column="shop_id" />
+		<result property="name" column="name" />
+		<result property="provinceId" column="province_id" />
+		<result property="cityId" column="city_id" />
+		<result property="countyId" column="county_id" />
+		<result property="detailAddress" column="detail_address" />
+		<result property="fullAddress" column="full_address" />
+		<result property="mobile" column="mobile" />
+		<result property="phone" column="phone" />
+		<result property="email" column="email" />
+		<result property="totalPrice" column="total_price" />
+		<result property="totalDiscount" column="total_discount" />
+		<result property="freight" column="freight" />
+		<result property="paymentPrice" column="payment_price" />
+		<result property="state" column="state" />
+		<result property="invoice" column="invoice" />
+		<result property="invoiceTitle" column="invoice_title" />
+		<result property="shipmentType" column="shipment_type" />
+		<result property="logisticsNo" column="logistics_no" />
+		<result property="logisticsCompany" column="logistics_company" />
+		<result property="logisticsRemark" column="logistics_remark" />
+		<result property="memo" column="memo" />
+		<result property="paymentMethod" column="payment_method"/>
+		<result property="paymentType" column="payment_type" />
+		<result property="paymentTime" column="payment_time" />
+		<result property="deleted" column="deleted" />
+		<result property="deleteTime" column="delete_time" />
+		<result property="locked" column="locked" />
+		<result property="lockTime" column="lock_time" />
+		<result property="refund" column="refund" />
+		<result property="refundTime" column="refund_time" />
+		<result property="delay" column="delay" />
+		<result property="delayOverTime" column="delay_over_time" />
+		<result property="afterService" column="after_service" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="cancelTime" column="cancel_time" />
+		<result property="changePaymentPriceTime" column="change_payment_price_time" />
+		<result property="sellerEvaluate" column="seller_evaluate" />
+		<result property="evaluate" column="evaluate" />
+		<result property="yn" column="yn" />
+		<result property="paid" column="paid"/>
+		<result property="payPeriod" column="pay_period"/>
+		<result property="promoCode" column="promo_code"/>
+        <result property="deliverTime" column="deliver_time"/>
+        <result property="orderType" column="orderType"/>
+        <result property="confirmReceiptTime" column="confirm_receipt_time"/>
+        <result property="platformId" column="platform_id"/>
+        <result property="discountAmount" column="discount_amount"/>
+        <result property="integral" column="integral"/>
+        <result property="exchangeRate" column="exchange_rate"/>
+        <result property="integralDiscount" column="integral_discount"/>
+        <result property="centralPurchasing" column="central_purchasing"/>
+        <result property="isService" column="is_service"/>
+	</resultMap>
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			*
+		FROM 
+		trade_orders trade_orders_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		from trade_orders trade_orders_,trade_order_items trade_order_items_
+		where trade_orders_.order_id = trade_order_items_.order_id
+			and trade_orders_.parent_order_id != '0'
+		<if test="entity!=null">
+			<if test="entity.shipmentType != null and entity.shipmentType !=''">
+				<![CDATA[ and trade_orders_.shipment_type = #{entity.shipmentType} ]]>
+			</if>
+			<if test="entity.deleted != null">
+				<![CDATA[ and trade_orders_.deleted = #{entity.deleted} ]]>
+			</if>
+			<if test="entity.orderId != null and entity.orderId != ''">
+				<![CDATA[ and trade_orders_.order_id  = #{entity.orderId} ]]>
+			</if>
+			<if test="entity.parentOrderId != null and entity.parentOrderId != ''">
+				<![CDATA[ and (trade_orders_.parent_order_id  = #{entity.parentOrderId} or trade_orders_.order_id  = #{entity.parentOrderId} )]]>
+			</if>
+			<if test="entity.sellerId != null">
+				<![CDATA[ and trade_orders_.seller_id  = #{entity.sellerId} ]]>
+			</if>
+			<if test="entity.buyerId != null">
+				<![CDATA[ and trade_orders_.buyer_id  = #{entity.buyerId} ]]>
+			</if>
+			<if test="entity.shopId != null ">
+				<![CDATA[ and trade_orders_.shop_id  = #{entity.shopId} ]]>
+			</if>
+			<if test="entity.state != null ">
+				<![CDATA[ and trade_orders_.state  = #{entity.state} ]]>
+			</if>
+			<if test="entity.cancelFlag != null">
+				<![CDATA[ and trade_orders_.yn  = #{entity.cancelFlag}]]>
+			</if>
+			<if test="entity.locked != null">
+				<![CDATA[ and trade_orders_.locked = #{entity.locked}]]>
+			</if>
+			<if test="entity.createStart != null">
+				<![CDATA[ 
+				and DATE_FORMAT(trade_orders_.order_time, '%Y-%m-%d') >=  DATE_FORMAT(#{entity.createStart}, '%Y-%m-%d')
+				]]>
+			</if>
+			<if test="entity.createEnd != null">
+				<![CDATA[ 
+				and date_format(trade_orders_.order_time,'%Y-%m-%d')  <= date_format(#{entity.createEnd},'%Y-%m-%d')
+				]]>
+			</if>
+			<if test="entity.updateStart != null">
+				<![CDATA[ 
+				and DATE_FORMAT(trade_orders_.update_time, '%Y-%m-%d') >=  DATE_FORMAT(#{entity.updateStart}, '%Y-%m-%d')
+				]]>
+			</if>
+			<if test="entity.updateEnd != null">
+				<![CDATA[ 
+				and date_format(trade_orders_.update_time,'%Y-%m-%d')  <= date_format(#{entity.updateEnd},'%Y-%m-%d')
+				]]>
+			</if>
+			
+			<if test="entity.paymentTimeStart != null">
+				<![CDATA[ 
+				and DATE_FORMAT(trade_orders_.payment_time, '%Y-%m-%d') >=  DATE_FORMAT(#{entity.paymentTimeStart}, '%Y-%m-%d')
+				]]>
+			</if>
+			<if test="entity.paymentTimeEnd != null">
+				<![CDATA[ 
+				and date_format(trade_orders_.payment_time,'%Y-%m-%d')  <= date_format(#{entity.paymentTimeEnd},'%Y-%m-%d')
+				]]>
+			</if>
+			<if test="entity.paymentType != null" >
+				<![CDATA[ 
+				AND trade_orders_.payment_type = #{entity.paymentType}
+				]]>
+			</if>
+			<if test="entity.paymentMethod != null" >
+				<![CDATA[ 
+				AND trade_orders_.payment_method = #{entity.paymentMethod}
+				]]>
+			</if>
+			
+			<if test="entity.evaluate != null" >
+				<![CDATA[ 
+				AND trade_orders_.evaluate = #{entity.evaluate}
+				]]>
+			</if>
+			<if test="entity.sellerEvaluate != null">
+				<![CDATA[ 
+				AND trade_orders_.seller_evaluate = #{entity.sellerEvaluate}
+				]]>
+			</if>
+			<if test="entity.integral != null">
+				<![CDATA[ 
+				AND trade_orders_.integral = #{entity.integral}
+				]]>
+			</if>
+			
+			<if test="entity.sellerIdList != null and entity.sellerIdList.size()>0">
+				<![CDATA[ 
+					AND trade_orders_.seller_id in
+					]]>
+				<foreach collection="entity.sellerIdList" item="sellerId" open="(" separator="," close=")">
+					#{sellerId}
+				</foreach>
+			</if>
+			<if test="entity.buyerIdList != null and entity.buyerIdList.size()>0">
+				<![CDATA[ 
+					AND trade_orders_.buyer_id in
+					]]>
+				<foreach collection="entity.buyerIdList" item="buyerId" open="(" separator="," close=")">
+					#{buyerId}
+				</foreach>
+			</if>
+			<if test="entity.shopIdList != null and entity.shopIdList.size()>0">
+				<![CDATA[ 
+					AND trade_orders_.shop_id in
+					]]>
+				<foreach collection="entity.shopIdList" item="shopId" open="(" separator="," close=")">
+					#{shopId}
+				</foreach>
+			</if>
+			<if test="entity.itemIdList != null and entity.itemIdList.size()>0">
+				<![CDATA[ 
+					AND trade_order_items_.item_id in
+					]]>
+				<foreach collection="entity.itemIdList" item="itemId" open="(" separator="," close=")">
+					#{itemId}
+				</foreach>
+			</if>
+			<choose>
+				<when test="entity.removeServiceGoodsFlag != null">
+					<if test="entity.stateList != null and entity.stateList.size()>0">
+						<![CDATA[ 
+						AND ((trade_orders_.state in
+						]]>
+					<foreach collection="entity.stateList" item="st" open="(" separator="," close=")">
+						#{st}
+					</foreach>
+					and trade_orders_.is_service='2' ) or (trade_orders_.state ='2' and trade_orders_.is_service='1')) 
+					</if>
+				</when>
+				<otherwise>
+					<if test="entity.stateList != null and entity.stateList.size()>0">
+					   <![CDATA[ 
+						AND trade_orders_.state in
+						]]>
+						<foreach collection="entity.stateList" item="st" open="(" separator="," close=")">
+							#{st}
+						</foreach>
+			       </if>
+				</otherwise>
+		  </choose>
+			<if test="entity.refund!= null ">
+				<![CDATA[ 
+					AND trade_orders_.refund = #{entity.refund}
+				]]>
+			</if>
+			<if test=" entity.delay!=null and entity.delay==3 ">
+				<![CDATA[ 
+					and( (delay=2 and delay_over_time<=DATE_SUB(NOW(),INTERVAL 14 DAY) )
+						or 
+						(delay=1 and trade_orders_.deliver_time <= DATE_SUB(NOW(),INTERVAL 14 DAY) )
+					)
+				]]>
+	
+			</if>
+			<if test="entity.platformId!=null">
+		      <if test="entity.platformId==''">
+		      and trade_orders_.platform_id is null
+		      </if>
+		      <if test="entity.platformId !=''">
+		      and trade_orders_.platform_id =#{entity.platformId}
+		      </if>
+		    </if>
+		    <if test="entity.paid != null">
+		    		and trade_orders_.paid =#{entity.paid}
+		    </if>
+		    <if test="entity.isPayPeriod != null">
+		    	<if test="entity.isPayPeriod == 1">
+		    		and trade_orders_.pay_period is not null
+		    	</if>
+		    	<if test="entity.isPayPeriod == 2">
+		    		and trade_orders_.pay_period is null
+		    	</if>
+		    </if>
+		    <if test="entity.centralPurchasing != null">
+		    	and trade_orders_.central_purchasing =#{entity.centralPurchasing}
+		    </if>
+		    <if test="entity.isService != null">
+		    	and trade_orders_.is_service =#{entity.isService}
+		    </if>
+		</if>
+		order by trade_orders_.create_time desc
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="tradeOrdersMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where trade_orders_.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="tradeOrdersMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		<include refid="where_fragement" />
+	</select>
+	
+	<delete id="delete">
+	<![CDATA[
+		DELETE 
+		FROM
+		  trade_orders 
+		WHERE trade_orders.order_id =#{id}
+		  OR trade_orders.parent_order_id =#{id}
+	]]>
+	
+	</delete>
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="com.camelot.tradecenter.domain.TradeOrders">
+		<![CDATA[
+		insert into trade_orders (
+		    	 order_id
+		    	 ,parent_order_id
+		    	 ,seller_id
+		    	 ,buyer_id
+		    	 ,shop_id
+		    	 ,name
+		    	 ,province_id
+		    	 ,city_id
+		    	 ,county_id
+		    	 ,detail_address
+		    	 ,full_address
+		    	 ,mobile
+		    	 ,phone
+		    	 ,email
+		    	 ,order_time
+		    	 ,order_finish_time
+		    	 ,total_price
+		    	 ,total_discount
+		    	 ,freight
+		    	 ,payment_price
+		    	 ,state
+		    	 ,yn
+		    	 ,order_jfs_key
+		    	 ,invoice
+		    	 ,invoice_title
+		    	 ,logistics_no
+		    	 ,logistics_company
+		    	 ,logistics_remark
+		    	 ,memo
+		    	 ,payment_method
+		    	 ,payment_type
+		    	 ,payment_time
+		    	 ,shipment_type
+		    	 ,deleted
+		    	 ,delete_time
+		    	 ,locked
+		    	 ,lock_time
+		    	 ,refund
+		    	 ,refund_time
+		    	 ,delay
+		    	 ,delay_over_time
+		    	 ,evaluate
+		    	 ,seller_evaluate
+		    	 ,after_service
+		    	 ,create_time
+		    	 ,update_time
+		    	 ,cancel_time
+		    	 ,change_payment_price_time
+		    	 ,paid
+		    	 ,pay_period
+		    	 ,promo_code
+		    	 ,orderType
+		    	 ,platform_id
+		    	 ,discount_amount
+		    	 ,integral
+		    	 ,exchange_rate
+		    	 ,integral_discount
+		    	 ,central_purchasing
+		    	 ,is_service
+		    	 ,creator_id
+		   )values(
+		    	#{orderId}
+		    	,#{parentOrderId}
+		    	,#{sellerId}
+		    	,#{buyerId}
+		    	,#{shopId}
+		    	,#{name}
+		    	,#{provinceId}
+		    	,#{cityId}
+		    	,#{countyId}
+		    	,#{detailAddress}
+		    	,#{fullAddress}
+		    	,#{mobile}
+		    	,#{phone}
+		    	,#{email}
+		    	,now()
+		    	,#{orderFinishTime}
+		    	,#{totalPrice}
+		    	,#{totalDiscount}
+		    	,#{freight}
+		    	,#{paymentPrice}
+		    	,#{state}
+		    	,1
+		    	,#{orderJfsKey}
+		    	,#{invoice}
+		    	,#{invoiceTitle}
+		    	,#{logisticsNo}
+		    	,#{logisticsCompany}
+		    	,#{logisticsRemark}
+		    	,#{memo}
+		    	,#{paymentMethod}
+		    	,#{paymentType}
+		    	,#{paymentTime}
+		    	,#{shipmentType}
+		    	,1
+		    	,#{deleteTime}
+		    	,1
+		    	,#{lockTime}
+		    	,1
+		    	,#{refundTime}
+		    	,1
+		    	,#{delayOverTime}
+		    	,1
+		    	,1
+		    	,1
+		    	,now()
+		    	,now()
+		    	,#{cancelTime}
+		    	,#{changePaymentPriceTime}
+		    	,#{paid}
+		    	,#{payPeriod}
+		    	,#{promoCode}
+		    	,#{orderType}
+		    	,#{platformId}
+		    	,#{discountAmount}
+		    	,#{integral}
+		    	,#{exchangeRate}
+		    	,#{integralDiscount}
+		    	,#{centralPurchasing}
+		    	,#{isService}
+		    	,#{creatorId}
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.tradecenter.domain.TradeOrders">
+		update trade_orders set
+   			update_time = now()
+			<if test="name!=null and name!=''">
+   			,name = #{name}
+			</if>
+			<if test="provinceId!=null ">
+   			,province_id = #{provinceId}
+			</if>
+			<if test="cityId!=null ">
+   			,city_id = #{cityId}
+			</if>
+			<if test="countyId!=null">
+   			,county_id = #{countyId}
+			</if>
+			<if test="detailAddress!=null and detailAddress!=''">
+			,detail_address = #{detailAddress}
+			</if>
+			<if test="fullAddress!=null and fullAddress!=''">
+			,full_address = #{fullAddress}
+			</if>
+			<if test="mobile!=null and mobile!=''">
+			,mobile = #{mobile}
+			</if>
+			<if test="phone!=null and phone!=''">
+			,phone = #{phone}
+			</if>
+			<if test="email!=null and email!=''">
+			,email = #{email}
+			</if>
+			<if test="orderTime!=null">
+			,order_time = #{orderTime}
+			</if>
+			<if test="orderFinishTime!=null ">
+			,order_finish_time = #{orderFinishTime}
+			</if>
+			<if test="paymentPrice!=null ">
+			,payment_price = #{paymentPrice}
+			</if>
+			<if test="state!=null">
+			,state = #{state}
+			</if>
+			<if test="yn!=null ">
+			,yn = #{yn}
+			</if>
+			<if test="invoice!=null ">
+			,invoice = #{invoice}
+			</if>
+			<if test="invoiceTitle!=null and invoiceTitle!=''">
+			,invoice_title = #{invoiceTitle}
+			</if>
+   			<if test="logisticsNo!=null and logisticsNo!=''">
+   			,logistics_no = #{logisticsNo}
+			</if>
+   			<if test="logisticsCompany!=null and logisticsCompany!=''">
+   			,logistics_company = #{logisticsCompany}
+			</if>
+			<if test="logisticsRemark!=null and logisticsRemark!=''">
+   			,logistics_remark = #{logisticsRemark}
+			</if>
+   			<if test="memo!=null and memo!=''">
+   			,memo = #{memo}
+			</if>
+   			<if test="paymentTime!=null">
+   			,payment_time = #{paymentTime}
+			</if>
+			<if test="paymentMethod!=null">
+   			,payment_method = #{paymentMethod}
+			</if>
+			<if test="paymentType!=null">
+   			,payment_type = #{paymentType}
+			</if>
+   			<if test="shipmentType!=null and shipmentType!=''">
+   			,shipment_type = #{shipmentType}
+			</if>
+   			<if test="deleted!=null ">
+   			,deleted = #{deleted}
+			</if>
+   			<if test="deleteTime!=null">
+   			,delete_time = #{deleteTime}
+			</if>
+   			<if test="locked!=null ">
+   			,locked = #{locked}
+			</if>
+   			<if test="lockTime!=null">
+   			,lock_time = #{lockTime}
+			</if>
+   			<if test="refund!=null">
+   			,refund = #{refund}
+			</if>
+   			<if test="refundTime!=null ">
+   			,refund_time = #{refundTime}
+			</if>
+   			<if test="delayOverTime!=null ">
+   			,delay_over_time = #{delayOverTime}
+			</if>
+   			<if test="evaluate!=null">
+   			,evaluate = #{evaluate}
+			</if>
+   			<if test="sellerEvaluate!=null">
+   			,seller_evaluate = #{sellerEvaluate}
+			</if>
+			<if test="afterService!=null and afterService!=''">
+   			,after_service = #{afterService}
+			</if>
+			<if test="cancelTime!=null">
+   			,cancel_time = #{cancelTime}
+			</if>
+			<if test="changePaymentPriceTime!=null">
+   			,change_payment_price_time = #{changePaymentPriceTime}
+			</if>
+			<if test="paid!=null">
+   			,paid = #{paid}
+			</if>
+			<if test="promoCode!=null and promoCode!=''">
+   			,promo_code = #{promoCode}
+			</if>
+            <if test="deliverTime!=null">
+                ,deliver_time = #{deliverTime}
+            </if>
+            <if test="confirmReceiptTime!=null">
+                ,confirm_receipt_time = #{confirmReceiptTime}
+            </if>
+            <if test="integral!=null">
+                ,integral = #{integral}
+            </if>
+           
+		 where 
+		 		order_id = #{orderId} or parent_order_id = #{orderId}
+		 	
+	</update>
+	
+	<select id="getOrderId" resultType="string">
+		<![CDATA[
+			SELECT get_order_no(#{flag})
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryTradeOrders" resultMap="tradeOrdersDTOMap" >
+		<![CDATA[ select distinct trade_orders_.* ]]>
+		<include refid="where_fragement"></include>
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryTradeOrdersCount"  resultType="long">
+		<![CDATA[ 
+		select count(*)
+		from (
+		select distinct trade_orders_.* 
+			 ]]>
+		<include refid="where_fragement"></include>
+		<![CDATA[ 
+		) tt
+			 ]]>
+	</select>
+	
+	<select id="queryTradeOrderById" resultMap="tradeOrdersDTOMap">
+		<![CDATA[ 
+		select * 
+		from 
+			trade_orders trade_orders_
+		where trade_orders_.order_id = #{orderId}
+		]]>
+	</select>
+	
+	<update id="updateSubOrderPrice">
+		update trade_orders set
+   			update_time = now()
+			<if test="paymentPrice!=null ">
+			,payment_price = #{paymentPrice}
+			</if>
+			<if test="totalPrice!=null ">
+			,total_price = #{totalPrice}
+			</if>
+			<if test="totalDiscount!=null ">
+			,total_discount = #{totalDiscount}
+			</if>
+			<if test="integral!=null ">
+			,integral = #{integral}
+			</if>
+			<if test="freight!=null ">
+			,freight = #{freight}
+			</if>   
+   			,change_payment_price_time = now()
+		 where 
+		 	order_id = #{orderId} 
+	</update>
+	<!--修改订单状态 延迟7天收货 -->
+	<update id="updateDelayDelivery">
+		update trade_orders set
+   			update_time = now(),
+			delay='2',
+			delay_over_time=#{delayOverTime}
+		 where order_id = #{orderId} and state='3'  and delay='1'
+	</update>
+	
+	<select id="queryTradeOrdersForDelayPay" resultMap="tradeOrdersDTOMap">
+		<include refid="selectAllColumns" />
+			where trade_orders_.paid = 1
+		<if test='args == "order_time"'>
+			<![CDATA[and trade_orders_.order_time is not null and 
+			TO_DAYS(NOW()) BETWEEN (TO_DAYS(trade_orders_.order_time) + trade_orders_.order_time) and 
+			(TO_DAYS(trade_orders_.order_time) + trade_orders_.order_time + 3)]]>
+		</if>	
+		<if test='args == "confirm_receipt_time"'>
+			<![CDATA[and trade_orders_.confirm_receipt_time is not null and 
+			TO_DAYS(NOW()) BETWEEN (TO_DAYS(trade_orders_.confirm_receipt_time) + trade_orders_.confirm_receipt_time) and 
+			(TO_DAYS(trade_orders_.confirm_receipt_time) + trade_orders_.confirm_receipt_time + 3)]]>
+		</if>
+		<if test='args == "deliver_time"'>
+			<![CDATA[and trade_orders_.deliver_time is not null and 
+			TO_DAYS(NOW()) BETWEEN (TO_DAYS(trade_orders_.deliver_time) + trade_orders_.pay_period) and 
+			(TO_DAYS(trade_orders_.deliver_time) + trade_orders_.pay_period + 3)]]>
+		</if>
+	</select>
+</mapper>

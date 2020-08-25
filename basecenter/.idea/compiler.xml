@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="basecenter-common" />
+        <module name="basecenter-dao" />
+        <module name="basecenter-domain" />
+        <module name="basecenter-export" />
+        <module name="basecenter-rpc" />
+        <module name="basecenter-service" />
+        <module name="basecenter-web" />
+        <module name="common-core" />
+        <module name="goodscenter-common" />
+        <module name="goodscenter-dao" />
+        <module name="goodscenter-domain" />
+        <module name="goodscenter-export" />
+        <module name="goodscenter-rpc" />
+        <module name="goodscenter-service" />
+        <module name="goodscenter-web" />
+        <module name="mallwx-common" />
+        <module name="mallwx-dao" />
+        <module name="mallwx-domain" />
+        <module name="mallwx-export" />
+        <module name="mallwx-rpc" />
+        <module name="mallwx-service" />
+        <module name="mallwx-web" />
+        <module name="tradecenter-common" />
+        <module name="tradecenter-dao" />
+        <module name="tradecenter-domain" />
+        <module name="tradecenter-export" />
+        <module name="tradecenter-rpc" />
+        <module name="tradecenter-service" />
+        <module name="tradecenter-web" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="basecenter" target="1.5" />
+      <module name="basecenter-common" target="1.6" />
+      <module name="basecenter-dao" target="1.6" />
+      <module name="basecenter-domain" target="1.6" />
+      <module name="basecenter-export" target="1.6" />
+      <module name="basecenter-parent" target="1.6" />
+      <module name="basecenter-rpc" target="1.6" />
+      <module name="basecenter-service" target="1.6" />
+      <module name="basecenter-web" target="1.6" />
+      <module name="common" target="1.5" />
+      <module name="common-core" target="1.6" />
+      <module name="goodscenter" target="1.5" />
+      <module name="goodscenter-common" target="1.6" />
+      <module name="goodscenter-dao" target="1.6" />
+      <module name="goodscenter-domain" target="1.6" />
+      <module name="goodscenter-export" target="1.6" />
+      <module name="goodscenter-parent" target="1.6" />
+      <module name="goodscenter-rpc" target="1.6" />
+      <module name="goodscenter-service" target="1.6" />
+      <module name="goodscenter-web" target="1.6" />
+      <module name="mallwx" target="1.5" />
+      <module name="mallwx-common" target="1.6" />
+      <module name="mallwx-dao" target="1.6" />
+      <module name="mallwx-domain" target="1.6" />
+      <module name="mallwx-export" target="1.6" />
+      <module name="mallwx-parent" target="1.6" />
+      <module name="mallwx-rpc" target="1.6" />
+      <module name="mallwx-service" target="1.6" />
+      <module name="mallwx-web" target="1.6" />
+      <module name="tradecenter" target="1.5" />
+      <module name="tradecenter-common" target="1.6" />
+      <module name="tradecenter-dao" target="1.6" />
+      <module name="tradecenter-domain" target="1.6" />
+      <module name="tradecenter-export" target="1.6" />
+      <module name="tradecenter-parent" target="1.6" />
+      <module name="tradecenter-rpc" target="1.6" />
+      <module name="tradecenter-service" target="1.6" />
+      <module name="tradecenter-web" target="1.6" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

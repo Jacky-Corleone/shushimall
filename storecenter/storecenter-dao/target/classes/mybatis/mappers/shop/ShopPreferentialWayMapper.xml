@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.storecenter.dao.ShopPreferentialWayDAO">
+  <resultMap id="shopPreferentialWayDTO" type="com.camelot.storecenter.dto.ShopPreferentialWayDTO">
+    <id column="id"  property="id" />
+    <result column="template_id"  property="templateId" />
+    <result column="delivery_type"  property="deliveryType" />
+    <result column="strategy"  property="strategy" />
+    <result column="full"  property="full" />
+    <result column="reduce"  property="reduce" />
+    <result column="shop_id"  property="shopId" />
+    <result column="seller_id"  property="sellerId" />
+    <result column="create_time"  property="createTime" />
+    <result column="update_time"  property="updateTime" />
+    <result column="del_state"  property="delState"/>
+  </resultMap>
+  <!-- =========================================================== -->
+  <!-- 一些公共变量设置                                                                                                                                                                             -->
+  <!-- =========================================================== -->
+  <!--查询条件-->
+  <sql id="where_shopPreferentialWay">
+    where 1=1
+    <if test="entity!=null">
+      <if test="entity.id != null  and entity.id !=''">
+        <![CDATA[ and id  = #{entity.id} ]]>
+      </if>
+      <if test="entity.templateId != null  and entity.templateId !=''">
+        <![CDATA[ and template_id  = #{entity.templateId} ]]>
+      </if>
+      <if test="entity.delState != null  and entity.delState !=''">
+        <![CDATA[ and del_state  = #{entity.delState} ]]>
+      </if>
+    </if>
+  </sql>
+  <sql id="Base_Column_List">
+    select id, template_id, del_state, delivery_type, strategy, full, reduce, shop_id, seller_id, create_time,
+    update_time from shop_preferential_way
+  </sql>
+
+  <select id="selectListByCondition" resultMap="shopPreferentialWayDTO">
+    <include refid="Base_Column_List" />
+    <include refid="where_shopPreferentialWay" />
+  </select>
+
+  <select id="selectById" parameterType="java.lang.Long" resultMap="shopPreferentialWayDTO">
+    <include refid="Base_Column_List" />
+    where id = #{id}
+  </select>
+  <delete id="delete">
+    delete from shop_preferential_way
+    where id = #{id}
+  </delete>
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    insert into shop_preferential_way (template_id, delivery_type,
+      strategy, full, reduce, 
+      shop_id, seller_id, create_time, 
+      update_time,del_state)
+    values (#{templateId}, #{deliveryType},
+      #{strategy}, #{full}, #{reduce}, 
+      #{shopId}, #{sellerId}, now(),
+      #{updateTime},#{delState})
+  </insert>
+  <update id="update">
+    update shop_preferential_way
+    <set>
+      <if test="templateId != null">
+        template_id = #{templateId},
+      </if>
+      <if test="deliveryType != null">
+        delivery_type = #{deliveryType},
+      </if>
+      <if test="strategy != null">
+        strategy = #{strategy},
+      </if>
+      <if test="full != null">
+        full = #{full},
+      </if>
+      <if test="reduce != null">
+        reduce = #{reduce},
+      </if>
+      <if test="shopId != null">
+        shop_id = #{shopId},
+      </if>
+      <if test="sellerId != null">
+        seller_id = #{sellerId},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime},
+      </if>
+      <if test="delState != null">
+        del_state = #{delState},
+      </if>
+    </set>
+    where id = #{id}
+  </update>
+</mapper>

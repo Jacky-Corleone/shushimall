@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.usercenter.dao.UserMallResourceMybatisDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="userMallResourceMap" type="com.camelot.usercenter.dto.UserMallResourceDTO">
+				<result property="id" column="id"/>
+				<result property="type" column="type"/>
+				<result property="url" column="url"/>
+				<result property="resourceName" column="resource_name"/>
+				<result property="parentId" column="parent_id"/>
+				<result property="modularType" column="modular_type"/>
+				<result property="filterMenu" column="shgreen_filter"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{pager.pageOffset} , #{pager.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,type
+ 			,url
+ 			,resource_name
+ 			,parent_id
+ 			,modular_type
+ 			,shgreen_filter
+		FROM 
+		user_mall_resource user_mall_resource_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.id != null  and entity.id !=''">
+				<![CDATA[ and user_mall_resource_.id  = #{entity.id} ]]>
+			</if>
+			<if test="entity.modularType != null  and entity.modularType !=''">
+				<![CDATA[ and user_mall_resource_.modular_type  = #{entity.modularType} ]]>
+			</if>
+			
+			<if test="entity.type != null  and entity.type !=''">
+				<![CDATA[ and user_mall_resource_.type  = #{entity.type} ]]>
+			</if>
+			<if test="entity.url != null  and entity.url !=''">
+				<![CDATA[ and user_mall_resource_.url  = #{entity.url} ]]>
+			</if>
+			<if test="entity.resourceName != null  and entity.resourceName !=''">
+				<![CDATA[ and user_mall_resource_.resource_name  = #{entity.resourceName} ]]>
+			</if>
+			<if test="entity.parentId != null  and entity.parentId !=''">
+				<![CDATA[ and user_mall_resource_.parent_id  = #{entity.parentId} ]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+    
+    <select id="queryParentResourceList" resultMap="userMallResourceMap">
+    	<include refid="selectAllColumns"/>
+    	where parent_id='-1' and type=#{type} and  modular_Type=#{modularType}
+    </select>
+    
+    <select id="selectMallResourceById" resultMap="userMallResourceMap"   parameterType="long" >
+		select um.* from user_permission up,user_mall_resource um
+		where up.resource_id=um.id 
+		and up.user_id=#{uid} and um.modular_Type=#{modularType}
+    </select>
+    
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="userMallResourceMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where user_mall_resource_.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="selectList" resultMap="userMallResourceMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="pager!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectCount" resultType="long">
+		<include refid="count_Tail" />
+		user_mall_resource user_mall_resource_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="com.camelot.usercenter.dto.UserMallResourceDTO">
+		<![CDATA[
+		insert into user_mall_resource (
+		    	 type
+		    	 ,url
+		    	 ,resource_name
+		    	 ,parent_id
+		    	 ,modular_type
+		   )values(
+		    	#{type}
+		    	,#{url}
+		    	,#{resourceName}
+		    	,#{parentId}
+		    	,#{modularType}
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.usercenter.dto.UserMallResourceDTO">
+		<![CDATA[
+		update user_mall_resource set
+   			type = #{type}
+   			,url = #{url}
+   			,resource_name = #{resourceName}
+   			,parent_id = #{parentId}
+		 where id = #{id}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from user_mall_resource where id = #{id}
+		]]>
+	</delete>
+</mapper>

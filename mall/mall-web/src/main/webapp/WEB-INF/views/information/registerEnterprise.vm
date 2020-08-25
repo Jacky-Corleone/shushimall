@@ -1,0 +1,825 @@
+#if("$!type"=="buyer")
+	#parse("/information/registerInit.vm")
+#end
+
+<script type="text/javascript">
+$(function(){
+	/*注册提示信息*/
+	if("$!type"=="buyer"){
+		$(".information").html("欢迎认证买家");
+	} else {
+		$(".information").html("欢迎注册");
+	}
+
+	/*调用方法--企业注册*/
+//	$.focusblur("#enterpriseLoginName");
+//	$.focusblur("#firstEnterprisePassword");
+//	$.focusblur("#secondEnterprisePassword");
+//	$.focusblur("#linkMan");
+//	$.focusblur("#linkPhoneNum");
+//	$.focusblur("#enterprisePhoneInput");
+//	$.focusblur("#enterpriseMailInput");
+//	$.focusblur("#companyName");
+//	$.focusblur("#companyDeclinedAddress");
+
+	//初始化页面开始-------------------------------------------------------------------------------------------------------------------------
+	initValidEnterprise();
+	//邮箱格式
+	var mailChrnum = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/;
+	function initValidEnterprise(){
+		$("#enterpriseForm").validate({
+			rules: {
+				"loginname":{
+                    loginName:true,
+					required: true,
+                    remote:"$request.contextPath/information/register/verifyRegisterName"
+
+				},
+				"firstEnterprisePassword":{
+					required: true,
+					passwordlength6: true
+				},
+				"secondEnterprisePassword":{
+					required: true,
+					passwordlength6: true,
+                    equalTo:"#firstEnterprisePassword"
+				},
+				"linkMan":{
+					linkManName:true,
+					required: true
+				},
+				"userEmail":{
+					email:true,
+                    remote:"$request.contextPath/information/register/verifyEnterpriseEmail"
+				},
+				"departMentVal":{
+					required: true
+				},
+				"linkPhoneNum":{
+					required: true
+				},
+				"userMobile":{
+					required: true,
+					phone: true
+                 //    remote:"$request.contextPath/information/register/verifyEnterpriseMobile"
+				},
+				"enterprisePhoneCaptchaInput":{
+					required: true
+				},
+				"userBusinessDTO.companyName":{
+					companyName:true,
+					required: true
+				},
+//				"business_provinces":{
+//					required: true
+//				},
+//				"business_city":{
+//					required: true
+//				},
+				/* "business_area":{
+					required: true
+				}, */
+				"userBusinessDTO.companyDeclinedAddress":{
+                    companyDeclinedAddress:true,
+					required: true
+				},
+				"userBusinessDTO.financingNum":{
+                    financingNum:true,
+					required: true
+				},
+				"verificationCode":{
+					required: true
+				}
+			},
+            messages: {
+                loginname: {
+                    remote: "用户名已存在，请重新输入"
+                },
+//                userMobile: {
+//                    remote: "手机号已存在，请重新输入"
+//                },
+                userEmail: {
+                    remote: "邮箱已存在，请重新输入"
+                },
+                secondEnterprisePassword:{
+                    equalTo: "两次输入密码不一致"
+                }
+            },
+			fail:function(element) {
+//    			if($(element)[0].id=="enterprisePhoneInput"){
+//    				$('#sendEnterprisePhoneCaptchaButton').attr('disabled','disabled');
+//    				$('#sendEnterprisePhoneCaptchaButton').html('手机号码已注册');
+//    			}
+				if($(element)[0].id=="enterpriseMailInput"){
+    				$('#sendEnterpriseMailCaptchaButton').attr('disabled','disabled');
+    				if(!mailChrnum.test($('#enterpriseMailInput').val())){
+						$('#sendEnterpriseMailCaptchaButton').html('邮箱格式不正确');
+					}else{
+						$('#sendEnterpriseMailCaptchaButton').html('邮箱已注册');
+					}
+    				$("#enterpriseMailInput").attr("readonly",false);
+    			}
+			},
+			successA:function(error, element){
+    			if($(element)[0].id=="enterprisePhoneInput"){
+    				$('#sendEnterprisePhoneCaptchaButton').removeAttr('disabled');
+    				$("#enterpriseMailInput").attr("readonly",false);
+    				$('#sendEnterprisePhoneCaptchaButton').html('获取短信验证码');
+				}
+    			if($(element)[0].id=="enterpriseMailInput"){
+    				$('#sendEnterpriseMailCaptchaButton').removeAttr('disabled');
+    				$("#enterpriseMailInput").attr("readonly",false);
+    				$('#sendEnterpriseMailCaptchaButton').html('获取邮箱验证码');
+				}
+			}
+			
+		});
+
+        jQuery.validator.addMethod("loginName", function(value, element) {
+            var chrnum =  /^((?=.*?[0-9])(?=.*?[A-Za-z])|(?=.*?[0-9])(?=.*?[_])|(?=.*?[A-Za-z])(?=.*?[_]))[0-9A-Za-z_]{4,20}$/;
+            return this.optional(element) || (chrnum.test(value));
+        }, "4-20位字符，支持字母、数字、下划线两个以上组合!");
+
+		jQuery.validator.addMethod("passwordlength6", function(value, element) {
+			var chrnum = /^((?=.*?\d)(?=.*?[A-Za-z])|(?=.*?\d)(?=.*?[\W])|(?=.*?[A-Za-z])(?=.*?[\W]))[\dA-Za-z\W]+.{5,20}$/;
+			return this.optional(element) || (chrnum.test(value));
+		}, "6-20位字符，由数字、字母、符号两个以上组合!");
+
+        jQuery.validator.addMethod("linkManName", function(value, element) {
+            var chrnum = /^[\u4e00-\u9fa5a-zA-Z]{2,20}$/;
+            return this.optional(element) || (chrnum.test(value));
+        }, "输入2-20个字符，可由中文和英文组成!");
+
+		//jQuery.validator.addMethod("linkPhone", function(value, element) {
+		//	var chrnum =/^\d{3,4}\-\d{7,8}$/;
+		//	return this.optional(element) || (chrnum.test(value));
+		//}, "请填写联系人常用电话，以便于我们联系，如：0527-88001100!");
+
+        jQuery.validator.addMethod("phone", function(value, element) {
+            var chrnum = /^[1]([3|5|7|8][0-9]{1}|59|58|88|89)[0-9]{8}$/;
+            return this.optional(element) || (chrnum.test(value));
+        }, "请输入正确的手机号码!");
+
+
+		jQuery.validator.addMethod("mail", function(value, element) {
+			var chrnum = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/;
+			return this.optional(element) || (chrnum.test(value));
+		}, "请输入正确的邮箱!");
+
+        jQuery.validator.addMethod("companyName", function(value, element) {
+            // [\u4e00-\u9fa5a-zA-Z0-9\-]{4,20}
+            var chrnum = /^[\u4e00-\u9fa5a-zA-Z0-9_\-\—\\(\\)\\（\\）|\w]{4,40}$/;
+            return this.optional(element) || (chrnum.test(value));
+        }, "请填写工商局注册的全称。4-40位字符，可由中英文、数字及”_”、”-”、()、（）组成");
+
+		jQuery.validator.addMethod("companyDeclinedAddress", function(value, element) {
+			var chrnum = /^[\u4e00-\u9fa5\-|\w]{0,100}$/;
+			return this.optional(element) || (chrnum.test(value));
+		}, "请填写详细公司经营地址，如：苏州街20号汇丰大厦A座11层");
+		jQuery.validator.addMethod("financingNum", function(value, element) {
+			//var chrnum = /^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/;
+			var chrnum = /^[1-9][0-9]{0,8}$/;
+			return this.optional(element) || (chrnum.test(value));
+		}, "融资额度为最多不超过9位的正整数");
+
+
+	};
+
+
+	//初始化页面结束-------------------------------------------------------------------------------------------------------------------------
+	//关闭按钮
+	$("#enterprisePicCaptchaDivClose").click(function(){
+		$('#enterprisePicCaptchaDiv').attr('style','display:none');
+	});
+	//输入完图片验证码，点击确认
+	$("#enterprisePicCaptchaNextStep").click(function(){
+		var ifEnterprisePicCaptchaFormValid = $("#enterprisePicCaptchaForm").valid();
+		if( !ifEnterprisePicCaptchaFormValid ){
+			return false;
+		}
+		//点击下一步，发送手机验证码
+		sendCaptcha('enterprisePhoneCaptchaKey','sendEnterprisePhoneCaptchaButton','enterprisePhoneInput',1,2,1,'e_register');
+	});
+	//提交：企业注册/买家认证
+	$("#enterpriseBtn").click(function(){
+		
+        var isValid = $("#enterpriseForm").valid();
+        if(!isValid){
+            return;
+        }
+
+		//是否同意科印协议商城《用户协议》和《隐私声明》
+		if($("#enterprise").is(":checked")!=true && "$!type"!="buyer"){
+			alert("请阅读商城协议!");
+			return false;
+		}
+		//验证用户名:唯一
+##		if( "$!type"!="buyer" && !loginname_state ){
+##			alert("请填写用户名!");
+##			return false;
+##		}
+		//确认密码
+		if($("#firstEnterprisePassword").val() != $("#secondEnterprisePassword").val()){
+			alert("两次输入的密码不一致!");
+			return false;
+		}
+
+		//校验联系人输入内容长度
+		if(!checkLinkMan($('#linkMan').val())){
+			alert("输入2-20个字符，可由中文和英文组成 !");
+			return false;
+		}
+
+		//验证固定电话
+		//if(!checkLinkNum($('#linkPhoneNum').val())){
+		//	alert("固定电话格式不正确!");
+		//	return false;
+		//}
+
+		//RegisterInfoDTO-loginpwd属性
+		$("#enterprisePassword").val($("#firstEnterprisePassword").val());
+		//判断是否需要校验手机
+		if("$!type"!="buyer"){
+			//if($("#enterprisePhoneCaptchaInput").val() != "111111"){
+				//验证手机
+				var enterprisePhoneCaptchaBoolean = checkSynchronizedCaptcha("enterprisePhoneCaptchaKey","enterprisePhoneCaptchaInput",2,0);
+				if(enterprisePhoneCaptchaBoolean == false){
+					return false;
+				}
+			//}
+		}
+		//验证邮箱
+		if($("#enterpriseMailInput").val() != '' && $("#enterpriseMailInput").val() != null && $("#enterpriseMailInput").val() != undefined){
+			//if($("#enterpriseMailCaptchaInput").val() != "111111"){
+				var enterpriseMailCaptchaBoolean = checkSynchronizedCaptcha("enterpriseMailCaptchaKey","enterpriseMailCaptchaInput",1,0);
+				if(enterpriseMailCaptchaBoolean == false){
+					return false;
+				}
+			//}
+		}
+		//公司地址
+		$("#companyAddress").val($("#business_provinces").val()+","+$("#business_city").val()/* +","+$("#business_area").val() */);
+		//经营范围
+		var businessScope_val = "";
+		$('input[name="businessScope"]:checked').each(function(){
+			businessScope_val += $(this).val() + ",";
+		});
+		$("#businessScope").val(businessScope_val);
+		if($("#businessScope").val() == '' || $("#businessScope").val() == null || $("#businessScope").val() == undefined){
+			alert("请勾选经营范围!");
+			return false;
+		}
+		//表单数据校验
+		var ifEnterpriseFormValid = $("#enterpriseForm").valid();
+		if( !ifEnterpriseFormValid ){
+			return false;
+		}
+		//判断是否需要校验图片验证码
+		// if($("#captcha_id").val() != "111111"){
+			//校验图片验证码
+			var ifCheckCaptcha = checkImgCaptcha();
+			if(!ifCheckCaptcha){
+				return false;
+			}
+		// }
+		//提交操作
+		var destinationURL;
+		//个人用户提交买家认证后跳转至买家中心>账号信息>基本信息页面
+		if("$!type" != "" && "$!type"=="buyer"){
+			destinationURL = "$request.contextPath/information/informationBuyer/initLoad";
+		//企业用户注册（提交买家认证）后跳转至注册成功页面
+		}else{
+			destinationURL = "$request.contextPath/information/register/registerSucceed?loginname="+$("#enterpriseLoginName").val()+"&userType=enterprise";
+		}
+        if($("#enterprisePhoneStatus").val()=="true") {
+            if (confirm("验证手机已注册,继续操作将与原账号解绑，是否继续？")) {
+                $("#enterpriseBtn").loadingMsg();
+                $.ajax({
+                    type: "post",
+                    dataType: "json",
+                    url:"$request.contextPath/information/register/submitEnterprise",
+                    data:$("#enterpriseForm").serializeArray(),
+                    success: function(data){
+                        $("#enterpriseBtn").hideMsg();
+                        window.location.href = destinationURL;
+                    },
+                    error:function(data){
+                        alert("注册失败，请重新操作！");
+                        $("#enterpriseBtn").hideMsg();
+                    }
+                });
+            }
+        }else{
+            $("#enterpriseBtn").loadingMsg();
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                url:"$request.contextPath/information/register/submitEnterprise",
+                data:$("#enterpriseForm").serializeArray(),
+                success: function(data){
+                    $("#enterpriseBtn").hideMsg();
+                    window.location.href = destinationURL;
+                },
+                error:function(data){
+                    alert("注册失败，请重新操作！");
+                    $("#enterpriseBtn").hideMsg();
+                }
+            });
+        }
+	});
+
+	//下拉菜单:公司所在地
+	$("#business_provinces").change(function(){
+		/* $("#business_area").empty().append($("<option>").text("请选择").val("")); */
+		optionItems("$request.contextPath/information/register/queryAddress",$("#business_provinces").val(),"business_city","");
+	});
+	/* $("#business_city").change(function(){
+		optionItems("$request.contextPath/information/register/queryAddress",$("#business_city").val(),"business_area","");
+	}); */
+});
+//校验 固定电话是否符合格式linkPhoneNum
+function checkLinkNum(val)
+{
+	var reg = /^\d{3,4}\-\d{7,8}$/;
+	return reg.test(val);
+}
+
+//校验联系人 姓名输入内容长度linkMan
+function checkLinkMan(val)
+{
+	val = $.trim(val);
+	return val.length >= 2 && val.length <= 20;
+}
+
+/**
+ * url 链接地址
+ * parentCode 父级编码
+ * opitonId 需要填充数据的下拉列表框的id
+ * selectVal 默认选中的值
+ * name 服务器返回的数据中，作为下拉框option的text的字段名，默认为"name"
+ * code 服务器返回的数据中，作为下拉框option的value的字段名，默认为"code"
+ */
+function optionItems(url, parentCode, optionId, selectVal, name, code){
+	$.ajax({
+		url:url,
+		type:"post",
+		data:{
+			parentCode:parentCode
+		},
+		dataType: "json",
+		success:function(data){
+			var optionItem = $("#"+optionId);
+			optionItem.empty();
+			optionItem.append($("<option>").text("请选择").val(""));
+			$.each(data, function (n, itemObj) {
+				if(!name){
+					name = "name";
+				}
+				if(!code){
+					code = "code";
+				}
+				var option = $("<option>").text(itemObj[name]).val(itemObj[code]);
+				if(itemObj.code==selectVal || itemObj.categoryCid==selectVal){
+					option.attr("selected",true);
+				}
+				optionItem.append(option);
+			});
+		}
+	});
+}
+
+//换验证码图片
+function _chage(){
+	var img = document.getElementById("vc");
+	img.src="$request.contextPath/user/acquire?a=" + new Date().getTime();
+}
+//发送手机短信的图片验证码
+function enterprise_chage(){
+	var img = document.getElementById("e_vc");
+	img.src="$request.contextPath/user/acquire?a=" + new Date().getTime()+"&type=e_register";
+}
+//校验验证码
+function checkImgCaptcha(){
+	var ifCheckCaptcha1 = false;
+	var captcha = $("#captcha_id").val();
+	var captchaFormat = /^[a-zA-Z0-9]{4}$/;
+	if(!captchaFormat.test(captcha)){
+		$("#captcha_span").html("验证码不正确");
+		$("#captcha_span").css("color", "red");
+		$("#captcha_span").show();
+		_chage();
+	}
+	var data = {captcha:captcha};
+	$.ajax({
+		async: false,
+		url:"$request.contextPath/user/verifyCaptcha",
+		type:"post",
+		data:data,
+		success:function(data){
+			if(!data.message){
+				ifCheckCaptcha1 = false;
+				$("#captcha_span").html("验证码不正确");
+				$("#captcha_span").css("color", "red");
+				_chage();
+			} else {
+				ifCheckCaptcha1 = true;
+				$("#captcha_span").html("");
+			}
+		}
+	});
+	return ifCheckCaptcha1;
+}
+//企业是否有融资需求
+function changeFinancing(thiz){
+	if(thiz.checked){
+		$("#isFinancing").val('1');
+		// $("#financingNum").attr("required","required");
+		$("#financingNum_li").show();
+	}else{
+		$("#isFinancing").val('0');
+		// $("#financingNum").removeAttr("required");
+		$("#financingNum_li").hide();
+	}
+	$("#financingNum").focus();
+	$("#financingNum").blur();
+}
+
+
+function enterpriseUserVali(){
+    var content=$('#enterprisePhoneInput').val();
+    if($.trim(content) == '' ){
+        $("#enterprisePhoneInputDiv1").hide();
+        return false;
+    }
+    $.ajax({
+        type: "post",
+        data:{userMobile:$('#enterprisePhoneInput').val()},
+        url:"$request.contextPath/information/register/verifyEnterpriseMobile",
+        success: function(data){
+            if(!data){
+                $("#enterprisePhoneStatus").val("true");
+                $("#enterprisePhoneInputDiv1").show();
+            }else{
+                $("#enterprisePhoneStatus").val("false");
+                $("#enterprisePhoneInputDiv1").hide();
+            }
+        },
+        error:function(data){
+            alert("注册失败，请重新操作！");
+            $("#enterpriseBtn").hideMsg();
+        }
+    });
+}
+
+</script>
+
+#if("$!type"=="buyer")
+	<div class="nTab">
+	<div class="TabContent">
+#end
+<form id="enterpriseForm" method="post" >
+	<input id="keyEnterpriseRegisterDuplicateRedis" name="keyEnterpriseRegisterDuplicateRedis" type="hidden" value="$!keyEnterpriseRegisterDuplicateRedis"/>
+	<input name="type" type="hidden" value="$!type" />
+	<input name="userId" type="hidden" value="$!userId" />
+	<input id="enterprisePassword" name="loginpwd" type="hidden" />
+	#if("$!type"=="buyer")
+		<div id="myTab0_Content1" >
+	#else
+		<div id="myTab0_Content1" class="none">
+		<div class="register_box_3">
+			<p class="font_24 font_7a">欢迎注册成为企业用户</p>
+			<dl class="border-11">
+				<dt class="font_14b">专享服务</dt>
+				<dd>1. 专享VIP采购管家服务；</dd>
+			</dl>
+			<dl>
+				<dt class="font_14b">服务需知</dt>
+				<dd>我们的审核时限为24小时（工作日），遇法定节假日顺延；</dd>
+			</dl>
+		</div>
+		<div class="clear"></div>
+	#end
+
+	#if("$!type" != "buyer")
+	<p class="bg_05 hei_35 font_left border-1">
+		<i class="mar_l10">账户信息</i>
+	</p>
+	<div class="register_box_2">
+		<ul>
+			<li>
+				<span class="regist_font"><i class="font_fs">*</i>用户名：</span>
+				<div class="regist_item_ifo">
+					<input id="enterpriseLoginName"  name="loginname" type="text" class="input_Style1 wid_350" placeholder="4-20位字符，支持字母、数字、下划线两个以上组合" maxlength="20" value="$!userDTO.uname"/>
+					<span class="register-icon fa-user font_c7"></span>
+				</div>
+				<div id="enterpriseLoginNameDiv" class="regist_text bg_05 border-1 none">4-20位字符，支持字母、数字、下划线两个以上组合</div>
+			</li>
+			<li class="pr">
+				<span class="regist_font"><i class="font_fs">*</i>请设置密码：</span>
+				<div class="regist_item_ifo">
+					<input id="firstEnterprisePassword" name="firstEnterprisePassword" type="password" class="input_Style1 wid_350" placeholder="6-20位字符，由数字、字母、符号两个以上组合" maxlength="20" onfocus="$(this).checkPwdIn()" onKeyUp="$(this).checkPwdStrong('pwd_level_4','pwd_level_5','pwd_level_6')" />
+					<span class="register-icon fa-lock font_c7"></span>
+					<div class="password_length" style="margin-top: 5px;">
+                    	<span id="pwd_level_4" class="bg_09 font_12" style="display:none">弱</span><!--密码长度为短就用第一个span -->
+                        <span id="pwd_level_5" class="bg_10 font_12" style="display:none">中</span><!--密码长度为中就用到第一个和第二个span -->
+                        <span id="pwd_level_6" class="bg_11 font_12" style="display:none">强</span><!--密码长度为高就用到第一个和第二个和第三个span -->
+                    </div>
+				</div>
+				<div id="firstEnterprisePasswordDiv" class="regist_text bg_05 border-1 none">6-20位字符，由数字、字母、符号两个以上组合</div>
+			</li>
+			<li>
+				<span class="regist_font"><i class="font_fs">*</i>请确认密码：</span>
+				<div class="regist_item_ifo">
+					<input id="secondEnterprisePassword" name="secondEnterprisePassword" type="password" class="input_Style1 wid_350" placeholder="请您再次输入密码" maxlength="20"/>
+					<span class="register-icon fa-lock font_c7"></span>
+				</div>
+				<div id="secondEnterprisePasswordDiv1" class="regist_text bg_05 border-1 none">请再次输入密码</div>
+				<div id="secondEnterprisePasswordDiv2" class="regist_text bg_05 border-1 font_fe none">
+					<i class="fa-exclamation-circle font_16 demo-icons"></i>两次输入密码不一致
+				</div>
+			</li>
+		</ul>
+	</div>
+	<div class="clear"></div>
+	#end
+
+	<p class="bg_05 hei_35 font_left border-1">
+		<i class="mar_l10">联系人信息</i>
+	</p>
+	<div class="register_box_2">
+		<ul>
+			#if("$!type" == "buyer")
+				<li>
+					<span class="regist_font">用 户 名：</span>
+					<div class="regist_item_ifo">$!userDTO.uname</div>
+				</li>
+			#end
+			<li>
+				<span class="regist_font"><i class="font_fs">*</i>联系人姓名：</span>
+				<div class="regist_item_ifo">
+					<input id="linkMan" name="linkMan" type="text" class="input_Style1 wid_350" placeholder="请输入联系人姓名" maxlength="20"/>
+					<span id="linkManCheck"></span>
+				</div>
+				<div id="linkManDiv" class="regist_text bg_05 border-1 none"> 输入2-20个字符，可由中文和英文组成 </div>
+			</li>
+			<li class="pr">
+				<span class="regist_font"><i class="font_fs">*</i>所在部门：</span>
+				<div class="regist_item_ifo">
+					<select name="departMentVal" class="input_Style1 wid_367">
+						<option value="" selected="selected">请选择</option>
+						#foreach($departMent in $departMents)
+							<option value="$!departMent"> $!departMent.label </option>
+						#end
+					</select>
+				</div>
+			</li>
+			<li>
+				<span class="regist_font"><i class="font_fs">*</i>固定电话：</span>
+				<div class="regist_item_ifo">
+					<input id="linkPhoneNum" name="linkPhoneNum" type="text" class="input_Style1 wid_350" placeholder="请输入固定电话" maxlength="20"/>
+                    <span class="register-icon fa-mobile font_c7" style="font-size:24px;"></span>
+				</div>
+				<div id="linkPhoneNumDiv" class="regist_text bg_05 border-1 none" >请填写联系人常用电话，以便于我们联系</div>
+			</li>
+			<li>
+				<span class="regist_font"><i class="font_fs">*</i>手机：</span>
+				<div class="regist_item_ifo">
+					#if("$!type"!="buyer"||$!userDTO.umobile=='')
+					<input id="enterprisePhoneInput" name="userMobile" type="text" class="input_Style1 wid_350"
+                           placeholder="请输入手机号" maxlength="11" value="$!userDTO.umobile" onblur="enterpriseUserVali();" />
+					<span class="register-icon fa-mobile font_c7" style="font-size:24px;"></span>
+					#else
+					$!userDTO.umobile
+					#end
+				</div>
+			</li>
+			<li style="display:none" id="enterprisePhoneInputDiv1" >
+	             <input type="hidden" id="enterprisePhoneStatus" />
+	             <span class="regist_font"><i class="font_fe">*</i></span>
+	             <div  class="f1 regist_text bg_05 border-1  font_fe ">
+	                 <i class="fa-exclamation-circle font_12 demo-icons"></i>手机号已注册，继续注册将与原账号解绑
+	             </div>
+            </li>
+            <li style="display:none" id="enterprisePhoneInputDiv" >
+                 <div id="enterprisePhoneInputDiv" class="regist_text bg_05 border-1">完成验证后可以通过手机号登录和找回密码</div>
+            </li>
+			#if("$!type"!="buyer")
+			<li>
+				<span class="regist_font"><i class="font_fs">*</i>手机验证码：</span>
+				<div class="regist_item_ifo">
+					<input id="enterprisePhoneCaptchaKey" type="hidden" />
+					<input id="enterprisePhoneCaptchaInput" name="enterprisePhoneCaptchaInput" type="text" class="input_Style1 wid_220 fl" placeholder="请输入手机验证码" maxlength="6"/>
+					<!--<button id="sendEnterprisePhoneCaptchaButton" type="button" onclick="sendCaptcha('enterprisePhoneCaptchaKey','sendEnterprisePhoneCaptchaButton','enterprisePhoneInput',1,2,1)" class="fl button_4 hei_35 mar_l10">获取短信验证码</button>-->
+					<button id="sendEnterprisePhoneCaptchaButton" type="button" onclick="isSendCaptcha('enterprisePhoneInput','e_regiter')" class="fl button_4 hei_35 mar_l10">获取短信验证码</button>
+				</div>
+			</li>
+			#end
+			<li>
+				<span class="regist_font">邮箱：</span>
+				#if("$!type"!="buyer")
+				<div class="regist_item_ifo">
+					<input id="enterpriseMailInput" name="userEmail" id="userEmail" type="text" class="input_Style1 wid_350" placeholder="请输入邮箱" maxlength="50" value="$!userDTO.userEmail"/>
+				</div>
+				<div id="enterpriseMailInputDiv" class="regist_text bg_05 border-1 none">请填写本人邮箱 </div>
+			   #else
+				#if($!userDTO.userEmail=='')
+					<div class="regist_item_ifo">
+			       <input id="enterpriseMailInput" name="userEmail" id="userEmail" type="text" class="input_Style1 wid_350" placeholder="请输入邮箱" maxlength="50" value="$!userDTO.userEmail"/>
+		           </div>
+		           <div id="enterpriseMailInputDiv" class="regist_text bg_05 border-1 none">请填写本人邮箱 </div>
+				#else
+					$!userDTO.userEmail
+				#end	
+			#end
+				</li>
+				#if("$!type"!="buyer")
+					<li>
+					<span class="regist_font">邮箱验证码：</span>
+					<div class="regist_item_ifo">
+						<input id="enterpriseMailCaptchaKey" type="hidden" />
+						<input id="enterpriseMailCaptchaInput" name="enterpriseMailCaptchaInput" type="text" class="input_Style1 wid_220 fl" placeholder="请输入邮箱验证码" maxlength="6"/>
+						<button id="sendEnterpriseMailCaptchaButton" type="button" onclick="sendCaptcha('enterpriseMailCaptchaKey','sendEnterpriseMailCaptchaButton','enterpriseMailInput',1,1,1)" class="fl button_4 hei_35 mar_l10">获取邮箱验证码</button>
+					</div>
+			       </li>
+					#else
+						#if($!userDTO.userEmail=='')
+						<li>
+						<span class="regist_font">邮箱验证码：</span>
+						<div class="regist_item_ifo">
+						<input id="enterpriseMailCaptchaKey" type="hidden" />
+						<input id="enterpriseMailCaptchaInput" name="enterpriseMailCaptchaInput" type="text" class="input_Style1 wid_130 fl" placeholder="请输入邮箱验证码" maxlength="6"/>
+						<button id="sendEnterpriseMailCaptchaButton" type="button" onclick="sendCaptcha('enterpriseMailCaptchaKey','sendEnterpriseMailCaptchaButton','enterpriseMailInput',1,1,1)" class="fl button_4 hei_35 mar_l10">获取邮箱验证码</button>
+						</li>
+						#else
+						#end
+						</div>
+						#end
+		</ul>
+	</div>
+	<div class="clear"></div>
+	<p class="bg_05 hei_35 font_left border-1">
+		<i class="mar_l10">公司信息</i>
+	</p>
+	<div class="register_box_2 register_box_3">
+		<ul>
+			<li>
+				<span class="regist_font"><i class="font_fs">*</i>公司名称：</span>
+				<div class="regist_item_ifo">
+					<input id="companyName" name="userBusinessDTO.companyName" type="text" class="input_Style1 wid_350" placeholder="请输入公司名称"/>
+				</div>
+				<div id="companyNameDiv" class="regist_text bg_05 border-1 none" >请填写工商局注册的全称。4-40位字符，可由中英文、数字及”_”、”-”、()、（）组成</div>
+			</li>
+			<li class="pr">
+				<span class="regist_font"><i class="font_fs">*</i>公司所在地：</span>
+				<div class="regist_item_ifo">
+					<select id="business_provinces" name="business_provinces" class="input_Style1 wid_114">
+						<option value="" selected="selected"> 请选择 </option>
+						#foreach($address in $addressList)
+							<option value="$!address.code"> $!address.name </option>
+						#end
+					</select>
+					<i>-</i>
+					<select id="business_city" name="business_city" class="input_Style1 wid_114">
+						<option value="" selected="selected"> 请选择 </option>
+					</select>
+					<!-- <i>-</i> -->
+					<!-- <select id="business_area" name="business_area" class="input_Style1 wid_114">
+						<option value="" selected="selected"> 请选择 </option>
+					</select> -->
+					<input id="companyAddress" name="userBusinessDTO.companyAddress" type="hidden" />
+				</div>
+			</li>
+			<li>
+				<span class="regist_font"><i class="font_fs">*</i>公司地址：</span>
+				<div class="regist_item_ifo">
+					<input id="companyDeclinedAddress" name="userBusinessDTO.companyDeclinedAddress" type="text" class="input_Style1 wid_350" placeholder="请填写详细公司经营地址"/>
+				</div>
+				<div id="companyDeclinedAddressDiv" class="regist_text bg_05 border-1 none">请填写详细公司经营地址，如：苏州街20号汇丰大厦A座11层</div>
+			</li>
+			<li>
+				<span class="regist_font"><i class="font_fs">*</i>经营范围：</span>
+				<div class="regist_item_ifo">
+					##foreach($usePurchaseType in $usePurchaseTypes)
+						##<i class="mar_r10"><input name="businessScope" type="checkbox" value="$!usePurchaseType.code" />$!usePurchaseType.label</i>
+					##end
+					<i class="mar_r30 fl"><input name="businessScope" type="checkbox" value="书刊印刷"/>书刊印刷</i>
+					<i class="mar_r30 fl"><input name="businessScope" type="checkbox" value="包装印刷"/>包装印刷</i>
+					<i class="mar_r30"><input name="businessScope" type="checkbox" value="数字印刷" />数字印刷</i>
+					<i class="mar_r30"><input name="businessScope" type="checkbox" value="商业印刷" />商业印刷</i>
+					<i class="mar_r30"><input name="businessScope" type="checkbox" value="报业印刷" />报业印刷</i>
+					<i class="mar_r30"><input name="businessScope" type="checkbox" value="标签印刷" />标签印刷</i>
+					<i class="mar_r30"><input name="businessScope" type="checkbox" value="票据印刷" />票据印刷</i>
+					<i class="mar_r30"><input name="businessScope" type="checkbox" value="特种印刷" />特种印刷</i>
+					<i class="mar_r30"><input name="businessScope" type="checkbox" value="广告设计" />广告设计</i>
+					<i class="mar_r30"><input name="businessScope" type="checkbox" value="专项印刷" />专项印刷</i>
+					<i class="mar_r30"><input name="businessScope" type="checkbox" value="其他" />其他</i>
+				</div>
+				<input id="businessScope" name="userBusinessDTO.businessScope" type="hidden" />
+			</li>
+			<li>
+				<span class="regist_font">企业人数：</span>
+				<div class="regist_item_ifo">
+					<select name="companyPeoNum" class="input_Style1 wid_367">
+						<option value="" selected="selected">请选择</option>
+						#foreach($companyPeopleNum in $companyPeopleNums)
+							<option value="$!companyPeopleNum"> $!companyPeopleNum.label </option>
+						#end
+					</select>
+				</div>
+			</li>
+			<li>
+				<span class="regist_font">经营规模：</span>
+				<div class="regist_item_ifo">
+					<select name="businessScale" class="input_Style1 wid_367">
+						<option value="" selected="selected">请选择</option>
+						#foreach($businessScale in $businessScales)
+							<option value="$!businessScale"> $!businessScale.label </option>
+						#end
+					</select>
+				</div>
+			</li>
+			<li>
+				<span class="regist_font">公司性质：</span>
+				<div class="regist_item_ifo">
+					<select name="companyQualt" class="input_Style1 wid_367">
+						<option value="" selected="selected">请选择</option>
+						#foreach($companyQualt in $companyQualts)
+							<option value="$!companyQualt"> $!companyQualt.label </option>
+						#end
+					</select>
+				</div>
+			</li>
+			<li>
+				<span class="regist_font">企业是否有融资需求：</span>
+				<div class="regist_item_ifo">
+					<i class="mar_r10">
+						<input id="isFinancingCheckbox" name="isFinancingCheckbox" type="checkbox" value="1" onchange="changeFinancing(this)"/>
+						<input id="isFinancing" name="userBusinessDTO.isFinancing" type="hidden" />
+					</i>
+				</div>
+			</li>
+			<li id="financingNum_li" style="display: none">
+				<span class="regist_font">期望融资额度：</span>
+				<div class="regist_item_ifo">
+					<i class="mar_r10">
+						<input id="financingNum" name="userBusinessDTO.financingNum" type="text" class="input_Style1 wid_130" placeholder="请输入融资金额" />万元
+					</i>
+				</div>
+			</li>
+			<li>
+				<span class="regist_font"><i class="font_fs">*</i>图片验证码：</span>
+				<div class="regist_item_ifo">
+					<input name="captcha" type="text" id="captcha_id" class="input_Style1 wid_130 fl" placeholder="请输入图片验证码" maxlength="6"/>
+					<span class="wid_120">
+						<img id="vc" style="" src="$request.contextPath/user/acquire" />
+						<a href="javascript:_chage();">换一张</a>
+					</span>
+					<span id="captcha_span" style="margin-top: 3px; margin-left: 7px;"></span>
+				</div>
+			</li>
+			#if("$!type"!="buyer")
+			<li class="mar_t10" >
+				<p style="margin-left:175px;">
+					<input id="enterprise" name="enterprise" type="checkbox"/>
+					<a href="#" onclick="$('#mallAgreement').attr('style','');">同意舒适100《用户协议》和《隐私声明》</a>
+				</p>
+			</li>
+			#end
+			<li>
+				<button id="enterpriseBtn" class="button_1 hei_40" style="width:260px; margin-left:180px;" loadMsg="正在提交..." type="button">
+				#if("$!type"=="buyer") 提交买家认证 #else 同意协议并注册 #end
+				</button>
+			</li>
+		</ul>
+	</div>
+</div>
+</form>
+#if("$!type"=="buyer")
+</div></div>
+#end
+
+<!-- 图片验证码弹出层开始 -->
+<div id="enterprisePicCaptchaDiv" class="po_fai" style="display:none">
+	<form id="enterprisePicCaptchaForm"  method="post">
+		<div class="po_main" style="width:300px; margin-left:-250px;">
+			<div class="tit pad_l10 hei_35 bg_05" >
+				<i id="enterprisePicCaptchaDivClose" class="fa fa-times-circle fr font_14 mar_r10 cursor"></i>
+			</div>
+			<ul class="mar_tb20">
+				<li style="text-align:left">
+    				<input name="captcha" type="text" id="enterprise_pic_captcha_id" class="input_Style1 wid_120" placeholder="验证码" maxlength="6"/>
+    				<span class="wid_120">
+    					<img id="e_vc" style="" src="$request.contextPath/user/acquire?type=e_register" />
+    					<a href="javascript:enterprise_chage();">换一张</a>
+    				</span>
+    				<span id="enterprise_pic_captcha_span" style="margin-top: 3px; margin-left: 7px;"></span>
+    			</li>
+				<li class="clear"></li>
+				<li>
+					<button id="enterprisePicCaptchaNextStep" type="button" class="button_1 hei_35" loadMsg="正在提交...">确定</button>
+				</li>
+			</ul>
+		</div>
+	</form>
+</div>
+<!-- 图片验证码弹出层结束 -->

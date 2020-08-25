@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>tradecenter-parent</artifactId>
+		<groupId>com.camelot.openplatform.tradecenter</groupId>
+		<version>shushi100-1.0.3.daily-SNAPSHOT</version>
+		<relativePath>../tradecenter-parent/pom.xml</relativePath>
+	</parent>
+	<artifactId>tradecenter-export</artifactId>
+	<name>tradecenter-export</name>
+	<url>http://maven.apache.org</url>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>com.camelot.openplatform.tradecenter</groupId>
+			<artifactId>tradecenter-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.camelot.openplatform.tradecenter</groupId>
+			<artifactId>tradecenter-domain</artifactId>
+		</dependency>
+		<dependency>
+				<groupId>com.camelot.openplatform.marketcenter</groupId>
+			    <artifactId>marketcenter-export</artifactId>
+		</dependency>
+	</dependencies>
+</project>

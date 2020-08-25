@@ -1,0 +1,30 @@
+#set($layout = "common/order.vm")
+#foreach($company in $pager.records)
+<div class="mar_lr5" onclick="putCompanyValue(this)">
+    <!-- 发货商城 -->
+    <div class="hei_32 border_2">
+        <p class="fl"><span>$!company.companyName</span>
+        </p>
+
+        <p class="fr font_e5">$!company.uname</p>
+    </div>
+    <!-- 发货商城 -->
+    <!-- 发货信息 -->
+    <div class="border_2 shop_order pad_tb5">
+        <p class="wid_69 fl shop_order_p">
+            $!company.umobile
+        </p>
+
+        <p class="wid_69 fl shop_order_p">$!company.userEmail</p>
+        <input type="hidden" value="$!company.uid" name="companyId"/>
+        <input type="hidden" value="$!company.companyName" name="companyName"/>
+        <input type="hidden" value="$!company.uname" name="userName">
+        <div class="clear"></div>
+    </div>
+</div>
+#end
+
+<script>
+currentPage=$pager.page;
+totalPage=$pager.totalPage
+</script>

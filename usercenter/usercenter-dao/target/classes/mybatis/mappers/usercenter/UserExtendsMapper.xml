@@ -1,0 +1,705 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.usercenter.dao.UserExtendsMybatisDAO">
+
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="userInfoDTOMap" type="userInfoDTO">
+			<result property="extendId" column="extend_id"/>
+			<result property="userId" column="user_id"/>
+			
+			<result property="userDTO.uname" column="username"/>
+			<result property="userDTO.umobile" column="mobile"/>
+			<result property="userDTO.usertype" column="type"/>
+			<result property="userDTO.parentId" column="parent_id"/>
+			<result property="userDTO.userEmail" column="email"/>
+			<result property="userDTO.nickname" column="nickname"/>
+			<result property="userDTO.userstatus" column="status"/>
+			<result property="userDTO.shopId" column="shop_id"/>
+			<result property="userDTO.auditStatus" column="result"/>
+			<result property="userDTO.auditRemark" column="remarks"/>
+			<result property="userDTO.platformId" column="platform_id"/>
+			
+			<result property="userBusinessDTO.companyName" column="company_name"/>
+			<result property="userBusinessDTO.artificialPersonName" column="artificial_person_name"/>
+			<result property="userBusinessDTO.businessLicenceId" column="business_licence_id"/>
+			<result property="userBusinessDTO.artificialPersonPicSrc" column="artificial_person_pic_src"/>
+			<result property="userBusinessDTO.artificialPersonPicBackSrc" column="artificial_person_pic_back_src"/>
+			<result property="userBusinessDTO.registeredCapital" column="registered_capital"/>
+			<result property="userBusinessDTO.businessLicencePicSrc" column="business_licence_pic_src"/>
+			<result property="userBusinessDTO.businessScope" column="business_scope"/>
+			<result property="userBusinessDTO.businessLicenceIndate" column="business_licence_indate"/>
+			<result property="userBusinessDTO.linkman" column="linkman"/>
+			<result property="userBusinessDTO.companyAddress" column="company_address"/>
+			<result property="userBusinessDTO.companyPhone" column="company_phone"/>
+			<result property="userBusinessDTO.businessStatus" column="business_status"/>
+            <result property="userBusinessDTO.companyPeoNum" column="company_peo_num"/>
+            <result property="userBusinessDTO.companyQualt" column="company_qualt"/>
+            <result property="userBusinessDTO.businessScale" column="business_scale"/>
+            <result property="userBusinessDTO.isFinancing" column="is_financing"/>
+            <result property="userBusinessDTO.financingNum" column="financing_num"/>
+            <result property="userBusinessDTO.isSanzheng" column="is_sanzheng"/>
+            <result property="userBusinessDTO.unifiedCreditCode" column="unified_credit_code"/>
+            
+            <result property="userBusinessDTO.idCardType" column="id_card_type"/>
+            <result property="userBusinessDTO.idCardNum" column="id_card_num"/>
+            <result property="userBusinessDTO.businessLicenceAddress" column="business_licence_address"/>
+            <result property="userBusinessDTO.businessLicencAddressDetail" column="business_licenc_address_detail"/>
+            <result property="userBusinessDTO.businessLicenceDate" column="business_licence_date"/>
+            <result property="userBusinessDTO.linkmanPhone" column="linkman_phone"/>
+            <result property="userBusinessDTO.companyDeclinedAddress" column="company_declined_address"/>
+            
+            <result property="userBusinessDTO.gpProductCertification" column="gp_product_certification"/>
+            <result property="userBusinessDTO.gpPrintBusinessLicense" column="gp_print_business_license"/>
+            <result property="userBusinessDTO.gpPublicationLicense" column="gp_publication_license"/>
+            <result property="userBusinessDTO.gpCommitmentBook" column="gp_commitment_book"/>
+            <result property="userBusinessDTO.gpQualityManagementCertification" column="gp_quality_management_certification"/>
+            <result property="userBusinessDTO.gpEnvironmentalManagementCertification" column="gp_environmental_management_certification"/>
+
+
+			<result property="userOrganizationDTO.organizationId" column="organization_id"/>
+			<result property="userOrganizationDTO.organizationPicSrc" column="organization_pic_src"/>
+			<result property="userOrganizationDTO.organizationStatus" column="organization_status"/>
+            <result property="userOrganizationDTO.userfulTime" column="userful_time"/>
+
+			<result property="userTaxDTO.taxManId" column="tax_man_id"/>
+			<result property="userTaxDTO.taxpayerType" column="taxpayer_type"/>
+			<result property="userTaxDTO.taxpayerCode" column="taxpayer_code"/>
+			<result property="userTaxDTO.taxRegistrationCertificatePicSrc" column="tax_registration_certificate_pic_src"/>
+			<result property="userTaxDTO.taxpayerCertificatePicSrc" column="taxpayer_certificate_pic_src"/>
+			<result property="userTaxDTO.taxStatus" column="tax_status"/>
+            <result property="userTaxDTO.taxType" column="tax_type"/>
+
+
+			<result property="userAccountDTO.bankAccountName" column="bank_account_name"/>
+			<result property="userAccountDTO.bankAccount" column="bank_account"/>
+			<result property="userAccountDTO.bankName" column="bank_name"/>
+			<result property="userAccountDTO.bankBranchJointLine" column="bank_branch_joint_line"/>
+			<result property="userAccountDTO.bankBranchIsLocated" column="bank_branch_is_located"/>
+			<result property="userAccountDTO.bankAccountPermitsPicSrc" column="bank_account_permits_pic_src"/>
+			<result property="userAccountDTO.bankAccountStatus" column="bank_account_status"/>
+			<result property="userAccountDTO.isCiticBank" column="is_citic_bank"/>
+			
+			<result property="userCiticDTO.sellerFrozenAccount" column="seller_frozen_account"/>
+			<result property="userCiticDTO.sellerWithdrawsCashAccount" column="seller_withdraws_cash_account"/>
+			<result property="userCiticDTO.buyerPaysAccount" column="buyer_pays_account"/>
+			<result property="userCiticDTO.buyerFinancingAccount" column="buyer_financing_account"/>
+			<result property="userCiticDTO.accountState" column="account_state"/>
+
+
+
+
+            <result property="userManageDTO.dealerType" column="dealer_type"/>
+            <result property="userManageDTO.homePage" column="home_page"/>
+            <result property="userManageDTO.saleNum" column="sale_num"/>
+            <result property="userManageDTO.isHaveEbusiness" column="is_have_ebusiness"/>
+            <result property="userManageDTO.erpType" column="erp_type"/>
+            <result property="userManageDTO.webOperaPeo" column="web_opera_peo"/>
+            <result property="userManageDTO.userManageStatus" column="user_manage_status"/>
+
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                        -->
+    <!-- =========================================================== -->
+    <!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{pager.pageOffset} , #{pager.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	<sql id="selectAllColumns">
+		select
+ 			user_.username
+ 			,user_.mobile
+ 			,user_.type
+ 			,user_.parent_id
+ 			,user_.email
+ 			,user_.nickname
+ 			,user_.status
+ 			,user_.shop_id
+ 			,user_.platform_id
+ 			,audit.result 
+ 			,audit.remarks 
+ 			,user_extends_.extend_id
+ 			,user_extends_.user_id
+ 			,user_extends_.company_name
+ 			,user_extends_.artificial_person_name
+ 			,user_extends_.registered_capital
+ 			,user_extends_.business_licence_id
+ 			,user_extends_.company_address
+ 			,user_extends_.business_scope
+ 			,user_extends_.artificial_person_pic_src
+ 			,user_extends_.artificial_person_pic_back_src
+ 			,user_extends_.business_licence_pic_src
+ 			,user_extends_.company_phone
+ 			,user_extends_.business_status
+ 			,user_extends_.organization_id
+ 			,user_extends_.organization_pic_src
+ 			,user_extends_.organization_status
+ 			,user_extends_.tax_man_id
+ 			,user_extends_.taxpayer_type
+ 			,user_extends_.taxpayer_code
+ 			,user_extends_.tax_registration_certificate_pic_src
+ 			,user_extends_.taxpayer_certificate_pic_src
+ 			,user_extends_.tax_status
+ 			,user_extends_.bank_account_name
+ 			,user_extends_.bank_account
+ 			,user_extends_.bank_name
+ 			,user_extends_.bank_branch_joint_line
+ 			,user_extends_.bank_branch_is_located
+ 			,user_extends_.bank_account_permits_pic_src
+ 			,user_extends_.bank_account_status
+ 			,user_extends_.business_licence_indate
+ 			,user_extends_.seller_frozen_account
+ 			,user_extends_.seller_withdraws_cash_account
+ 			,user_extends_.buyer_pays_account
+ 			,user_extends_.buyer_financing_account
+ 			,user_extends_.account_state
+ 			,user_extends_.linkman
+ 			,user_extends_.is_citic_bank
+ 			,user_extends_.company_declined_address
+ 			,user_extends_.company_peo_num
+ 			,user_extends_.company_qualt
+ 			,user_extends_.business_scale
+ 			,user_extends_.is_financing
+ 			,user_extends_.financing_num
+            ,user_extends_.is_sanzheng
+            ,user_extends_.unified_credit_code
+ 			,user_extends_.id_card_type
+ 			,user_extends_.id_card_num
+ 			,user_extends_.business_licence_address
+ 			,user_extends_.business_licenc_address_detail
+ 			,user_extends_.business_licence_date
+ 			,user_extends_.linkman_phone
+ 			,user_extends_.userful_time
+ 			,user_extends_.tax_type
+ 			,user_extends_.dealer_type
+ 			,user_extends_.home_page
+ 			,user_extends_.sale_num
+ 			,user_extends_.is_have_ebusiness
+ 			,user_extends_.erp_type
+ 			,user_extends_.web_opera_peo
+ 			,user_extends_.user_manage_status
+ 			
+ 			,user_extends_.gp_product_certification
+ 			,user_extends_.gp_print_business_license
+ 			,user_extends_.gp_publication_license
+ 			,user_extends_.gp_commitment_book
+ 			,user_extends_.gp_quality_management_certification
+ 			,user_extends_.gp_environmental_management_certification
+
+		FROM 
+		user user_ left join  user_extends user_extends_ on  user_.id=user_extends_.user_id 
+		left join user_audit audit on user_.id=audit.context_id
+	</sql>
+	
+	<sql id="where_fragement">
+		where  1=1
+		<if test="entity!=null">
+			<if test="entity.userId != null">
+				<![CDATA[ and user_extends_.user_id LIKE CONCAT('%',#{entity.userId},'%') ]]>
+			</if>
+			<if test="entity.userType != null">
+				<![CDATA[ and user_.type = #{entity.userType.code}]]>
+			</if>	
+			<if test="entity.userDTO != null">
+				<if test="entity.userDTO.uid !=null">
+					<![CDATA[ and user_extends_.user_id LIKE CONCAT('%',#{entity.userDTO.uid},'%') ]]>
+				</if>
+				<if test="entity.userDTO.usertype !=null">
+					<![CDATA[ and user_.type = #{entity.userDTO.usertype}]]>
+				</if>
+				<if test="entity.userDTO.companyName !=null and entity.userDTO.companyName !=''">
+					<![CDATA[ and user_extends_.company_name  LIKE CONCAT('%',#{entity.userDTO.companyName},'%') ]]>
+				</if>
+				<if test="entity.userDTO.shopIds != null">
+					<![CDATA[ and user_.shop_id in]]>
+					<foreach collection="entity.userDTO.shopIds" item="item" index="index" open="(" separator="," close=")">
+			        	#{item}
+			  		</foreach>
+				</if>
+			</if>	
+			<if test="entity.userBusinessDTO != null">
+				<if test="entity.userBusinessDTO.companyName != null  and entity.userBusinessDTO.companyName !=''">
+					<![CDATA[ and user_extends_.company_name  LIKE CONCAT('%',#{entity.userBusinessDTO.companyName},'%') ]]>
+				</if>
+			</if>
+			<if test="entity.userCiticDTO != null">
+				<if test="entity.userCiticDTO.accountState != null">
+					<![CDATA[ and user_extends_.account_state  =#{entity.userCiticDTO.accountState}]]>
+				</if>
+			</if>
+			
+			<if test="entity.isHaveSellerCashAccount != null">
+				<if test="entity.isHaveSellerCashAccount == 1">
+					<![CDATA[ and user_extends_.seller_withdraws_cash_account is not null and user_extends_.seller_withdraws_cash_account !='' ]]>
+				</if>
+			</if>
+			<if test="entity.isHaveBuyerPaysAccount != null">
+				<if test="entity.isHaveBuyerPaysAccount == 1">
+					<![CDATA[ and user_extends_.buyer_pays_account is not null and  user_extends_.buyer_pays_account is not null !='' ]]>
+				</if>
+			</if>
+			<if test="entity.userDTO.platformId!=null">
+		      <if test="entity.userDTO.platformId==''">
+		      and user_.platform_id is null
+		      </if>
+		      <if test="entity.userDTO.platformId !=''">
+		      and user_.platform_id =#{entity.userDTO.platformId}
+		      </if>
+		    </if>
+		</if>
+		order by user_.updated_time desc
+	</sql>
+	<!-- =========================================================== -->
+    <!-- Dao方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+	
+	<select id="selectById" resultMap="userInfoDTOMap"  parameterType="long">
+		<include refid="selectAllColumns" />
+		where user_extends_.user_id=#{id}
+	</select>
+	
+	<select id="queryUserExtendsByname" resultMap="userInfoDTOMap"  parameterType="String">
+	     <include refid="selectAllColumns" />
+		where user_extends_.company_name=#{companyName}
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="selectList" resultMap="userInfoDTOMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="pager!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectCount" resultType="long">
+		<include refid="count_Tail" />
+		user user_ left join  user_extends user_extends_ on  user_.id=user_extends_.user_id 
+		left join user_audit audit on user_.id=audit.context_id
+		<include refid="where_fragement" />
+	</select>
+	
+    <insert id="insert"  parameterType="userInfoDTO" useGeneratedKeys="true" keyProperty="extendId">
+		<![CDATA[
+		insert into user_extends (
+		    	 user_id
+		    	 ,company_name
+		    	 ,artificial_person_name
+		    	 ,business_licence_id
+		    	 ,artificial_person_pic_src
+		    	 ,artificial_person_pic_back_src
+		    	 ,registered_capital
+		    	 ,business_licence_pic_src
+		    	 ,business_scope
+		    	 ,business_licence_indate
+		    	 ,linkman
+		    	 ,company_address
+		    	 ,company_phone
+		    	 ,business_status
+		    	 ,organization_id
+		    	 ,organization_pic_src
+		    	 ,organization_status
+		    	 ,tax_man_id
+		    	 ,taxpayer_type
+		    	 ,taxpayer_code
+		    	 ,tax_registration_certificate_pic_src
+		    	 ,taxpayer_certificate_pic_src
+		    	 ,tax_status
+		    	 ,bank_account_name
+		    	 ,bank_account
+		    	 ,bank_name
+		    	 ,bank_branch_joint_line
+		    	 ,bank_branch_is_located
+		    	 ,bank_account_permits_pic_src
+		    	 ,bank_account_status
+		    	 ,seller_frozen_account
+		    	 ,seller_withdraws_cash_account
+		    	 ,buyer_pays_account
+		    	 ,buyer_financing_account
+		    	 ,account_state
+		    	 ,is_citic_bank
+		    	 ,company_declined_address
+				,company_peo_num
+				,company_qualt
+				,business_scale
+				,is_financing
+				,financing_num
+				,is_sanzheng
+                ,unified_credit_code
+				,id_card_type
+				,id_card_num
+				,business_licence_address
+				,business_licenc_address_detail
+				,business_licence_date
+				,linkman_phone
+				,userful_time
+				,tax_type
+				,dealer_type
+				,home_page
+				,sale_num
+				,is_have_ebusiness
+				,erp_type
+				,web_opera_peo
+                ,user_manage_status
+                ,gp_product_certification
+                ,gp_print_business_license
+                ,gp_publication_license
+                ,gp_commitment_book
+                ,gp_quality_management_certification
+                ,gp_environmental_management_certification
+            
+		   )values(
+		    	#{userId}
+		    	,#{userBusinessDTO.companyName}
+		    	,#{userBusinessDTO.artificialPersonName}
+		    	,#{userBusinessDTO.businessLicenceId}
+		    	,#{userBusinessDTO.artificialPersonPicSrc}
+		    	,#{userBusinessDTO.artificialPersonPicBackSrc}
+		    	,#{userBusinessDTO.registeredCapital}
+	    		,#{userBusinessDTO.businessLicencePicSrc}
+		    	,#{userBusinessDTO.businessScope}
+		    	,#{userBusinessDTO.businessLicenceIndate}
+		    	,#{userBusinessDTO.linkman}
+		    	,#{userBusinessDTO.companyAddress}
+		    	,#{userBusinessDTO.companyPhone}
+		    	,#{userBusinessDTO.businessStatus}
+		    	,#{userOrganizationDTO.organizationId}
+		    	,#{userOrganizationDTO.organizationPicSrc}
+		    	,#{userOrganizationDTO.organizationStatus}
+		    	,#{userTaxDTO.taxManId}
+		    	,#{userTaxDTO.taxpayerType}
+		    	,#{userTaxDTO.taxpayerCode}
+		    	,#{userTaxDTO.taxRegistrationCertificatePicSrc}
+		    	,#{userTaxDTO.taxpayerCertificatePicSrc}
+	    		,#{userTaxDTO.taxStatus}
+		    	,#{userAccountDTO.bankAccountName}
+		    	,#{userAccountDTO.bankAccount}
+		    	,#{userAccountDTO.bankName}
+		    	,#{userAccountDTO.bankBranchJointLine}
+		    	,#{userAccountDTO.bankBranchIsLocated}
+		    	,#{userAccountDTO.bankAccountPermitsPicSrc}
+		    	,#{userAccountDTO.bankAccountStatus}
+		    	,#{userCiticDTO.sellerFrozenAccount}
+		    	,#{userCiticDTO.sellerWithdrawsCashAccount}
+		    	,#{userCiticDTO.buyerPaysAccount}
+		    	,#{userCiticDTO.buyerFinancingAccount}
+		    	,#{userCiticDTO.accountState}
+		    	,#{userAccountDTO.isCiticBank}
+
+		    	,#{userBusinessDTO.companyDeclinedAddress}
+				,#{userBusinessDTO.companyPeoNum}
+				,#{userBusinessDTO.companyQualt}
+				,#{userBusinessDTO.businessScale}
+				,#{userBusinessDTO.isFinancing}
+				,#{userBusinessDTO.financingNum}
+				,#{userBusinessDTO.isSanzheng}
+				,#{userBusinessDTO.unifiedCreditCode}
+				,#{userBusinessDTO.idCardType}
+				,#{userBusinessDTO.idCardNum}
+				,#{userBusinessDTO.businessLicenceAddress}
+				,#{userBusinessDTO.businessLicencAddressDetail}
+				,#{userBusinessDTO.businessLicenceDate}
+				,#{userBusinessDTO.linkmanPhone}
+				,#{userOrganizationDTO.userfulTime}
+				,#{userTaxDTO.taxType}
+				,#{userManageDTO.dealerType}
+				,#{userManageDTO.homePage}
+				,#{userManageDTO.saleNum}
+				,#{userManageDTO.isHaveEbusiness}
+				,#{userManageDTO.erpType}
+				,#{userManageDTO.webOperaPeo}
+				,#{userManageDTO.userManageStatus}
+				
+				,#{userBusinessDTO.gpProductCertification}
+				,#{userBusinessDTO.gpPrintBusinessLicense}
+				,#{userBusinessDTO.gpPublicationLicense}
+				,#{userBusinessDTO.gpCommitmentBook}
+				,#{userBusinessDTO.gpQualityManagementCertification}
+				,#{userBusinessDTO.gpEnvironmentalManagementCertification}
+				
+				
+		   )
+	    ]]>	
+	</insert>
+	
+	<update id="updateBySelect" parameterType="userInfoDTO">
+		<if test="userInfoDTO!= null">
+			update user_extends set
+			extend_id = #{userInfoDTO.extendId}
+	   		<if test="(userExtendsType == -1  or userExtendsType ==0) and userInfoDTO.userBusinessDTO != null">
+		   		<if test="userInfoDTO.userBusinessDTO.companyName != null and userInfoDTO.userBusinessDTO.companyName !=''">
+		   			,company_name = #{userInfoDTO.userBusinessDTO.companyName}
+		   		</if>
+		   		<if test="userInfoDTO.userBusinessDTO.artificialPersonName != null and userInfoDTO.userBusinessDTO.artificialPersonName !=''">
+		   			,artificial_person_name = #{userInfoDTO.userBusinessDTO.artificialPersonName}
+		   		</if>
+		   		<if test="userInfoDTO.userBusinessDTO.businessLicenceId != null and userInfoDTO.userBusinessDTO.businessLicenceId !=''">
+		   			,business_licence_id = #{userInfoDTO.userBusinessDTO.businessLicenceId}
+		   		</if>
+		   		<if test="userInfoDTO.userBusinessDTO.artificialPersonPicSrc != null and userInfoDTO.userBusinessDTO.artificialPersonPicSrc !=''">
+		   			,artificial_person_pic_src = #{userInfoDTO.userBusinessDTO.artificialPersonPicSrc}
+		   		</if>
+		   		<if test="userInfoDTO.userBusinessDTO.artificialPersonPicBackSrc != null and userInfoDTO.userBusinessDTO.artificialPersonPicBackSrc !=''">
+		   			,artificial_person_pic_back_src = #{userInfoDTO.userBusinessDTO.artificialPersonPicBackSrc}
+		   		</if>
+		   		<if test="userInfoDTO.userBusinessDTO.registeredCapital != null and userInfoDTO.userBusinessDTO.registeredCapital !=''">
+		   			,registered_capital = #{userInfoDTO.userBusinessDTO.registeredCapital}
+		   		</if>
+		   		<if test="userInfoDTO.userBusinessDTO.businessLicencePicSrc != null and userInfoDTO.userBusinessDTO.businessLicencePicSrc !=''">
+		   			,business_licence_pic_src = #{userInfoDTO.userBusinessDTO.businessLicencePicSrc}
+		   		</if>
+		   		<if test="userInfoDTO.userBusinessDTO.businessScope != null and userInfoDTO.userBusinessDTO.businessScope !=''">
+		   			,business_scope = #{userInfoDTO.userBusinessDTO.businessScope}
+		   		</if>
+   				<if test=" userInfoDTO.userBusinessDTO.neverExpires ==2">
+   					,business_licence_indate = null
+   				</if>
+   				<if test="userInfoDTO.userBusinessDTO.neverExpires ==1">
+   					,business_licence_indate = #{userInfoDTO.userBusinessDTO.businessLicenceIndate}
+   				</if>
+		   		<if test="userInfoDTO.userBusinessDTO.linkman != null and userInfoDTO.userBusinessDTO.linkman !=''">
+		   			,linkman = #{userInfoDTO.userBusinessDTO.linkman}
+		   		</if>
+		   		<if test="userInfoDTO.userBusinessDTO.companyAddress != null and userInfoDTO.userBusinessDTO.companyAddress !=''">
+		   			,company_address = #{userInfoDTO.userBusinessDTO.companyAddress}
+		   		</if>
+		   		<if test="userInfoDTO.userBusinessDTO.companyPhone != null and userInfoDTO.userBusinessDTO.companyPhone !=''">
+		   			,company_phone = #{userInfoDTO.userBusinessDTO.companyPhone}
+		   		</if>
+		   		<if test="userInfoDTO.userBusinessDTO.businessStatus != null">
+		   			,business_status = #{userInfoDTO.userBusinessDTO.businessStatus}
+		   		</if>
+
+                <if test="userInfoDTO.userBusinessDTO.companyDeclinedAddress!= null">
+                   , company_declined_address = #{userInfoDTO.userBusinessDTO.companyDeclinedAddress}
+                </if>
+                <if test="userInfoDTO.userBusinessDTO.companyPeoNum!= null">
+                   , company_peo_num = #{userInfoDTO.userBusinessDTO.companyPeoNum}
+                </if>
+                <if test="userInfoDTO.userBusinessDTO.companyQualt!= null">
+                    ,company_qualt = #{userInfoDTO.userBusinessDTO.companyQualt}
+                </if>
+                <if test="userInfoDTO.userBusinessDTO.businessScale!= null">
+                   , business_scale = #{userInfoDTO.userBusinessDTO.businessScale}
+                </if>
+                <if test="userInfoDTO.userBusinessDTO.isFinancing!= null">
+                  ,  is_financing = #{userInfoDTO.userBusinessDTO.isFinancing}
+                </if>
+                <if test="userInfoDTO.userBusinessDTO.financingNum!= null">
+                   , financing_num = #{userInfoDTO.userBusinessDTO.financingNum}
+                </if>
+                <if test="userInfoDTO.userBusinessDTO.isSanzheng!= null">
+                  ,  is_sanzheng = #{userInfoDTO.userBusinessDTO.isSanzheng}
+                </if>
+                <if test="userInfoDTO.userBusinessDTO.unifiedCreditCode!= null">
+                   , unified_credit_code = #{userInfoDTO.userBusinessDTO.unifiedCreditCode}
+                </if>
+                
+                <if test="userInfoDTO.userBusinessDTO.idCardType!= null">
+                    ,id_card_type = #{userInfoDTO.userBusinessDTO.idCardType}
+                </if>
+                <if test="userInfoDTO.userBusinessDTO.idCardNum!= null">
+                    ,id_card_num = #{userInfoDTO.userBusinessDTO.idCardNum}
+                </if>
+                <if test="userInfoDTO.userBusinessDTO.businessLicenceAddress!= null">
+                   , business_licence_address = #{userInfoDTO.userBusinessDTO.businessLicenceAddress}
+                </if>
+                <if test="userInfoDTO.userBusinessDTO.businessLicencAddressDetail!= null">
+                   , business_licenc_address_detail = #{userInfoDTO.userBusinessDTO.businessLicencAddressDetail}
+                </if>
+                <if test="userInfoDTO.userBusinessDTO.businessLicenceDate!= null">
+                  ,  business_licence_date = #{userInfoDTO.userBusinessDTO.businessLicenceDate}
+                </if>
+                <if test="userInfoDTO.userBusinessDTO.linkmanPhone!= null">
+                   , linkman_phone = #{userInfoDTO.userBusinessDTO.linkmanPhone}
+                </if>
+
+            </if>
+			<if test="(userExtendsType == -1  or userExtendsType ==1) and userInfoDTO.userOrganizationDTO != null">
+				<if test="userInfoDTO.userOrganizationDTO.organizationId != null and userInfoDTO.userOrganizationDTO.organizationId !=''">
+	   				,organization_id = #{userInfoDTO.userOrganizationDTO.organizationId}
+	   			</if>
+	   			<if test="userInfoDTO.userOrganizationDTO.organizationPicSrc != null and userInfoDTO.userOrganizationDTO.organizationPicSrc !=''">
+	   				,organization_pic_src = #{userInfoDTO.userOrganizationDTO.organizationPicSrc}
+	   			</if>
+	   			<if test="userInfoDTO.userOrganizationDTO.organizationStatus != null">
+		   			,organization_status = #{userInfoDTO.userOrganizationDTO.organizationStatus}
+		   		</if>
+                <if test="userInfoDTO.userOrganizationDTO.userfulTime!= null">
+                   , userful_time = #{userInfoDTO.userOrganizationDTO.userfulTime}
+                </if>
+            </if>
+			<if test="(userExtendsType == -1  or userExtendsType ==2) and userInfoDTO.userTaxDTO != null">
+		   		<if test="userInfoDTO.userTaxDTO.taxManId != null and userInfoDTO.userTaxDTO.taxManId !=''">
+		   			,tax_man_id = #{userInfoDTO.userTaxDTO.taxManId}
+	   			</if>
+		   		<if test="userInfoDTO.userTaxDTO.taxpayerType != null and userInfoDTO.userTaxDTO.taxpayerType !=''">
+		   			,taxpayer_type = #{userInfoDTO.userTaxDTO.taxpayerType}
+	   			</if>
+		   		<if test="userInfoDTO.userTaxDTO.taxpayerCode != null and userInfoDTO.userTaxDTO.taxpayerCode !=''">
+		   			,taxpayer_code = #{userInfoDTO.userTaxDTO.taxpayerCode}
+	   			</if>
+		   		<if test="userInfoDTO.userTaxDTO.taxRegistrationCertificatePicSrc != null and userInfoDTO.userTaxDTO.taxRegistrationCertificatePicSrc !=''">
+		   			,tax_registration_certificate_pic_src = #{userInfoDTO.userTaxDTO.taxRegistrationCertificatePicSrc}
+	   			</if>
+		   		<if test="userInfoDTO.userTaxDTO.taxpayerCertificatePicSrc != null and userInfoDTO.userTaxDTO.taxpayerCertificatePicSrc !=''">
+		   			,taxpayer_certificate_pic_src = #{userInfoDTO.userTaxDTO.taxpayerCertificatePicSrc}
+		   		</if>	
+		   		<if test="userInfoDTO.userTaxDTO.taxStatus != null">
+		   			,tax_status = #{userInfoDTO.userTaxDTO.taxStatus}
+		   		</if>
+                <if test="userInfoDTO.userTaxDTO.taxType!= null">
+                    tax_type = #{userInfoDTO.userTaxDTO.taxType},
+                </if>
+            </if>
+			<if test="(userExtendsType == -1  or userExtendsType ==3) and userInfoDTO.userAccountDTO != null">
+		   		<if test="userInfoDTO.userAccountDTO.bankAccountName != null and userInfoDTO.userAccountDTO.bankAccountName !=''">
+		   			,bank_account_name = #{userInfoDTO.userAccountDTO.bankAccountName}
+	   			</if>
+		   		<if test="userInfoDTO.userAccountDTO.bankAccount != null and userInfoDTO.userAccountDTO.bankAccount !=''">
+		   			,bank_account = #{userInfoDTO.userAccountDTO.bankAccount}
+	   			</if>
+		   		<if test="userInfoDTO.userAccountDTO.bankName != null and userInfoDTO.userAccountDTO.bankName !=''">
+		   			,bank_name = #{userInfoDTO.userAccountDTO.bankName}
+	   			</if>
+		   		<if test="userInfoDTO.userAccountDTO.bankBranchJointLine != null and userInfoDTO.userAccountDTO.bankBranchJointLine !=''">
+		   			,bank_branch_joint_line = #{userInfoDTO.userAccountDTO.bankBranchJointLine}
+	   			</if>
+		   		<if test="userInfoDTO.userAccountDTO.bankBranchIsLocated != null and userInfoDTO.userAccountDTO.bankBranchIsLocated !=''">
+		   			,bank_branch_is_located = #{userInfoDTO.userAccountDTO.bankBranchIsLocated}
+	   			</if>
+		   		<if test="userInfoDTO.userAccountDTO.bankAccountPermitsPicSrc != null and userInfoDTO.userAccountDTO.bankAccountPermitsPicSrc !=''">
+		   			,bank_account_permits_pic_src = #{userInfoDTO.userAccountDTO.bankAccountPermitsPicSrc}
+	   			</if>
+	   			<if test="userInfoDTO.userAccountDTO.bankAccountStatus != null">
+		   			,bank_account_status = #{userInfoDTO.userAccountDTO.bankAccountStatus}
+	   			</if>
+	   			<if test="userInfoDTO.userAccountDTO.isCiticBank != null">
+		   			,is_citic_bank = #{userInfoDTO.userAccountDTO.isCiticBank}
+	   			</if>
+		   	</if>
+			<if test="(userExtendsType == -1  or userExtendsType ==4) and userInfoDTO.userCiticDTO != null">
+		   		<if test="userInfoDTO.userCiticDTO.sellerFrozenAccount != null and userInfoDTO.userCiticDTO.sellerFrozenAccount !=''">
+		   			,seller_frozen_account = #{userInfoDTO.userCiticDTO.sellerFrozenAccount}
+		   		</if>
+		   		<if test="userInfoDTO.userCiticDTO.sellerWithdrawsCashAccount != null and userInfoDTO.userCiticDTO.sellerWithdrawsCashAccount !=''">
+		   			,seller_withdraws_cash_account = #{userInfoDTO.userCiticDTO.sellerWithdrawsCashAccount}
+		   		</if>
+		   		<if test="userInfoDTO.userCiticDTO.buyerPaysAccount != null and userInfoDTO.userCiticDTO.buyerPaysAccount !=''">
+		   			,buyer_pays_account = #{userInfoDTO.userCiticDTO.buyerPaysAccount}
+		   		</if>
+		   		<if test="userInfoDTO.userCiticDTO.buyerFinancingAccount != null and userInfoDTO.userCiticDTO.buyerFinancingAccount !=''">
+		   			,buyer_financing_account = #{userInfoDTO.userCiticDTO.buyerFinancingAccount}
+		   		</if>
+		   		<if test="userInfoDTO.userCiticDTO.accountState != null and userInfoDTO.userCiticDTO.accountState != ''">
+		   			,account_state = #{userInfoDTO.userCiticDTO.accountState}
+	   			</if>
+		   	</if>
+
+            <if test="userInfoDTO.userManageDTO != null">
+                <if test="userInfoDTO.userManageDTO.dealerType!= null">
+                    ,dealer_type = #{userInfoDTO.userManageDTO.dealerType}
+                </if>
+                <if test="userInfoDTO.userManageDTO.homePage!= null">
+                    ,home_page = #{userInfoDTO.userManageDTO.homePage}
+                </if>
+                <if test="userInfoDTO.userManageDTO.saleNum!= null">
+                    ,sale_num = #{userInfoDTO.userManageDTO.saleNum}
+                </if>
+                <if test="userInfoDTO.userManageDTO.isHaveEbusiness!= null">
+                   , is_have_ebusiness = #{userInfoDTO.userManageDTO.isHaveEbusiness}
+                </if>
+                <if test="userInfoDTO.userManageDTO.erpType!= null">
+                   , erp_type = #{userInfoDTO.userManageDTO.erpType}
+                </if>
+                <if test="userInfoDTO.userManageDTO.webOperaPeo!= null">
+                   , web_opera_peo = #{userInfoDTO.userManageDTO.webOperaPeo}
+                </if>
+            </if>
+			 where extend_id = #{userInfoDTO.extendId}
+		</if>
+	</update>
+	<update id="updateStatusByType" >
+			update user_extends set extend_id = #{extendId}
+			<if test="userExtendsType == -1  or userExtendsType ==0">
+					,business_status =  #{status}
+			</if>
+			<if test="userExtendsType == -1  or userExtendsType ==1">
+				,organization_status = #{status}
+		   	</if>
+			<if test="userExtendsType == -1  or userExtendsType ==2">
+				,tax_status = #{status}
+	   		</if>
+			<if test="userExtendsType == -1  or userExtendsType ==3">
+				,bank_account_status = #{status}
+	  		</if>
+	  		<if test="userExtendsType == -1 or userExtendsType ==4">
+				,account_state = #{status}
+	  		</if>
+            <if test="userExtendsType == -1 or userExtendsType ==5">
+                ,user_manage_status = #{status}
+            </if>
+	  	 where extend_id = #{extendId}
+	</update>
+	
+	
+	<update id="updateSelective" parameterType="userInfoDTO">
+		<if test="userInfoDTO!= null">
+			update user_extends set user_id = #{userInfoDTO.userId}
+			
+	   		
+		   		<if test="userInfoDTO.userBusinessDTO!=null and userInfoDTO.userBusinessDTO.businessStatus != null and userInfoDTO.userBusinessDTO.businessStatus !=''">
+		   			,business_status = #{userInfoDTO.userBusinessDTO.businessStatus}
+		   		</if>
+		   		
+				<if test="userInfoDTO.userOrganizationDTO!=null and userInfoDTO.userOrganizationDTO.organizationStatus != null and userInfoDTO.userOrganizationDTO.organizationStatus!=''">
+	   				,organization_status = #{userInfoDTO.userOrganizationDTO.organizationStatus}
+	   			</if>
+	   			
+		   		<if test="userInfoDTO.userTaxDTO!=null and userInfoDTO.userTaxDTO.taxStatus != null and userInfoDTO.userTaxDTO.taxStatus !=''">
+		   			,tax_status = #{userInfoDTO.userTaxDTO.taxStatus}
+	   			</if>
+		   		
+		   		<if test="userInfoDTO.userAccountDTO!=null and userInfoDTO.userAccountDTO.bankAccountStatus != null and userInfoDTO.userAccountDTO.bankAccountStatus !=''">
+		   			,bank_account_status = #{userInfoDTO.userAccountDTO.bankAccountStatus}
+	   			</if>
+		   		
+		   		<if test="userInfoDTO.userCiticDTO!=null and userInfoDTO.userCiticDTO.accountState != null and userInfoDTO.userCiticDTO.accountState !=''">
+		   			,account_state = #{userInfoDTO.userCiticDTO.accountState}
+		   		</if>
+                <if test="userInfoDTO.userManageDTO!=null and userInfoDTO.userManageDTO.userManageStatus != null and userInfoDTO.userManageDTO.userManageStatus !=''">
+                    ,user_manage_status = #{userInfoDTO.userManageDTO.userManageStatus}
+                </if>
+			 where user_id = #{userInfoDTO.userId}
+		</if>
+	</update>
+	
+	
+	<update id="updateAllStatusByUserExtendId" >
+		
+			update user_extends  set extend_id = #{extendId},
+			business_status=#{status},
+			organization_status = #{status}, 
+			tax_status = #{status},
+			bank_account_status=#{status},
+			user_manage_status=#{status}
+			where extend_id = #{extendId}
+			
+		
+	</update>
+	
+	<delete id="deleteUserExtendByUserId" parameterType="long">
+		<![CDATA[
+		delete from user_extends where user_id = #{userId}
+		]]>
+	</delete>
+</mapper>

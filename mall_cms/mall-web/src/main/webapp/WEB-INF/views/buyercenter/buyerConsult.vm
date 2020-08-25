@@ -1,0 +1,148 @@
+
+#set($layout = "/buyer_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<link href="$staticPath/css/manage_style.css" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript">
+	$("document").ready(function(){
+		$("#leftBuyer").load("$request.contextPath/leftBuyer");
+	});
+	//到指定的分页页面
+	function topage(page){
+		var form = document.getElementById("consultForm");
+		form.page.value=page;
+		form.submit();
+	}
+	//查看商品详细属性
+	function viewDetail(itemId){
+		window.location.href="$request.contextPath/productController/details?id="+itemId;
+	}
+</script>
+
+
+<div id="main">
+	<div id="leftBuyer" style="width: 198px; float: left;" class="border-4">&nbsp;</div>
+	
+	<form id="consultForm">
+		<input type="hidden" name="page">
+	</form>
+	<div id="right">
+<!--     	<div id="right_top" class="right_top border-4 bg_06"> -->
+<!-- 			<div class="right_top_l"> -->
+<!-- 				<ul class="list"> -->
+<!-- 					<li class="wid_220"> -->
+<!-- 						<span class="font_wid">商品名称：</span> -->
+<!-- 						<input class="input_Style2 wid_120 hei_30" type="text" /> -->
+<!-- 					</li> -->
+<!-- 					<li class="wid_220"> -->
+<!-- 						<span class="font_wid">商品编码：</span> -->
+<!-- 						<input type="text" class="input_Style2 wid_120 hei_30"/> -->
+<!-- 					</li> -->
+<!-- 					<li> -->
+<!-- 						<span class="font_wid">店铺分类：</span> -->
+<!-- 						<select class="input_Style2 wid_90 mar_r10 hei_35"> -->
+<!-- 							<option>一级分类</option> -->
+<!-- 						</select> -->
+<!-- 						<select class="input_Style2 wid_90 mar_r10 hei_35"> -->
+<!-- 							<option>二级分类</option> -->
+<!-- 						</select> -->
+<!-- 						<select class="input_Style2 wid_90 mar_r10 hei_35"> -->
+<!-- 							<option>三级分类</option> -->
+<!-- 						</select>				 -->
+<!-- 					</li> -->
+<!-- 					<li class="wid_220"> -->
+<!-- 						<span class="font_wid">SKU编码：</span> -->
+<!-- 						<input class="input_Style2 wid_120 hei_30" type="text" /> -->
+<!-- 					</li> -->
+<!-- 					<li class="wid_220"> -->
+<!-- 						<span class="font_wid">商品货号：</span> -->
+<!-- 						<input type="text" class="input_Style2 wid_120 hei_30"/> -->
+<!-- 					</li> -->
+<!-- 					<li> -->
+<!-- 						<span class="font_wid">库存区间：</span> -->
+<!-- 						<input class="input_Style2 wid_120 hei_30" type="text" /> -->
+<!-- 						<i class="demo-icons">-</i> -->
+<!-- 						<input class="input_Style2 wid_120 hei_30" type="text" />				 -->
+<!-- 					</li> -->
+<!-- 					<li> -->
+<!-- 						<span class="font_wid">售价区间：</span> -->
+<!-- 						<input class="input_Style2 wid_120 hei_30" type="text" /> -->
+<!-- 						<i class="demo-icons">-</i> -->
+<!-- 						<input class="input_Style2 wid_120 hei_30" type="text" />				 -->
+<!-- 					</li> -->
+<!-- 					<li> -->
+<!-- 						<span class="font_wid mar_l">商品状态：</span> -->
+<!-- 						<select class="input_Style2 wid_90 mar_r10 hei_35 "> -->
+<!-- 							<option ></option><option>未发布</option> -->
+<!-- 							<option >待审核</option> -->
+<!-- 							<option >审核驳回</option> -->
+<!-- 							<option >待上架</option> -->
+<!-- 							<option>在售</option> -->
+<!-- 							<option>已下架</option> -->
+<!-- 							<option>锁定</option> -->
+<!-- 							<option>申请解锁</option> -->
+<!-- 						</select> -->
+<!-- 					</li>		 -->
+				</ul>
+<!-- 			</div> -->
+		
+<!-- 			<div class="right_top_r "> -->
+<!-- 				<button type="button" class="button_4 but_cx1" style="margin:0px; width: 80px;">查 询</button> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
+		<!-- right结束 -->
+
+		<div id="right_bot" class="right_bot border-4 mar_t10 bg_06">
+    		<!-- 商品列表开头 -->
+			<div class="right_xinxi mar_l14">
+				<ul class="list_top bg_08 font_14b mar_b10">
+					<li class="wid_200 font_cen hei_35">咨询商品</li>
+					<li class="wid_200 font_cen hei_35">商品名称</li>
+					<li class="wid_540 font_cen hei_35">咨询回复</li>
+				</ul>
+				#foreach($consult in $pager.records)
+		      		<!-- 商品信息 -->
+		      		<table class="information" id="information">
+		        		<tr>
+		          			<td class="wid_200 border-1 font_cen">
+		          				<img src="$!imageServerAddr$!consult.picUrl" name="" width="150" height="80"
+		          				 	style="cursor: pointer;" onclick="viewDetail($!consult.itemId);"/>
+		          			</td>
+		          			<td class="wid_200 border-1 ">
+		          				<a style="cursor: pointer;" onclick="viewDetail($!consult.itemId);">$!consult.itemName</a>
+		          				<!-- <p class="mar_l10 mar_r10">$!consult.itemName</p> -->
+		          			</td>
+		          			<td class="wid_540 border-1 hei_24">
+		            			<p class="mar_l10" style="word-break:break-all;word-wrap:break-word;">
+		            				<i class="font_fe">我的咨询</i>：$!consult.consulting
+		            				<span class="fr mar_r10 font_c7">$!date.format('yyyy-MM-dd HH:mm:ss ',$!consult.created)</span>
+		            			</p>
+		            			<div class="clear"></div>
+		            			<p class="mar_l10" style="word-break:break-all;word-wrap:break-word;">
+		            				<i class="font_fe">店家回复</i>：$!consult.reply
+		            				<span class="fr mar_r10 font_c7">$!date.format('yyyy-MM-dd HH:mm:ss ',$!consult.modified)</span>
+		            			</p>
+		          			</td>
+		       	 		</tr>
+		      		</table>
+				#end
+	  		</div>
+		</div>
+	  	
+      		
+		#pageVelocity($pager)
+	</div>
+</div>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</div>

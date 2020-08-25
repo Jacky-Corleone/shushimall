@@ -1,0 +1,41 @@
+#set($ctxPath="$request.contextPath")
+#set($layout = "common/blanklayout.vm")
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <base href="${request.getContextPath()}/"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>个人中心 - 微信帐号绑定</title>
+<link href="assets/css/detail.css" rel="stylesheet" type="text/css"/>
+<style >
+.content{
+	position : static;
+}
+</style>
+<script type="text/javascript" src="assets/js/style.js"></script>
+<script type="text/javascript" src="assets/js/iscroll.js"></script>
+<script type="text/javascript" src="assets/js/zepto.js"></script>
+</head>
+<body class="bg_02">
+<div id="main" class="po_re">
+
+    <!-- 中间内容 -->
+    <div class="content" id="wrapper">
+        <div class="hei_100 font_cen wid_100">
+            <img src="assets/images/logo-ke.png"  style="max-width: 100%;max-height: 100%"/>
+        </div>
+        <div class="hei_50 font_cen font_1_5">解绑账户</div>
+        <div class="news bg_01">
+            <p class="hei_100 font_cen font_1_5 pad_t50">微信帐号解绑成功!</p>
+            <div class="font_cen pad_tb50">
+                <a href="./">印刷家主页</a>
+            </div>
+            
+        </div>
+         
+    </div><!-- 中间内容 end-->
+</div>
+</body>
+</html>

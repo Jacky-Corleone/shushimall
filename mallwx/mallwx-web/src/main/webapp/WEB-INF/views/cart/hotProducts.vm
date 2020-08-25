@@ -1,0 +1,34 @@
+#set($layout = "common/blanklayout.vm")
+#*#if($hotProducts != $null && $hotProducts.size()!= $0)
+	<p class="hei_34 font_1_0">可能您还想要</p>
+    <div class="sale_shop" >
+		#foreach($hotProduct in ${hotProducts})
+			<ul freshUrl="$hotProduct.adURL" onclick="toProductDetail(this);return false;">
+                <dl>
+                    <dt class=""><img src="$imgUrlPre/$hotProduct.adSrc" width="90%" height="90%"></dt>
+                    <dd>
+            			<p class="two">$hotProduct.title</p>
+            			##<p class="font_e5">￥$hotProduct.guidePrice</p>
+            		</dd>
+                </dl>
+        	</ul>
+		#end
+    </div>
+#end*#
+
+#if($hotProducts != $null && $hotProducts.size()!= $0)
+
+<div class="sale_shop" >
+    <p class="hei_34 font_1_2">可能您还想要</p>
+	#foreach($hotProduct in ${hotProducts})
+        <dl freshUrl="$hotProduct.adURL" style="" onclick="toProductDetail(this);return false;">
+            <dt><img src="$imgUrlPre/$hotProduct.adSrc"></dt>
+            <dd>
+                <p class="two">$hotProduct.title</p>
+                ##<strong class="font_e5">￥$hotProduct.guidePrice</strong>
+                <strong></strong>
+            </dd>
+        </dl>
+	#end
+</div>
+#end

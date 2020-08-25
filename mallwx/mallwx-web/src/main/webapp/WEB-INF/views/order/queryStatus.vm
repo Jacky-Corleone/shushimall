@@ -1,0 +1,61 @@
+#set($layout = "common/order.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+#parse("common/scriptAndCss.vm")
+<title>印刷家</title>
+<script type="text/javascript">
+
+	$(document).ready(function(){
+		//pageSize,url,totalItem, appendId,selectElement,data, ,callback
+		var Num = 0;
+// 		var url = "$request.contextPath/orderWx/toOrderSubmit?orderSource=$!{orderSource}&orderStatus="+Num;
+		var url = "$request.contextPath/orderWx/toOrderSubmit?orderSource=$!{orderSource}&fuckStatus='$!{fuckStatus}'";
+		var totalItem = '$!{totalItem}';
+		$.dropDownFresh('3',url, totalItem , "wrapper","wrapper");
+	});
+	$(document).ready(function(){
+		if("buyers"=='$!{orderSource}'){
+			changeIconToRed(2);
+		}else{
+			changeIconToRed(3);
+		}
+	});
+
+	function refundAgreement(orderId){
+		window.location.href="$request.getContextPath()/orderWx/refundAgreement?orderId="+orderId;
+	}
+	
+	//查看退换货进度
+	function refundSubmitSucc(orderId,refundId){
+		window.location.href="$request.getContextPath()/orderWx/refundSubmitSucc?returnId="+refundId;
+	}
+	//查看详情
+	function refundSubmitSuccDetail(orderId,refundId){
+		if("buyers"=='$!{orderSource}'){
+			window.location.href="$request.getContextPath()/orderWx/refundInfoBuyer?returnGoodId="+refundId;
+		}else{
+			window.location.href="$request.getContextPath()/orderWx/refundInfoSeller?returnGoodId="+refundId;
+		}
+	}
+	
+	//订单详情
+	function orderDetail(orderId){
+		window.location.href="$request.getContextPath()/orderWx/queryOrderInfoBuyer?orderId="+orderId;
+	}
+</script>
+<script type="text/javascript" src="$request.contextPath/assets/js/dropDownFresh/dropDownFresh.js"></script>
+</head>
+<body>
+<div id="main" class="bg_02 po_re">
+	<div class="content" id="wrapper" style="overflow-x:hidden;">
+		#parse("order/queryStatusDetail.vm")
+	</div>
+
+</div>
+	#parse("common/footer.vm")
+</body>
+</html>

@@ -1,0 +1,355 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript">
+	$(function(){
+		//加载左侧菜单
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+		if("$!read" == 1){
+			$("#read_id").attr("checked", "checked");
+		}
+	});
+function hideDiv(id){
+	   var date = $("#messageTime").val();
+	    var wmRead = '';
+		if($("#read_id")[0].checked){
+			wmRead=1;
+		}
+		var Id=$("#Id").val();
+      if(wmRead==''||wmRead==null||wmRead==undefined){
+    		$("#"+id).hide();
+    }else{
+		if(messageType == 1 ){
+    			$("#form_read_id").attr('action',"$request.getContextPath()/buyer/setread?type=1&newsType=$!newsType&ids="+Id+"&messageDate="+date+"&wmRead="+wmRead);
+    		}else{
+    			$("#form_read_id").attr('action',"$request.getContextPath()/buyer/setread?newsType=$!newsType&ids="+Id+"&messageDate="+date+"&wmRead="+wmRead);
+    		}
+    		$("#form_read_id").submit();
+      }
+	}
+	function showDiv(id,content,Id){
+	    $("#contentId").html(content);
+		$("#"+id).show();
+		$("#hideId").val($("#"+Id).val());
+		$("#Id").val(Id);
+		biaoji();
+	}
+</script>
+
+<div id="main">
+<!--中间部分开始-->
+
+<!-- left start -->
+<div id="leftSeller"></div>
+<!-- left end -->
+
+<!--右边部分开始-->
+<div id="right">
+    <h3>消息中心</h3>
+       <div class="message-class">
+         <ul>
+             <li><span class="ued" style="cursor: pointer;" onclick="flushnews(0)">系统消息($allMag.total)</span></li>
+			 <!--
+             <li><span class="ued" style="cursor: pointer;" onclick="flushnews(1)">系统消息($sysMag.total)</span></li>
+             --->
+			 <li><span class="ued"><input id="read_id" name="" type="checkbox" value="" onchange="flushnews(2)" #if($!read == 1) checked='checked' #end /></span><span class="ued-2">只显示未读消息</span></li>
+             <li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;日期选择：</span><input id="messageTime" class="input_Style2 wid_120 hei_30" type="text" value="$!messageDate" readonly="readonly" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true,oncleared:selectByTime,onpicked:selectByTime});" /></li>
+         </ul> 
+        </div><!--message-class end--> 
+        <div id="msg_list_id" class="register_content">
+        <form id="form_read_id" action="$request.contextPath/seller/setread?newsType=$!newsType" method="post">
+        #if($!allMag.rows.size() > 0)
+			#if($!newsType=='news')
+				#set($news = $allMag.rows)
+			#else
+				#set($news = $sysMag.rows)
+			#end
+                #foreach($d in $news)
+                	<dl>
+						#if(${velocityCount}==1)
+							<br/>
+                        <dt>
+                            <i class="demo-icons fa-clock-o font_20 font_c7"></i>$!date.format('yyyy-MM-dd',$!d.wmCreated)<!--最上面的日期 -->
+                        </dt>
+						#set($time = $!date.format('yyyy-MM-dd',$!d.wmCreated))
+						#end
+						
+						#if($time != $!date.format('yyyy-MM-dd',$!d.wmCreated))
+                        <dt>
+							<br/>
+                            <i class="demo-icons fa-clock-o font_20 font_c7"></i>$!date.format('yyyy-MM-dd',$!d.wmCreated)<!--最上面的日期 -->
+                        </dt>
+						#set($time = $!date.format('yyyy-MM-dd',$!d.wmCreated))
+						#end
+                        <dd class="pad_t20">
+                            <!--消息内容开始 -->
+                            <ul >
+                              <li class="over_ell f1 wid_800">
+								 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                 <span class="wid_80">$!date.format('HH:mm:ss',$!d.wmCreated)</span>
+								  <input name="reads" type="checkbox" id="$!d.id" value="$!d.wmRead"/>
+                                 #if($!d.wmRead == 2)
+        						 <i id="${d.id}_" class="demo-icons font_14 font_7a"><img src="$request.contextPath/assets/images/envelope-open.png"/></i><!--i里放的是消息图标-->
+                                 #else
+        						 <i id="${d.id}_" class="demo-icons fa-envelope font_14 font_7a"></i><!--i里放的是消息图标-->
+								 #end
+								 <a style="cursor:pointer;" onclick="javascript:showDiv('shopNewsDiv','$!d.wmContext','$!d.id');"><span>$!d.wmContext</span></a>
+                              </li>
+        					</ul>
+                        </dd>
+                    </dl>
+                   
+				#end
+        #end
+        </form>
+        </div><!--register_content end-->
+		</br></br>
+        <div style="margin-left: 98px;">
+        <div class="message-class">
+			<input id="checkall_id" type="checkbox" onclick="selectAll(this)"/>
+			<label id="all_id" for="checkall_id">全选本页</label>
+			<button id="btn_read" class="button_2" style="padding: 0px 15px;">标记为已读</button>
+			<button id="btn_del" class="button_4">删除</button>
+		</div>
+        <!--分页-->
+        <form id="pageForm" action="$request.getContextPath()/seller/news" method="post">
+			<input type="hidden" name="page" value="$!page.page" />
+			<input type="hidden" id="dataId" name="messageDate" />
+		    <input type="hidden" id="readId" name="wmRead" />
+		</form>
+<!-- 		<div class="page ml14px"> -->
+<!-- 		    <ul> -->
+<!-- 			    <li class="lastPage"><a href="javascript:topage($page.previewPage)">上一页</a></li> -->
+<!-- 			    #foreach($pageNo in [$!page.startPageIndex .. $!page.endPageIndex]) -->
+<!-- 			    <li> -->
+<!-- 			        <a #if($pageNo==$page.page) class="curr" #end href="javascript:topage($pageNo)"> -->
+<!-- 			          	#if($page.pageCode/2==$pageNo)  -->
+<!-- 							... -->
+<!-- 			          	#else -->
+<!-- 			          		$pageNo -->
+<!-- 			          	#end -->
+<!-- 			        </a> -->
+<!-- 			    </li> -->
+<!-- 			    #end -->
+<!-- 			    <li class="nextPage"><a href="javascript:topage($page.nextPage)">下一页</a></li> -->
+<!-- 		    </ul> -->
+<!-- 		</div> -->
+		
+		#pageVelocity($page)
+		
+        </div>
+</div><!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->
+<!-- 弹出层  -->
+<div class="po_fai" style="display:none;" id="shopNewsDiv">
+    <div class="po_fai_bg"></div>
+    <div class="po_main0 pad_t10" >
+      <div class=" hei_32 bg_05 pad_l10 font_14b"><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor" onclick="hideDiv('shopNewsDiv')"></i>详细信息</div>
+        <div class="clear"></div>
+        <div class="add_qynm">
+			<span class="list_top font_14b fl" id="contentId"></span>
+        </div>
+		<input id="hideId" type="hidden"/>
+		<input id="Id" type="hidden"/>
+        <div class="wid_130 mar_cen">
+          <button type="button" class="button_3 but_cx hei_30 " onclick="hideDiv('shopNewsDiv')"><a class="font_82">关闭</a></button>
+        </div>
+        <div class="clear"></div>
+      </div>
+</div>
+<script type="text/javascript">
+	var messageType = '$!newsType'=='news'?0:1;//记录是系统消息，还是所有消息
+	
+	
+	function flushnews(val){
+    	if(val != 2){
+    		messageType = val;
+    	}
+    	var date = $("#messageTime").val();
+		if(val == 1){
+    		if($("#read_id")[0].checked){
+				window.location.href="$request.contextPath/seller/sysnews?type=1&wmRead=1&messageDate="+date;
+    		}else{
+				window.location.href="$request.contextPath/seller/sysnews?type=1&messageDate="+date;
+			}
+		} else if(val == 2){
+			if(messageType==0){
+				if($("#read_id")[0].checked){
+    				window.location.href="$request.contextPath/seller/news?wmRead=1&messageDate="+date;
+    			} else {
+    				window.location.href="$request.contextPath/seller/news?messageDate="+date;
+    			}
+			}else if(messageType==1){
+				if($("#read_id")[0].checked){
+    				window.location.href="$request.contextPath/seller/sysnews?wmRead=1&messageDate="+date;
+    			} else {
+    				window.location.href="$request.contextPath/seller/sysnews?messageDate="+date;
+    			}
+			}
+			
+		} else if(val == 0){
+			if($("#read_id")[0].checked){
+				window.location.href="$request.contextPath/seller/news?wmRead=1&messageDate="+date;
+    		}else{
+				window.location.href="$request.contextPath/seller/news?messageDate="+date;
+			}
+		}
+	}
+	
+	function topage(page){
+		var form = document.getElementById("pageForm");
+		var messageTime=$("#messageTime").val();
+		$("#dataId").val(messageTime);
+		if($("#read_id")[0].checked){
+			$("#readId").val(1);
+		}
+		form.page.value=page;
+		form.submit();
+	}
+	
+// 	$("#checkall_id").toggle(
+// 		function(){
+// 			$("#msg_list_id").find("input:checkbox").attr("checked","checked");
+// 		}
+// 		function(){
+// 			$("#msg_list_id").find("input:checkbox").removeAttr("checked");
+// 		}
+// 	);
+// var v = 1;
+// 	$("#checkall_id").change(function(){
+// 		if(v == 1){
+// 			$("#msg_list_id").find("input:checkbox").attr("checked","checked");
+// 			v = 2;
+// 		} else {
+// 			$("#msg_list_id").find("input:checkbox").removeAttr("checked");
+// 			v = 1;
+// 		}
+// 		$("#msg_list_id").find("input:checkbox[disabled='disabled']").removeAttr("checked");
+// 		var all = $("#msg_list_id").find("input:checkbox");
+// 		for(var i = 0; i < all.length; i++){
+// 				all[i].checked = $("#checkall_id").checked;
+// 		}
+// 	});
+	
+	function selectAll(chkAll){
+		var all = $("#msg_list_id").find("input:checkbox");
+		for(var i = 0; i < all.length; i++){
+			if(all[i].type == "checkbox"){
+				all[i].checked = chkAll.checked;
+			}
+		}
+		$("#msg_list_id").find("input:checkbox[disabled='disabled']").removeAttr("checked");
+	}
+// 	function selectAll(chkAll){
+// 		var all = document.getElementsByTagName("input");
+// 		for(var i = 0; i < all.length; i++){
+// 			if(all[i].type == "checkbox"){
+// 				all[i].checked = chkAll.checked;
+// 			}
+// 		}
+// 	}
+	
+	$("#btn_read").click(function(){
+		var isHasChecked = false;
+		var ids = [];
+    	$("#msg_list_id").find("input:checkbox").each(function(){
+    		if(this.checked&&this.value==1){
+				isHasChecked = true;
+				ids.push(this.id);
+			}
+    	})
+		if(!isHasChecked){
+			alert("请至少选择一条未读消息");
+			return;
+		}
+		var date = $("#messageTime").val();
+		var wmRead = '';
+		if($("#read_id")[0].checked){
+			wmRead=1;
+		}
+		if(messageType == 1 ){
+			$("#form_read_id").attr('action',"$request.getContextPath()/seller/setread?type=1&newsType=$!newsType&ids="+ids+"&messageDate="+date+"&wmRead="+wmRead);
+		}else{
+			$("#form_read_id").attr('action',"$request.getContextPath()/seller/setread?newsType=$!newsType&ids="+ids+"&messageDate="+date+"&wmRead="+wmRead);
+		}
+		$("#form_read_id").submit();
+	});
+	$("#btn_del").click(function(){
+		var isHasChecked = false;
+		var ids = [];
+    	$("#msg_list_id").find("input:checkbox").each(function(){
+    		if(this.checked){
+				isHasChecked = true;
+				ids.push(this.id);
+			}
+    	})
+		if(!isHasChecked){
+			alert("请至少选择一条消息");
+			return;
+		}
+		var date = $("#messageTime").val();
+		var wmRead = '';
+		if($("#read_id")[0].checked){
+			wmRead=1;
+		}
+		if(messageType == 1 ){
+			$("#form_read_id").attr('action',"$request.getContextPath()/seller/delNews?type=1&newsType=$!newsType&ids="+ids+"&messageDate="+date+"&wmRead="+wmRead);
+		}else{
+			$("#form_read_id").attr('action',"$request.getContextPath()/seller/delNews?newsType=$!newsType&ids="+ids+"&messageDate="+date+"&wmRead="+wmRead);
+		}
+		$("#form_read_id").submit();
+		
+	});
+	function selectByTime(){
+		var date =$("#messageTime").val();
+		
+		if(messageType == 0){
+			if($("#read_id")[0].checked){
+    			window.location.href="$request.contextPath/seller/news?wmRead=1&messageDate="+date;
+    		} else {
+    			window.location.href="$request.contextPath/seller/news?messageDate="+date;
+    		}
+		}else if(messageType == 1){
+			if($("#read_id")[0].checked){
+    			window.location.href="$request.contextPath/seller/sysnews?wmRead=1&messageDate="+date;
+    		} else {
+    			window.location.href="$request.contextPath/seller/sysnews?messageDate="+date;
+    		}
+		}
+		
+	}
+function biaoji(){
+   var data={};
+	var isHasChecked = false;
+	var id ="";
+    	if($("#hideId").val()==1){
+				isHasChecked = true;
+				id=$("#Id").val();
+    	}
+		if(!isHasChecked){
+			return;
+		}
+		var date = $("#messageTime").val();
+		var wmRead = '';
+		if($("#read_id")[0].checked){
+			wmRead=1;
+		}
+   if(wmRead==''||wmRead==null||wmRead==undefined){	
+	$.ajax({
+			type: "post",
+			dataType: "json",
+			url:"$request.getContextPath()/buyer/ajaxSetread",
+			data:{ids:id},
+			success: function(data){
+			  $("#" +data.id).val(2);
+			  $("#"+data.id+"_").removeClass("demo-icons fa-envelope font_14 font_7a").addClass("demo-icons font_14 font_7a").prepend("<img src='$request.contextPath/assets/images/envelope-open.png'/>");
+			},
+			error:function(data){
+			  alert(data.meessage);
+			}
+		});
+	}
+}	
+</script>
+

@@ -1,0 +1,173 @@
+#set($staticPath="$request.contextPath/assets")
+#set($rootPath="$request.scheme://"+"$request.serverName:"+"$request.serverPort")
+#set($layout = "/seller_layout.vm")
+<script type="text/javascript">
+	$(function(){
+		//加载左侧菜单
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+		/* //平台分类 二级联动
+		$("#itemCategoryLevelOne").click(function(){
+			optionItems($("#itemCategoryLevelOne").val(),"itemCategoryLevelTwo","二级分类");
+		});
+		//平台分类 三级联动
+		$("#itemCategoryLevelTwo").click(function(){
+			optionItems($("#itemCategoryLevelTwo").val(), "itemCategoryLevelThree","三级分类");
+		}); */
+		//平台分类 二级联动
+		$("#itemCategoryLevelOne").change(function(){
+			emptySelect('itemCategoryLevelTwo',"二级分类");
+			emptySelect('itemCategoryLevelThree',"三级分类");
+			optionItems($("#itemCategoryLevelOne").val(),"",1, "itemCategoryLevelTwo");
+		});
+		//平台分类 三级联动
+		$("#itemCategoryLevelTwo").change(function(){
+			emptySelect('itemCategoryLevelThree',"三级分类");
+			optionItems($("#itemCategoryLevelOne").val(),$("#itemCategoryLevelTwo").val(),2, "itemCategoryLevelThree");
+		});
+	})
+	
+	//清空下拉列表
+	function emptySelect(id,defaultVal){
+		var obj = $("#"+id);
+		obj.empty();
+		if(defaultVal != ""){
+			obj.append($("<option>").text(defaultVal).val(""));
+		}
+	}	
+	
+	//平台分类
+	function optionItems(levelOneVal,levelTwoVal,level,optionId){
+		$.ajax({
+			//url:"$request.contextPath/sellcenter/sellProduct/getItemCategoryByParent",
+			url:"$request.contextPath/sellcenter/sellProduct/getItemCategorys",
+			type:"post",
+			data:{
+				levelOneId:levelOneVal,
+				levelTwoId:levelTwoVal,
+				level:level
+			},
+			dataType: "json",
+			success:function(data){
+				/* var optionItem = $("#"+optionId);
+				optionItem.empty();
+				optionItem.append("<option value=''>"+message+"</option>");
+				$.each(data.result, function (n, category) {
+					//var option = $("<option>").text(category.categoryCName).val(category.categoryCid);
+					//optionItem.append(option);
+					var select = "";
+					optionItem.append("<option "+select+" value='"+category.categoryCid+"'>"+category.categoryCName+"</option>");
+				}); */
+				//获取地域数据
+				var optionItem = $("#"+optionId);
+				$.each(data.result, function (n, category) {
+					var option = $("<option>").text(category.cname).val(category.cid);
+					optionItem.append(option);
+				});
+			}
+		});
+	}
+	
+	//到指定的分页页面
+	function topage(page){
+		$("#page").val(page);
+		$("#searchForm").submit();
+	}
+	
+	function selectItem(itemId,passKey){
+		$.cookie('clicked_menu', "$rootPath$request.contextPath/sellcenter/sellProduct/itemAddSelect", {path:'/'});
+		window.location.href="$request.contextPath/sellcenter/sellProduct/plantForm?addSource=2&itemId="+itemId+"&isPlantEdit=false&passKey="+passKey;
+	}
+	
+</script>
+<div id="main">
+<!--中间部分开始-->
+<div id="leftSeller" class="border-4">
+</div><!--left end -->
+
+<!--右边部分开始-->
+<div id="right">
+    <div id="right_top" class="right_top border-4 bg_06">
+	<form method="post" id="searchForm" action="$request.contextPath/sellcenter/sellProduct/platformGoodsList">
+		<input type="hidden" name="page" id="page" />
+		<div class="right_top_l" style="margin-top: 40px">
+			<ul class="list">
+				<li>
+					<span class="font_wid">平台分类：</span>
+						<select class="input_Style2 hei_30 wid_95" name="levelOneId" id="itemCategoryLevelOne">
+			        		<option value="">一级分类</option>
+			        		 #foreach( $itemCategoryDTO in $itemCategoryDTOList) 
+			                   	 <option #if("$!levelOneId" == "$!itemCategoryDTO.cid") selected="selected" #end value="$!itemCategoryDTO.cid">$!itemCategoryDTO.cname</option>
+							 #end
+			        	</select>
+			        	<select class="input_Style2 hei_30 wid_95" name="levelTwoId" id="itemCategoryLevelTwo">
+			        		<option value="">二级分类</option>
+			        		 #foreach( $itemCategoryDTOTwo in $ItemCatCascadeLevelTwoList) 
+			                   	 <option #if("$!levelTwoId" == "$!itemCategoryDTOTwo.cid") selected="selected" #end value="$!itemCategoryDTOTwo.cid">$!itemCategoryDTOTwo.cname</option>
+							 #end
+			        	</select>
+			        	<select class="input_Style2 hei_30 wid_90" id="itemCategoryLevelThree" name="cid">
+			        		<option value="">三级分类</option>
+			        		 #foreach( $itemCategoryDTOThree in $ItemCatCascadeLevelThreeList) 
+			                   	 <option #if("$!cid" == "$!itemCategoryDTOThree.cid") selected="selected" #end value="$!itemCategoryDTOThree.cid">$!itemCategoryDTOThree.cname</option>
+							 #end
+			        	</select>
+				</li>
+				<li class="wid_220">
+					<span class="font_wid">商品名称：</span><input class="input_Style2 wid_120 hei_30" type="text" name="itemName" value="$!itemName"/>
+				</li>
+				<li class="wid_220">
+					<span class="font_wid">商品库编码：</span><input class="input_Style2 wid_120 hei_30" type="text" name="id" value="$!id" onkeyup="value=value.replace(/[^\d]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))" maxlength="10"/>
+				</li>
+				
+			</ul>
+		</div>
+    </form>
+		<div class="right_top_r ">
+			<button type="button" class="button_4 but_cx1" onclick="topage(1);">
+				<a class="font_1c hei_24">查 询</a>
+			</button>
+		</div>
+	</div>
+	<!-- right结束 -->
+
+	<div id="right_bot" class="right_bot border-4 mar_t10 bg_06">
+    <!-- 商品列表开头 -->
+		<div class="right_xinxi mar_l14">
+
+			<ul class="list_top bg_08 font_14b">
+				<li class="wid_400 font_cen hei_35">商品名称</li>
+				<li class="wid_100 font_cen hei_35">商品库编码</li>
+				<li class="wid_180 font_cen hei_35">类目</li>
+				<li class="wid_80 font_cen hei_35">报价</li>
+				<li class="wid_190 font_cen hei_35">操作</li>
+			</ul>
+      <!-- 商品信息 -->
+      <table class="information" id="information ">
+		#foreach($goods in $pager.records)
+		<tr>
+          <td class="wid_100 hei_60 border-1 border-12">
+            <img src="$!imageServerAddr$!goods.pictureUrl" width="75" height="50"/>
+          </td>
+          <td class="border-6 border-9" style="width:300px">$!goods.itemName</td>
+          <td class="wid_100 border-1 font_cen">$!goods.itemId</td>
+          <td class="wid_180 border-1 font_cen">$!goods.cName</td>
+          <td class="wid_80 border-1 font_cen">$!goods.guidePrice</td>
+          <td class="wid_180 border-1 ">
+          	<p class="mar_l32 wid_130 font_cen">
+                  <a class="font_1c" style="cursor:pointer;" onclick="selectItem('$!goods.itemId','$!goods.passKey')">选择此商品</a>
+          	</p>
+          </td>
+		</tr>
+		#end
+      </table>
+       #pageVelocity($pager)
+      <div class="clear"></div>
+	  </div>
+	</div>
+      
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->      
+    
+
+

@@ -1,0 +1,56 @@
+ #set($layout = "common/order.vm")
+ #foreach($translation in $!pager.records)
+ <div class="mar_b10 bg_01 pad_lr5">
+    <!-- 发货商城 -->
+    <div class="hei_32 border_2">
+        <p class="fl" style="font-weight:bold;"><span>求购名称：$!translation.translationName</span></p>
+		#if($!translation.status == "0")
+			<p class="fr font_e5">待提交</p>
+		#elseif($!translation.status == "1")
+			<p class="fr font_e5">待审核</p>
+		#elseif($!translation.status == "2")
+			<p class="fr font_e5">待报价</p>
+		#elseif($!translation.status == "3")
+			<p class="fr font_e5">已确认</p>
+		#else
+			<p class="fr font_e5"></p>
+		#end
+		
+    </div><!-- 发货商城 -->
+	<!--物品信息展示--><p class="hei_32" >商品信息：</p>
+	#foreach($listDetail in $translation.translationMatDTOs )
+        <!-- 发货信息 -->
+        <div class="border_2 shop_order pad_tb3" >
+            <p class="wid_87 shop_order_p">
+            商品名称：$listDetail.matDesc</p>
+            <p class="wid_87 shop_order_p">类目名称：$!listDetail.alternate2</p>
+            <p class="wid_87 shop_order_p">商品属性：$!listDetail.matAttribute</p>
+			 <p class="wid_87 shop_order_p">数    量：$!listDetail.quantity</p>
+ 			 #if($!listDetail.alternate1 != "")
+			 <div id="$!listDetail.id" >
+				<p class="wid_87 shop_order_p">供应商：$!listDetail.alternate1</p>
+				 #if($!listDetail.status == "1")
+                     <p class="wid_87 shop_order_p">状   态：已接收</p>
+				 #else
+                     <p class="wid_87 shop_order_p">状   态：未接收</p>
+				 #end
+				<p class="wid_87 shop_order_p">价   格：$!listDetail.matPrice</p>
+			</div>
+			#end
+            <div class="clear"></div>
+        </div>
+        <!-- 发货信息 -->
+    <!--物品信息展示end-->
+    #end
+     <p>&nbsp;</p>
+     <p>截止报价时间：$!date.format('yyyy-MM-dd', $!translation.endDate)</p>
+        <!-- 按钮 -->
+        <div class="pad_tb5">
+			#if($!translation.status == "2")
+			<button class="button_3 pad_mlr5" onclick="updateRepTranslation('$!translation.translationNo','$!translation.status','$!date.format('yyyy/MM/dd', $!translation.endDate)');">报价</button>
+			#end
+			<button class="button_3 pad_mlr5" onclick="lookTranslationInfo('$!translation.translationNo','response');">查看</button>
+			<div class="clear"></div>
+		</div>
+		</div>
+#end

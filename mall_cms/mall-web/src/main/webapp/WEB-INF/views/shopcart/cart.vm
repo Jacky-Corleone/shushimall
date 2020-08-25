@@ -1,0 +1,491 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/none_layout.vm")
+## 1：满减券，2：现金券
+#set($FULL = "1")
+#set($CASH = "2")
+<style type="text/css">
+	.disabled{
+		color: #efefef;
+	}
+	.po_fai .man1_con{
+		width: 100%;
+	}
+	
+	.list_lh{ height:18px; line-height:18px; overflow:hidden;}
+    .list_lh li p{ height:18px; line-height:18px;}
+</style>
+<script type="text/javascript" src="$request.contextPath/assets/plugin/common/scroll.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	$(".mc_prompt_close").click(function(){
+		$(this).parents(".po_fai").fadeOut();
+	});
+	$("div.list_lh").myScroll({
+		speed:90, //数值越大，速度越慢
+		rowHeight:18 //li的高度
+	});
+	$(".cou_img").click(function(e){
+        $(this).next().toggle()
+        e.stopPropagation();
+        e.cancelBubble=true;
+    });
+    $(".coupon_bg").click(function(e){
+        e.stopPropagation();
+        e.cancelBubble=true;
+    });
+    $(".coupon_close").click(function(){
+        $(".coupon_bg").hide();
+    });
+    $(document).click(function(){
+        $(".coupon_bg").hide();
+    })
+});
+function openCustomerWin() {
+    if( '$!userId' ==  ''){
+        alert("你目前处于非登陆状态，请先登录再联系客服！");
+        this.location.href="$request.contextPath/user/login";
+        return false;
+    }
+    $.ajax({
+        type: "post",
+        dataType: "json",
+        url:"$request.contextPath/shopCart/ifLogin_shopCustomer",
+        success: function(data){
+            if(data.ifLogin_shopCustomer == false){
+                alert("你目前处于非登陆状态，请先登录再联系客服！");
+                this.location.href="$request.contextPath/user/login";
+                return false;
+            }
+        }
+    });
+}
+//领取优惠券
+function getCoupon(couponId) {
+    if (couponId && '' != $.trim(couponId)) {
+        $.ajax({
+            url: "$request.contextPath/coupons/getCoupons",
+            data: {
+                "couponId": couponId
+            },
+            type: 'post',
+            dataType: 'json',
+            success: function (data) {
+                // 提示信息
+                alert(data.resultMessage);
+
+                // 如果领取成功且满足限领条件后，页面中删除该优惠券
+                var result = data.result;
+                if (result) {
+                    $("li").remove("." + couponId);
+                }
+            }
+        });
+    }
+}
+</script>
+<!--以下为表头-->
+<div class="list_top">
+    <ul>
+        <li class="shop_name">
+        	<input type="checkbox" #if($myCart.checked && $myCart.quantity > 0)checked#end style=" vertical-align: middle;" onclick="checkAll(this)"/>全选
+        	<i class="mar_l32">商品信息</i>
+        </li>
+        <li class="shop_pri">单价</li>
+        <li class="shop_num">数量</li>
+        <li class="shop_add">合计</li>
+        <li class="shop_cz">操作</li>
+    </ul>
+</div>
+<!--以下为 表单列表-->
+#if( $!myCart.shops.size() > 0 )
+	#foreach( $shop in $myCart.shops )
+	<div class="main border-4" style="position: relative">
+		#if($shop)
+		    <h4 class="pad_l10">
+		    	<span class="fl">
+		    		<input name="shopid" value="$shop.shopId" type="checkbox" #if($shop.checked && $shop.quantity > 0)checked#end onclick="checkShop(this)"/>
+		    		<a href="$request.contextPath/shopItemListIndexController/toIndex?shopId=$shop.shopId" >$shop.shopTitle</a>
+				</span>
+				<!-- <!-- 优惠券显示地方 -->
+				&nbsp;&nbsp;&nbsp;
+				<!-- <select class="input_Style2 wid_160 mar_r10 hei_30 " onchange="getCoupons(this.value,this)">
+					<option value="">可领取优惠券</option>
+					#foreach( $coupons in $shop.couponsList )
+	                     <option value="$!coupons.couponId">$!coupons.couponName</option>
+					#end
+				</select> -->
+				
+
+				<!-- #if($shop.stationId !='')
+					&nbsp;&nbsp;&nbsp;
+					<a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=$!shop.stationId&site=qq&menu=yes"><img border="0" src="http://wpa.qq.com/pa?p=2:$!shop.stationId:51" alt="点击这里给我发送消息" title="点击这里给我发送消息"/></a>
+				#else
+                    <img border="0" src="http://wpa.qq.com/pa?p=2:2323322:52" alt="暂无客服" title="暂无客服"/>暂无客服
+				#end
+				<span>$!shop.shopRule</span> -->
+		    
+		    				##            -----------------------------优惠券 BEGIN 
+            #if($!shop.couponsList.size() > 0 )
+                <div class="coupon"><img src="$staticPath/pic/ico_yhq.png" alt="优惠券" class="cou_img cursor"/>
+                <div class="coupon_bg" style="z-index:1">
+                    <div class="coupon_bg_in" >
+                        <p><img src="$staticPath/pic/cio_cou_close.png" alt="" style="float: right;cursor: pointer" class="coupon_close"/></p>
+                        <p class="bor_1">有新优惠券可领取</p>
+                        <div class="coupon_bg_minbox">
+                            <ul class="coupon_ul">
+                                #foreach($coupon in $!shop.couponsList)
+                                    <li class="$!coupon.couponId">
+                                        <div class="money_bg">
+                                        	<span>
+                                        		#if($!coupon.couponType == $FULL)
+                                        			￥$!number.format("0", $!coupon.couponAmount)
+                                        		#elseif($!coupon.couponType == $CASH)
+                                        			#set($str = $!coupon.couponAmount.toString())
+                                        			#set($val = $!str.length())
+													#if($!str.endsWith(".00"))
+													   $!number.format("0", $!coupon.couponAmount)折
+													#else
+														#set($val_x = $val - 1)
+														$!str.substring(0,$val_x)折
+													#end
+                                        		#else
+                                        			降$!number.format("0", $!coupon.couponAmount)
+                                        		#end
+                                        	</span>
+                                        </div>
+                                        <div class="coupon_ul_mind" style="float: left;margin-left: 12px">
+                                        	 <p class="wid_140 over_ell cursor" title="$!coupon.couponName，$!coupon.descr">$!coupon.couponName，$!coupon.descr</p>
+                                           ##  #if($!coupon.couponType == $CASH)
+                                           ##     <p>$!coupon.couponName，现金$!number.format("0", $!coupon.couponAmount)</p>
+                                           ##  #else
+                                           ##     <p>$!coupon.couponName，满$!number.format("0", $!coupon.meetPrice)减$!number.format("0", $!coupon.couponAmount)</p>
+                                           ##  #end 
+                                            <p class="cor_2">$!date.format("yyyy-MM-dd", $!coupon.couponStartTime)-$!date.format("yyyy-MM-dd", $!coupon.couponEndTime)</p>
+                                        </div>
+                                        <span class="get" onclick="getCoupon('$!coupon.couponId')">领取</span>
+                                    </li>
+                                #end
+##                                <li>
+##                                    <div class="money_bg"><span>10</span></div>
+##                                    <div class="coupon_ul_mind" style="float: left;margin-left: 12px">
+##                                        <p>抢年货通用，满100减10</p>
+##                                        <p class="cor_2">2016.01.15-2016.03.13</p>
+##                                    </div>
+##                                    <span class="get">领取</span>
+##                                </li>
+##                                <li>
+##                                    <div class="money_bg"><span>10</span></div>
+##                                    <div class="coupon_ul_mind" style="float: left;margin-left: 12px">
+##                                        <p>抢年货通用，满100减10</p>
+##                                        <p class="cor_2">2016.01.15-2016.03.13</p>
+##                                    </div>
+##                                    <span class="get">领取</span>
+##                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            #end
+##            -----------------------------优惠券 END
+	</h4>		
+		    
+			<div class="clear"></div>
+				#foreach( $product in $shop.products )
+					#if($!product.promotions.size() == 1)
+						<div class="clear"></div>
+						<div class="goods-suit-tit">
+							<span class="sales-icon">满减</span>
+    						<strong>
+    						#foreach( $promotion in $!product.promotions )
+                               #if("$!promotion.type" == "2")
+									满$!{promotion.meetPrice}元，减$!{promotion.discountPrice}元
+                               #end
+    						#end
+    						</strong>
+                        </div>
+					#elseif($!product.promotions.size() > 1)
+						<div class="goods-suit-tit">
+							<span class="sales-icon">满减</span>
+    						<div class="list_lh">
+                    			<ul>
+    								#foreach( $promotion in $!product.promotions )
+    									#if("$!promotion.type" == "2")
+    										<li style="float:none;">
+                                                <p><strong>满$!{promotion.meetPrice}元，减$!{promotion.discountPrice}元</strong></p>
+                            				</li>
+    									#end
+    								#end
+                    			</ul>
+								<div class="clear"></div>
+                    		</div>
+                        </div>
+					#end
+			        <div class="man1_con">
+			           	<ul>
+			                 <li class="pad_t20 pad_l10">
+		                 		<input type="checkbox" name="skuid" value="$!product.skuId" onclick="checkProduct(this)" class="$!product.addSource"
+		                 		#if($product.status != 4 || $product.qty <= 0) disabled #end
+		                 		#if( $product.checked ) checked #end
+		                 		/>
+			                 </li>
+			                 <li class="man1_pro">
+			                 	<a href="$request.contextPath/productController/details?id=$!product.itemId&skuId=$!product.skuId">
+			                 		<img src="$!imageServerAddr$!product.src"/>
+			                 	</a>
+			                 </li>
+			                 <li class="man1_n">
+			                 	<p class="man1_name" >
+
+			                 			<a href="$request.contextPath/productController/details?id=$!product.itemId&skuId=$!product.skuId" target="_blank">
+			                 				$!product.title
+			                 			</a>
+
+			                        #if( $product.status != 4 )
+			                        	<span style="color: #c90202;">商品已下架！</span>
+			                        #end
+			                 		<br>
+			            			<div style="height: 30px;width: 180px; white-space:nowrap; overflow: hidden; text-overflow: ellipsis;">
+			                 			<a href="$request.contextPath/productController/details?id=$!product.itemId&skuId=$!product.skuId" target="_blank">
+			            					#foreach( $attr in $product.attrs )
+			            						$attr.name：$attr.value &nbsp;
+			            					#end
+			            				</a>
+			            			</div>
+			                 	</p>
+							 </li>
+							 <li class="man1_p_m hei_80">
+			                 	<div>#if( $product.hasPrice )
+									#if($product.skuPrice!=$product.payPrice)
+										<span style="margin-top:20px;line-height: 22px;display: block;">
+											<del class="font_c7">￥$!product.skuPrice</del>
+											<p class="font_fe">促销价¥$!product.payPrice</p>
+										</span>
+									#else
+                                     ¥$!product.payPrice
+									#end
+								#else <font color='red'>暂无报价</font> #end</div>
+			                 	<input name="sellerId" type="hidden" value="$!product.sellerId">
+			                 	<input name="itemId" type="hidden" value="$!product.itemId">
+			                 </li>
+							 <li class="man1_p_m hei_80">
+								<!-- 校验库存
+							 	<div style="margin-top:31px;">
+							 		#set($min = $product.quantity <= 1 )
+									#if( $product.activitesDetailsId )
+										#set($max = $product.quantity >= $product.perPerchaseMaxNum )
+									#else
+										#set($max = $product.quantity >= $product.qty )
+									#end
+								 	<button class="fl p-quantity #if( $min ) disabled #end" type="button" style="height: 22px;" onclick="subQuantity(this)" #if( $min ) disabled #end>-</button>
+									<input class="fl p-quantity" name="quantity" onkeyup="onkeyup_product(this)" onfocus="setOldQuantity(this)" onblur="reCalcShopCart(this)" onkeypress="if(event.keyCode==13) {reCalcShopCart(this);return false;}" type="text" value="$!product.quantity" autocomplete="off" style="width: 64px; border-left: none; border-right:none; height: 20px;"/>
+									<button class="fl p-quantity #if( $max ) disabled #end" type="button" style="height: 22px;" onclick="addQuantity(this)" #if( $max ) disabled #end>+</button>
+							 	</div>
+								<div style="min-height: 30px; line-height: 20px; width: 98px; margin-top: 50px; text-align: left; text-indent: 5px;background:#fff;">
+									<input type="hidden" name="activitesDetailsId" class="isCentralPurchasing" value="$!product.activitesDetailsId"/>
+									#if( $product.activitesDetailsId )
+										<input type="hidden" class="qty_js" value="$!product.perPerchaseMaxNum"/>
+									#else
+										<input type="hidden" class="qty_js" value="$!product.qty"/>
+									#end
+									#if($product.qty <= 0)
+										<span style="color:#FF0000">库存:</span><span class="proAllQty" style="color:#FF0000">$!product.qty</span><span style="color:#FF0000">件</span>
+									#else
+										库存:<span class="proAllQty">$!product.qty</span>件
+									#end
+								</div>
+								-->
+								<!-- 不校验库存 -->
+								<div style="margin-top:31px;">
+							 		#set($min = $product.quantity <= 1 )
+								 	<button class="fl p-quantity #if( $min ) disabled #end" type="button" style="height: 22px;" onclick="subQuantity(this)" #if( $min ) disabled #end>-</button>
+									<input class="fl p-quantity" name="quantity" onkeyup="onkeyup_product(this)" onfocus="setOldQuantity(this)" onblur="reCalcShopCart(this)" onkeypress="if(event.keyCode==13) {reCalcShopCart(this);return false;}" type="text" value="$!product.quantity" autocomplete="off" style="width: 64px; border-left: none; border-right:none; height: 20px;"/>
+									<button class="fl p-quantity" type="button" style="height: 22px;" onclick="addQuantity(this)">+</button>
+							 	</div>
+								<div style="min-height: 30px; line-height: 20px; width: 98px; margin-top: 50px; text-align: left; text-indent: 5px;background:#fff;">
+									<input type="hidden" name="activitesDetailsId" class="isCentralPurchasing" value="$!product.activitesDetailsId"/>
+									#if( $product.activitesDetailsId )
+										<input type="hidden" class="qty_js" value="$!product.perPerchaseMaxNum"/>
+									#else
+										<input type="hidden" class="qty_js" value="$!product.qty"/>
+									#end
+								</div>
+							 </li>
+							 <li class="man1_p_m hei_80">
+								<strong>¥$!product.payTotal</strong>
+							 </li>
+							 <li class="main1_del hei_80">
+		                    	<a href="javascript:void(0);" onclick="winDelOpen(this)">【删除】</a>
+		                        <div class="del_box">
+		                        	<em class="demo-icons fa-close fr" href="javascript:;" onClick="winDelClose(this);" style="cursor:pointer;font-size:14px;margin-right:10px;"></em>
+	                                <p>确认删除？</p>
+	                                <ul>
+	                                	<li class="del_box_c font_ff">
+	                                		<a href="javascript:void(0);" onclick="mvProToFavourite(this)">移入收藏</a>
+	                                	</li>
+	                                	<li class="del_box_t font_ff">
+	                                		<a href="javascript:void(0);" onclick="removeProduct(this);">确定删除</a>
+	                                	</li>
+	                           		</ul>
+	                        	</div>
+		                    </li>
+			        	</ul>
+						<!-- 套装sku单品开始 -->
+						#if($product.subProducts && $product.subProducts.size() > 0)
+							#foreach( $subProduct in $!product.subProducts )
+								<ul class="bg_09" style="border-bottom:1px dashed #e8e8e8;">
+								<li class="pad_t20 pad_l10">
+    		                 	<!--	<input type="checkbox" name="skuid" value="$!subProduct.skuId" onclick="checkProduct(this)" class="$!subProduct.addSource"
+    		                 		#if($!subProduct.status != 4 || $!subProduct.qty <= 0) disabled #end
+    		                 		#if( $!subProduct.checked ) checked #end
+    		                 		/>-->
+								</li>
+    			                 <li class="man1_pro pad_l20">
+    			                 	<a href="$request.contextPath/productController/details?id=$!subProduct.itemId&skuId=$!subProduct.skuId">
+    			                 		<img src="$!imageServerAddr$!subProduct.src"/>
+    			                 	</a>
+    			                 </li>
+    			                 <li class="man1_n">
+    			                 	<p class="man1_name" >
+			                 			<a href="$request.contextPath/productController/details?id=$!subProduct.itemId&skuId=$!subProduct.skuId" target="_blank">
+			                 				$!subProduct.title
+			                 			</a>
+    			                        #if( $!subProduct.status != 4 )
+    			                        	<span style="color: #c90202;">商品已下架！</span>
+    			                        #end
+    			                 		<br>
+    			            			<div style="height: 30px;width: 180px; white-space:nowrap; overflow: hidden; text-overflow: ellipsis;">
+    			                 			<a href="$request.contextPath/productController/details?id=$!subProduct.itemId&skuId=$!subProduct.skuId" target="_blank">
+    			            					#foreach( $attr in $!subProduct.attrs )
+    			            						$attr.name：$attr.value &nbsp;
+    			            					#end
+    			            				</a>
+    			            			</div>
+    			                 	</p>
+    							 </li>
+    							 <li class="man1_p_m hei_80">
+    			                 	<div>
+										#if( $!subProduct.hasPrice )
+        									#if($!subProduct.skuPrice!=$!subProduct.payPrice)
+        										<span style="margin-top:20px;line-height: 22px;display: block;">
+        											<del class="font_c7">￥$!subProduct.skuPrice</del>
+        											<p class="font_fe">促销价¥$!subProduct.payPrice</p>
+        										</span>
+        									#else
+												¥$!subProduct.payPrice
+        									#end
+										#else 
+											<font color='red'>暂无报价</font> 
+										#end
+									</div>
+    			                 </li>
+    							 <li class="man1_p_m hei_80">
+    							 	<div style="margin-top:31px;">
+    									<input class="fl p-quantity" readonly type="text" value="$!{subProduct.quantity}件/套x$!{product.quantity}" style="width: 64px; height: 20px;"/>
+    							 	</div>
+    							 </li>
+    							 <li class="man1_p_m hei_80">
+									#if( $!subProduct.hasPrice )
+										<strong>¥$!subProduct.payTotal</strong>
+									#else
+										<font color='red'>暂无报价</font>
+									#end
+								 </li>
+								</ul>
+							#end
+						#end
+						<!-- 套装sku单品结束 -->
+						<!-- 增值服务开始 -->
+						#if($product.valueAddedProducts && $product.valueAddedProducts.size() > 0)
+							#foreach( $valueAddedProduct in $!product.valueAddedProducts )
+								<ul class="bg_09" style="border-bottom:1px dashed #e8e8e8;margin-bottom:0px;">
+								<li class="pad_t20 pad_l10">
+    		                 	<!--	<input type="checkbox" name="skuid" value="$!valueAddedProduct.skuId" onclick="checkProduct(this)" class="$!valueAddedProduct.addSource"
+    		                 		#if($!valueAddedProduct.status != 4 || $!valueAddedProduct.qty <= 0) disabled #end
+    		                 		#if( $!valueAddedProduct.checked ) checked #end
+    		                 		/>-->
+								</li>
+    			                 <li class="man1_pro pad_l20">
+    			                 	<a href="$request.contextPath/productController/details?id=$!valueAddedProduct.itemId&skuId=$!valueAddedProduct.skuId">
+    			                 		<img src="$!imageServerAddr$!valueAddedProduct.src"/>
+    			                 	</a>
+    			                 </li>
+    			                 <li class="man1_n">
+    			                 	<p class="man1_name" >
+			                 			<a href="$request.contextPath/productController/details?id=$!valueAddedProduct.itemId&skuId=$!valueAddedProduct.skuId" target="_blank">
+			                 				$!valueAddedProduct.title
+			                 			</a>
+    			                        #if( $!valueAddedProduct.status != 4 )
+    			                        	<span style="color: #c90202;">商品已下架！</span>
+    			                        #end
+    			                 		<br>
+    			            			<div style="height: 30px;width: 180px; white-space:nowrap; overflow: hidden; text-overflow: ellipsis;">
+    			                 			<a href="$request.contextPath/productController/details?id=$!valueAddedProduct.itemId&skuId=$!valueAddedProduct.skuId" target="_blank">
+    			            					#foreach( $attr in $!valueAddedProduct.attrs )
+    			            						$attr.name：$attr.value &nbsp;
+    			            					#end
+    			            				</a>
+    			            			</div>
+    			                 	</p>
+    							 </li>
+    							 <li class="man1_p_m hei_80">
+    			                 	<div>
+										#if( $!valueAddedProduct.hasPrice )
+        									#if($!valueAddedProduct.skuPrice!=$!valueAddedProduct.payPrice)
+        										<span style="margin-top:20px;line-height: 22px;display: block;">
+        											<del class="font_c7">￥$!valueAddedProduct.skuPrice</del>
+        											<p class="font_fe">促销价¥$!valueAddedProduct.payPrice</p>
+        										</span>
+        									#else
+												¥$!valueAddedProduct.payPrice
+        									#end
+										#else 
+											<font color='red'>暂无报价</font> 
+										#end
+									</div>
+    			                 </li>
+    							 <li class="man1_p_m hei_80">
+    							 	<div style="margin-top:31px;">
+    									<input class="fl p-quantity" readonly type="text" value="$!{valueAddedProduct.quantity}件/套x$!{product.quantity}" style="width: 64px; height: 20px;"/>
+    							 	</div>
+    							 </li>
+    							 <li class="man1_p_m hei_80">
+    								<strong>¥$!valueAddedProduct.payTotal</strong>
+								 </li>
+								</ul>
+							#end
+						#end
+						<!-- 增值服务结束 -->
+			    	</div>
+				#end
+			</div>
+		#end
+	#end
+
+	<!--结算 start-->
+	<div class="shop_set box-shadow1">
+		<div class="set_left" >
+    		<input type="checkbox" #if($myCart.checked && $myCart.quantity > 0)checked#end  onclick="checkAll(this)" class="mar_lr10"/>
+			<label >全选</label>
+		</div>
+		<div class="set_right" style="width:480px;">
+			<div style="float:left;">
+				<input type="hidden" name="proQuantity" value="$myCart.quantity">
+				共选中<strong>$myCart.quantity</strong>件商品，总计（不含运费）：<strong>¥ $myCart.payTotal</strong>
+			</div>
+	    	<button type="button" class="font_18 button_1 hei_45" onclick="toOrderView();">
+	    		<i class="demo-icons fa-jpy"></i>去结算
+	    	</button>
+		</div>
+		<div class="clear"></div>
+	</div>
+
+#else
+	<div style=" height:260px;line-height:50px;" class="wid_500 font_cen mar_cen pad_tb20  font_20">
+		<i class="demo-icons fa-cart"></i>亲，购物车内暂时没有商品......<br/>
+		<button type="button" class="button_2 hei_35 font_16" onclick="goShop();">去逛逛>></button>
+	</div>
+#end
+<form id="cartForm" action="$request.contextPath/shopCart/toOrderView" method="post">
+	<input type="hidden" name="orderType" value="2" >
+</form>

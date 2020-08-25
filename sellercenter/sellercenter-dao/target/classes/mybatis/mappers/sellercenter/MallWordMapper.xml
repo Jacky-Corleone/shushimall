@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.sellercenter.dao.MallWordDAO">
+	
+	<sql id="queryPage_where">
+		<where>
+			<if test=" entity.id != null and entity.id != '' ">
+				and id = #{entity.id}
+			</if>
+			<if test=" entity.word != null and entity.word != '' ">
+				and word like concat('%',#{entity.word},'%')
+			</if>
+		</where>
+	</sql>
+	
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	
+	
+	<insert id="add">
+		insert into mall_word(
+				word,
+				created
+		)values(
+				#{word},
+				now()
+		)
+		<selectKey resultType="long" order="AFTER" keyProperty="id">
+			select @@IDENTITY
+		</selectKey>
+	</insert>
+	
+	<delete id="delete">
+		delete from mall_word
+		<if test=" id != null">
+			where id = #{id}
+		</if>
+		<if test=" id == null">
+			where 1 = 3
+		</if>
+	</delete>
+	
+	
+	<select id="queryCount" resultType="long">
+		select count(0) from mall_word
+		<include refid="queryPage_where"/>
+	</select>
+	
+	<select id="queryList" resultType="com.camelot.sellercenter.mallword.dto.MallWordDTO">
+		SELECT * FROM mall_word
+		<include refid="queryPage_where"/>
+	  	limit #{page.pageOffset} , #{page.rows}
+	</select>
+</mapper>

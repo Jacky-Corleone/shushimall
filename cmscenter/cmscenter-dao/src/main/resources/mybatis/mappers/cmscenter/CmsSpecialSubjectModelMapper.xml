@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.cmscenter.dao.CmsSpecialSubjectModelDAO">
+	<resultMap id="CmsSpecialSubjectModelMapper" type="com.camelot.cmscenter.dto.CmsSpecialSubjectModelDTO">
+			<result property="id" column="id" />
+			<result property="name" column="name" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+	</resultMap>
+
+	<select id="queryAllModelList" resultMap="CmsSpecialSubjectModelMapper" >
+		select * from cms_special_subject_model 
+	</select>
+	
+	<select id="queryModelById" resultMap="CmsSpecialSubjectModelMapper" >
+		select * from cms_special_subject_model where id = #{id}
+	</select>
+	
+	<insert id="insert" parameterType="com.camelot.cmscenter.dto.CmsSpecialSubjectModelDTO" useGeneratedKeys="false" keyProperty="id">
+		INSERT INTO cms_special_subject_model (id,name,create_by,create_date,remarks)
+		VALUES(#{id},#{name},#{createBy},NOW(),#{remarks})
+	</insert>
+	
+	<update id="update" parameterType="com.camelot.cmscenter.dto.CmsSpecialSubjectModelDTO">
+		UPDATE cms_special_subject_model SET name=#{name},update_by=#{updateBy},update_date=NOW() where id=#{id}
+	</update>
+	
+	<delete id="deleteModel" parameterType="java.lang.String">
+		DELETE from cms_special_subject_model where id=#{id}
+	</delete>
+
+	<select id="getCount" parameterType="com.camelot.cmscenter.dto.CmsSpecialSubjectModelDTO" resultType="long">
+		select count(*) from cms_special_subject_model 
+		<include refid="where_fragement" />
+	</select>
+
+	<!-- 查询 -->
+	<select id="queryModelList" resultMap="CmsSpecialSubjectModelMapper" >
+		select * from cms_special_subject_model
+		<include refid="where_fragement" />
+			ORDER BY create_date ASC
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+
+	<sql id="where_fragement">
+		where 1 = 1
+		<if test="cmsSpecialSubjectModelDTO.name!=null and cmsSpecialSubjectModelDTO.name!=''">
+			and name = #{cmsSpecialSubjectModelDTO.name}
+		</if>
+	</sql>
+
+	<sql id="pagination_tail">
+		limit #{page.pageOffset} , #{page.rows}
+	</sql>
+</mapper>

@@ -1,0 +1,129 @@
+<div id="shop_left">
+	<div class="shop_seller border-9">
+		<h3 class="pad_l10 bg_05 hei_35 border-6">商家信息</h3>
+		<ol>
+			<li class="mar_l10 hei_30 ft_hide">
+				<DIV class="ft_hide cursor over_ell" style="width: 190px;">
+					<a href="$request.contextPath/shopItemListIndexController/toIndex?shopId=$!shopInfo.shopId" title="$!shopInfo.shopName">店铺名称：$!shopInfo.shopName</a>
+				</DIV>
+			</li>
+            #if($!user.companyName)
+            <li class="mar_l10 hei_30 cursor over_ell" title="$!user.companyName">公司名称：$!user.companyName
+            </li>
+            #end
+            #set($addr = "$!shopInfo.provinceName $!shopInfo.cityName $!shopInfo.districtName")
+            <li class="mar_l10 hei_30 cursor over_ell" title="$addr">所在地：
+                $addr
+            </li>
+			<li class="mar_l10">认证服务：
+				#foreach($entity in $listRule)
+				<img src="$!imageServerAddr$entity.iconImageSrc" width="22" height="22" alt="$entity.simpleIntro" title="$entity.simpleIntro" />
+				#end
+			</li>
+            <li class="mar_l10 hei_30">
+                营业执照：<a href="$!imageServerAddr$!busLicenImgSrc" target="_blank"><img src="$request.contextPath/assets/images/national_emblem_light.png" width="22" height="22" /></a>
+            </li>
+			#if(!$!flag || $!flag=='')
+			<li class="mar_l10 hei_30">
+				#if($!favouriteShop == "true")
+				<button disabled="disabled">已收藏</button>
+				#else
+				<button onclick="addShopFavourite($!shopInfo.sellerId, $!shopInfo.shopId)" id="buttonId">收藏本店</button>
+				#end
+				#if($!qqId !='')
+                <a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=$!qqId&site=qq&menu=yes"><img border="0" src="http://wpa.qq.com/pa?p=2:$!qqId:51" alt="点击这里给我发送消息" title="点击这里给我发送消息"/></a>
+	            #else
+	                <img border="0" src="http://wpa.qq.com/pa?p=2:2323322:52" alt="暂无客服" title="暂无客服"/>暂无客服
+	            #end
+			</li>
+			#end
+			
+		</ol>
+	</div>
+
+	<dl>
+		<dt class="pad_l10">产品分类</dt>
+		#foreach($entity in $categorylist)
+			<dd class="cursor over_ell" style="width:200px" title="$entity.cname">
+		        <i class="fa-angle-double-down fr mar_r10"></i>
+				$entity.cname
+			</dd>
+			#if($!entity.childShopCategory.size()>0)
+				<ul>
+					#foreach($entityChild in $!entity.childShopCategory)
+					<li cid="$entityChild.cid" class="cursor over_ell" title="$entityChild.cname"><i class="demo-icons fa-angle-right"></i>$entityChild.cname</li>
+					#end
+				</ul>
+			#end
+		#end
+	</dl>
+
+	<!-- 销量排行榜start -->
+	<div class="nTab">
+		<!-- 标题开始 -->
+		<div class="left_top border-9 pad_l10 mar_tb10">销量排行榜</div>
+		<div class="TabTitle" id="shop-tab1">
+			<ol id="myTab0">
+				<li class="active" onclick="changeTabs(this,0);">出货量</li>
+				<li class="normal" onclick="changeTabs(this,1);">收藏</li>
+			</ol>
+		</div>
+		<!-- 内容开始 -->
+		<div class="TabContent">
+			<!-- 商品介绍下的内容开始 -->
+			<div id="myTab0_Content0">
+				<div class="left_content3">
+					<ol id="hotPros"></ol>
+				</div>
+				<!-- left_content3 end-->
+			</div>
+			<!-- myTab0_Content0 end-->
+			<!-- 规格说明下的内容开始 -->
+			<div id="myTab0_Content1" class="hide left_content3">
+				<ol id="favouritePros">
+
+				</ol>
+			</div>
+			<!-- 包装清单下的内容开始 -->
+		</div>
+	</div>
+	<!-- 销量排行榜end -->
+</div>
+<script type="text/javascript">
+	function changeTabs(obj, index){
+		var color = "$!shopTemplates.color";
+		var selectedColor = $("#colorValue").val();
+		if(selectedColor){
+			color = selectedColor;
+		}
+		nTabs(obj, index);
+		$(".active").css({"border":"1px solid "+color,"border-top":"2px solid "+ShopDecorate.getSeledMenuBgColor(color),"color":color});
+		$(".normal").removeAttr("style");
+	}
+</script>
+
+
+<script language="javascript">
+    var LR_username='$!user.uid';
+    var LR_userdata="店铺名称：'$!shopInfo.shopName'";
+    function openZoosUrl_UserDefine(){
+        //你们的判断登录跳转功能，也可以在这里进行判断
+        if( '$!user.uid' ==  ''){
+            alert("你目前处于非登陆状态，请先登录再联系客服！");
+            this.location.href="$request.contextPath/user/login";
+            return true;
+        }
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            url:"$request.contextPath/shopCart/ifLogin_shopCustomer",
+            success: function(data){
+                if(data.ifLogin_shopCustomer == false){
+                    alert("你目前处于非登陆状态，请先登录再联系客服！");
+                    this.location.href="$request.contextPath/user/login";
+                    return true;
+                }
+            }
+        });
+    }
+</script>

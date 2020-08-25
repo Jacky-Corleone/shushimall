@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.sellercenter.dao.NoticeMybatisDAO">
+
+	<!-- =========================================================== -->
+	<!-- 定义resultMap -->
+	<!-- =========================================================== -->
+	<resultMap id="noticeMap" type="com.camelot.sellercenter.domain.Notice">
+		<result property="id" column="id" />
+		<result property="title" column="title" />
+		<result property="content" column="content" />
+		<result property="status" column="status" />
+		<result property="isRecommend" column="is_recommend" />
+		<result property="created" column="created" />
+		<result property="sortNum" column="sort_num" />
+		<result property="noticeType" column="notice_type" />
+		<result property="url" column="url" />
+		<result property="themeType" column="theme_type" />
+		<result property="themeId" column="theme_id" />
+	</resultMap>
+
+	<resultMap id="noticeDTOMap"
+		type="com.camelot.sellercenter.notice.dto.MallNoticeDTO">
+		<result property="noticeId" column="id" />
+		<result property="noticeTitle" column="title" />
+		<result property="noticeContent" column="content" />
+		<result property="noticeStatus" column="status" />
+		<result property="isRecommend" column="is_recommend" />
+		<result property="created" column="created" />
+		<result property="modified" column="modified" />
+		<result property="sortNum" column="sort_num" />
+		<result property="platformId" column="platform_id" />
+		<result property="noticeType" column="notice_type" />
+		<result property="url" column="url" />
+		<result property="themeType" column="theme_type" />
+		<result property="themeId" column="theme_id" />
+	</resultMap>
+
+	<!-- =========================================================== -->
+	<!-- 一些公共变量设置 -->
+	<!-- =========================================================== -->
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+			*
+		from 
+			mall_notice mn
+		]]>
+	</sql>
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity != null">
+			<if test="entity.noticeType != null">
+				and notice_type = #{entity.noticeType}
+			</if>
+			<if test="entity.status != null and entity.status != ''">
+				and status = #{entity.status}
+			</if>
+			<if test="entity.sortNum != null and entity.sortNum != ''">
+				and sort_num = #{entity.sortNum}
+			</if>
+			<if test="entity.platformId != null ">
+				and platform_id = #{entity.platformId}
+			</if>
+			<if test="entity.isRecommend != null and entity.isRecommend != ''">
+				and is_recommend = #{entity.isRecommend}
+			</if>
+			<if test="entity.title != null and entity.title != ''">
+				and title LIKE CONCAT('%',#{entity.title},'%')
+			</if>
+			<if test="entity.sortNum != null and entity.sortNum != ''">
+				and sort_num = #{entity.sortNum}
+			</if>
+            <if test="entity.noticeType != null and entity.noticeType != ''">
+                and notice_type = #{entity.noticeType}
+            </if>
+            <if test="entity.createDtBegin != null ">
+                and created > #{entity.createDtBegin}
+            </if>
+            <if test="entity.createDtEnd != null ">
+                <![CDATA[
+                and created < #{entity.createDtEnd}
+                ]]>
+            </if>
+            <if test="entity.createDtEnd != null ">
+                <![CDATA[
+                and created < #{entity.createDtEnd}
+                ]]>
+            </if>
+            <if test="entity.publishDtBegin != null ">
+                <![CDATA[
+                and modified > #{entity.publishDtBegin}
+                ]]>
+            </if>
+            <if test="entity.publishDtEnd != null ">
+                <![CDATA[
+                and modified < #{entity.publishDtEnd}
+                ]]>
+            </if>
+            <if test="entity.themeId != null ">
+                <![CDATA[
+                and theme_id = #{entity.themeId}
+                ]]>
+            </if>
+		   <if test="entity.themeType != null ">
+                <![CDATA[
+                and theme_type = #{entity.themeType}
+                ]]>
+            </if>
+		</if>
+	</sql>
+	<!-- mysql 分页尾 -->
+	<sql id="pagination_tail">
+		limit #{page.pageOffset} , #{page.rows}
+	</sql>
+
+	<!-- =========================================================== -->
+	<!-- Dao方法中的基本增删改查方法 -->
+	<!-- =========================================================== -->
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="Object">
+		<![CDATA[
+		insert into mall_notice
+		  (	
+				title
+				,content
+				,status
+				,created
+				,modified
+				,sort_num
+				,is_recommend
+				,platform_id
+				,notice_type
+				,url
+				,theme_id
+				,theme_type
+		   )
+		values
+		  (		
+				#{title}
+				,#{content}
+				,#{status}
+				,now()
+				,now()
+				,#{sortNum}
+				,#{isRecommend}
+				,#{platformId}
+				,#{noticeType}
+				,#{url}
+				,#{themeId}
+				,#{themeType}
+		   )
+	    ]]>
+	</insert>
+
+	<!-- 根据id查询 -->
+	<select id="queryById" resultMap="noticeMap" parameterType="Object">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where mn.id = #{id}
+		]]>
+	</select>
+
+	<!-- 根据id查询,返回DTO -->
+	<select id="queryDTOById" resultMap="noticeDTOMap"
+		parameterType="Object">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where mn.id = #{id}
+		]]>
+	</select>
+
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="Object">
+		update mall_notice
+		set modified = now()
+		<if test="title != null  ">
+			,title = #{title}
+		</if>
+		<if test="content != null  ">
+			,content = #{content}
+		</if>
+		<if test="status != null  ">
+			,status = #{status}
+		</if>
+		<if test="sortNum != null  ">
+			,sort_num = #{sortNum}
+		</if>
+		<if test="isRecommend != null  ">
+			,is_recommend = #{isRecommend}
+		</if>
+		<if test="status != null  ">
+			,status = #{status}
+		</if>
+		<if test="noticeType != null  ">
+			,notice_type = #{noticeType}
+		</if>
+		<if test="url != null and url!='' ">
+			,url = #{url}
+		</if>
+		<if test="themeId != null and themeId!='' ">
+			,theme_id = #{themeId}
+		</if>
+		<if test="themeType != null and themeType!='' ">
+			,theme_type = #{themeType}
+		</if>
+		where id = #{id}
+	</update>
+
+	<!-- 修改记录，只修改只不为空的字段 -->
+	<update id="updateBySelect" parameterType="Object">
+		update mall_notice
+		set
+		<if test="isRecommend != null  ">
+			is_recommend = #{isRecommend},
+		</if>
+		<if test="status != null  ">
+			status = #{status},
+		</if>
+
+		modified = now()
+		where id = #{id}
+	</update>
+
+	<!-- 删除记录 -->
+	<delete id="delete" parameterType="Object">
+		<![CDATA[
+		delete from mall_notice where id = #{id}
+		]]>
+	</delete>
+
+	<!-- 查询总数 -->
+	<select id="queryCount" resultType="java.lang.Long">
+		select count(*) from mall_notice
+		<include refid="where_fragement" />
+	</select>
+
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="noticeMap">
+		<include refid="selectAllColumns" />
+		<include refid="where_fragement" />
+		<!-- order by 手工添加 -->
+		<include refid="pagination_tail" />
+	</select>
+
+	<!-- 分页查询 -->
+	<select id="queryListDTO" parameterType="Object" resultMap="noticeDTOMap">
+		<include refid="selectAllColumns" />
+		<include refid="where_fragement" />
+		<!-- order by 手工添加 -->
+			ORDER BY is_recommend  desc,sort_num ,modified desc
+		<include refid="pagination_tail" />
+	</select>
+
+    <select id="queryListByNextSort" parameterType="Object" resultMap="noticeDTOMap">
+        <include refid="selectAllColumns" />
+
+       where 1=1
+        <if test="entity.platformId != null ">
+            and platform_id = #{entity.platformId}
+        </if>
+        <if test="entity.isRecommend != null and entity.isRecommend == 1">
+            <![CDATA[ and sort_num > #{entity.sortNum}
+         order by sort_num
+         ]]>
+        </if>
+        <if test="entity.isRecommend != null and entity.isRecommend == -1">
+            <![CDATA[
+         and sort_num < #{entity.sortNum}
+         order by sort_num desc
+         ]]>
+        </if>
+
+
+    </select>
+
+	<select id="getSortNumByCondation" resultType="java.lang.Long">
+		select max(sort_num) from mall_notice
+		<include refid="where_fragement" />
+	</select>
+</mapper>

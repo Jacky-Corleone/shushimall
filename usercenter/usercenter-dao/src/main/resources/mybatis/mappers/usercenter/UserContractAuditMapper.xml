@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.usercenter.dao.UserContractAuditMybatisDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="userContractAuditMap" type="userContractAuditDTO">
+				<result property="caId" column="ca_id"/>
+				<result property="cid" column="c_id"/>
+				<result property="auditId" column="audit_id"/>
+				<result property="auditDate" column="audit_date"/>
+				<result property="remark" column="remark"/>
+				<result property="status" column="status"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{pager.pageOffset} , #{pager.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			ca_id
+ 			,c_id
+ 			,audit_id
+ 			,audit_date
+ 			,remark
+ 			,status
+		FROM 
+		user_contract_audit user_contract_audit_
+		]]>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+	<!-- 分页查询 -->
+	<select id="selectList" resultMap="userContractAuditMap" >
+		<include refid="selectAllColumns"/>
+		where user_contract_audit_.c_id=#{cid}
+		<if test="pager!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectCount" resultType="long">
+		<include refid="count_Tail" />
+		user_contract_audit user_contract_audit_ where user_contract_audit_.c_id = #{cid}
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="userContractAuditDTO" useGeneratedKeys="true" keyProperty="caId">
+		<![CDATA[
+		insert into user_contract_audit (
+		    	 c_id
+		    	 ,audit_id
+		    	 ,audit_date
+		    	 ,remark
+		    	 ,status
+		   )values(
+		    	#{cid}
+		    	,#{auditId}
+		    	,#{auditDate}
+		    	,#{remark}
+		    	,#{status}
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="userContractAuditDTO">
+		<![CDATA[
+		update user_contract_audit set
+   			ca_id = #{caId}
+   			,c_id = #{cid}
+   			,audit_id = #{auditId}
+   			,audit_date = #{auditDate}
+   			,remark = #{remark}
+   			,status = #{status}
+		 where id = #{id}
+		]]>
+	</update>
+</mapper>

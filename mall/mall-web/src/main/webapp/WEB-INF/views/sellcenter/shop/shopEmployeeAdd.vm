@@ -1,0 +1,227 @@
+#set($layout = "/none_layout.vm")
+<link href="$request.getContextPath()/assets/css/register.css" rel="stylesheet" type="text/css"/>
+<style type="text/css">
+.unchick_btn {
+	background-color: #e8e8e8;
+	cursor: default;
+}
+.unchick_btn:hover {
+	background-color: #e8e8e8;
+}
+.add_div_1{ display:block; width:100%; height:100%;}
+.add_div_2{background:#000; opacity:0.5;filter: Alpha(Opacity=50); width:100%; height:100%; position:fixed; left:0; top:0;z-index:100; overflow:hidden;}
+.add_div_3{background-color:#FFF; padding:10px; border:5px solid #e3e3e3;z-index:101;position:fixed; top:50%; left:50%; zoom:1;min-height:120px;}
+.add_div_3{width:555px; min-height:105px;margin-left:-310px; margin-top:-300px;}
+.add_div_3 ul li{width:100%; text-align:center; line-height:22px;}
+</style>
+<script type="text/javascript">
+	$(function(){
+		$("div>div>i.demo-icons,#cancelEmployeeAdd").bind("click",function(){
+			$("#add_div").hide();
+		});
+	});
+
+	// 新增员工操作
+function addEmployee() {
+	var cb = document.getElementsByName("resourceId");
+	var str = "";
+	for (var i = 0; i < cb.length; i++) {
+		if (cb[i].checked) {
+			str = str + cb[i].value + ",";
+		}
+	}
+
+	$.get("$request.contextPath/shopAuthorityManageController/addEmploy", {
+		"username" : document.all.username.value,
+		"nickname" : document.all.nickname.value,
+		"password" : document.all.password.value,
+		"checkbox" : str,
+		"moduleType":"$!moduleType"
+	}, function(response) {
+		if (response.result == 'success') {
+			alert(response.message);
+			window.location.reload();
+		} else {
+    		alert(response.message);
+    		window.location.reload();
+		}
+	}, "json");
+	$(".po_fai").hide();
+};
+
+</script>
+<div  class="add_div_1">
+<div class="add_div_2"></div>
+<div class="add_div_3" >
+   <div class="hei_32 bg_05 pad_l10"><i class="demo-icons fa-times-circle font_16 fr mar_r10"></i><b>创建店铺员工</b></div>
+   <div class="clear"></div>   
+   <div class="register_content" style="width:500px; height:510px; margin: 0; overflow:hidden  ">
+		<div class="register_box" style="padding:0;">
+			<ul>
+                <!--如需增加可循环li开始-->
+                    <li class="mar_tb10">
+					<input name="username" id="loginname_id" type="text" class="input_Style1 wid_260" placeholder="员工账号名" maxlength="29"/>
+                    <span class="register-icon fa-user font_c7"></span>
+                    <span id="loginname_span" class="msg_span font_12"></span>
+                    </li>
+				<!--如需增加可循环li结束-->
+					<li class="mar_tb10">
+					<input name="nickname" id="nickname_id" type="text" class="input_Style1 wid_260" placeholder="员工姓名" maxlength="29"/>
+                    <span class="register-icon fa-user font_c7"></span>
+                    <span id="nickname_span" class="msg_span font_12"></span>
+                    </li>
+                <!--如需增加可循环li结束-->
+                    <li class="mar_tb10">
+                    <input name="password" type="password" id="loginpwd_id" class="input_Style1 wid_260" placeholder="登录密码" maxlength="29"/>
+                    <span class="register-icon fa-lock font_c7"></span>
+                    <span id="loginpwd_span" class="msg_span font_12"></span>
+                    </li>
+                    <li class="mar_tb10">
+                    <input name="pwd" type="password" id="pwd_id" class="input_Style1 wid_260" style="background:#efefef;" placeholder="确认密码" maxlength="29"/>
+                    <span class="register-icon fa-lock font_c7"></span>
+                    <span id="pwd_span" class="msg_span"></span>
+                    <li style="border:none" name="resourceIds" >
+					 <span class="fl">权限设置：&nbsp;&nbsp;</span>
+					 #foreach($entity in $resources)
+					 <span class="fl mar_l10">
+						 #if($entity.resourceName=="店铺管理")<input type="checkbox" name="resourceId" value="$entity.id" />$entity.resourceName 
+							<span class="font_ec">(最高权限)</span> <br>
+							#else
+							<input type="checkbox" name="resourceId" value="$entity.id" />$entity.resourceName
+						 #end
+					 </span>		 
+						 #if( $!{velocityCount}%4==0 ) <br/>#end
+					 #end
+                   </li>
+                </ul>
+             <div class="mar">
+                     <button class="button_2 hei_35 font_16"  id="btn_submit" >确定</button>
+                     <button class="button_3 hei_35 font_16" id="cancelEmployeeAdd">取消</button>
+        	</div>
+               
+		</div>
+
+				
+   </div>
+</div>
+</div>
+	
+<script type="text/javascript">
+
+	//验证用户名
+	$("#loginname_id").focusin(inLogName).focusout(checkLogName);
+	
+	function inLogName(){
+		$("#loginname_span").html("4-20位字符，支持字母、数字、下划线两个以上组合");
+		$("#loginname_span").css("color", "rgb(222, 222, 222)");
+	}
+	
+	function checkLogName(){
+		var loginname = $("#loginname_id").val();
+		if(loginname.length < 1){
+			$("#loginname_span").html("不能为空");
+			$("#loginname_span").css("color", "red");
+			return false;
+		}
+		var lognameFormat = /^((?=.*?[0-9])(?=.*?[A-Za-z])|(?=.*?[0-9])(?=.*?[_])|(?=.*?[A-Za-z])(?=.*?[_]))[0-9A-Za-z_]{4,20}$/;
+		if(!lognameFormat.test(loginname)){
+			$("#loginname_span").html("格式不正确");
+			$("#loginname_span").css("color", "red");
+			return false;
+		}
+		var data = {loginname:loginname};
+		$.ajax({
+			url:"$request.contextPath/user/verifyLoginName",
+			type:"post",
+			data:data,
+			success:function(data){
+				if(data.message){
+					$("#loginname_span").html("此用户名已经被使用");
+					$("#loginname_span").css("color", "red");
+				}else {
+					$("#loginname_span").html("用户名可用");
+					$("#loginname_span").css("color", "rgb(222, 222, 222)");
+				}
+			}
+		});
+		if($("#loginname_span").html() == "用户名可用"){
+			return true;
+		}
+		return false;
+	}
+	
+	//验证密码格式
+	$("#loginpwd_id").focus(checkPwdIn).focusout(checkPwdOut);
+	
+	function checkPwdIn(){
+		$("#loginpwd_span").html("6-20位字符，建议由字母数字和符号组合");
+		$("#loginpwd_span").css("color", "#dedede");
+	}
+	
+	function checkPwdOut(){
+		var pwd = $("#loginpwd_id").val();
+		if(pwd.length == 0){
+			$("#loginpwd_span").html("请输登录密码");
+			$("#loginpwd_span").css("color","red");
+			return false;
+		}
+		if(pwd.length < 6){
+			$("#loginpwd_span").html("密码不得少于六位，请重新输入");
+			$("#loginpwd_span").css("color","red");
+			return false;
+		} else {
+			var pwdFormat = /^((?=.*?\d)(?=.*?[A-Za-z])|(?=.*?\d)(?=.*?[.,\?/\\\{\}\(\)\[\]!@#$%^&])|(?=.*?[A-Za-z])(?=.*?[!@#$%^&]))[\dA-Za-z,./\\'"\(\)\{\}\[\]\?\-_+\=!@#$%^&]{6,20}$/;
+			if(!pwdFormat.test(pwd)){
+				$("#loginpwd_span").html("密码格式不正确，请重新输入");
+				$("#loginpwd_span").css("color","red");
+				return false
+			} else {
+				return true;
+			}
+		}
+	}
+	
+	$("#pwd_id").focusout(checkPwdToo);
+	
+	function checkPwdToo(){
+		var pwdToo = $("#pwd_id").val();
+		if(pwdToo.length == 0){
+			$("#pwd_span").html("请输入确认密码");
+			$("#pwd_span").css("color","red");
+			return false;
+		}
+		var pwd = $("#loginpwd_id").val();
+		if(pwdToo != pwd){
+			$("#pwd_span").html("两次密码不同，请重新输入");
+			$("#pwd_span").css("color","red");
+			return false;
+		} else {
+			$("#pwd_span").html("");
+			return true;
+		}
+	}
+	
+	function _chage(){
+		var img = document.getElementById("vc");
+		img.src="$request.contextPath/user/acquire?a=" + new Date().getTime();
+	}
+	
+    function checkProtocol() {
+    	var cb = document.getElementsByName("resourceId");
+    	for (var i = 0; i < cb.length; i++) {
+    		if (cb[i].checked) {
+    			return true;
+    		}
+    	}
+		
+		alert('权限设置需要至少选择一项。');
+    	return false;
+    }
+	
+	$("#btn_submit").click(function(){
+		if(checkLogName() && checkPwdOut() && checkPwdToo()&& checkProtocol() ){
+			addEmployee() ;
+		}
+	});
+	
+</script>

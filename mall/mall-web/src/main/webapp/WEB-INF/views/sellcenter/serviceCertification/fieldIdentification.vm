@@ -1,0 +1,258 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<style type="text/css">
+	.none_border{
+		border:0px;
+	}
+</style>
+<script type="text/javascript">
+	$(function(){
+		//加载左侧菜单
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+		//提交实地认证
+		$('#submitButton').click(function(){
+			$.ajax({
+				type: "post",
+				dataType: "json",
+				url:"$request.contextPath/sellcenter/service/submitIdentification",
+				success:function(data){
+					if(data.success){
+						alert("提交实地认证成功!");
+					}else{
+						alert("提交实地认证失败!");
+					}
+					window.location.href = "$request.contextPath/sellcenter/service/fieldIdentification";
+				},
+	            error:function(XMLHttpRequest, textStatus, errorThrown){
+	            	alert("系统繁忙,请稍后再试!");
+	            }
+			});
+		})
+	});
+
+	//显示审核结果信息
+	function showAuditDiv(){
+		$("#applyDiv").hide();
+		$("#auditDiv").show();
+		$("#pictureDiv").hide();
+	}
+	//显示审核申请信息
+	function showApplyDiv(){
+		$("#applyDiv").show();
+		$("#auditDiv").hide();
+		$("#pictureDiv").hide();
+	}
+	//显示审核图片信息
+	function showPictureDiv(){
+		$("#applyDiv").hide();
+		$("#auditDiv").hide();
+		$("#pictureDiv").show();
+	}
+	//显示审核驳回原因
+	function showRejectDiv(){
+		$("#rejectDiv").show();
+	}
+	//隐藏审核驳回原因
+	function closeRejectDiv(){
+		$("#rejectDiv").hide();
+	}
+</script>
+<div id="main">
+	<div id="leftSeller" class="border-4"></div>
+		<div id="right_top" class="right_top border-4 bg_06">
+			<ul class="list wid_950 mar">
+				<li class="wid_950 font_14b font_fe">为何要认证？</li>
+				<li class="wid_950 border-5">通过实地认证，可提升店铺在消费者心目中的信赖度，获取更多交易机会。</li>
+				<li class="wid_950"><i class="font_14b font_fe">公司名称：</i>$!userBusinessDTO.companyName</li>
+			</ul>
+		</div>
+		<div id="right_bot" class="right_bot border-4 bg_06">
+      		<div id="auditDiv">
+      			#if($!auditStatus==0)
+      				实地认证申请已经提交平台，请您耐心等待平台处理结果。
+      				<div style="margin-top:20px; margin-bottom:20px;">
+  						认证处理状态：待受理，您可以
+  						<button onclick="showApplyDiv()" class="button_2 hei_35 font_14b">查看实地认证信息</button>
+      				</div>
+      				#if($!uploaded)
+      					<div style="margin-top:20px; margin-bottom:20px;">
+      						平台已上传图片，您可以
+      						<button onclick="showPictureDiv()" class="button_2 hei_35 font_14b">查看平台上传图片</button>
+      					</div>
+					#end
+				#elseif($!auditStatus==1)
+					实地认证申请已经提交平台，请您耐心等待平台处理结果。
+					<div style="margin-top:20px; margin-bottom:20px;">
+						认证处理状态：待审核，您可以
+						<button onclick="showApplyDiv()" class="button_2 hei_35 font_14b">查看实地认证信息</button>
+  					</div>
+   					#if($!uploaded)
+      					<div style="margin-top:20px; margin-bottom:20px;">
+      						平台已上传图片，您可以
+      						<button onclick="showPictureDiv()" class="button_2 hei_35 font_14b">查看平台上传图片</button>
+      					</div>
+					#end
+				#elseif($!auditStatus==2)
+					实地认证申请平台处理结果：审核通过，您可以
+  					<button onclick="showApplyDiv()" class="button_2 hei_35 font_14b">查看实地认证信息</button>
+   					#if($!uploaded)
+      					<div style="margin-top:20px; margin-bottom:20px;">
+	   						平台已上传图片，您可以
+	   						<button onclick="showPictureDiv()" class="button_2 hei_35 font_14b">查看平台上传图片</button>
+    					</div>
+					#end
+				#elseif($!auditStatus==3)
+					实地认证申请平台处理结果： <span class="wid_950 font_14b font_fe">审核驳回</span>，您可以
+					<button onclick="showRejectDiv()" class="button_2 hei_35 font_14b">查看审核驳回原因</button>
+					并重新
+					<button onclick="showApplyDiv()" class="button_2 hei_35 font_14b">申请实地认证信息</button>
+					#if($!uploaded)
+      					<div style="margin-top:20px; margin-bottom:20px;">
+      						平台已上传图片，您可以
+      						<button onclick="showPictureDiv()" class="button_2 hei_35 font_14b">查看平台上传图片</button>
+      					</div>
+					#end
+				#else
+					<div style="margin-top:20px; margin-bottom:20px;">
+						<button onclick="showApplyDiv()" class="button_2 hei_35 font_14b">申请实地认证信息</button>
+					</div>
+				#end
+			</div>
+
+			<div id="applyDiv" style="display:none">
+				<form id="auditInfoForm" method="post">
+						<div class="Notice pad_tb20">
+							#if(!$!applyed || $!auditStatus == 3)
+								<dl>
+									<dt>企业名称:</dt>
+									<dd><input class="input_Style2 wid_500 hei_30" value="$!userBusinessDTO.companyName"/></dd>
+								</dl>
+								<dl>
+									<dt>企业类型:</dt>
+									<dd><input class="input_Style2 wid_500 hei_30" value="$!userBusinessDTO.companyQualt.label"/></dd>
+								</dl>
+								<dl>
+									<dt>企业法人代表:</dt>
+									<dd><input class="input_Style2 wid_500 hei_30" value="$!userBusinessDTO.artificialPersonName"/></dd>
+								</dl>
+								<dl>
+									<dt>注册资本:</dt>
+									<dd><input class="input_Style2 wid_500 hei_30" value="$!userBusinessDTO.registeredCapital"/></dd>
+								</dl>
+								<dl>
+									<dt>经营范围:</dt>
+									<dd><textarea maxlength="200" class="input_Style2 hei_60 wid_500">$!businessScope</textarea></dd>
+								</dl>
+								<dl>
+									<dt>成立日期:</dt>
+									<dd><input class="input_Style2 wid_500 hei_30" value="$!businessLicenceDate"/></dd>
+								</dl>
+								<dl>
+									<dt>经营期限:</dt>
+									<dd><input class="input_Style2 wid_500 hei_30" value="$!businessLicenceIndate"/></dd>
+								</dl>
+								<dl>
+									<dt>工商注册号:</dt>
+									<dd><input class="input_Style2 wid_500 hei_30" value="$!userBusinessDTO.businessLicenceId"/></dd>
+								</dl>
+								<div class="wid_460" style="margin:30px 100px 30px 300px">
+									<button id="submitButton" class="button_2 hei_35 font_14b">提交</button>
+								</div>
+							#else
+								<dl>
+									<dt>企业名称:</dt>
+									<dd><input class="input_Style2 wid_500 hei_30 none_border" value="$!userBusinessDTO.companyName" diabled="diabled"/></dd>
+								</dl>
+								<dl>
+									<dt>企业类型:</dt>
+									<dd><input class="input_Style2 wid_500 hei_30 none_border" value="$!userBusinessDTO.companyQualt.label" diabled="diabled"/></dd>
+								</dl>
+								<dl>
+									<dt>企业法人代表:</dt>
+									<dd><input class="input_Style2 wid_500 hei_30 none_border" value="$!userBusinessDTO.artificialPersonName" diabled="diabled"/></dd>
+								</dl>
+								<dl>
+									<dt>注册资本:</dt>
+									<dd><input class="input_Style2 wid_500 hei_30 none_border" value="$!userBusinessDTO.registeredCapital" diabled="diabled"/></dd>
+								</dl>
+								<dl>
+									<dt>经营范围:</dt>
+									<dd><textarea maxlength="200" class="input_Style2 hei_60 wid_500 none_border" diabled="diabled">$!businessScope</textarea></dd>
+								</dl>
+								<dl>
+									<dt>成立日期:</dt>
+									<dd><input class="input_Style2 wid_500 hei_30 none_border" value="$!businessLicenceDate" diabled="diabled"/></dd>
+								</dl>
+								<dl>
+									<dt>经营期限:</dt>
+									<dd><input class="input_Style2 wid_500 hei_30 none_border" value="$!businessLicenceIndate" diabled="diabled"/></dd>
+								</dl>
+								<dl>
+									<dt>工商注册号:</dt>
+									<dd><input class="input_Style2 wid_500 hei_30 none_border" value="$!userBusinessDTO.businessLicenceId" diabled="diabled"/></dd>
+								</dl>
+								<div class="wid_460" style="margin:30px 100px 30px 300px">
+									<button onclick="showAuditDiv()" class="button_2 hei_35 font_14b">返回</button>
+								</div>
+							#end
+						</div>
+				</form>
+      		</div>
+
+			<div id="pictureDiv" style="display:none">
+				<li>厂房产品图片:</li>
+  				<li>
+   					<img src="$!imageServerAddr$!pictureMap.get('0-0').pictureSrc" width="120" height="120"/>
+   					<img src="$!imageServerAddr$!pictureMap.get('0-0').pictureSrc" width="120" height="120"/>
+   					<img src="$!imageServerAddr$!pictureMap.get('0-2').pictureSrc" width="120" height="120"/>
+   					<img src="$!imageServerAddr$!pictureMap.get('0-3').pictureSrc" width="120" height="120"/>
+   					<img src="$!imageServerAddr$!pictureMap.get('0-4').pictureSrc" width="120" height="120"/>
+   				</li>
+  				<li>企业大门图片:</li>
+  				<li>
+   					<img src="$!imageServerAddr$!pictureMap.get('1-0').pictureSrc" width="120" height="120"/>
+   					<img src="$!imageServerAddr$!pictureMap.get('1-1').pictureSrc" width="120" height="120"/>
+   					<img src="$!imageServerAddr$!pictureMap.get('1-2').pictureSrc" width="120" height="120"/>
+   					<img src="$!imageServerAddr$!pictureMap.get('1-3').pictureSrc" width="120" height="120"/>
+   					<img src="$!imageServerAddr$!pictureMap.get('1-4').pictureSrc" width="120" height="120"/>
+   				</li>
+   				<li>办公场所图片:</li>
+  				<li>
+   					<img src="$!imageServerAddr$!pictureMap.get('2-0').pictureSrc" width="120" height="120"/>
+   					<img src="$!imageServerAddr$!pictureMap.get('2-1').pictureSrc" width="120" height="120"/>
+   					<img src="$!imageServerAddr$!pictureMap.get('2-2').pictureSrc" width="120" height="120"/>
+   					<img src="$!imageServerAddr$!pictureMap.get('2-3').pictureSrc" width="120" height="120"/>
+   					<img src="$!imageServerAddr$!pictureMap.get('2-4').pictureSrc" width="120" height="120"/>
+   				</li>
+   				<li>其他证书图片:</li>
+  				<li>
+   					<img src="$!imageServerAddr$!pictureMap.get('3-0').pictureSrc" width="120" height="120"/>
+   					<img src="$!imageServerAddr$!pictureMap.get('3-1').pictureSrc" width="120" height="120"/>
+   					<img src="$!imageServerAddr$!pictureMap.get('3-2').pictureSrc" width="120" height="120"/>
+   					<img src="$!imageServerAddr$!pictureMap.get('3-3').pictureSrc" width="120" height="120"/>
+   					<img src="$!imageServerAddr$!pictureMap.get('3-4').pictureSrc" width="120" height="120"/>
+   				</li>
+   				<div class="wid_460" style="margin:30px 100px 30px 300px">
+					<button onclick="showAuditDiv()" class="button_2 hei_35 font_14b">返回</button>
+				</div>
+			</div>
+
+			<div id="rejectDiv" class="po_fai" style="display:none">
+				<div class="po_main" style="width:500px; margin-left:-250px;">
+					<div class="tit pad_l10 hei_35 bg_05" >
+						<span class="fl font_14b">驳回原因</span><i onclick="closeRejectDiv()" class="fa fa-times-circle fr font_14 mar_r10 cursor"></i>
+					</div>
+					<ul class="mar_tb20">
+						<li>
+							<span class="font_left fl">$!auditRemark</span>
+						</li>
+						<li class="clear"></li>
+						<li>
+							<button onclick="closeRejectDiv()" class="button_1 hei_35">返回</button>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div><!-- right_bot结束 -->
+	</div>
+</div>

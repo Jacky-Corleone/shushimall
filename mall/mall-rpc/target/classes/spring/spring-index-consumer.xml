@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+	<!-- dubbo服务取调用其他模块的dubbo服务 -->
+	
+	<dubbo:reference id="mallAdService" registry="qingdaoRegistry" 
+ 		owner="camelot" interface="com.camelot.sellercenter.malladvertise.service.MallAdExportService" 
+		version="1.0" protocol="dubbo" timeout="100000" init="true" /> 
+	
+	<dubbo:reference id="logoExportService" registry="qingdaoRegistry" 
+ 		owner="camelot" interface="com.camelot.sellercenter.logo.service.LogoExportService" 
+		version="1.0" protocol="dubbo" timeout="100000" init="true" /> 
+		
+	<dubbo:reference id="itemExportService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.goodscenter.service.ItemExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+	<dubbo:reference id="mallAdvertisService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.sellercenter.malladvertise.service.MallAdExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+	<dubbo:reference id="mallDocumentService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.basecenter.service.MallDocumentService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+		
+	<dubbo:reference id="noticeSevice" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.sellercenter.notice.service.NoticeExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />  
+		
+		
+	<dubbo:reference id="mallBannerService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.sellercenter.mallBanner.service.MallBannerExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />  
+		
+		
+	<dubbo:reference id="mallRecService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.sellercenter.mallRec.service.MallRecExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />  
+		
+		
+	<dubbo:reference id="categoryService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.goodscenter.service.ItemCategoryService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />  
+		
+		
+	<dubbo:reference id="mallRecAttrService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.sellercenter.mallrecattr.service.MallRecAttrExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />  
+	
+    <dubbo:reference id="shopExportService" registry="qingdaoRegistry" 
+		owner="storecenter" interface="com.camelot.storecenter.service.ShopExportService" 
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	
+    <dubbo:reference id="citicExportService" registry="qingdaoRegistry" 
+		owner="storecenter" interface="com.camelot.payment.CiticExportService" 
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+    <dubbo:reference id="financeWithdrawRecordExportService" registry="qingdaoRegistry"
+                     owner="storecenter" interface="com.camelot.payment.FinanceWithdrawRecordExportService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+    <dubbo:reference id="itemEvaluationService" registry="qingdaoRegistry"
+                     owner="zhangfan" interface="com.camelot.goodscenter.service.ItemEvaluationService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+                     
+    <dubbo:reference id="baseSmsConfigService" registry="qingdaoRegistry"
+                     owner="zhangfan" interface="com.camelot.basecenter.service.BaseSmsConfigService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+</beans>
+
+

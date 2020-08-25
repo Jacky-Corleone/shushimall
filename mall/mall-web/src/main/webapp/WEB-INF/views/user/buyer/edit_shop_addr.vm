@@ -1,0 +1,155 @@
+#set($layout = "/none_layout.vm")
+<link href="$request.getContextPath()/assets/css/register.css" rel="stylesheet" type="text/css"/>
+<style type="text/css">
+.msg_span{
+	font-size: 12px;
+	float: left;
+	margin-left: 16px;
+}
+.unchick_btn {
+	background-color: #e8e8e8;
+	cursor: default;
+}
+.unchick_btn:hover {
+	background-color: #e8e8e8;
+}
+.edit_div_1{ display:block; width:100%; height:100%;}
+.edit_div_2{background:#000; opacity:0.5;filter: Alpha(Opacity=50); width:100%; height:100%; position:fixed; left:0; top:0;z-index:100; overflow:hidden;}
+.edit_div_3{background-color:#FFF; padding:10px; border:5px solid #e3e3e3;z-index:101;position:fixed; top:50%; left:50%; zoom:1;min-height:120px;}
+.edit_div_3{width:555px; min-height:105px;margin-left:-310px; margin-top:-300px;}
+</style>
+
+<div  class="edit_div_1">
+<div class="edit_div_2"></div>
+<div class="edit_div_3" >
+   <div class="hei_32 bg_05 pad_l10"><i id="closeEditAddrForm" class="demo-icons fa-times-circle font_16 fr mar_r10 cursor"></i><b>修改默认收获地址</b></div>
+   <div class="clear"></div>
+            <form id="edit_addrform_id" method="post">
+            <input type="hidden" name="id" id="edit_addrId" value="${addr.id}"/>
+    		<div class="cle_con1_add mar_l32">
+        		<dl>
+                    <dt><i class="demo-icons font_fe">*</i>收&nbsp;货&nbsp;人：</dt>
+                    <dd class="wid_180"><input id="edit_contactperson_id" name="contactperson" type="text" maxlength="10" value="${addr.contactperson}"/></dd>
+                    <dd class="wid_80 font_right"><i class="demo-icons font_fe">*</i>手机号码</dd>
+                    <dd class="wid_180"><input id="edit_contactphone_id" name="contactphone" type="text" maxlength="11" value="${addr.contactphone}"/></dd>
+       	 		</dl>
+        		<dl>
+                    <dt class="cle_con1_star"><i class="demo-icons font_fe">*</i>收货地址：</dt>
+                    <dd class="cle_con1_address">
+                    	<select name="provicecode" id="edit_business_provinces" class="input_Style1 wid_80">
+							<option value="$!addr.provicecode"> $!proviceName </option>
+						</select>
+                    </dd>
+                    <dd class="cle_con1_address">
+                    	<select name="citycode" id="edit_business_city" class="input_Style1 wid_80">
+							<option value="$!addr.citycode" > $!cityName </option>
+						</select>
+                    </dd>
+                    <dd class="cle_con1_address" style="display:none">
+                    	<select name="countrycode" id="edit_business_area" class="input_Style1 wid_80">
+							<option value="$!addr.countrycode"> $!countryName </option>
+						</select>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt class="cle_con1_star"><i class="demo-icons font_fe">*</i>详细地址：</dt>
+                    <dd class="cle_con1_det"><input id="edit_fulladdress_id" name="fulladdress" style="width: 430px;" type="text" maxlength="40" value="${addr.fulladdress}"/></dd>
+                </dl>
+                <dl>
+                	<dt class="cle_con1_star">固定电话：</dt>
+                    <dd class="cle_con1_t2"><input id="edit_contacttel_id" name="contacttel" type="text" maxlength="13" value="${addr.contacttel}" /></dd><span style="width: 150px; height: 20px; color: #747474;">格式：010-88888888</span>
+                </dl>
+                <dl class="cle_con1_but">
+                	<dt><input id="def_id_edit" name="defauleAddr" type="checkbox" value="${addr.isdefault}" style="border:0px;" #if($!addr.isdefault==1) checked="checked" #end/></dt>
+                    <dd>设为常用地址</dd>
+                    <dd><a href="#"><button id="edit_submit_addr" class="button_1 mar_lr10 hei_35" type="button">保存收货地址</button></a></dd>
+                </dl>
+    		</div><!--cle_con1_add -->
+    		</form>
+        </div>
+</div>
+</div>
+    <script type="text/javascript">
+		
+		$(document).ready(function(){
+			
+			$("#edit_business_provinces").change(function(){
+        		$("#edit_business_city").empty();
+        		$("#edit_business_city").append($("<option>").text("请选择").val("0"));
+				$("#edit_business_area").empty();
+        		$("#edit_business_area").append($("<option>").text("请选择").val("0"));
+        		optionItems("$request.getContextPath()/controller/configuration/queryAddress",$("#edit_business_provinces").val(),"edit_business_city");
+        	});
+			/*
+			$("#edit_business_city").change(function(){
+        		$("#edit_business_area").empty();
+        		$("#edit_business_area").append($("<option>").text("请选择").val("0"));
+        		optionItems("$request.getContextPath()/controller/configuration/queryAddress",$("#edit_business_city").val(),"edit_business_area");
+        	});
+			*/
+			optionItems("$request.getContextPath()/controller/configuration/queryAddress",'0',"edit_business_provinces",$!addr.provicecode);
+			optionItems("$request.getContextPath()/controller/configuration/queryAddress",$!addr.provicecode,"edit_business_city",$!addr.citycode);
+			optionItems("$request.getContextPath()/controller/configuration/queryAddress",$!addr.citycode,"edit_business_area",$!addr.countrycode);
+			
+			//关闭按钮
+			$("#closeEditAddrForm").click(function(){
+				$("#edit_div").attr("style","display:none");
+			});
+		});
+		$("#edit_submit_addr").click(function(){
+        	var contactperson = $("#edit_contactperson_id").val().replace(/[ ]/g,"");
+        	var contactphone = $("#edit_contactphone_id").val().replace(/[ ]/g,"");
+        	var provinces = $("#edit_business_provinces").val();
+        	var city = $("#edit_business_city").val();
+        	//var area = $("#edit_business_area").val();
+        	var fulladdress = $("#edit_fulladdress_id").val().replace(/[ ]/g,"");
+        	var contacttel = $("#edit_contacttel_id").val().replace(/[ ]/g,"");
+        	if(contactperson.length < 1 || contactphone.length < 1 || provinces.length < 1 || fulladdress.length < 1 || provinces == 0 || city == 0 /*|| area == 0*/){
+        		alert("请把必填信息填写完整");
+        	} else {
+        		$("#edit_addrform_id").attr("action","$request.getContextPath()/buyer/modifyAddr");
+        		contactperson = $("#edit_contactperson_id").val();
+        		contactphone = $("#edit_contactphone_id").val();
+        		contacttel = $("#edit_contacttel_id").val();
+        		var mobileFormat = /^[1]{1}[0-9]{10}$/;
+        		var linePhoneFormat = /^[0-9]{3,4}[-]{1}[0-9]{7,8}$/;
+        		if(!mobileFormat.test(contactphone)){
+        			alert("手机号格式不正确！");
+        			return;
+        		}
+        		if(contacttel.length > 0) {
+        			if(!linePhoneFormat.test(contacttel)){
+    	    			alert("固定电话格式不正确！");
+    	    			return;
+    	    		}
+        		}
+        		$("#edit_addrform_id").submit();
+        	}
+        });
+		//工具方法：下拉框
+    	function optionItems(url, parentCode, optionId,selectVal){
+    		$.ajax({
+    			url:url,
+    			type:"post",
+    			data:{
+    				parentCode:parentCode
+    			},
+    			dataType: "json",
+    			success:function(data){
+    				var optionItem = $("#"+optionId);
+    				optionItem.empty();
+    				optionItem.append($("<option>").text("请选择").val(""));
+					for(var i = 0 ; i < data.length ; i++){
+						
+    					var option = $("<option>").text(data[i].name).val(data[i].code);
+						
+						if(data[i].code == selectVal){
+    						option.attr("selected",true);
+    					}
+						
+        				optionItem.append(option);
+					}
+    			}
+    		});
+    	}
+    </script>

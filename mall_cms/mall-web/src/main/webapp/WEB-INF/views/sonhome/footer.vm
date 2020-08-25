@@ -1,0 +1,9 @@
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#foot").load("$request.contextPath/footer");
+	});
+	function openDocs(id){
+		$.cookie('clicked_docs', id, {path:'/'});
+	}
+</script>
+<div id="foot"></div>

@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.goodscenter.dao.InquiryInfoDAO">
+	<resultMap id="inquiryInfoMapper" type="com.camelot.goodscenter.dto.InquiryInfoDTO">
+			<result property="id" column="id" />
+			<result property="inquiryNo" column="inquiry_no" />
+			<result property="inquiryName" column="inquiry_name" />
+			<result property="printerId" column="printer_id" />
+			<result property="supplierId" column="supplier_id" />
+			<result property="beginDate" column="begin_date" />
+			<result property="endDate" column="end_date" />
+			<result property="matCd" column="mat_cd"/>
+		    <result property="quantity" column="quantity"/>
+			<result property="status" column="status" />
+			<result property="deliveryDate" column="delivery_date" />
+			<result property="annex" column="annex" />
+			<result property="remarks" column="remarks" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="activeFlag" column="active_flag" />
+			<result property="itemName" column="item_name" />
+			<result property="tempIds" column="temp_ids"/>
+			<result property="deliveryDate2" column="delivery_date2" />
+			<result property="skuId" column="sku_id" />
+			
+
+	</resultMap>
+	
+	<sql id="where">
+		<where>
+			<if test="inquiryInfo.id != null and inquiryInfo.id != '' ">
+				and  inquiryInfo.id = #{inquiryInfo.id}
+			</if>
+			<if test="inquiryInfo.inquiryNo != null and inquiryInfo.inquiryNo != '' ">
+				and  inquiryInfo.inquiry_no = #{inquiryInfo.inquiryNo}
+			</if>
+			<if test="inquiryInfo.inquiryName != null and inquiryInfo.inquiryName != '' ">
+				<![CDATA[ and inquiryInfo.inquiry_name like CONCAT('%',TRIM(#{inquiryInfo.inquiryName}),'%')]]>
+			</if>
+			<if test="inquiryInfo.printerId != null and inquiryInfo.printerId != '' ">
+				and  inquiryInfo.printer_id = #{inquiryInfo.printerId}
+			</if>
+			<if test="inquiryInfo.supplierId != null and inquiryInfo.supplierId != '' ">
+				and  inquiryInfo.supplier_id = #{inquiryInfo.supplierId}
+			</if>
+			<if test="inquiryInfo.beginDate != null and inquiryInfo.beginDate != '' ">
+				and  inquiryInfo.begin_date = #{inquiryInfo.beginDate}
+			</if>
+			<if test="inquiryInfo.endDate != null and inquiryInfo.endDate != '' ">
+				and  inquiryInfo.end_date = #{inquiryInfo.endDate}
+			</if>
+			<if test="inquiryInfo.matCd != null and inquiryInfo.matCd != '' ">
+				and  inquiryInfo.mat_cd = #{inquiryInfo.matCd}
+			</if>
+			<if test="inquiryInfo.status != null and inquiryInfo.status != '' ">
+				and  inquiryInfo.status = #{inquiryInfo.status}
+			</if>
+			<if test="inquiryInfo.deliveryDate != null and inquiryInfo.deliveryDate != '' ">
+				and  inquiryInfo.delivery_date = #{inquiryInfo.deliveryDate}
+			</if>
+			<if test="inquiryInfo.annex != null and inquiryInfo.annex != '' ">
+				and  inquiryInfo.annex = #{inquiryInfo.annex}
+			</if>
+			<if test="inquiryInfo.remarks != null and inquiryInfo.remarks != '' ">
+				and  inquiryInfo.remarks = #{inquiryInfo.remarks}
+			</if>
+			<if test="inquiryInfo.createBy != null and inquiryInfo.createBy != '' ">
+				and  inquiryInfo.create_by = #{inquiryInfo.createBy}
+			</if>
+<!-- 			<if test="inquiryInfo.createDate != null and inquiryInfo.createDate != '' "> -->
+<!-- 				and  inquiryInfo.create_date = #{inquiryInfo.createDate} -->
+<!-- 			</if> -->
+			<if test="inquiryInfo.updateBy != null and inquiryInfo.updateBy != '' ">
+				and  inquiryInfo.update_by = #{inquiryInfo.updateBy}
+			</if>
+			<if test="inquiryInfo.updateDate != null and inquiryInfo.updateDate != '' ">
+				and  inquiryInfo.update_date = #{inquiryInfo.updateDate}
+			</if>
+			<if test="inquiryInfo.activeFlag != null and inquiryInfo.activeFlag != '' ">
+				and  inquiryInfo.active_flag = #{inquiryInfo.activeFlag}
+			</if>
+			<if test="inquiryInfo.itemName != null and inquiryInfo.itemName != '' ">
+				<!--  and  item.item_name LIKE '%'||TRIM(#{inquiryInfo.itemName}) ||'%' -->
+				<![CDATA[ and  item.item_name LIKE CONCAT('%',TRIM(#{inquiryInfo.itemName}),'%')]]>
+			</if>
+			<if test="inquiryInfo.quantity != null and inquiryInfo.quantity != '' ">
+				and  item.quantity=#{inquiryInfo.quantity}
+			</if>
+			<if test=" inquiryInfo.supplierIdList != null and inquiryInfo.supplierIdList.size() > 0 ">
+				AND inquiryInfo.supplier_id in
+				<foreach collection="inquiryInfo.supplierIdList" open="(" separator="," close=")" item="supplierId">
+					#{supplierId}
+				</foreach>
+			</if>
+			<if test=" inquiryInfo.createBys != null and inquiryInfo.createBys.size() > 0 ">
+				AND inquiryInfo.create_by in
+				<foreach collection="inquiryInfo.createBys" open="(" separator="," close=")" item="createBy">
+					#{createBy}
+				</foreach>
+			</if>
+			<if test="inquiryInfo.tempIds != null and inquiryInfo.tempIds != '' ">
+				and  inquiryInfo.temp_ids=#{inquiryInfo.tempIds}
+			</if>
+			
+
+			
+			<if test="inquiryInfo.startTime != null and inquiryInfo.startTime != '' ">
+		           <![CDATA[   and DATE_FORMAT(inquiryInfo.create_date, '%Y-%m-%d')>=  DATE_FORMAT(#{inquiryInfo.startTime}, '%Y-%m-%d')   ]]>
+		   </if>
+		   <if test="inquiryInfo.endTime!=null and inquiryInfo.endTime!=''">
+		           <![CDATA[  and DATE_FORMAT(inquiryInfo.create_date, '%Y-%m-%d') <= DATE_FORMAT(#{inquiryInfo.endTime}, '%Y-%m-%d')    ]]>
+		   </if>
+			
+			
+			
+			
+			<if test=" inquiryInfo.statusList != null and inquiryInfo.statusList.size() > 0 ">
+				AND inquiryInfo.status in
+				<foreach collection="inquiryInfo.statusList" open="(" separator="," close=")" item="status">
+					#{status}
+				</foreach>
+			</if>
+		</where>
+	</sql>
+	
+	<select id="queryPage" resultMap="inquiryInfoMapper">
+		SELECT
+		inquiry_no,
+		inquiry_name,
+		printer_id,
+		begin_date,
+		end_date,
+		STATUS,
+		delivery_date,
+		annex,
+		remarks,
+		create_by,
+		MAX(create_date) create_date,
+		temp_ids,
+		delivery_date2,
+		sku_id
+		FROM
+		inquiry_info inquiryInfo
+		LEFT join item item ON inquiryInfo.mat_cd=item.item_id
+		<include refid="where"/>
+		group by inquiry_no,
+		inquiry_name,
+		printer_id,
+		begin_date,
+		end_date,
+		STATUS,
+		delivery_date,
+		annex,
+		remarks,
+		temp_ids
+		ORDER BY MAX(create_date) DESC
+		limit #{pager.pageOffset},#{pager.rows}
+
+	</select>
+	
+	<select id="queryPageCount" resultType="long">
+		SELECT COUNT(*) FROM (SELECT
+		inquiry_no,
+		inquiry_name,
+		printer_id,
+		begin_date,
+		end_date,
+		STATUS,
+		delivery_date,
+		annex,
+		remarks,
+		create_by,
+		MAX(create_date),
+		temp_ids,
+		delivery_date2
+		FROM
+		inquiry_info inquiryInfo
+		LEFT join item item ON inquiryInfo.mat_cd=item.item_id
+		<include refid="where"/>
+		group by inquiry_no,
+		inquiry_name,
+		printer_id,
+		begin_date,
+		end_date,
+		STATUS,
+		delivery_date,
+		annex,
+		remarks,
+		temp_ids) a
+
+	</select>
+	
+	<select id="findById" resultMap="inquiryInfoMapper" >
+		select * from inquiry_info inquiryInfo
+		where id = #{id}
+	</select>
+
+	<select id="findByInquiryInfoDTO" resultMap="inquiryInfoMapper">
+		select * from inquiry_info inquiryInfo
+		<include refid="where"/>
+	</select>
+
+
+	<select id="queryInquiryInfoPagerCount" resultType="long">
+		SELECT count(*)
+		FROM   inquiry_info inquiryInfo,
+			   item item
+		WHERE  inquiryInfo.mat_cd = item.item_id
+		<if test="inquiryInfo.inquiryNo != null and inquiryInfo.inquiryNo != '' ">
+			<![CDATA[ and inquiryInfo.inquiry_no like CONCAT('%',TRIM(#{inquiryInfo.inquiryNo}),'%')]]>
+		</if>
+		<if test="inquiryInfo.itemName != null and inquiryInfo.itemName != '' ">
+			<![CDATA[ and item.item_name like CONCAT('%',TRIM(#{inquiryInfo.itemName}),'%')]]>
+		</if>
+		<if test="inquiryInfo.printerId != null and inquiryInfo.printerId != '' ">
+			and  inquiryInfo.printer_id = #{inquiryInfo.printerId}
+		</if>
+		<if test="inquiryInfo.supplierId != null and inquiryInfo.supplierId != '' ">
+			and  inquiryInfo.supplier_id = #{inquiryInfo.supplierId}
+		</if>
+		<if test=" inquiryInfo.supplierIdList != null and inquiryInfo.supplierIdList.size() > 0 ">
+			AND inquiryInfo.supplier_id in
+			<foreach collection="inquiryInfo.supplierIdList" open="(" separator="," close=")" item="supplierId">
+				#{supplierId}
+			</foreach>
+		</if>
+		<if test=" inquiryInfo.statusList != null and inquiryInfo.statusList.size() > 0 ">
+			AND inquiryInfo.status in
+			<foreach collection="inquiryInfo.statusList" open="(" separator="," close=")" item="status">
+				#{status}
+			</foreach>
+		</if>
+		<if test="inquiryInfo.activeFlag != null and inquiryInfo.activeFlag != '' ">
+			and  inquiryInfo.active_flag = #{inquiryInfo.activeFlag}
+		</if>
+	</select>
+
+	<select id="queryInquiryInfoPager" resultType="map">
+		SELECT
+		*
+		FROM
+		inquiry_info inquiryInfo,
+		item item,
+		item_category itemCategory
+		WHERE inquiryInfo.mat_cd = item.item_id
+		AND item.cid=itemCategory.cid
+		<if test="inquiryInfo.inquiryNo != null and inquiryInfo.inquiryNo != '' ">
+			<![CDATA[ and inquiryInfo.inquiry_no like CONCAT('%',TRIM(#{inquiryInfo.inquiryNo}),'%')]]>
+		</if>
+		<if test="inquiryInfo.itemName != null and inquiryInfo.itemName != '' ">
+			<![CDATA[ and item.item_name like CONCAT('%',TRIM(#{inquiryInfo.itemName}),'%')]]>
+		</if>
+		<if test="inquiryInfo.printerId != null and inquiryInfo.printerId != '' ">
+			and  inquiryInfo.printer_id = #{inquiryInfo.printerId}
+		</if>
+		<if test="inquiryInfo.supplierId != null and inquiryInfo.supplierId != '' ">
+			and  inquiryInfo.supplier_id = #{inquiryInfo.supplierId}
+		</if>
+		<if test=" inquiryInfo.supplierIdList != null and inquiryInfo.supplierIdList.size() > 0 ">
+			AND inquiryInfo.supplier_id in
+			<foreach collection="inquiryInfo.supplierIdList" open="(" separator="," close=")" item="supplierId">
+				#{supplierId}
+			</foreach>
+		</if>
+		<if test=" inquiryInfo.statusList != null and inquiryInfo.statusList.size() > 0 ">
+			AND inquiryInfo.status in
+			<foreach collection="inquiryInfo.statusList" open="(" separator="," close=")" item="status">
+				#{status}
+			</foreach>
+		</if>
+		<if test="inquiryInfo.activeFlag != null and inquiryInfo.activeFlag != '' ">
+			and  inquiryInfo.active_flag = #{inquiryInfo.activeFlag}
+		</if>
+		limit #{pager.pageOffset},#{pager.rows}
+	</select>
+
+	<insert id="insert" parameterType="com.camelot.goodscenter.dto.InquiryInfoDTO" useGeneratedKeys="true" keyProperty="id">
+		insert into inquiry_info(
+				inquiry_no,
+				inquiry_name,
+				printer_id,
+				supplier_id,
+				begin_date,
+				end_date,
+				mat_cd,
+				quantity,
+				status,
+				delivery_date,
+				annex,
+				remarks,
+				create_by,
+				create_date,
+				update_by,
+				update_date,
+				active_flag,
+				temp_ids,
+				delivery_date2,
+				sku_id
+		)values(
+				#{inquiryNo},
+				#{inquiryName},
+				#{printerId},
+				#{supplierId},
+				#{beginDate},
+				#{endDate},
+				#{matCd},
+				#{quantity},
+				#{status},
+				#{deliveryDate},
+				#{annex},
+				#{remarks},
+				#{createBy},
+				SYSDATE() ,
+				#{updateBy},
+				#{updateDate},
+				#{activeFlag},
+				#{tempIds},
+				#{deliveryDate2},
+				#{skuId}
+		)
+	</insert>
+	
+	<update id="update">
+		update inquiry_info set
+				id = #{id},
+				inquiry_no = #{inquiryNo},
+				inquiry_name = #{inquiryName},
+				printer_id = #{printerId},
+				supplier_id = #{supplierId},
+				begin_date = #{beginDate},
+				end_date = #{endDate},
+				mat_cd=#{matCd},
+				quantity=#{quantity},
+				status = #{status},
+				delivery_date = #{deliveryDate},
+				annex = #{annex},
+				remarks=#{remarks},
+				create_by = #{createBy},
+				create_date = #{createDate},
+				update_by = #{updateBy},
+				update_date = #{updateDate},
+				active_flag = #{activeFlag},
+				temp_ids=#{tempIds},
+				delivery_date2=#{deliveryDate2},
+				sku_id=#{skuId}
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from inquiry_info
+		<if test=" codes != null and codes.size() > 0 ">
+			where id in
+			<foreach collection="codes" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test=" codes == null or codes.size() == 0 ">
+			where 1 = 3
+		</if>
+	</delete>
+	
+	<select id="findAll" resultMap="inquiryInfoMapper">
+		select * from inquiry_info inquiryInfo
+		WHERE 1=1
+		<if test="inquiryInfo.id != null and inquiryInfo.id != '' ">
+			and  inquiryInfo.id = #{inquiryInfo.id}
+		</if>
+		<if test="inquiryInfo.inquiryNo != null and inquiryInfo.inquiryNo != '' ">
+			and  inquiryInfo.inquiry_no = #{inquiryInfo.inquiryNo}
+		</if>
+		<if test="inquiryInfo.matCd != null and inquiryInfo.matCd != '' ">
+			and  inquiryInfo.mat_cd = #{inquiryInfo.matCd}
+		</if>
+		<if test="inquiryInfo.supplierId != null and inquiryInfo.supplierId != '' ">
+			and  inquiryInfo.supplier_id = #{inquiryInfo.supplierId}
+		</if>
+		<if test=" inquiryInfo.supplierIdList != null and inquiryInfo.supplierIdList.size() > 0 ">
+			AND inquiryInfo.supplier_id in
+			<foreach collection="inquiryInfo.supplierIdList" open="(" separator="," close=")" item="supplierId">
+				#{supplierId}
+			</foreach>
+		</if>
+	</select>
+	
+	<select id="queryByMids" resultMap="inquiryInfoMapper">
+		SELECT
+			inquiryInfo.*
+		FROM
+			inquiry_info inquiryInfo,
+			inquiry_mat mat
+		WHERE
+			mat.STATUS = '1'
+		AND
+			mat.shop_id = inquiryInfo.supplier_id
+		AND
+			mat.inquiry_no = inquiryInfo.inquiry_no
+		AND mat.id in
+		<foreach collection="ids" open="(" separator="," close=")" item="id">
+			#{id}
+		</foreach>
+		GROUP BY
+			inquiryInfo.inquiry_no,
+			inquiryInfo.supplier_id
+	</select>
+	
+	<select id="queryByInquiryNos" resultMap="inquiryInfoMapper">
+		SELECT
+			inquiryInfo.*
+		FROM
+			inquiry_info inquiryInfo
+		WHERE
+			inquiryInfo.inquiry_no in
+		<foreach collection="ids" open="(" separator="," close=")" item="id">
+			#{id}
+		</foreach>
+		GROUP BY
+			inquiryInfo.inquiry_no,
+			inquiryInfo.supplier_id
+	</select>
+</mapper>

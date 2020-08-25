@@ -1,0 +1,65 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+
+<script type="text/javascript">
+$(document).ready(function() {
+	//加载左侧菜单
+	$("#leftBuyer").load("$request.contextPath/leftBuyer");
+});
+//Form表单提交
+function topage(page){
+    //此处赵修改
+	$("input[name='page']").val(page);
+	$("#queryForm").submit();
+}
+</script>
+ 
+<div id="main">
+<!--left start-->
+<div id="leftBuyer"></div>
+<!--left end-->
+
+<!--right start-->
+<div id="right" class="box-shadow1">
+	<div class="nTab">
+	<form id="queryForm" method="post" action="$request.contextPath/integralRecord/init" >
+		<div class="TabContent box-shadow1">
+		<!--此处赵修改-->
+		<input type="hidden" name="page" value="$!pager.page" />
+			<div id="myTab0_Content0">
+				<div id="right_bot" class="right_bot mar_t10">
+					<ul class="list_top bg_08 font_14b wid_950 mar">
+						<li class="wid_80 font_cen hei_35">序 号</li>
+						<li class="wid_200 font_cen hei_35 lin-hei">日期</li>
+						<li class="wid_200 font_cen hei_35 lin-hei">积分变化</li>
+						<li class="wid_260 font_cen hei_35">详细说明</li>
+					</ul>
+					<div class="wid_950 mar_cen border-4" >
+						#foreach($evaluation in $pager.records)
+						<ul class="list_top min-hei font_14b border-5">
+							<li class="wid_80 font_cen lin-hei">$velocityCount</li>
+							<li class="wid_200 font_cen lin-hei">$!date.format('yyyy-MM-dd HH:mm:ss',$!evaluation.created)</li>
+							<li class="wid_200 font_cen font_18 lin-hei font_e3">
+								#if($evaluation.credit>=0)	+	#else	-	#end	$evaluation.credit
+							</li>
+							<li class="wid_260 font_cen lin-hei">
+								#if($evaluation.sorceType=="1")
+									订单积分
+								#elseif($evaluation.sorceType=="0")
+									平台积分
+								#end
+							</li>
+						</ul> 
+						<div class="clear"></div>
+						#end
+					</div>
+					<!--分页数据-->
+            		#pageVelocity($pager)
+				</div>
+			</div>
+		</div>
+	</form>
+	</div>
+</div>
+<!--right end-->
+</div>

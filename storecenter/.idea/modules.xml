@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/storecenter.iml" filepath="$PROJECT_DIR$/storecenter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/storecenter-common/storecenter-common.iml" filepath="$PROJECT_DIR$/storecenter-common/storecenter-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/storecenter-dao/storecenter-dao.iml" filepath="$PROJECT_DIR$/storecenter-dao/storecenter-dao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/storecenter-domain/storecenter-domain.iml" filepath="$PROJECT_DIR$/storecenter-domain/storecenter-domain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/storecenter-export/storecenter-export.iml" filepath="$PROJECT_DIR$/storecenter-export/storecenter-export.iml" />
+      <module fileurl="file://$PROJECT_DIR$/storecenter-parent/storecenter-parent.iml" filepath="$PROJECT_DIR$/storecenter-parent/storecenter-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/storecenter-rpc/storecenter-rpc.iml" filepath="$PROJECT_DIR$/storecenter-rpc/storecenter-rpc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/storecenter-service/storecenter-service.iml" filepath="$PROJECT_DIR$/storecenter-service/storecenter-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/storecenter-web/storecenter-web.iml" filepath="$PROJECT_DIR$/storecenter-web/storecenter-web.iml" />
+    </modules>
+  </component>
+</project>

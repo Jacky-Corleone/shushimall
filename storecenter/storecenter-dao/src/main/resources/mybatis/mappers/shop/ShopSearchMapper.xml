@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.storecenter.dao.ShopSearchDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="shopDTOMap" type="com.camelot.storecenter.dto.ShopDTO">
+				<result property="shopId" column="shop_id"/>
+				<result property="shopName" column="shop_name"/>
+				<result property="sellerId" column="seller_id"/>
+				<result property="status" column="status"/>
+				<result property="shopUrl" column="shop_url"/>
+				<result property="logoUrl" column="logo_url"/>
+				<result property="keyword" column="keyword"/>
+				<result property="introduce" column="introduce"/>
+				<result property="mainSell" column="main_sell"/>
+				<result property="priceMin" column="price_min"/>
+				<result property="mountMin" column="mount_min"/>
+				<result property="provinceCode" column="province_code"/>
+				<result property="provinceName" column="province_name"/>
+				<result property="zcode" column="zcode"/>
+				<result property="streetName" column="street_name"/>
+				<result property="mobile" column="mobile"/>
+				<result property="areaCode" column="area_code"/>
+				<result property="landline" column="landline"/>
+				<result property="extensionNumber" column="extension_number"/>
+				<result property="created" column="created"/>
+				<result property="modified" column="modified"/>
+				<result property="passTime" column="pass_time"/>
+				<result property="endTime" column="end_time"/>
+				<result property="sellerBrand" column="seller_brand"/>
+				<result property="comment" column="comment"/>
+				<result property="platformUserId" column="platform_user_id"/>
+				<result property="mutilPrice" column="mutilPrice"/>
+				<result property="cityName" column="city_name"/>
+				<result property="cityCode" column="city_code"/>
+				<result property="districtName" column="district_name"/>
+				<result property="districtCode" column="district_code"/>
+				<result property="mutilCondition" column="mutil_condition"/>
+				<result property="initialPrice" column="initial_price"/>
+				<result property="initialMount" column="initial_mount"/>
+				<result property="initialCondition" column="initial_condition"/>
+				<result property="modifyStatus" column="modify_status"/>
+				<result property="runStatus" column="run_status"/>
+				<result property="cid" column="cid"  />
+				<result property="cStatus" column="cStatus"  />
+				<result property="platformId" column="platform_id"  />
+				<result property="scope" column="scope"  />
+				<result property="salesVolume" column="sales_volume"  />
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			shop_info_.shop_id
+ 			,shop_info_.shop_name
+ 			,shop_info_.seller_id
+ 			,shop_info_.status
+ 			,shop_info_.shop_url
+ 			,shop_info_.logo_url
+ 			,shop_info_.keyword
+ 			,shop_info_.introduce
+ 			,shop_info_.main_sell
+ 			,shop_info_.price_min
+ 			,shop_info_.mount_min
+ 			,shop_info_.province_code
+ 			,shop_info_.province_name
+ 			,shop_info_.zcode
+ 			,shop_info_.street_name
+ 			,shop_info_.mobile
+ 			,shop_info_.area_code
+ 			,shop_info_.landline
+ 			,shop_info_.extension_number
+ 			,shop_info_.created
+ 			,shop_info_.modified
+ 			,shop_info_.pass_time
+ 			,shop_info_.end_time
+ 			,shop_info_.seller_brand
+ 			,shop_info_.comment
+ 			,shop_info_.platform_user_id
+ 			,shop_info_.mutilPrice
+ 			,shop_info_.city_name
+ 			,shop_info_.city_code
+ 			,shop_info_.district_name
+ 			,shop_info_.district_code
+ 			,shop_info_.mutil_condition
+ 			,shop_info_.initial_price
+ 			,shop_info_.initial_mount
+ 			,shop_info_.initial_condition
+ 			,shop_info_.modify_status
+ 			,shop_info_.run_status
+ 			,shop_info_.platform_id
+ 			,ifnull(shop_eval_.scope,0) scope
+ 			,ifnull(shop_sales_volume_.sales_volume,0) sales_volume
+ 		FROM
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		 
+		shop_info shop_info_
+		<![CDATA[
+			LEFT JOIN 
+		    (SELECT 
+		      tt.by_shop_id,
+		      ROUND(tt.shop_scope,1) scope 
+		    FROM
+		      (SELECT 
+		        shop_evaluation_.by_shop_id,
+		        SUM(
+		          (
+		            shop_evaluation_.shop_arrival_scope + shop_evaluation_.shop_description_scope + shop_evaluation_.shop_service_scope
+		          ) / 3
+		        )/COUNT(1) shop_scope 
+		      FROM
+		        shop_evaluation shop_evaluation_
+		        GROUP BY shop_evaluation_.by_shop_id) tt 
+		    GROUP BY tt.by_shop_id) shop_eval_ 
+		    ON shop_eval_.by_shop_id = shop_info_.shop_id 
+			LEFT JOIN 
+		    shop_sales_volume shop_sales_volume_
+		    ON shop_sales_volume_.shop_id= shop_info_.shop_id
+		]]>
+		where 1=1
+		<if test="entity!=null">
+			and shop_info_.run_status =1
+			<if test="entity.keyword != null and entity.keyword !=''">
+				<![CDATA[and (shop_info_.keyword LIKE CONCAT('%',#{entity.keyword},'%') or shop_info_.shop_name  LIKE CONCAT('%',#{entity.keyword},'%') )]]>
+			</if>
+			<if test="entity.platformId!=null">
+				<![CDATA[and shop_info_.platform_id=#{entity.platformId}]]>
+			</if>
+			<if test="entity.collation==1">
+				<![CDATA[ORDER BY  shop_info_.modified  ]]>
+			</if>
+			<if test="entity.collation==2">
+				<![CDATA[ORDER BY  shop_info_.modified desc ]]>
+			</if>
+			<if test="entity.collation==3">
+				<![CDATA[ORDER BY  ifnull(shop_eval_.scope,0)  ]]>
+			</if>
+			<if test="entity.collation==4">
+				<![CDATA[ORDER BY  ifnull(shop_eval_.scope,0)  desc]]>
+			</if>
+			<if test="entity.collation==5">
+				<![CDATA[ORDER BY ifnull(shop_sales_volume_.sales_volume,0) ]]>
+			</if>
+			<if test="entity.collation==6">
+				<![CDATA[ORDER BY  ifnull(shop_sales_volume_.sales_volume,0)  desc]]>
+			</if>
+				
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="selectById" resultMap="shopDTOMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where shop_info_.shop_id = #{id}
+		]]>
+	</select>
+	
+	
+	<!-- 分页查询 -->
+	<select id="searchShop" resultMap="shopDTOMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="searchShopCount" resultType="long">
+		<include refid="count_Tail" />
+		<include refid="where_fragement" />
+	</select>
+	
+	
+</mapper>

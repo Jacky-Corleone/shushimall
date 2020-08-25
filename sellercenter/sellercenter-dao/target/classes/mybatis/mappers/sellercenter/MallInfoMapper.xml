@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.sellercenter.dao.MallInfoDAO">
+	<resultMap id="mallInfoMapper" type="com.camelot.sellercenter.domain.MallInfo">
+			<result property="id" column="id" />
+			<result property="title" column="title" />
+			<result property="platformId" column="platform_id" />
+			<result property="logo" column="logo" />
+			<result property="created" column="created" />
+			<result property="modified" column="modified" />
+			<result property="domain" column="domain" />
+			<result property="needAuth" column="need_auth" />
+			<result property="shortName" column="short_name" />
+			<result property="status" column="status" />
+			<result property="platformQq" column="platform_qq" />
+			<result property="jfcpAccount" column="jfcp_account" />
+			<result property="fullName" column="full_name" />
+			<result property="paymentChannel" column="payment_channel" />
+			<result property="bankuserName" column="bankuser_name" />
+			<result property="bankmasterAccountNo" column="bankmaster_account_no" />
+			<result property="bankmasterAccountName" column="bankmaster_account_name" />
+			<result property="commissionAccountNo" column="commission_account_no" />
+			<result property="gatherAccountNo" column="gather_account_no" />
+			<result property="bankWithdrawDelegate" column="bank_withdraw_delegate" />
+			<result property="bankInterest" column="bank_interest" />
+			<result property="bankAdjustment" column="bank_adjustment" />
+			<result property="bankInitializer" column="bank_initializer" />
+			<result property="clusterId" column="cluster_id" />
+	</resultMap>
+	<resultMap id="logoDTOMapper" type="com.camelot.sellercenter.logo.dto.LogoDTO">
+			<result property="logoName" column="title" />
+			<result property="picUrl" column="logo" />
+			<result property="platformId" column="platform_id" />
+	</resultMap>
+	<select id="queryPage" resultType="map">
+		select * from mall_info
+	</select>
+	
+	<select id="findById" resultMap="mallInfoMapper" >
+		select * from mall_info
+		where id = #{id}
+	</select>
+	
+	<insert id="insert">
+		insert into mall_info(
+				title,
+				platform_id,
+				logo,
+				created,
+				modified,
+				domain,
+				need_auth,
+				short_name,
+				status,
+				platform_qq,
+				jfcp_account,
+				full_name,
+				payment_channel,
+				bankuser_name,
+				bankmaster_account_no,
+				bankmaster_account_name,
+				commission_account_no,
+				gather_account_no,
+				bank_withdraw_delegate,
+				bank_interest,
+				bank_adjustment,
+				bank_initializer,
+				cluster_id
+		)values(
+				#{title},
+				#{platformId},
+				#{logo},
+				NOW(),
+				NOW(),
+				#{domain},
+				#{needAuth},
+				#{shortName},
+				#{status},
+				#{platformQq},
+				#{jfcpAccount},
+				#{fullName},
+				#{paymentChannel},
+				#{bankuserName},
+				#{bankmasterAccountNo},
+				#{bankmasterAccountName},
+				#{commissionAccountNo},
+				#{gatherAccountNo},
+				#{bankWithdrawDelegate},
+				#{bankInterest},
+				#{bankAdjustment},
+				#{bankInitializer},
+				#{clusterId}
+		)
+		<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+			select @@IDENTITY
+		</selectKey>
+	</insert>
+	
+	
+	<insert id="add">
+		insert into mall_info(
+				title,
+				platform_id,
+				logo,
+				created,
+				modified,
+				domain,
+				need_auth,
+				short_name,
+				status,
+				platform_qq,
+				jfcp_account,
+				full_name,
+				payment_channel,
+				bankuser_name,
+				bankmaster_account_no,
+				bankmaster_account_name,
+				commission_account_no,
+				gather_account_no,
+				bank_withdraw_delegate,
+				bank_interest,
+				bank_adjustment,
+				bank_initializer,
+				cluster_id
+		)values(
+				#{title},
+				#{platformId},
+				#{logo},
+				NOW(),
+				NOW(),
+				#{domain},
+				#{needAuth},
+				#{shortName},
+				#{status},
+				#{platformQq},
+				#{jfcpAccount},
+				#{fullName},
+				#{paymentChannel},
+				#{bankuserName},
+				#{bankmasterAccountNo},
+				#{bankmasterAccountName},
+				#{commissionAccountNo},
+				#{gatherAccountNo},
+				#{bankWithdrawDelegate},
+				#{bankInterest},
+				#{bankAdjustment},
+				#{bankInitializer},
+				#{clusterId}
+		)
+		
+	</insert>
+	
+	<update id="update">
+		update mall_info set
+				id = #{id},
+				title = #{title},
+				platform_id = #{platformId},
+				logo = #{logo},
+				modified = NOW(),
+				domain = #{domain},
+				need_auth = #{needAuth},
+				short_name = #{shortName},
+				status = #{status},
+				platform_qq = #{platformQq},
+				jfcp_account = #{jfcpAccount},
+				full_name = #{fullName},
+				payment_channel = #{paymentChannel},
+				bankuser_name = #{bankuserName},
+				bankmaster_account_no = #{bankmasterAccountNo},
+				bankmaster_account_name = #{bankmasterAccountName},
+				commission_account_no = #{commissionAccountNo},
+				gather_account_no = #{gatherAccountNo},
+				bank_withdraw_delegate = #{bankWithdrawDelegate},
+				bank_interest = #{bankInterest},
+				bank_adjustment = #{bankAdjustment},
+				bank_initializer = #{bankInitializer},
+				cluster_id = #{clusterId}
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from mall_info
+		<if test=" codes != null and codes.size() > 0 ">
+			where id in
+			<foreach collection="codes" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test=" codes == null or codes.size() == 0 ">
+			where 1 = 3
+		</if>
+	</delete>
+	
+	<select id="findAll" resultMap="logoDTOMapper">
+		select * from mall_info
+	</select>
+	
+	<!-- 根据平台ID查询logo -->
+	<select id="findByPlatformId" parameterType="Object" resultMap="logoDTOMapper">
+		select * from mall_info
+		<where>
+			<if test="platformId==null">
+				platform_id is null
+			</if>
+			<if test="platformId!=null">
+				platform_id = #{platformId}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 根据平台ID修改logo -->
+	<update id="updateByPlatformId">
+		update mall_info set
+				title = #{logoName},
+				logo = #{picUrl}
+		<if test="platformId==null">
+			where platform_id is null
+		</if>
+		<if test="platformId!=null">
+			where platform_id = #{platformId}
+		</if>
+	</update>
+
+	<!-- 修改科印logo -->
+	<update id="updateAll">
+		update mall_info set
+				title = #{logoName},
+				logo = #{picUrl}
+		where platform_id is null
+	</update>
+</mapper>

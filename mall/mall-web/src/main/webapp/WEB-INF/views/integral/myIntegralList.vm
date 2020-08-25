@@ -1,0 +1,148 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+<script language="javascript" type="text/javascript" src="$staticPath/js/tab.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript">
+	 $(document).ready(function () {
+        //加载左侧菜单
+        $("#leftBuyer").load("$request.contextPath/leftBuyer");
+    });
+    function openCustomerWin() {
+        if( '$!userId' ==  ''){
+            alert("你目前处于非登录状态，请先登录再联系客服！");
+            this.location.href="$request.contextPath/user/login";
+            return false;
+        }
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            url:"$request.contextPath/shopCart/ifLogin_shopCustomer",
+            success: function(data){
+                if(data.ifLogin_shopCustomer == false){
+                    alert("你目前处于非登录状态，请先登录再联系客服！");
+                    this.location.href="$request.contextPath/user/login";
+                    return false;
+                }
+            }
+        });
+    }
+    function changeTabs(thisObj,num){
+	    if (thisObj.className == "active"){
+			return;
+		}
+		if(num){
+			window.location.href="$request.contextPath/integralRecord/list?type="+num;
+		}else{
+			window.location.href="$request.contextPath/integralRecord/list";
+		}
+    }
+    function topage(page){
+    	var type = '$!type';
+		if(type){
+			window.location.href="$request.contextPath/integralRecord/list?type="+type+"&page="+page;
+		}else{
+			window.location.href="$request.contextPath/integralRecord/list?page="+page;
+		}
+	}
+	function enter_press_page(e){
+		if(e == 13|| e == 32){
+			page_num();
+		}
+	}
+	function page_num(){
+		var pageNumVal=$("#pageNum").val();
+		if(pageNumVal == ''){
+			topage(1);
+			$("#pageNum").val(1);
+		}else if(parseInt(pageNumVal)>=parseInt($pager.totalPage)){
+			topage($pager.totalPage);
+		}else{
+			topage(pageNumVal);
+		}
+	}
+</script>
+<style>
+.wid_165{width:165px;}
+</style>
+<input type="hidden" id="contextPath" value="$request.contextPath" />
+<div id="main">
+<!--left start -->
+<div id="leftBuyer" class="border-4" style="width: 198px; float: left;"></div>
+<!--left end -->
+
+<!--右边部分开始-->
+<div id="right">
+      <div class="nTab">
+            <!-- 标题开始 -->
+            <div class="TabTitle">
+				<ul id="myTab0">
+				    <li #if(!$type) class="active" #else class="normal" #end onclick="changeTabs(this);">积分明细</li>
+					<li #if($type == 1) class="active" #else class="normal" #end onclick="changeTabs(this,1);">积分收入</li>
+					<li #if($type == 2) class="active" #else class="normal" #end onclick="changeTabs(this,2);">积分支出</li>
+					<li><span class="font_7a fr">总 积 分: #if("$!totalIntegral"!="") $!totalIntegral #else 0 #end</span></li>
+				</ul>
+            </div>
+            <!-- 内容开始 -->
+            <div class="TabContent">
+               <!-- 全部订单 下的内容开始 -->
+                <div id="myTab0_Content0">
+                <div id="right_bot" class="right_bot">
+					<!-- 商品列表开头 -->
+					<div class="right_xinxi mar_l14">
+						<ul class="list_top bg_08 font_14b mar_b10">
+							<li class="wid_140 font_cen hei_40">序号</li>
+							<li class="wid_270 font_cen hei_40">积分变化</li>
+							<li class="wid_270 font_cen hei_40">日期</li>
+							<li class="wid_270 font_cen hei_40">来源</li>
+						</ul>
+						#if($!pager.records.size() == 0)
+								<p class="hei_40 mar_20 font_cen" >没有搜索到该信息&nbsp;</p>
+						#end
+						#foreach($entity in $pager.records)
+						<div class="mar_b10">
+							<ul class="list_top font_14b border-5">
+								<li class="wid_140 font_cen hei_40">
+									$velocityCount
+								</li>
+								<li class="wid_270 font_cen hei_40">
+									$entity.integralValue
+								</li>
+								<li class="wid_270 font_cen hei_40">
+									$!date.format('yyyy-MM-dd HH:mm:ss',$!entity.usingTime)
+								</li>
+                                <li class="wid_270 font_cen hei_40">
+									#if($entity.integralType == 1)
+										订单金额获取
+									#end
+									#if($entity.integralType == 2)
+										订单评论获取
+									#end
+									#if($entity.integralType == 3)
+										订单支付使用
+									#end
+									#if($entity.integralType == 5)
+										退款返还积分
+									#end
+									#if($entity.integralType == 6)
+										取消订单返还
+									#end
+									#if($entity.integralType == 7)
+										评价+晒单获取
+									#end
+                                </li>
+							</ul>
+						</div>
+						#end
+						<div class="clear"></div>
+						<!--分页开始 -->
+			            #pageVelocity($pager)<!--分页结束 -->
+					</div>
+				</div>
+
+				<!--循环列表end-->
+				</div>
+			</div><!-- tab页签开始 -->
+<div class="clear"></div>
+</div>
+<!--id="right" end-->
+</div>

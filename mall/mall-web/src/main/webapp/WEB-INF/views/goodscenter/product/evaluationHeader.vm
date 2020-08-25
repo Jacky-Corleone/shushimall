@@ -1,0 +1,59 @@
+#set($layout = "/none_layout.vm")
+<script>
+	var comm_skuId = '$!queryIn.skuId';
+	var comm_itemId = '$!queryIn.itemId';
+</script>
+<div class="assess-top">
+	<h2 class="font_14">商品评价</h2>
+	<ul>
+		<li class="first fl pad_t20">
+		#set($integer = $avgSkuScope.intValue())
+		#set($frac = $avgSkuScope - $integer)
+		#foreach($index in [1,2,3,4,5])
+			<span
+				class="
+			#if($index <= $integer)
+				star-on
+			#elseif($index > $integer + 1)
+				star-off
+			#else
+				#if($frac < 0.3)
+					star-off
+				#elseif($frac < 0.7)
+					star-half
+				#else
+					star-on
+				#end
+			#end
+				"></span>
+		#end
+		</li>
+		<li class="fl">
+		<span class="mar_l20">买家印象：</span>
+		<div class="mar_l20">
+			#if($!evalTagCounts)
+				#foreach($item in $!evalTagCounts)
+					<a href="javascript:void(0);" class="style_aa">$item.evalTag.tagName<span>（$item.count）</span></a>
+				#end
+			#end
+		</div>
+		</li>
+	</ul>
+</div>
+<!--评价tab start-->
+<div id="nTab">
+	<!--评价tabs开始-->
+	<div class="nTab">
+		<!-- 标题开始 -->
+		<div class="TabTitle">
+			<ul id="Tab0">
+				<li class="active">全部评价(<span id="commCount2"></span>)</li>
+				<li class="normal">有图评论($!evalShowCount)</li>
+			</ul>
+		</div><!-- 内容开始 -->
+		<div class="TabContent" id="tabContent">
+		</div>
+	</div><!--nTab end-->
+</div> 
+<!--评价tab end-->
+

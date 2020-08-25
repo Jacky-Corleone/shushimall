@@ -1,0 +1,63 @@
+#set($staticPath="$request.contextPath/assets")
+#set($rootPath="$request.scheme://"+"$request.serverName:"+"$request.serverPort")
+#set($layout = "/seller_layout.vm")
+<link href="$request.contextPath/assets/css/register.css" rel="stylesheet" type="text/css"/>
+<style type="text/css">
+	.po_fai{ display:block; width:100%; height:100%;}
+	.po_fai .po_fai_bg{background:#000; opacity:0.5;filter: Alpha(Opacity=50); width:100%; height:100%; position:fixed; left:0; top:0;z-index:100; }
+	.po_fai .po_main{background-color:#FFF;width:555px; min-height:105px; padding:10px; border:5px solid #e3e3e3;z-index:101;position:fixed; top:50%; left:50%; margin-left:-310px; margin-top:-200px;zoom:1;}
+	.po_fai .po_main ul li{width:100%; text-align:center; line-height:50px;}
+	.po_fai .po_main2{background-color:#FFF;width:980px;height:500px; overflow-y:auto; padding:10px; border:5px solid #e3e3e3;z-index:101;position:fixed; top:50%; left:50%; margin-left:-490px; margin-top:-250px;zoom:1;}
+</style>
+<script type="text/javascript">
+	$(function(){
+		//加载左侧菜单
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+	})
+	//自行添加新商品
+	function addNewGoods(){
+		$.cookie('clicked_menu', "$rootPath$request.contextPath/sellcenter/sellProduct/itemAddSelect", {path:'/'});
+		window.location.href="$request.contextPath/sellcenter/sellProduct/form?addSource=1&page=1&rows=10";
+	}
+	function plantAddNewGoods(){
+		$.cookie('clicked_menu', "$rootPath$request.contextPath/sellcenter/sellProduct/itemAddSelect", {path:'/'});
+		$.ajax({
+			url: "$request.contextPath/sellcenter/sellProduct/validateAttrAndBrand",
+			type:"post",
+			dataType: "json",
+			success:function(data){
+				if(data.result){
+					window.location.href="$request.contextPath/sellcenter/sellProduct/platformGoodsList?page=1";
+				}else{
+					alert(data.message);
+				}
+			}
+		})
+	}
+	//添加组合商品
+	function addCombinationGoods(){
+		$.cookie('clicked_menu', "$rootPath$request.contextPath/sellcenter/sellProduct/itemAddSelect", {path:'/'});
+		window.location.href="$request.contextPath/sellcenter/sellProduct/form?addSource=3&page=1&rows=10";
+	}
+	//添加服务商品
+	function addServiceGoods(){
+		$.cookie('clicked_menu', "$rootPath$request.contextPath/sellcenter/sellProduct/itemAddSelect", {path:'/'});
+		window.location.href="$request.contextPath/sellcenter/sellProduct/form?page=1&rows=10";
+	}
+</script>
+<div id="main">
+<!--中间部分开始-->
+<div id="leftSeller" class="border-4">
+</div><!--left end -->
+<!--右边部分开始-->
+<div id="right">
+      <div class="wap">
+        <div class="register_content">
+           <div class="button_1 hei_40 font_16 add_moban" id="next" onclick="addNewGoods()">添加普通商品</div>
+           <div class="button_1 hei_40 font_16" id="next" onclick="addCombinationGoods()">添加套装商品</div>
+           <div class="button_1 hei_40 font_16" id="next" onclick="addServiceGoods()">添加服务商品</div>
+        </div><!--register_content end-->
+      </div> <!--wap end--> 
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->

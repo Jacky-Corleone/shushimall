@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.cmscenter.dao.CmsImgDAO">
+	<resultMap id="CmsImageMapper" type="com.camelot.cmscenter.dto.CmsImageDto">
+			<result property="id" column="id" />
+			<result property="aid" column="aid" />
+			<result property="imgtype" column="imgtype" />
+			<result property="imgname" column="imgname" />
+			<result property="remark" column="remark" />
+			<result property="path" column="path" />
+			<result property="viewnum" column="viewnum" />
+			<result property="addview" column="addview" />
+			<result property="praisenum" column="praisenum" />
+			<result property="addpraise" column="addpraise" />
+			<result property="iscomment" column="iscomment" />
+			<result property="list" column="list" />
+			<result property="ishide" column="ishide" />
+			<result property="ishtml" column="ishtml" />
+			<result property="editor" column="editor" />
+			<result property="author" column="author" />
+			<result property="releasetime" column="releasetime" />
+			<result property="addtime" column="addtime" />
+			<result property="createdate" column="create_date" />
+			<result property="updateby" column="update_by" />
+			<result property="updatedate" column="update_date" />
+			<result property="createby" column="create_by" />
+			<result property="delflag" column="del_flag" />
+			<result property="remarks" column="remarks" />
+	</resultMap>
+
+	<select id="queryDTOById" resultMap="CmsImageMapper" >
+		select * from cms_article_img where id = #{idDTO}
+	</select>
+	
+	<update id="modifyCmsImage">
+		update cms_article_img set
+			<if test="entity.imgtype != null">
+				imgtype = #{entity.imgtype},
+			</if>
+			<if test="entity.imgname != null">
+				imgname = #{entity.imgname},
+			</if>
+			<if test="entity.remark != null">
+				remark = #{entity.remark},
+			</if>
+			<if test="entity.path != null">
+				path = #{entity.path},
+			</if>
+			<if test="entity.viewnum != null">
+				viewnum = #{entity.viewnum},
+			</if>
+			<if test="entity.praisenum != null">
+				praisenum = #{entity.praisenum},
+			</if>
+			<if test="entity.addpraise != null">
+				addpraise = #{entity.addpraise},
+			</if>
+			<if test="entity.iscomment != null">
+				iscomment = #{entity.iscomment},
+			</if>
+			<if test="entity.list != null">
+				list = #{entity.list},
+			</if>
+			<if test="entity.ishide != null">
+				ishide = #{entity.ishide},
+			</if>
+			<if test="entity.editor != null">
+				editor = #{entity.editor},
+			</if>
+			<if test="entity.author != null">
+				author = #{entity.author},
+			</if>
+			<if test="entity.releasetime != null">
+				releasetime = #{entity.releasetime},
+			</if>
+			<if test="entity.addtime != null">
+				addtime = #{entity.addtime},
+			</if>
+			<if test="entity.createdate != null">
+				create_date = #{entity.createdate},
+			</if>
+			<if test="entity.updateby != null">
+				update_by = #{entity.updateby},
+			</if>
+			<if test="entity.createby != null">
+				create_by = #{entity.createby},
+			</if>
+			<if test="entity.delflag != null">
+				delflag = #{entity.delflag},
+			</if>
+			<if test="entity.remarks != null">
+				remarks = #{entity.remarks},
+			</if>
+			id = #{entity.id}
+		where id = #{entity.id}
+	</update>
+
+	<select id="queryCount" resultType="long">
+		SELECT
+		count(1)
+		from cms_article_img
+		<include refid="where_fragement" />
+	</select>
+	<!-- 查询 -->
+	<select id="queryDTOList" resultMap="CmsImageMapper">
+		select *,cms_article.title
+		from cms_article_img LEFT JOIN cms_article ON cms_article.id=cms_article_img.aid
+		<include refid="where_fragement" />
+		ORDER BY cms_article_img.create_date ASC
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+
+	<sql id="where_fragement">
+		where 1 = 1
+		<if test="entity.id!=null and entity.id!=''">
+			and id = #{entity.id}
+		</if>
+		<if test="entity.aid!=null and entity.aid!=''">
+			and aid = #{entity.aid}
+		</if>
+		<if test="entity.imgtype!=null and entity.imgtype!=''">
+			and imgtype = #{entity.imgtype}
+		</if>
+		<if test="entity.imgname!=null and entity.imgname!=''">
+			and imgname = #{entity.imgname}
+		</if>
+	</sql>
+
+	<sql id="pagination_tail">
+		limit #{page.pageOffset} , #{page.rows}
+	</sql>
+</mapper>

@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.maketcenter.dao.PromotionInfoDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="promotionInfoMap" type="com.camelot.maketcenter.dto.PromotionInfo">
+				<result property="id" column="id"/>
+				<result property="sellerId" column="seller_id"/>
+				<result property="shopId" column="shop_id"/>
+				<result property="activityName" column="activity_name"/>
+				<result property="type" column="type"/>
+				<result property="startTime" column="start_time"/>
+				<result property="endTime" column="end_time"/>
+				<result property="onlineState" column="online_state"/>
+				<result property="words" column="words"/>
+				<result property="createUser" column="create_user"/>
+				<result property="reviewer" column="reviewer"/>
+				<result property="createTime" column="create_time"/>
+				<result property="updateTime" column="update_time"/>
+				<result property="userType" column="user_type"/>
+				<result property="isAllItem" column="is_all_item"/>
+				<result property="membershipLevel" column="membership_level"/>
+				<result property="platformId" column="platform_id"/>
+				<result property="deleted" column="deteled"/>
+				<result property="itemId" column="item_id"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,seller_id
+ 			,shop_id
+ 			,activity_name
+ 			,type
+ 			,start_time
+ 			,end_time
+ 			,online_state
+ 			,words
+ 			,create_user
+ 			,reviewer
+ 			,create_time
+ 			,update_time
+ 			,user_type
+ 			,is_all_item
+ 			,membership_level
+ 			,platform_id
+ 			,deleted
+ 			,auditDismissedMsg
+		FROM 
+		promotion_info promotion_info_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.id != null">
+				<![CDATA[ and promotion_info_.id  = #{entity.id} ]]>
+			</if>
+			<if test="entity.sellerId != null">
+				<![CDATA[ and promotion_info_.seller_id  = #{entity.sellerId} ]]>
+			</if>
+			<if test="entity.shopId != null">
+				<![CDATA[ and promotion_info_.shop_id  = #{entity.shopId} ]]>
+			</if>
+			<if test="entity.activityName != null  and entity.activityName !=''">
+				<![CDATA[ and promotion_info_.activity_Name like  CONCAT('%',#{entity.activityName},'%') ]]>
+			</if>
+			<if test="entity.type != null">
+				<![CDATA[ and promotion_info_.type  = #{entity.type} ]]>
+			</if>
+			<if test="entity.isEffective != null and entity.isEffective != '' ">
+				<if test="entity.isEffective ==1 ">
+				    <![CDATA[	and promotion_info_.start_time > now() and promotion_info_.online_state  =1 ]]>	
+				</if>
+				<if test="entity.isEffective ==2 ">
+					<![CDATA[	and promotion_info_.start_time <= now() and promotion_info_.end_time >= now() and promotion_info_.online_state  =1 ]]>	
+				</if>
+				<if test="entity.isEffective ==3 ">
+					<![CDATA[	and promotion_info_.end_time < now() and promotion_info_.online_state  =1 ]]>	
+				</if>
+				<if test="entity.isEffective ==4 ">
+					<![CDATA[	and promotion_info_.start_time <= now() and promotion_info_.end_time >= now() and promotion_info_.online_state  =3 ]]>	
+				</if>
+			</if>
+			<if test="entity.onlineState != null ">
+				<![CDATA[ and promotion_info_.online_state  = #{entity.onlineState} ]]>
+			</if>
+			<if test="entity.words != null  and entity.words !=''">
+				<![CDATA[ and promotion_info_.words  = #{entity.words} ]]>
+			</if>
+			<if test="entity.createUser != null  and entity.createUser !=''">
+				<![CDATA[ and promotion_info_.create_user  = #{entity.createUser} ]]>
+			</if>
+			<if test="entity.reviewer != null  and entity.reviewer !=''">
+				<![CDATA[ and promotion_info_.reviewer  = #{entity.reviewer} ]]>
+			</if>
+			<if test="entity.createTime != null  and entity.createTime !=''">
+				<![CDATA[ and DATE_FORMAT(promotion_info_.create_time, '%Y-%m-%d') >=  DATE_FORMAT(#{entity.createTime}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="entity.createEndTime != null  and entity.createEndTime !=''">
+				<![CDATA[ and DATE_FORMAT(promotion_info_.create_time, '%Y-%m-%d') <=  DATE_FORMAT(#{entity.createEndTime}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="entity.updateTime != null  and entity.updateTime !=''">
+				<![CDATA[ and promotion_info_.update_time  = #{entity.updateTime} ]]>
+			</if>
+			<if test="entity.userType != null">
+				<![CDATA[ and promotion_info_.user_type  = #{entity.userType} ]]>
+			</if>
+			<if test="entity.isAllItem != null">
+				<![CDATA[ and promotion_info_.is_all_item  = #{entity.isAllItem} ]]>
+			</if>
+			<if test="entity.membershipLevel != null and entity.membershipLevel != ''">
+				<![CDATA[ and promotion_info_.membership_level like  CONCAT('%',#{entity.membershipLevel},'%')]]>
+			</if>
+			<if test="entity.platformId != null">
+				<![CDATA[ and promotion_info_.platform_id  = #{entity.platformId} ]]>
+			</if>
+		</if>
+		<![CDATA[ and deleted = 0 ORDER BY  promotion_info_.create_time desc ]]>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="promotionInfoMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where promotion_info_.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="promotionInfoMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		promotion_info promotion_info_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="com.camelot.maketcenter.dto.PromotionInfo" useGeneratedKeys="true" keyProperty="id" >
+		<![CDATA[
+		insert into promotion_info (
+		    	 seller_id
+		    	 ,shop_id
+		    	 ,activity_name
+		    	 ,type
+		    	 ,start_time
+		    	 ,end_time
+		    	 ,online_state
+		    	 ,words
+		    	 ,create_user
+		    	 ,create_time
+		    	 ,update_time
+		    	 ,user_type
+		    	 ,is_all_item
+		    	 ,membership_level
+		    	 ,platform_id
+		    	 ,deleted
+		   )values(
+		    	#{sellerId}
+		    	,#{shopId}
+		    	,#{activityName}
+		    	,#{type}
+		    	,#{startTime}
+		    	,#{endTime}
+		    	,#{onlineState}
+		    	,#{words}
+		    	,#{createUser}
+		    	,now()
+		    	,now()
+		    	,#{userType}
+		    	,#{isAllItem}
+		    	,#{membershipLevel}
+		    	,#{platformId}
+		    	,0
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.maketcenter.dto.PromotionInfo">
+		update promotion_info set update_time =now()
+			<if test="sellerId != null and sellerId != '' ">
+				<![CDATA[	,seller_id=#{sellerId} ]]>	
+			</if>
+			<if test="shopId != null and shopId != '' ">
+				<![CDATA[	,shop_id=#{shopId} ]]>	
+			</if>
+			<if test="activityName != null and activityName != '' ">
+				<![CDATA[	,activity_name=#{activityName} ]]>	
+			</if>
+			<if test="type != null and type != '' ">
+				<![CDATA[	,type=#{type} ]]>	
+			</if>
+			<if test="startTime != null and startTime != '' ">
+				<![CDATA[	,start_time=#{startTime} ]]>	
+			</if>
+			<if test="endTime != null and endTime != '' ">
+				<![CDATA[	,end_time=#{endTime} ]]>	
+			</if>
+			<if test="onlineState != null and onlineState != '' ">
+				<![CDATA[	,online_state=#{onlineState} ]]>	
+			</if>
+			<if test="words != null and words != '' ">
+				<![CDATA[	,words=#{words} ]]>	
+			</if>
+			<if test="createUser != null and createUser != '' ">
+				<![CDATA[	,create_user=#{createUser} ]]>	
+			</if>
+			<if test="reviewer != null and reviewer != '' ">
+				<![CDATA[	,reviewer=#{reviewer} ]]>	
+			</if>
+			<if test="userType != null">
+				<![CDATA[	,user_type=#{userType} ]]>	
+			</if>
+			<if test="isAllItem != null">
+				<![CDATA[	,is_all_item=#{isAllItem} ]]>	
+			</if>
+			<if test="membershipLevel != null and membershipLevel != '' ">
+				<![CDATA[	,membership_level=#{membershipLevel} ]]>	
+			</if>
+			<if test="platformId != null">
+				<![CDATA[	,platform_id=#{platformId} ]]>	
+			</if>
+			<if test="deteled != null">
+				<![CDATA[	,deleted=#{deteled} ]]>	
+			</if>
+			<if test="auditDismissedMsg != null">
+				<![CDATA[	,auditDismissedMsg=#{auditDismissedMsg} ]]>	
+			</if>
+		 where id = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		update promotion_info set deleted = 1 where id = #{id}
+		]]>
+	</delete>
+	
+	<select id="queryMdTimeFrameByItemId"  resultMap="promotionInfoMap" >
+		SELECT t.id,m.id markDownId,t.start_time,t.end_time ,m.item_id
+		FROM (
+			SELECT id,start_time,end_time FROM  promotion_info WHERE end_time>NOW() AND TYPE=1 AND ONLINE_STATE != 2 AND ONLINE_STATE != 3 AND DELETED = 0
+				<if test="entity.shopId != null and entity.shopId != '' ">
+					<![CDATA[ and shop_id=#{entity.shopId} ]]>	
+				</if>
+				<if test="entity.shopId == null or entity.shopId == '' ">
+					<![CDATA[ and shop_id=0 ]]>	
+				</if>
+			)t
+		INNER JOIN (
+			SELECT id,promotion_info_id,item_id FROM promotion_markdown 
+				<if test="entity.itemId != null">
+					<![CDATA[  WHERE item_id=#{entity.itemId} or item_id =0 ]]>
+				</if>
+		)m ON t.id=m.promotion_info_id
+		
+		
+	</select>
+	
+	<select id="queryActivityCheck" resultType="long">
+		SELECT
+			COUNT(i.id)
+		FROM
+			promotion_info i
+		WHERE
+		<![CDATA[ 
+			i.online_state = '1'
+			AND i.end_time > now()
+			AND i.is_all_item = '1'
+			AND i.deleted = '0'
+			AND (
+					i.shop_id = #{shopId}
+					OR i.shop_id = 0
+				)
+		]]>	
+	</select>
+</mapper>

@@ -1,0 +1,55 @@
+#set($layout = "/none_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+#if($packageSkuMap)
+<div class="packageSku">
+	<div class="pack_top hei_40 bg_05 mar_t20" id="distrib">
+		<span class="mar_l20 font_14 fl">推荐套装：</span>
+		<div class="text border-4 fl mar_t10">
+			<select name="packageSkuId" onchange="getPackageSku();" class="wid_170">
+        		#foreach($packageSkuId in $packageSkuMap.keySet())
+        			<option value="$packageSkuId" #if($combinationSkuMap.get($packageSkuId))selected#end>$packageSkuMap.get($packageSkuId).itemName</option>
+        		#end
+            </select>
+		</div>
+	</div>
+	<div class="pack_bottom pad_t20 pad_l20 border-13">
+		<div class="left_img">
+		#foreach($packageSkuId in $combinationSkuMap.keySet())
+    		#if($packageSkuMap.get($packageSkuId))
+    			#foreach($itemSku in $combinationSkuMap.get($packageSkuId))
+    				#if($itemSku.skuPics && $itemSku.skuPics.size() > 0)
+						<div class="fl mar_lr20">
+                			<a href="$request.getContextPath()/productController/details?id=$itemSku.itemId&skuId=$itemSku.skuId" target="_blank">
+                				<img src="$!imageServerAddr$itemSku.skuPics.get(0).picUrl" width="90" height="90">
+                				<p class="mar_tb10 over_p">$itemSku.itemName（#if($itemSku.hasPrice)￥$itemSku.skuPrice#else暂无报价#end）</p>
+                			</a>
+                		</div>
+					#end
+					
+            		#if($combinationSkuMap.get($packageSkuId).size()!=$velocityCount)
+            			<span class="add mar_t30 fl"></span>
+            		#end
+            	#end
+            	<div class="right_z">
+	            	<span class="equal mar_t30 fl"></span>
+					<div class="j_text fl">
+	        			<p>
+							<a target="_blank" href="$request.getContextPath()/productController/details?id=$packageSkuMap.get($packageSkuId).itemId&skuId=$packageSkuMap.get($packageSkuId).skuId">
+								$packageSkuMap.get($packageSkuId).itemName
+							</a>
+						</p>
+						#if($packageSkuMap.get($packageSkuId).hasPrice)
+							<p class="p01">套装价格：$packageSkuMap.get($packageSkuId).skuPrice元</p>
+							<!--<p class="p02">立省xxx元</p>-->
+						#else
+							<p class="p01">暂无报价</p>
+						#end
+	        			<p class="p03"><a href="$request.getContextPath()/productController/details?id=$packageSkuMap.get($packageSkuId).itemId&skuId=$packageSkuMap.get($packageSkuId).skuId">查看详情</a></p>
+	        		</div>
+	        	</div>
+	        </div>
+    		#end
+        #end
+	</div>
+</div>
+#end

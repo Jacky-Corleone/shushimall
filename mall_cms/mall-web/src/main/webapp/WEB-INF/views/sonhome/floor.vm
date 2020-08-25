@@ -1,0 +1,26 @@
+#set($layout = "/none_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<script type="text/javascript">
+	
+</script>
+<ul class="content_ul">
+    #foreach( $g in $floor.goods )
+       <li class="box_shadow">
+			<a onclick="adVisit('$!g.id','$!g.url',1)" href="javascript:void(0);">
+				<img src="$!imageServerAddr$g.picSrc" class="imgy" width="275" height="275">
+          	</a>
+			<div style="width:270px; height:25px; line-height:25px; margin:10px 10px 0; font-size:18px; color:#E50011;">#if($!g.hasPrice == 1) ￥$!g.guidePrice #elseif($!g.hasPrice == 2)暂无报价 #end</div>
+			##<p class="hei_40 mar_t5"><a href="javascript:void(0);" class="fr but_a">立即购买</a></p>
+            <div style="width:270px; margin:10px 10px 0; font-size:12px;"">
+            	<a onclick="adVisit('$!g.id','$!g.url',1)" href="javascript:void(0);" title="$!g.title">$!g.title</a>
+            </div>
+            <div class="border-9 mar_t10 tes_div">
+                ## <a href="javascript:void(0);" class="fl"><i><img src="$staticPath/imgs/pic_pic03.png" width="16" height="16" class="mar_r10"></i>联系客服</a>
+                ## <a href="javascript:void(0);" class="fr"><i><img src="$staticPath/imgs/pic_pic04.png" width="16" height="16" class="mar_r10"></i>加入购物车</a>
+            	<p><a onclick="adVisit('$!g.id','$!g.url',1)" href="javascript:void(0);" style="font-size:18px;">欢迎您的选购</a></p>
+            </div>
+       </li>
+     #end
+</ul>
+
+	

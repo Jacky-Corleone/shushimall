@@ -1,0 +1,88 @@
+#set($layout = "/none_layout.vm")
+#set($assetsPath="$request.contextPath/assets")
+<style>
+.head-img {
+width: 40px;
+height: 40px;
+margin-top:10px;
+}
+</style>
+#if( !$user )
+	<span class="head_photo">
+		<img class="head-img" src="$assetsPath/images/head.png" />
+	</span>
+	<span class="head_font wid_180 font_00" >
+		<a href="javascript:void(0);">欢迎来到舒适100<br/>您还未登录哦!</a>
+	</span>
+	<div class="clear"></div>
+	<div class="wid_180 mar">
+		<button class="fl wid_80 mar_r10 login_button bg_03" onclick="location.href='$request.contextPath/user/login'">登 录</button>
+		<button class="fl wid_80 login_button bg_04" onclick="location.href='$request.contextPath/information/register/initRegister'">注 册</button>
+	</div>
+	<div class="clear"></div>
+#else
+	
+	<span class="head_photo">
+   #if("$!type" == "buyer")
+		<a href="$request.contextPath/buyercenter/loadBuyerCenter"><img class="head-img" src="$assetsPath/images/head.png" /></a>
+	#elseif("$!type" == "seller")
+		<a href="$request.contextPath/information/informationSeller/initLoad"><img class="head-img" src="$assetsPath/images/head.png" /></a>
+	#else
+		<a href="$request.contextPath/information/informationSeller/initLoad"><img class="head-img" src="$assetsPath/images/head.png" /></a>
+	#end	
+	</span>
+    <span class="head_font wid_180">
+		<div style="height: 20px; line-height: 20px;">
+			<div style="width:120px;overflow:hidden; white-space:nowrap; text-overflow:ellipsis; float: left;">
+			#if("$!type" == "buyer")	
+			Hi，<a href="$request.contextPath/buyercenter/loadBuyerCenter">$user.uname</a>
+			#end
+			#if("$!type" == "seller" ||"$!type"=="noseller")
+			Hi，<a href="$request.contextPath/information/informationSeller/initLoad">$user.uname</a>
+			#end	
+			</div>
+			<a style="float:right; font-weight: bold;" href="$request.contextPath/user/logout">[退出]</a>
+		</div>
+        <div class="wid_180 mar font_7a">
+        </div>
+        <div class="wid_180 mar">
+        #if("$!type" == "seller")
+        	#if($!user.usertype==3)
+        		<span class="fl"><i class="fa-book demo-icons font_16"></i><a href="$request.contextPath/information/informationSeller/initLoad">卖家已认证</a></span>
+        	#end	
+        #end   
+        </div>
+	</span>
+    <div class="clear"></div>
+    <div class="loginArea_bottom">
+
+	    	<ul>
+                #if("$!type" == "buyer")
+                    <li class="border-11">
+                        <a href="$request.contextPath/order/queryBuyer?state=1">
+                            <i class="font_14b font_fe">$!paying</i><br/>待付款
+                        </a>
+                    </li>
+                    <li class="border-11">
+                        <a href="$request.contextPath/order/queryBuyer?state=3">
+                            <i class="font_14b font_fe">$!confirming</i><br/>待收货
+                        </a>
+                    </li>
+                    <li class="border-11" >
+                        <a href="$request.contextPath/order/queryBuyer?state=4">
+                            <i class="font_14b font_fe">$!evaluating</i><br/>待评价
+                        </a>
+                    </li>
+                #end
+                #if("$!type" == "seller")
+                <li class="border-11" >
+                    <a href="$request.contextPath/order/querySeller?state=2">
+                        <i class="font_14b font_fe">$!delivering</i><br/>待配送
+                    </a>
+                </li> 
+                #end
+	      	</ul>
+		</a>
+    </div>
+    <div class="clear"></div>
+#end

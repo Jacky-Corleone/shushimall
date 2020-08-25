@@ -1,0 +1,465 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+     http://www.springframework.org/schema/beans 
+     http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+
+    <bean id="confirmCiticJob" class="com.camelot.payment.job.ConfirmCiticJob"/>
+     <bean id="confirmSettleJob" class="com.camelot.settlecenter.job.ConfirmSettleJob"/>
+    <bean id="confirmOrderJob" class="com.camelot.tradecenter.job.ConfirmOrderJob"/> 
+    <bean id="synItemSalesVolumJob" class="com.camelot.tradecenter.job.SynItemSalesVolumJob"/> 
+    <bean id="synShopSalesVolumJob" class="com.camelot.tradecenter.job.SynShopSalesVolumJob"/>
+
+    <bean id="delayPaymentJob" class="com.camelot.tradecenter.job.DelayPaymentJob"/>
+
+    <bean id="autoAgreeReturnGoodsJob" class="com.camelot.aftersale.service.job.AutoAgreeReturnGoodsJob"/>
+    <bean id="autoCancleReturnGoodsJob" class="com.camelot.aftersale.service.job.AutoCancleReturnGoodsJob"/>
+    <bean id="autoAgreeRefundGoodsJob" class="com.camelot.aftersale.service.job.AutoAgreeRefundGoodsJob"/>
+    <bean id="autoCancleAppealReturnGoodsJob" class="com.camelot.aftersale.service.job.AutoCancleAppealReturnGoodsJob"/>
+    <bean id="autoAgreeReturnPriceJob" class="com.camelot.aftersale.service.job.AutoAgreeReturnPriceJob"/>
+    
+    <bean id="payBuyerReportJob" class="com.camelot.tradecenter.job.PayBuyerReportJob"/>
+    <bean id="shopReportJob" class="com.camelot.tradecenter.job.ShopReportJob"/>
+    <bean id="ItemShelvesJob" class="com.camelot.tradecenter.job.ItemShelvesJob"/>
+    <bean id="mallBannerJob" class="com.camelot.ecm.job.MallBannerJob"></bean>
+    <bean id="mallAdRecJob" class="com.camelot.ecm.job.MallAdRecJob"></bean>
+    <bean id="mallRecAttrJob" class="com.camelot.ecm.job.MallRecAttrJob"></bean>
+    
+    <bean id="WithdrawalJob" class="com.camelot.tradecenter.job.WithdrawalJob"></bean>
+    <bean id="remindBuyerEvaluationJob" class="com.camelot.tradecenter.job.RemindBuyerEvaluationJob"></bean>
+    
+    <bean id="orderDefaultEvaluateJob" class="com.camelot.tradecenter.job.OrderDefaultEvaluateJob"></bean>
+    <!-- 默认好评定时 -->
+    <bean id="orderDefaultEvaluateJobBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="orderDefaultEvaluateJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>updateOrderDefaultEvaluate</value>
+        </property>
+    </bean>
+    <bean id="orderDefaultEvaluateJobCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="orderDefaultEvaluateJobBean" />
+        <property name="cronExpression" value="0 0 1 * * ?" />    <!--每天 凌晨1:00-->
+        <!--<property name="cronExpression" value="0 1/10 * * * ?" /> --> <!--开发测试  每10分钟运行一次,起点1分-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    
+    
+     <!-- 定时汇总 店铺报表 -->
+    <bean id="shopReportJobBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="shopReportJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>updateReportShop</value>
+        </property>
+    </bean>
+    <bean id="shopReportJobCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="shopReportJobBean" />
+       <property name="cronExpression" value="0 1 0 * * ?" />    <!--每天 12:01分运行-->
+        <!--  <property name="cronExpression" value="0 4/3 * * * ?" /> --><!--开发测试  每5分钟运行一次,起点4分-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    
+    <!-- 定时汇总 买家报表 -->
+    <bean id="payBuyerReportJobBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="payBuyerReportJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>updateReportPayBuyer</value>
+        </property>
+    </bean>
+    <bean id="payBuyerReportJobCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="payBuyerReportJobBean" />
+       <!-- <property name="cronExpression" value="0 4/5 * * * ?" />  -->  <!--开发测试  每5分钟运行一次,起点4分-->
+         <property name="cronExpression" value="0 1 0 * * ?" /><!--每天 12:01分运行-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    
+    <!-- 定时刷新店铺销量任务 配置 -->
+    <bean id="synShopSalesVolumJobBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="synShopSalesVolumJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>updateShopSalesVolume</value>
+        </property>
+    </bean>
+    <bean id="synShopSalesVolumCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="synShopSalesVolumJobBean" />
+        <property name="cronExpression" value="0 10/30 * * * ?" /><!--每10分钟运行一次,起点10分-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    
+    <!-- 定时刷新商品销量任务 配置 -->
+    <bean id="synItemSalesVolumJobBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="synItemSalesVolumJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>updateItemSalesVolume</value>
+        </property>
+    </bean>
+    <bean id="synItemSalesVolumCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="synItemSalesVolumJobBean" />
+        <property name="cronExpression" value="0 25/10 * * * ?" /><!--每10分钟运行一次,起点0分-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    
+    <!-- 定时确认收货任务 配置 -->
+    <bean id="confirmOrderJobBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="confirmOrderJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>confirmOrder</value>
+        </property>
+    </bean>
+    <bean id="confirmOrderCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="confirmOrderJobBean" />
+        <property name="cronExpression" value="0 0 1 * * ?" /><!--每天凌晨1:00-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    
+    <!-- createAccount 配置 -->
+    <bean id="createAccountJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="confirmCiticJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>createAccount</value>
+        </property>
+    </bean>
+    <bean id="createAccountCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="createAccountJob" />
+        <property name="cronExpression" value="0 10/4 * * * ?" /><!--每4分钟运行一次,起点10分-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+	
+	<!-- confirmAccStatus 配置 -->
+	<bean id="confirmAccStatusJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="confirmCiticJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>confirmAccStatus</value>
+        </property>
+    </bean>
+    <bean id="confirmAccStatusCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="confirmAccStatusJob" />
+        <property name="cronExpression" value="0 12/4 * * * ?" /><!--每4分钟运行一次,起点12分-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+  
+    <!-- confirmTranResult 配置 -->
+	<bean id="confirmTranResultJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="confirmCiticJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>confirmTranResult</value>
+        </property>
+    </bean>
+    <bean id="confirmTranResultCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="confirmTranResultJob" />
+        <property name="cronExpression" value="0 0 1/2 * * ?" /><!--每隔两个小时运行一次,起点1小时 -->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    
+    <!-- createBill 配置 -->
+	<bean id="createBillJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="confirmSettleJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>createBill</value>
+        </property>
+    </bean>
+    <bean id="createBillCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="createBillJob" />
+        <!--  <property name="cronExpression" value="0 1/1 * * * ?" /> --><!--开发阶段 每5分钟运行一次，起点6分-->
+        <property name="cronExpression" value="0 0 13 * * ?" /><!--每天中午13时运行一次-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+   
+    <!-- proceedSettlement 配置 -->
+	<bean id="proceedSettlementjob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="confirmSettleJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>proceedSettlement</value>
+        </property>
+    </bean>
+    <bean id="proceedSettlementTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="proceedSettlementjob" />
+        <property name="cronExpression" value="0 0 0/1 * * ?" />
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    
+    <!-- collateSettleDetail 配置 -->
+	<bean id="collateSettleDetailJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="confirmSettleJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>collateSettleDetail</value>
+        </property>
+    </bean>
+    <bean id="collateSettleDetailCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="collateSettleDetailJob" />
+       <property name="cronExpression" value="0 8/10 * * * ?" /><!--每10分钟运行一次,起点8分-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+
+	<!-- confirmCompanyPayJob 配置 -->
+	<bean id="confirmCompanyPayJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="confirmCiticJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>confirmCompanyPayJob</value>
+        </property>
+    </bean>
+    <bean id="confirmCompanyPayJobCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="confirmCompanyPayJob" />
+        <!--<property name="cronExpression" value="0 17/10 * * * ?" />--><!--开发环境每10分钟运行一次,起点17分-->
+       <property name="cronExpression" value="0 21/35 * * * ?" /><!--每35分钟运行一次,起点21分-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    
+    <!--售后 退货处理 -->
+    <bean id="autoAgreeReturnGoodsTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="autoAgreeReturnGoodsJobBean" />
+        <!-- <property name="cronExpression" value="0 1/1 * * * ?" /> --><!--每1分钟运行一次,起点1分-->
+        <property name="cronExpression" value="0 20/30 * * * ?" /><!--每30分钟运行一次,起点20分-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+
+    <bean id="autoAgreeReturnGoodsJobBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="autoAgreeReturnGoodsJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>executeJob</value>
+        </property>
+    </bean>
+
+    <bean id="autoCancleReturnGoodsTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="autoCancleReturnGoodsJobBean" />
+        <property name="cronExpression" value="0 20/31 * * * ?" /><!--每31分钟运行一次,起点20分-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+
+    <bean id="autoCancleReturnGoodsJobBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="autoCancleReturnGoodsJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>execute</value>
+        </property>
+    </bean>
+
+    <bean id="autoAgreeRefundTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="autoAgreeRefundJob" />
+        <property name="cronExpression" value="0 20/32 * * * ?" /><!--每31分钟运行一次,起点20分-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    <bean id="autoAgreeRefundJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="autoAgreeRefundGoodsJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>execute</value>
+        </property>
+    </bean>
+	
+	<bean id="delayPaymentTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="delayPayJob" />
+        <property name="cronExpression" value="0 0 0 1/1 * ?" /><!--每天运行一次-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    <bean id="delayPayJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="delayPaymentJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>delayPay</value>
+        </property>
+    </bean>
+
+    <bean id="autoCancleAppealReturnGoodsTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="autoCancleAppealReturnGoodsJobBean" />
+        <property name="cronExpression" value="0 20/33 * * * ?" /><!--每31分钟运行一次,起点20分-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    <bean id="autoCancleAppealReturnGoodsJobBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="autoCancleAppealReturnGoodsJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>execute</value>
+        </property>
+    </bean>
+
+    <bean id="autoAgreeReturnPriceTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="autoAgreeReturnPriceJobBean" />
+        <property name="cronExpression" value="0 20/33 * * * ?" /><!--每31分钟运行一次,起点20分-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    <bean id="autoAgreeReturnPriceJobBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="autoAgreeReturnPriceJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>execute</value>
+        </property>
+    </bean>
+    <!-- 定时上架待上架的商品 -->
+    <bean id="ItemShelvesJobBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="ItemShelvesJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>updateItemShelves</value>
+        </property>
+    </bean>
+    <bean id="ItemShelvesJobCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="ItemShelvesJobBean" />
+       <property name="cronExpression" value="0 0/30 * * * ?" />    <!--每30分运行-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    <!-- ecm推荐位定时上下架 -->
+    <bean id="mallBannerJobTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="mallBannerJobBean" />
+        <property name="cronExpression" value="0 0/30 * * * ?" /><!--每30分钟运行一次,起点0分-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    <bean id="mallBannerJobBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="mallBannerJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>motifyMallBannerStatusAuto</value>
+        </property>
+    </bean>
+	<!-- ecm楼层定时上下架 -->
+	<bean id="mallRecAttrJobTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="mallRecAttrJobBean" />
+        <property name="cronExpression" value="0 0/30 * * * ?" /><!--每30分钟运行一次,起点0分-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    <bean id="mallRecAttrJobBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="mallRecAttrJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>execute</value>
+        </property>
+    </bean>
+	
+	<!-- ecm商城广告定时上下架 -->
+	<bean id="mallAdRecJobTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="mallAdRecJobBean" />
+        <property name="cronExpression" value="0 0/30 * * * ?" /><!--每30分钟运行一次,起点0分-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    <bean id="mallAdRecJobBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="mallAdRecJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>execute</value>
+        </property>
+    </bean>
+     <!-- 定时更新提现记录表的状态 -->
+    <bean id="WithdrawalJobBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="WithdrawalJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>updateWithdrawalStatus</value>
+        </property>
+    </bean>
+    <bean id="WithdrawalJobCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="WithdrawalJobBean" />
+      	<property name="cronExpression" value="0 0 13,17 * * ?" /><!--每天中午13,17时运行一次-->
+      	<!-- <property name="cronExpression" value="0 4/5 * * * ?" /> --><!--每5分钟运行一次,起点4分-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    <!-- 买家商品未评价,提醒买家评价 -->
+    <bean id="remindBuyerEvaluationJobBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="remindBuyerEvaluationJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>remindBuyerEvaluation</value>
+        </property>
+    </bean>
+    <bean id="remindBuyerEvaluationJobCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="remindBuyerEvaluationJobBean" />
+       	<property name="cronExpression" value="0 0 10 * * ?" /> <!--每天 早晨10:00-->
+        <!--<property name="cronExpression" value="0 1/2 * * * ?" />--> <!--开发测试  每2分钟运行一次,起点1分-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    <!-- 任务调度管理器 -->
+    <!--<bean id="clusterQuartzScheduler" class="com.camelot.openplatform.util.SchedulerFactoryBeanProxy">-->
+    <bean id="clusterQuartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="schedulerName" value="APP_SCHEDULER"/>
+        <!-- Job接受applicationContext的成员变量名 -->
+        <property name="applicationContextSchedulerContextKey" value="applicationContext" />
+        <!-- 是否覆盖已有的任务 -->
+        <property name="overwriteExistingJobs" value="true" />
+        <property name="triggers">
+            <list>
+            	<!--  买家商品未评价,提醒买家评价 -->
+            	<ref bean="remindBuyerEvaluationJobCronTriggerBean" />
+            	<!--  默认定时好评 -->
+            	<ref bean="orderDefaultEvaluateJobCronTriggerBean" />
+            	<ref bean="shopReportJobCronTriggerBean" />
+            	<ref bean="payBuyerReportJobCronTriggerBean" />
+<!--             	<ref bean="createAccountCronTriggerBean" /> -->
+<!--                 <ref bean="confirmAccStatusCronTriggerBean" /> -->
+                <!--<ref bean="confirmTranResultCronTriggerBean" />-->
+                
+                <ref bean="createBillCronTriggerBean" />
+	                <!-- 20160302 屏蔽掉结算的定时任务 -->
+	                <!-- <ref bean="collateSettleDetailCronTriggerBean" />  -->
+<!--                 <ref bean="confirmCompanyPayJobCronTriggerBean" /> -->
+                <ref bean="synItemSalesVolumCronTriggerBean" />
+                <ref bean="synShopSalesVolumCronTriggerBean" />
+                <ref bean="confirmOrderCronTriggerBean" />
+                <!-- 买家发出退货申请 卖家三天 不处理 自动同意退货-->
+                <ref bean="autoAgreeReturnGoodsTriggerBean" />
+                <!-- 如果卖家同意退货 买家三天 不重新发出货物 自动取消退货-->
+                <ref bean="autoCancleReturnGoodsTriggerBean" />
+                <!-- 如果 买家发回货物后 卖家10天不处理  自动退款-->
+                <ref bean="autoAgreeRefundTriggerBean" />
+                <!--  如果 买家可以申诉 不申诉 7天 自动关闭-->
+                <ref bean="autoCancleAppealReturnGoodsTriggerBean" />
+                <!--  如果 卖家已经退款 买家不确认  7天后自动打款 -->
+                <ref bean="autoAgreeReturnPriceTriggerBean" />
+                <!-- 定时上架已经设定上架时间的待上架的商品 -->
+                <ref bean="ItemShelvesJobCronTriggerBean"/>
+                <!-- 轮播图定时上下架 -->
+                <ref bean="mallBannerJobTriggerBean" />
+                <!-- ecm楼层定时上下架 -->
+                <ref bean="mallRecAttrJobTriggerBean" />
+                <!-- ecm商城广告定时上下架 -->
+                <ref bean="mallAdRecJobTriggerBean" />
+                 <!-- 定时更新提现记录表信息 -->
+                <ref bean="WithdrawalJobCronTriggerBean" />
+                <!--  延时付款自动付款 -->
+                <!--<ref bean="delayPaymentTriggerBean" />-->
+                <!--  卖家自动结算 -->
+                <!--<ref bean="proceedSettlementTriggerBean" />-->
+            </list>
+        </property>
+        <!--<property name="startFlag" value="false" />-->
+    </bean>
+    
+</beans>

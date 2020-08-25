@@ -1,0 +1,111 @@
+#set($layout = "/none_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<script type="text/javascript" src="$staticPath/js/all_classify.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#noticeArea").load("$request.contextPath/noticeFragement");
+    });
+</script>
+
+<ul>
+	#foreach($category in $categoryes)
+		<!-- 最多展示6个商品类目 -->
+		#if( $velocityCount < 7 )
+	 		<li class="mc mc_$velocityCount">
+	   			<span class="mc_classify_list" id="classify$velocityCount" style="overflow: hidden;">
+	   				<h3 class="po_re">
+	   					<a href="$request.contextPath/searchController/searchItemByCategory?cid=$!category.categoryCid" title="$!category.categoryCName" class='font-c1'>$category.categoryCName</a>
+	   				</h3>
+	   				<i class="demo-icons fa-angle-right po_ab pa_06 font-c1"></i>
+	   				<div class='data_list_d'>
+	   					<!-- 类目名称下面的二级类目展示，最多展示四个 -->
+	   					#foreach($cate in $category.children)
+	   						#if( $velocityCount < 5 )
+	   							#set($num=$velocityCount % 2)
+		   						#if($num != 0 && $velocityCount != 1)
+					  				</p>
+				   				#end
+				   				#if($num != 0)
+				   					<p class='hei_20'>
+				   				#end
+				  				    <a href="$request.contextPath/sonHome/forward/$!cate.categoryCid/$!cate.categoryLev" target="_blank">
+				  				    	$cate.categoryCName 
+				  				    	#if($num != 0)
+				  				    		|
+				  				    	#end
+				  				    </a>
+	   						#end
+				   		#end
+				   		</p>
+		  			</div>
+	  			</span>
+	 		</li>
+	 		<div class="mc_classify_prompt" pref="$velocityCount" style="z-index:999; min-height: 360px; overflow: hidden;">
+	 		    
+	 		  #if($category.mallThems!=[])
+	 		       <div class="item-channels">
+	        	   <div class="channels"> 		
+					 		   #foreach($mallTheme in $category.mallThems)
+				                	<a href="$request.contextPath/sonHome/index?cid=$!mallTheme.cId&lev=$!mallTheme.clev" title="$!mallTheme.cName" target="_blank">$!mallTheme.cName<i class="fa-angle-right"></i></a>
+					  		   #end
+				  	</div>
+		            </div> 
+	            #end 
+	 		    <span class="mc_prompt_close"><i class="fa-times-circle font_18"></i></span>
+				<div class="mc_subitem" style="height: auto;">
+					<!-- 二级、三级类目展示 -->
+			   		#foreach($cate in $category.children)
+		   				<dl>
+			   		            <dt><a href="$request.contextPath/sonHome/forward/$!cate.categoryCid/$!cate.categoryLev" title="$cate.categoryCName" target="_blank">$!cate.categoryCName</a></dt>
+		  						<dd>
+			  						#foreach($c in $cate.children)
+			     						<b><a href="$request.contextPath/searchController/searchItemByCategory?cid=$!c.categoryCid">$!c.categoryCName</a><i class="mar_l10">|</i></b>
+			  						#end
+		    					</dd>
+		   				</dl>
+			   		#end
+	 			</div>
+	 			#if( $category.bunners )
+         			<div class="mc_subitem">
+           				<div class="mc_subitem">
+            				<ul class="mc_subitem_img mc_subitem_img1">
+             					<!-- #foreach( $bunner in $category.bunners )
+               						<li>
+               							<a href="$!bunner.adURL" onclick="adVisit('$!bunner.id','$!bunner.adURL',1)" target="_blank">
+               								<img src="${imageServerAddr}$bunner.adSrc"
+               									#if( $velocityCount < 9  )
+               										width="100" height="40"
+               									#else
+               										width="210" height="60"
+               									#end>
+               							</a>
+               						</li>
+             					#end -->
+             					
+					 			#if( $category.mallAdvertis )
+					 				#foreach( $mallad in $category.mallAdvertis )
+		             					<li style="width:160px; height:130px;">
+		             						<a href="http://$mallad.adURL">
+		             							<img style="width:160px; height:130px;" src="${imageServerAddr}$mallad.adSrc" />
+		             						</a>
+		             					</li>
+             						#end
+             					#end
+             				</ul>
+           				</div>
+         			</div>
+	 			#end
+			</div>
+		#end
+	#end
+
+</ul>
+
+<!--<div id="index_news" class="news tit_style #if("$!type" == '') hide #else #end" >
+    <h2>公告<i class="fr"> <a href="$request.contextPath/notice/list" style="color:#747474;">更多>></a></i></h2>
+    <div id="noticeArea" class="left_notic">
+        <img src="$staticPath/images/loading-2.gif" style="margin: 68px auto auto 130px;">
+    </div>
+</div>-->
+
+

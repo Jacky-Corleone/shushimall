@@ -1,0 +1,312 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<script type="text/javascript">
+    //加载左侧菜单
+    $(function(){
+        $("#leftSeller").load("$request.contextPath/leftSeller");
+    });
+    //初始化校验控件
+    /*function initValidPlugin(){
+        $("#tixianform").validate({
+            rules: {
+                amount:{
+                    required: true,
+                    number: true,
+                    maxlength: 14
+                },
+                passWard:{
+                    required: true,
+                    maxlength: 20
+                }
+            }
+        });
+    }*/
+    //到指定的分页页面
+    function topage(page){
+        window.location.href="$request.contextPath/sellcenter/withdraw/withdrawselect?page="+page;
+    }
+
+    function showDiv(divid){
+        $("#"+divid).show();
+    }
+    function hideDivs(divid){
+        $("#"+divid).hide();
+    }
+    function showzx(){
+        $("#showzx").show();
+    }
+    var iftx=true;
+    function deposit(){
+        if(iftx){
+            var passWard=$("#passWard").val();
+            var amount=$("#amount").val();
+            if(!amount){
+                alert("金额不能为空");
+                return;
+            }
+            if(amount<=0){
+                alert("金额必须大于零");
+                return;
+            }
+            if(!passWard){
+                alert("支付密码不能为空");
+                return;
+            }
+            if($.trim(passWard).length ==0){
+                alert("密码不能只输入空格");
+                return;
+            }
+            var passWard=$("#passWard").val();
+            var amount=$("#amount").val();
+            /*var isValid = $("#tixianform").valid();
+            if(!isValid){
+                return;
+            }*/
+            $("#tixianid").loadingMsg();
+            iftx=false;
+            $.ajax({
+                url:"$request.contextPath/sellcenter/withdraw/deposit",
+                type:"post",
+                data:{
+                    passWard:passWard,
+                    amount:amount
+                },
+                dataType:'json',
+                success:function(data){
+                    //console.log(data);
+                    iftx=true;
+                    $("#tixianid").hideMsg();
+                    if(data.success){
+//                        var html= "<li id='lisuccess'>"+data.msg+"</li>";
+//                        $("#lisuccess").html(html);
+						hideDivs('showzx')
+                        showDiv('showSuccessMsg');
+                    }else{
+                        var html= "<li id='lierror'>"+data.msg+"</li>";
+                        $("#lierror").html(html);
+                        showDiv('showErrorMsg');
+                    }
+                }
+                ,error:function(){
+                    iftx=true;
+                    $("#tixianid").hideMsg();
+                    alert("亲，系统繁忙,请稍后再试");
+                }
+            });
+        }else{
+            alert('系统正在处理，请勿重复提交');
+            $("#tixianid").hideMsg();
+        }
+    }
+    function hideSuccessDiv(divid){
+        $("#"+divid).hide();
+        window.location.href="$request.contextPath/sellcenter/withdraw/withdrawselect";
+    }
+    function showDiv(id,content){
+	     $("#contentId").html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+content);
+		$("#"+id).show();
+	}
+</script>
+
+<!--头部开始-->
+<style type="text/css">
+    div.po_main500 {
+        width: 500px;
+        min-height: 105px;
+        margin-left: -310px;
+        margin-top: -200px;
+    }
+</style>
+<div id="main">
+    <!--中间部分开始-->
+    <!--left start-->
+    <div id="leftSeller" class="border-4"></div>
+    <!--left end -->
+
+    <!--右边部分开始-->
+    <div id="right">
+        <div id="right_top" class="right_top border-4 bg_06">
+            <ul class="list">
+                <li class="wid_300">
+                    <span class="font_wid">结算账户：</span>
+                    $!cashAccount
+                </li>
+                <li class="wid_300">
+                    <span class="font_wid">账户状态：</span>
+                    $!state
+                </li>
+                <div class="clear"></div>
+                <li class="wid_300">
+                    <span class="font_wid">冻结账户：</span>
+                    $!frozenAccount
+                </li>
+                <li class="wid_300">
+                    <span class="font_wid">账户状态：</span>
+                    $!state
+                </li>
+               <!--  <li class="wid_300">
+                    <span class="font_left">冻结账户余额：</span>
+                    <i class="font_18 font_fe">$!djAccount</i>元
+                </li> -->
+            </ul>
+        </div> <!-- right_top 结束 -->
+        <div id="right_top" class="right_top border-4 bg_06 mar_t10">
+            <ul class="list">
+                <li class="wid_260 font_left">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;结算账户可提现金额：<i class="font_18 font_fe">$!account</i>元
+                </li>
+                <li >
+                    <button type="button" onclick="showzx()" style="margin-top: 0px;" class="button_2 hei_35">提取现金</button>【提现时间为：<i class="font_fe">9:00-16:00</i>，其余时间均会失败】
+                </li>
+                #if($staceCode)
+                    <li class="wid_820 font_left">
+                        <i class="font_fe">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$!staceCode</i>
+                    </li>
+                #end
+                #if($errorMsg)
+                    <li class="wid_820 font_left">
+                        <i class="font_fe">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$!errorMsg</i>
+                    </li>
+                #end
+                
+                 <li class="wid_500 font_left">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;冻结账户余额：<i class="font_18 font_fe">$!djAccount</i>元
+                </li>
+                #if($djStaceCode)
+                    <li class="wid_820 font_left">
+                        <i class="font_fe">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$!djStaceCode</i>
+                    </li>
+                #end
+            </ul>
+        </div> <!-- right_top 结束 -->
+        <div id="right_bot" class="right_bot border-4 mar_t10 bg_06">
+            <!-- 商品列表开头 -->
+            <div class="right_xinxi mar_l14">
+                <h3>提现记录</h3>
+                <ul class="list_top bg_08 font_cen font_14b">
+	                <li class="wid_40">编号</li>
+	                <li class="wid_150">提现金额</li>
+	                <li class="wid_200">提交时间</li>
+	                <li class="wid_150">状态</li>
+	                <li class="wid_200">结果</li>
+	                <li class="wid_100">操作</li>
+                </ul>
+                <!-- 类型选择 -->
+                <!-- 商品信息 -->
+                <table class="information mar_b10" id="information"><!--单双行变色加bg_05这个样式-->
+                #*<tr>
+                    <td class="wid_40 font_cen">
+                        <input type="checkbox"/>
+                    </td>
+                    <td class="wid_300 font_cen">1001011</td>
+                    <td class="wid_400 font_cen">在售</td>
+                    <td class="wid_200 font_cen"><a class="font_1c">成功</td>
+                </tr>*#
+                    #foreach($detail in ${pager.records})
+                        <tr>
+			                <td class="wid_40 font_cen">$!{detail.no}</td>
+			                <td class="wid_150 font_cen">$!{detail.je}</td>
+			                <td class="wid_200 font_cen">$!{detail.date}</td>
+			                <td class="wid_150 font_cen"><a class="font_1c">$!{detail.stace}</td>
+			                <td class="wid_200 font_cen">$!{detail.failReason}</td> 
+			                <td class="wid_100 font_cen">
+                             #if($!{detail.codestate}==50) <a href="javascript:showCiticTrade('$!date.format('yyyyMMdd',$!detail.date )','settlement')" class="font_65">银行交易回单打印 </a>
+                             #end
+                            </td>
+                        </tr>
+                    #end
+                </table>
+                #pageVelocity($pager)
+            </div>  <!--right_xinxi end -->
+        </div><!--right_bot end -->
+    </div> <!--id="right" end-->
+    <!--右边部分结束-->
+</div><!--#main end -->
+<!-- 提现  开始 -->
+<div id="showzx" class="po_fai" style="display:none">
+    <div class="po_fai_bg"></div>
+    <div class="po_main pad_t10" style="width: 500px;">
+        <div class=" hei_32 bg_05 pad_l10 font_14b"><i onclick="hideDivs('showzx')" class="demo-icons fa-times-circle font_16 fr mar_r10"></i>账号提现</div>
+        <div class="clear"></div>
+        <div  style="width:500px; height:300px; margin: 0  ">
+            <div class="Basic_Info_left" >
+                <ul>
+                    <li style="width: 350px;text-align: left;" >
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="font_name">提取金额：</span>
+                        <input name="amount" id="amount" class="input_Style2 wid_230 hei_30" maxlength="20" placeholder="请输入提现金额..."  onkeyup="value=value.replace(/[^\d.]/g,'')" onafterpaste="value=value.replace(/[^\d.]/g,'')"/>
+                    </li>
+
+                    <!--如需增加可循环dl结束-->
+                    <li style="width: 350px; line-height: 30px;text-align: left;" >
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="font_name">账号信息</span>
+                    </li>
+                    <li style="width: 350px; line-height: 30px;text-align: left;">
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="font_name">账户名：</span>$!bankaccountname
+                    </li>
+                    <li style="width: 350px; line-height: 30px;text-align: left;" >
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="font_name">卡&nbsp;&nbsp;&nbsp;号：</span>$!bankaccount
+                    </li>
+                    <li style="width: 350px; line-height: 30px;text-align: left;" >
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="font_name">开户行：</span>$!bankName
+                    </li>
+                    <li style="width: 350px; text-align: left;">
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="font_name">支付密码：</span>
+                        <input name="passWard" id="passWard" class="input_Style2 wid_230 hei_30" placeholder="请输入密码..." maxlength="30" type="password" />
+                    </li>
+                    <!--如需增加可循环dl结束-->
+                </ul>
+            </div><!--register_box-->
+            <div class="font_cen" >
+                <button onclick="deposit()" loadMsg="提现请求处理中" id="tixianid" class="button_2 hei_40 font_16 ">确定</button>
+                <button onclick="hideDivs('showzx')" class="button_3  hei_40 font_16 ">取消</button>
+            </div>
+        </div>
+    </div>
+</div><!-- 提现 end -->
+
+<div class="po_fai" id="showErrorMsg" style="display:none">
+    <div class="po_fai_bg"></div>
+    <div class="po_main1" style="height:auto;">
+        <div class="tit bg_05 hei_30 pad_l10">提示</div>
+        <ul>
+            <li id="lierror">提现失败！</li>
+            <li><a href="#"><button type="button" class="button_1 hei_35" style="margin-left: 115px;margin-top: 10px;" onclick="hideDivs('showErrorMsg')" id="showMsgBtn">确定</button></a></li>
+        </ul>
+    </div>
+</div>
+
+
+
+<div class="po_fai" id="showSuccessMsg" style="display:none">
+    <div class="po_fai_bg"></div>
+    <div class="po_main1">
+        <div class="tit bg_05 hei_30 pad_l10">提示</div>
+        <ul>
+            <li id="lisuccess">&nbsp;&nbsp;提现成功！</li>
+            <li>&nbsp;&nbsp;转账申请已提交至银行处理，请关注转入账户资金动态。</li>
+            <li>&nbsp;&nbsp;如有疑问欢迎联系舒适100平台客服，我们将竭诚为您服务！</li>
+            <li><a href="#"><button type="button" class="button_1 hei_35" style="margin-left: 115px;margin-top: 10px;" onclick="hideSuccessDiv('showSuccessMsg')" >确定</button></a></li>
+
+        </ul>
+    </div>
+</div>
+<!-- 弹出层  交易信息列表DIV -->
+#parse("/bank/citic_trade_index.vm")
+<!--以上为弹出层-->
+<!-- 弹出层  -->
+<div class="po_fai" style="display:none;" id="shopNewsDiv">
+    <div class="po_fai_bg"></div>
+    <div class="po_main0 pad_t10" >
+      <div class=" hei_32 bg_05 pad_l10 font_14b"><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor" onclick="hideDivs('shopNewsDiv')"></i>驳回原因</div>
+        <div class="clear"></div>
+        <div class="add_qynm">
+			<span class="list_top font_14b fl" id="contentId"></span>
+        </div>
+        <div class="mar_cen" style="width:100px">
+          <button type="button" class="button_1 hei_35 font_14b " onclick="hideDivs('shopNewsDiv')"><a class="font_82">关闭</a></button>
+        </div>
+        <div class="clear"></div>
+      </div>
+</div>

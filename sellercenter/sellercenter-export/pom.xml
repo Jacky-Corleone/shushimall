@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>sellercenter-parent</artifactId>
+		<groupId>com.camelot.openplatform.sellercenter</groupId>
+		<version>shushi100-1.0.3.daily-SNAPSHOT</version>
+		<relativePath>../sellercenter-parent/pom.xml</relativePath>
+	</parent>
+	<artifactId>sellercenter-export</artifactId>
+	<name>sellercenter-export</name>
+	<url>http://maven.apache.org</url>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+    <dependencies>
+		<dependency>
+			<groupId>com.camelot.openplatform.sellercenter</groupId>
+			<artifactId>sellercenter-common</artifactId>
+		</dependency>
+    </dependencies>
+	
+	<!-- Maven私服配置 -->
+	<distributionManagement>
+		<repository>
+			<id>releases</id>
+    		<name>Releases</name>
+    		<url>http://121.42.168.19:8081/nexus/content/repositories/releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<name>Snapshots</name>
+    		<url>http://121.42.168.19:8081/nexus/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+</project>

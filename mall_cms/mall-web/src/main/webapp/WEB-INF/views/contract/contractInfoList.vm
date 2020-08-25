@@ -1,0 +1,77 @@
+#set($layout = "/none_layout.vm")
+
+#foreach($conInfo in $pager.records)
+    #if($conInfo.createBy==$register.uid || $conInfo.createBy==$conInfo.printerId||$conInfo.createBy==$conInfo.supplierId)
+    <ul class="list_top hei_40">
+        <li class="wid_50 font_cen"><input id="subCheck" type="checkbox" name="contractId"
+                                           value="$conInfo.id"
+                                           onclick="setSelectAll()"/>
+        </li>
+        <li class="wid_150 font_cen over_ell" onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')">
+            #if($sourcePage=="seller")
+                $!{cmap.get($conInfo.printerId.toString())}&nbsp;
+            #elseif($sourcePage=="buyer")
+                $!{cmap.get($conInfo.supplierId.toString())}&nbsp;
+            #end</li>
+        </li>
+        <li class="wid_130 font_cen over_ell" onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')">
+            <input type="hidden" value="$conInfo.contractName" name="contractName">
+            <input type="hidden" value="$!conInfo.contractNo"
+                   name="contractNo"/>$!conInfo.contractName&nbsp;
+        </li>
+        <li class="wid_90 over_ell font_cen" onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')"><input
+                type="hidden" name="status" value="$!conInfo.status">$!statusMap.get($conInfo.status)&nbsp;</li>
+        <li class="wid_110 over_ell font_cen"
+            onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')">$!{map.get($!conInfo.createBy.toString())}
+            &nbsp;</li>
+        <li class="wid_110 over_ell font_cen"
+            onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')">$!date.format(
+            'yyyy-MM-dd',$!conInfo.createDate)&nbsp;</li>
+        <li class="wid_180 over_ell font_cen" onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')">
+            $!date.format('yyyy-MM-dd',$!conInfo.beginDate)至$!date.format(
+            'yyyy-MM-dd',$!conInfo.endDate)&nbsp;
+        </li>
+        <li class="wid_130 over_ell font_cen"
+            onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')">$!conInfo.remark&nbsp;</li>
+    </ul>
+    #elseif("待确认"==$statusMap.get($conInfo.status)||"确认驳回"==$statusMap.get($conInfo.status)||
+        "待生效"==$statusMap.get($conInfo.status)||"协议生效"==$statusMap.get($conInfo.status)||
+        "协议生效(正在修改)"==$statusMap.get($conInfo.status))
+    <ul class="list_top hei_40">
+        <li class="wid_50 font_cen"><input id="subCheck" type="checkbox" name="contractId"
+                                           value="$!conInfo.id"
+                                           onclick="setSelectAll()"/>
+        </li>
+        <li class="wid_150 font_cen over_ell" onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')">
+            #if($sourcePage=="seller")
+                $!{cmap.get($conInfo.printerId.toString())}&nbsp;
+            #elseif($sourcePage=="buyer")
+                $!{cmap.get($conInfo.supplierId.toString())}&nbsp;
+            #end</li>
+        </li>
+        <li class="wid_130 font_cen over_ell" onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')">
+            <input type="hidden" value="$conInfo.contractName" name="contractName">
+            <input type="hidden" value="$!conInfo.contractNo"
+                   name="contractNo"/>$!conInfo.contractName&nbsp;
+        </li>
+        <li class="wid_90 over_ell font_cen" onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')"><input
+                type="hidden" name="status" value="$!conInfo.status">$!statusMap.get($conInfo.status)&nbsp;</li>
+        <li class="wid_110 over_ell font_cen"
+            onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')">$!{map.get($!conInfo.createBy.toString())}
+            &nbsp;</li>
+        <li class="wid_110 over_ell font_cen"
+            onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')">$!date.format(
+            'yyyy-MM-dd',$!conInfo.createDate)&nbsp;</li>
+        <li class="wid_180 over_ell font_cen" onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')">
+            $!date.format('yyyy-MM-dd',$!conInfo.beginDate)至$!date.format(
+            'yyyy-MM-dd',$!conInfo.endDate)&nbsp;
+        </li>
+        <li class="wid_130 over_ell font_cen"
+            onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')">$!conInfo.remark&nbsp;</li>
+    </ul>
+    #end
+#end
+
+<!-- 内容结束 -->
+
+#pageVelocity($pager)

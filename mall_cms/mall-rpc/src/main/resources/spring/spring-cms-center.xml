@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+
+   		<dubbo:reference id="cmsImageService" registry="qingdaoRegistry"
+                     owner="cmscenter" interface="com.camelot.cmscenter.service.CmsImageService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+   		<dubbo:reference id="cmsArticleService" registry="qingdaoRegistry"
+                     owner="cmscenter" interface="com.camelot.cmscenter.service.CmsArticleService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+        <dubbo:reference id="cmsCategoryService" registry="qingdaoRegistry"
+                     owner="cmscenter" interface="com.camelot.cmscenter.service.CmsCategoryService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+        <dubbo:reference id="cmsSpecialSubjectModelService" registry="qingdaoRegistry"
+        	         owner="cmscenter" interface="com.camelot.cmscenter.service.CmsSpecialSubjectModelService"
+            	     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+        <dubbo:reference id="cmsSpecialSubjectService" registry="qingdaoRegistry"
+       				 owner="cmscenter" interface="com.camelot.cmscenter.service.CmsSpecialSubjectService"
+        			 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+         <dubbo:reference id="cmsArtTagsService" registry="qingdaoRegistry"
+                     owner="cmscenter" interface="com.camelot.cmscenter.service.CmsArtTagsService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		<!-- 使用DUBBO协议暴露服务;标签关联 -->
+		<dubbo:reference id="cmsArtTagsListService" registry="qingdaoRegistry"
+                     owner="cmscenter" interface="com.camelot.cmscenter.service.CmsArtTagsListService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+</beans>

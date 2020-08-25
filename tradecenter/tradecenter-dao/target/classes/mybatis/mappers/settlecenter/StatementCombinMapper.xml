@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.settlecenter.dao.StatementCombinDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="settlementCombinMap" type="settlementCombin">
+				<result property="settlement.id" column="id"/>
+				<result property="settlement.sellerId" column="seller_id"/>
+				<result property="settlement.shopId" column="shop_id"/>
+				<result property="settlement.beginDate" column="begin_date"/>
+				<result property="settlement.endDate" column="end_date"/>
+				<result property="settlement.platformIncome" column="platform_income"/>
+				<result property="settlement.platformExpenditure" column="platform_expenditure"/>
+				<result property="settlement.sellerIncome" column="seller_income"/>
+				<result property="settlement.sellerExpenditure" column="seller_expenditure"/>
+				<result property="settlement.orderTotalMoney" column="order_total_money"/>
+				<result property="settlement.commissionTotalMoney" column="commission_total_money"/>
+				<result property="settlement.settlementTotalMoney" column="settlement_total_money"/>
+				<result property="settlement.refundTotalMoney" column="refund_total_money"/>
+				<result property="settlement.platformNeedPay" column="platform_need_pay"/>
+				<result property="settlement.platformHavePaid" column="platform_have_paid"/>
+				<result property="settlement.paymentId" column="payment_id"/>
+				<result property="settlement.status" column="status"/>
+				<result property="settlement.billDate" column="bill_date"/>
+				<result property="settlement.settlementDate" column="settlement_date"/>
+				<result property="settlement.havePaidDate" column="have_paid_date"/>
+				<result property="settlement.created" column="created"/>
+				<result property="settlement.modified" column="modified"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+					
+		select s.id,
+			s.seller_id,
+			s.shop_id,
+			s.begin_date,
+			s.end_date,
+			s.platform_income,
+			s.platform_expenditure,
+			s.seller_income,
+			s.seller_expenditure,
+			s.order_total_money,
+			s.commission_total_money,
+			s.settlement_total_money,
+			s.refund_total_money,
+			s.platform_need_pay,
+			s.platform_have_paid,
+			s.payment_id,
+			s.status,
+			s.bill_date,
+			s.settlement_date,
+			s.have_paid_date,
+			s.created,
+			s.modified
+		from   settlement s
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.settlement_id != null  and entity.settlement_id !=''">
+				<![CDATA[ and s.id  = #{entity.settlement_id} ]]>
+			</if>
+			<if test="entity.shopIds != null">
+					 and s.shop_id in
+				<foreach collection="entity.shopIds" item="item" index="index" open="(" separator="," close=")" >
+					 #{item} 
+	 			</foreach>
+			</if>
+			<if test="entity.shopId != null  and entity.shopId !=''">
+				<![CDATA[ and s.shop_id  = #{entity.shopId} ]]>
+			</if>
+			<if test="entity.settlementDatestr != null  and entity.settlementDatestr !=''">
+				<![CDATA[ and s.settlement_date  > #{entity.settlementDatestr} ]]>
+			</if>
+			<if test="entity.settlementDateend != null  and entity.settlementDateend !=''">
+				<![CDATA[ and s.settlement_date  < #{entity.settlementDateend} ]]>
+			</if>
+			<if test="entity.havePaidDatestr != null  and entity.havePaidDatestr !=''">
+				<![CDATA[ and s.have_paid_date  > #{entity.havePaidDatestr} ]]>
+			</if>
+			<if test="entity.havePaidDateend != null  and entity.havePaidDateend !=''">
+				<![CDATA[ and s.have_paid_date  < #{entity.havePaidDateend} ]]>
+			</if>
+			
+			<if test="entity.billDatestr != null  and entity.billDatestr !=''">
+				<![CDATA[ and s.bill_date  > #{entity.billDatestr} ]]>
+			</if>
+			
+			
+			
+			
+			<if test="entity.status != null  and entity.status !=''">
+				<![CDATA[ and s.status  = #{entity.status} ]]>
+			</if>
+			<if test=" entity.status ==''">
+				<![CDATA[ and s.status  = 0 ]]>
+			</if>
+			<!-- 
+			<if test="entity.sellerId != null  and entity.sellerId !=''">
+				<![CDATA[ and s.seller_id  = {entity.sellerId} ]]>
+			</if>
+			<if test="entity.beginDate != null  and entity.beginDate !=''">
+				<![CDATA[ and s.begin_date  = {entity.beginDate} ]]>
+			</if>
+			<if test="entity.endDate != null  and entity.endDate !=''">
+				<![CDATA[ and s.end_date  = {entity.endDate} ]]>
+			</if>
+			<if test="entity.platformIncome != null  and entity.platformIncome !=''">
+				<![CDATA[ and s.platform_income  = {entity.platformIncome} ]]>
+			</if>
+			<if test="entity.platformExpenditure != null  and entity.platformExpenditure !=''">
+				<![CDATA[ and s.platform_expenditure  = {entity.platformExpenditure} ]]>
+			</if>
+			<if test="entity.sellerIncome != null  and entity.sellerIncome !=''">
+				<![CDATA[ and s.seller_income  = {entity.sellerIncome} ]]>
+			</if>
+			<if test="entity.sellerExpenditure != null  and entity.sellerExpenditure !=''">
+				<![CDATA[ and s.seller_expenditure  = {entity.sellerExpenditure} ]]>
+			</if>
+			<if test="entity.orderTotalMoney != null  and entity.orderTotalMoney !=''">
+				<![CDATA[ and s.order_total_money  = {entity.orderTotalMoney} ]]>
+			</if>
+			<if test="entity.commissionTotalMoney != null  and entity.commissionTotalMoney !=''">
+				<![CDATA[ and s.commission_total_money  = {entity.commissionTotalMoney} ]]>
+			</if>
+			<if test="entity.settlementTotalMoney != null  and entity.settlementTotalMoney !=''">
+				<![CDATA[ and s.stotal_money  = {entity.settlementTotalMoney} ]]>
+			</if>
+			<if test="entity.refundTotalMoney != null  and entity.refundTotalMoney !=''">
+				<![CDATA[ and s.refund_total_money  = {entity.refundTotalMoney} ]]>
+			</if>
+			<if test="entity.platformNeedPay != null  and entity.platformNeedPay !=''">
+				<![CDATA[ and s.platform_need_pay  = {entity.platformNeedPay} ]]>
+			</if>
+			<if test="entity.platformHavePaid != null  and entity.platformHavePaid !=''">
+				<![CDATA[ and s.platform_have_paid  = {entity.platformHavePaid} ]]>
+			</if>
+			<if test="entity.paymentId != null  and entity.paymentId !=''">
+				<![CDATA[ and s.payment_id  = {entity.paymentId} ]]>
+			</if>
+
+			<if test="entity.billDate != null  and entity.billDate !=''">
+				<![CDATA[ and s.bill_date  = {entity.billDate} ]]>
+			</if>
+			<if test="entity.created != null  and entity.created !=''">
+				<![CDATA[ and s.created  = {entity.created} ]]>
+			</if>
+			<if test="entity.modified != null  and entity.modified !=''">
+				<![CDATA[ and s.modified  = {entity.modified} ]]>
+			</if> -->
+		</if>
+		ORDER BY s.created DESC
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="settlementCombinMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where s.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="querySettlementList" resultMap="settlementCombinMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="querySettlementListCount" resultType="long">
+		<include refid="count_Tail" />
+		settlement s
+		<include refid="where_fragement" />
+	</select>
+	
+	
+</mapper>

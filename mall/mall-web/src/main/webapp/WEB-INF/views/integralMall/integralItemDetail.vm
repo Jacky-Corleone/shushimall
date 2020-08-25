@@ -1,0 +1,345 @@
+#set($assetsPath="$request.contextPath/assets")
+<link href="$assetsPath/css/basic.css" rel="stylesheet" type="text/css"/>
+<link href="$assetsPath/css/Details.css" rel="stylesheet" type="text/css"/>
+<script language="javascript" type="text/javascript" src="$assetsPath/js/tab.js"></script>
+<script type="text/javascript" src="$assetsPath/plugin/common/loadMsg.js"></script>
+<script src="$assetsPath/js/goodscenter/details.js"></script>
+<script src="$assetsPath/js/goodscenter/map.js"></script>
+<script src="$assetsPath/js/integralMall/integralDetails.js"></script>
+<input type="hidden" id="contextPath" value="$request.getContextPath()"/>
+<input type="hidden" id="shopId" value="$!item.shopId"/>
+<input type="hidden" id="itemId" value="$!item.itemId"/>
+<input type="hidden" id="sellerId" value="$!item.sellerId"/>
+<input type="hidden" id="itemName" value="$!item.itemName"/>
+<input type="hidden" id="itemStatus" value="$!item.itemStatus"/>
+<input type="hidden" id="marketPrice" value="$!item.marketPrice"/>
+<input type="hidden" id="hasPrice" value="$!item.hasPrice"/>
+<input type="hidden" id="skuId" value="$!skuId"/>
+<input type="hidden" id="areaCode" value=""/>
+<input type="hidden" id="logging_status" value="$!logging_status"/>
+<input type="hidden" id="imageServerAddr" value="$!imageServerAddr"/>
+<style type="text/css">
+	.right_box {
+		right: 0;
+	}
+	.mid_font1 {
+		width:490px;
+	}
+	.mid_font1 li .mid_f_left {
+		width:80px;
+	}
+	.mid_font1 li .mid_f_right {
+		width:400px;
+	}
+</style>
+
+
+
+<div id="skuInfos" style="display:none;">
+	#foreach( $skuInfos in $!item.skuInfos)
+	<ul>
+		<li class="attributes">$skuInfos.attributes</li>
+		<li class="skuId">$skuInfos.skuId</li>
+		<li class="skuInventory">$skuInfos.skuInventory</li>
+		<li class="skuPicUrl">$skuInfos.skuPicUrl</li>
+		<li class="skuType">$skuInfos.skuType</li>
+	</ul>
+	#end
+</div>
+
+<!--内容开始-->
+<div id="content">
+    <!-- 广告类型 -->
+	<input type="hidden" id="integralType" value="$!integralType"/>
+	<!-- 是否为集采商品 -->
+	<input type="hidden" id="isCentralPurchasing" value="$!queryCentralPurchasingDTO.activitesDetailsId"/>
+	<div class="wid_auto mar_tb20 bg_05 pad_tb20 box-shadow1">
+		<div class="wid_1160 bg_06 border-4">
+			<!--面包屑开始-->
+			<div class="mic">
+				#foreach( $cadeOne in $catCascade)
+					<span><a href="$request.getContextPath()/searchController/searchItemByCategory?cid=$!cadeOne.cid">$!cadeOne.cname</a></span> >
+					#foreach( $cadeTwo in $cadeOne.childCats)
+						<a href="$request.getContextPath()/searchController/searchItemByCategory?cid=$!cadeTwo.cid">$!cadeTwo.cname ></a>
+						#foreach( $cadeThree in $cadeTwo.childCats)
+							<a href="$request.getContextPath()/searchController/searchItemByCategory?cid=$!cadeThree.cid">$!cadeThree.cname</a> >
+						#end
+					#end
+				#end
+				<a href="#">$!item.itemName</a>
+			</div>
+			<!--面包屑结束-->
+			<!--左侧图片开始-->
+			<div class="left_pic">
+				<div id="vertical" class="bigImg">
+						<img src="$!imageServerAddr#foreach( $picUrl in $!item.picUrls)#if($velocityCount == 1)$picUrl#end#end" width="398" height="398" id="midimg"/>
+					<div style="display:none;" id="winSelector"></div>
+				</div><!--bigImg end-->
+
+				<div class="smallImg">
+					<div class="scrollbutton smallImgUp disabled"><i class="fa-angle-left font_20"></i></div>
+					<div id="imageMenu">
+						<!-- $!item.picUrls -->
+						#if($!item.picUrls)
+							<ul>
+							#foreach( $picUrl in $!item.picUrls)
+								<li><img src="$!imageServerAddr$picUrl"/></li>
+							#end
+							</ul>
+						#end
+					</div>
+					<div class="scrollbutton smallImgDown"><i class="fa-angle-right font_20"></i></div>
+				</div><!--smallImg end-->
+				<div id="bigView" style="display:none;"><img width="800" height="800" alt="" src="" /></div>
+				<!--下图片下面的分享信息 商品信息 开始 -->
+				<div class="mar_t10">
+					<span class="mar_l10 fr cursor js_favourite">
+						<i class="demo-icons fa-star font_ffd font_14"></i>
+						<span id="shoucangshangpin">
+						#if($!favouriteItem == "true")
+							已收藏
+						#else
+							收藏商品
+						#end
+						</span>
+					</span>
+				</div>
+				<!--下图片下面的分享信息 商品信息 开始 -->
+			</div><!--left_pic end -->
+		<!--左侧图片结束-->
+		<!--中间文字购买信息开始-->
+		<div class="mid po_re">
+			<div class="mid_tit">
+				#if($!item.itemStatus != 4)
+    				<h1 class="fl over_ell cursor" title="$!item.itemName" style="font-size:18px;width:180px">$!item.itemName</h1>
+    				<span class="font_fe" style="display: block;">商品不是在售状态，无法兑换！</span>
+				#end
+				#if($!item.itemStatus == 4)
+					<h1 class="fl over_ell cursor" title="$!item.itemName" style="font-size:18px;width:650px">$!item.itemName</h1>
+				#end
+			</div>
+			<div class="mid_font1">
+				<ul>
+					<li>
+						<div class="mid_f_left">原价：</div>
+						<!-- 如果是询价的商品，市场价就展示为空 -->
+						<div class="mid_f_right"><del id="marketPrice_del">#if($!item.hasPrice == 1) ￥$!item.marketPrice #end</del></div>
+					</li>
+					<li>
+						<div class="mid_f_left">
+							兑换积分：
+						</div>
+						<div class="mid_f_right" id="shoujia">
+								<strong class="font_fe font_16" ><span id="itemPrice_js">$!integral</span></strong>积分
+						</div>
+					</li>
+					#*<li>
+						<div class="mid_f_left">购买限制：</div>
+						<div class="mid_f_right">
+						#if($!shopFreightTemplateDTO.deliveryTime)
+							<strong class="font_fe" >
+							卖家承诺$!shopFreightTemplateDTO.deliveryTime
+							</strong>
+					    #end
+					    </div>
+					</li>*#
+					#foreach( $attrSale in $!item.attrSale)
+					<li>
+						<div class="mid_f_left attrName_js" name="$attrSale.id:$attrSale.name" style="height:auto;">$attrSale.name：</div>
+						<div class="mid_f_right">
+							<!--选中用border-8 的样式 然后加上<b class="po_ab pa_04"></b>标签-->
+							#foreach( $values in $!attrSale.values)
+								#if($skuItem)
+									#foreach($!skuItemSales in $!skuItem.attrSales )
+										#if($!skuItemSales.id == $attrSale.id)
+											#foreach($!skuValues in $!skuItemSales.values )
+												#if($!skuValues.id == $!values.id)
+                        							<span class="press_classes po_re border-8 js_attr" name="$values.id:$values.name">
+                        								$values.name
+                        								<b class="po_ab pa_04" style="padding-left: 0px; padding-right: 0px;"></b>
+                        							</span>
+												#end
+											#end
+										#end
+									#end
+								#else
+								#end
+							#end
+						</div>
+						<div class="clear"></div>
+					</li>
+					#end
+					<li>
+						<div class="mid_f_left">数量：</div>
+						<div class="mid_f_right" style="width: 80px;">
+							<div class="wrap-input">
+								<a class="btn-reduce border-4" href="javascript:void(0);" onclick="minus(this)">-</a>
+								<form id="immediateExchangeForm" action="$request.contextPath/integralMall/integralOrderDetail"> 
+									<input id="buy_item_count" name="count" value="1" class="text border-4 number_js" onkeyup="handEntry(this);">
+									<input name="integralType" value="$!integralType" type="hidden" />
+									<input name="skuId" value="$!skuId" type="hidden" />
+									<input name="id" value="$!id" type="hidden" />
+								</form>
+								<a class="btn-add border-4" href="javascript:void(0);" onclick="plus(this)">+</a>
+							</div>
+						</div>
+						#if($queryCentralPurchasingDTO)
+							<div class="store-prompt" style="height: 26px;line-height: 26px;">
+    							#if($!queryCentralPurchasingDTO.perPerchaseMaxNum>0)
+    								<strong>有货#if($!item.hasPrice == 1)（库存$!queryCentralPurchasingDTO.releaseGoodsMaxNum件）#end</strong>
+    							#else
+    								<strong class="font_fe font_14">缺货</strong>
+    								<span></span>
+    							#end
+    							<input type="hidden" id="qty_js" value="$!queryCentralPurchasingDTO.perPerchaseMaxNum">
+    						</div>
+						#else
+							<div class="store-prompt" style="height: 26px;line-height: 26px;">
+    							#if($!item.inventory>0)
+    								<strong>有货#if($!item.hasPrice == 1)（库存$!item.inventory件）#end</strong>
+    							#else
+    								<strong class="font_fe font_14">缺货</strong>
+    								<span></span>
+    							#end
+    							<input type="hidden" id="qty_js" value="$!item.inventory">
+    						</div>
+						#end
+					</li>
+				</ul>
+
+			</div>
+			<!-- mid_font1 end-->
+			<div class="mid_font2 border-4 js_buyList" style="display:none;">
+
+			</div>
+			#if($!item.itemStatus == 4)
+				#if($!item.inventory>0)
+					<div onclick="immediateExchange();" class="mall_button js_addCart">
+    	    			<span class="icon"></span>立即兑换
+    				</div>
+				#else
+					<div class="mall_button_disabled js_addCart">
+    	    			<span class="icon"></span>已售罄
+    				</div>
+				#end
+			#end
+			<!--中间文字购买信息结束-->
+		   </div><!-- 右侧div结束-->
+		</div><!--1160 -->
+    </div><!--1200的外围盒子 -->
+<!--下面内容开始-->
+<div class=" clear"></div>
+<div class="wid">
+ <!--左侧开始-->
+ <div id="shop_left">
+    <dl class="border-1">
+        <dt class="pad_l10">产品分类</dt>
+		<!--向上class="fa-angle-double-up" 向下class="fa-angle-double-down"的箭头-->
+        #foreach($entity in $categorylist)
+			<dd class="over_ell fl cursor" style="width:200px" title="$entity.cname">
+                <i class="fa-angle-double-down fr mar_r10"></i>
+				$entity.cname
+			</dd>
+			#if($!entity.childShopCategory.size()>0)
+				<ul>
+					#foreach($entityChild in $!entity.childShopCategory)
+					<li onclick="toShopListIndex($entityChild.cid);" class="over_ell wid_250 fl cursor" title="$entityChild.cname"><i class="demo-icons fa-angle-right"></i>$entityChild.cname</li>
+					#end
+				</ul>
+			#end
+		#end
+    </dl>
+	
+	<form method="get" action="$request.getContextPath()/shopItemListIndexController/toListIndex" id="contentForm">
+		<input type="hidden" value="" id="shopCid" name="shopCid">
+		<input type="hidden" value="1" name="page">
+		<input type="hidden" value="$!item.shopId" id="shopId" name="shopId">
+	</form>
+  </div>
+ <!--左侧结束-->
+
+ <!-- 右侧开始-->
+ <div id="right">
+ <!--tabs开始-->
+          <div class="nTab">
+            <!-- 标题开始 -->
+            <div class="TabTitle">
+              <ul id="myTab0">
+                <li class="active" onclick="nTabs(this,0);">商品介绍</li>
+                <li class="normal" onclick="nTabs(this,1);">包装清单</li>
+                <li class="normal" onclick="nTabs(this,2);">售后保障</li>
+              </ul>
+            </div>
+            <!-- 内容开始 -->
+            <div class="TabContent">
+                        <!-- 商品介绍下的内容开始 -->
+				<div id="myTab0_Content0">
+				<ul>
+					<li class="nTab_list wid_300 cursor" title="$!item.itemName">商品名称：$!item.itemName</li>
+					<li class="nTab_list wid_300 cursor" title="$!item.itemId">商品编号：$!item.itemId</li>
+					<li class="nTab_list wid_300 cursor" title="$!date.format('yyyy-MM-dd HH:mm:ss ',$!item.listtingTime)">上架时间：$!date.format('yyyy-MM-dd HH:mm:ss ',$!item.listtingTime)</li>
+					<li class="nTab_list wid_300 cursor" title="$!shopInfo.shopName">店铺名称：$!shopInfo.shopName</li>
+					<li class="nTab_list wid_300 cursor" title="$!item.origin">商品产地：$!item.origin</li>
+					<li class="nTab_list wid_300 cursor" title="$!item.weight">商品毛重：#if($item.weight)$!{item.weight}$!{item.weightUnit}#end</li>
+					<li class="nTab_list wid_300 cursor" title="$!item.volume">商品体积：#if($item.volume)$!{item.volume}m³#end</li>
+				</ul>
+              </div>
+              <!-- 包装清单下的内容开始 -->
+              <div id="myTab0_Content1" class="none">
+               $!item.packingList
+              </div>
+
+              <!-- 售后保障下的内容开始 -->
+              <div id="myTab0_Content2" class="none">
+				服务承诺：$!item.afterService 
+              </div>
+            </div>
+          </div>
+    <!--tabs结束-->
+    <div class="clear"></div>
+    <!--下面图片内容开始-->
+    <div  class="right_pic">
+		#set($addr = 'src="' + $!imageServerAddr +"/")
+		#set($describeUrl = $!item.describeUrl.replaceAll('src="/', $addr))
+		$describeUrl
+		<!--图片的宽度不能超过990px -->
+       <!-- <img src="$assetsPath/pic/pic18.jpg"  class="img_l" />
+       <img src="$assetsPath/pic/pic19.jpg"  class="img_r"/>
+       <img src="$assetsPath/pic/pic20.jpg" class="img_l"/> -->
+    </div>
+	<!--下面图片内容结束-->
+
+</div><!--id="right" -->
+</div>
+ <!-- 右侧结束-->
+</div>
+<!--下面内容结束-->
+</div>
+<!--#content end内容结束-->
+<!-- <div class="dowebok"><a href="#top"> 返回顶部</a></div> -->
+
+<script language="javascript">
+    var LR_username='$!userId';
+    var LR_userdata="店铺名称：'$!shopInfo.shopName'<br/>商品名称：'$!item.itemName'";
+    function openZoosUrl_UserDefine(){
+        //你们的判断登录跳转功能，也可以在这里进行判断
+        if( '$!userId' == ''){
+            alert("你目前处于非登录状态，请先登录再联系客服！");
+            var retUrl = "$request.contextPath/productController/details?id="+$!item.itemId;
+            window.location.href="$request.contextPath/user/login?retUrl=" + encodeURI(retUrl);
+            return true;
+        }
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            url:"$request.contextPath/shopCart/ifLogin_shopCustomer",
+            success: function(data){
+                if(data.ifLogin_shopCustomer == false){
+                    alert("你目前处于非登录状态，请先登录再联系客服！");
+                    this.location.href="$request.contextPath/user/login";
+                    return true;
+                }
+            }
+        });
+    }
+</script>

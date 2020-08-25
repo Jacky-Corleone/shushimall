@@ -1,0 +1,342 @@
+#set($staticPath="$request.contextPath/assets")
+<link type="text/css" href="$staticPath/css/scnav.css" rel="stylesheet"/>
+<script type="text/javascript" src="$staticPath/js/adver_main.js"></script>
+<script type="text/javascript" src="$staticPath/js/scnav.js"></script>
+<meta property="qc:admins" content="53031545163755052525163757" />
+<script type="text/javascript">
+	$(document).ready(function(){
+		var addressCode = $.cookie('regionCode');
+		$("#loginArea").load("$request.contextPath/loginFragement?type=buyer");
+	//	$("#noticeArea").load("$request.contextPath/noticeFragement");
+		// 冲销all_classify.js 中的click方法
+		setTimeout(function(){
+			$(".Nav_left").unbind("mouseleave");
+			$(".Nav_left").unbind("mouseenter");
+		},100);
+		$(".Nav_classify").show();
+		
+		// 商城首页头部广告词
+		$.getJSON("$request.contextPath/topBunner?addressCode="+addressCode,function(data){
+			if(data){
+				$("#top_banner").find("img").attr("src","$!imageServerAddr"+data.adSrc);
+				//console.log(data.adURL);
+				$("#top_banner").find("a").click(function(){
+					adVisit(data.id,1,data.adURL);
+				});
+				$("#top_banner").slideDown("slow");
+				if(data.close=="2"){
+					$("#top_banner .fa-times-circle").hide();
+				}
+			}
+		});
+		
+		// 猜你喜欢
+		$("#guessLove").load("$request.contextPath/guessLove");
+        $(".Nav_classify").load("$request.contextPath/allCategory?type=show");
+
+		//获取购买流程
+		var salesProcessUrl = "$request.contextPath/getSalesProcess";
+		$.ajax({
+			url:salesProcessUrl+"?_="+new Date(),
+			type:'POST',
+			data:{"addressCode":addressCode,"adType":7,"rows":1},
+			dataType:'JSON',
+			success:function(d){
+				if(d!=null&&d.length>0){
+					var salesProcessHTML ="";
+					if(d[0].isClick==1){
+						var url1 = "";
+						if(d[0].adURL.indexOf("http") == 0){	
+							url1 = d[0].adURL;
+						}else{
+							url1 =  "http://" + d[0].adURL;
+						}
+						salesProcessHTML += "<a target=\"_blank\" href=\""+url1+"\" onclcik=\"return adVisit('"+d[0].id+"',7)\">";
+					}
+					salesProcessHTML += '<img src = "$!imageServerAddr'+d[0].adSrc+'" style="width:1200px;height:100px;" />';
+					if(d[0].isClick==1){
+						salesProcessHTML += "</a>";
+					}
+					$("#salesProcess").html(salesProcessHTML);
+					$("#salesProcess").show();
+				}else{
+					$("#salesProcess").hide();
+				}
+			}
+		});
+		
+		//获取推荐组合
+		$.ajax({
+			url:salesProcessUrl+"?_="+new Date(),
+			type:'POST',
+			data:{"addressCode":addressCode,"adType":6,"rows":3},
+			dataType:'JSON',
+			success:function(d){
+				if(d!=null&&d.length>0){
+					$.each(d,function(idx,ele){
+						var price = "";
+						$.ajax({
+							url:"$request.contextPath/getPrice?_="+new Date(),
+							type:'POST',
+							data:{"addressCode":addressCode,"skuId":ele.skuId},
+							dataType:'text',
+							success:function(data){
+								if(data!="-1"){
+									price = "￥"+data+"<i style=\"font-size:18px;color:rgb("+ele.priceColour+");\">元/套</i>";
+								}else{
+									price = "暂无报价";
+								}
+								var left_html = '<div style="width:433px;height:100%;float:left" class="web_trans"><img src="$!imageServerAddr'+ele.adSrc+'" width="100%" height="100%"></div>';
+								var middle_html ='<div style="width:300px;height:100%;float:left" class="web_trans"><img src ="$!imageServerAddr'+ele.adMiddleSrc+'" width ="100%" height ="100%" /></div>';
+								var url2 = "";
+								if(ele.adURL.indexOf("http") == 0){	
+									url2 = ele.adURL;
+								}else{
+									url2 =  "http://" + ele.adURL;
+								}
+								var right_html = '<div style="width:467px;height:100%;background-image:url($!imageServerAddr'+ele.adBackSrc+');float:left; position: relative;"><p><span style="cursor:default;position: absolute;bottom: 153px;left: 40px; font-size:30px;color:rgb('+ele.priceColour+');">'+price+'</span><a target="_blank" onclick="return adVisit(\''+ele.id+'\',6)" href="'+url2+'" style="position: absolute;bottom: 108px;left: 40px;"><img src="$staticPath/images/location_01.png"></a></p></div>';
+								if(ele.lrStyle!='1'){
+									$("#combo"+(idx+1)).html(left_html+middle_html+right_html);
+								}else{
+									$("#combo"+(idx+1)).html(right_html+middle_html+left_html);
+								}
+							}
+						});
+					});
+					if(d.length==1){
+						$("#combo2").hide();
+						$("#combo3").hide();
+					}else if(d.length==2){
+						$("#combo3").hide();
+					}
+				}else{
+					$("#combo1").hide();
+					$("#combo2").hide();
+					$("#combo3").hide();
+				}
+			},
+			complete:function(){
+			
+			}
+		});
+		
+		//ie换行bug
+		var lengts=$('.group_list_ie ul li').length-1;
+		$('.group_list_ie ul li').eq(lengts).css({'margin-right':'0px'});
+		
+	});
+	
+	// 广告点击量统计
+	function adVisit(id,type,url){
+		$.ajax({
+			url: "$request.contextPath/adVisit",
+			type: "post",
+			data: {
+				"id": id,
+				"type": type
+			}
+		});
+		if(url!=""&&url!=null&&url!=undefined){
+			if(url.indexOf("http") != 0){
+				url = "http://"+url;
+			}
+			window.open(url);
+		}
+	}
+	
+	function toUrl(isPackage){
+		var href = "$request.contextPath/searchController/searchItem?keyword=";
+		if(isPackage){
+			href += "&addSourcesStr=3";
+		}
+		window.location.href = href;
+	}
+	
+</script>
+
+<!--轮播图开始-->
+<div class="main_flash" onmouseover="clearFlashTimer()" onmouseleave="leaveFlashTimer()">
+    <div class="main_flash_bg">
+    <!-- 每一行轮播图片站位一个DIV-->
+
+        <div class="focusPic" >
+            #foreach($banner in $banners)
+                #if($velocityCount == 1)
+                    <a onclick="return adVisit('$!banner.id',2)" href="#if($!banner.bannerLink.indexOf('http://')==-1)http://#end$!banner.bannerLink" target="_blank" class="cursor lbp" style="display: block;" title="$!bunner.title">
+                        <img src="$!imageServerAddr$banner.bannerUrl" border="0"  width="670" height="450"/>
+                    </a>
+                #else
+                    <a onclick="return adVisit('$!banner.id',2)" href="#if($!banner.bannerLink.indexOf('http://')==-1)http://#end$!banner.bannerLink" target="_blank" class="cursor lbp" style="display: none;" title="$!bunner.title">
+                        <img src="$!imageServerAddr$banner.bannerUrl" border="0"  width="670" height="450"/>
+                    </a>
+                #end
+            #end
+            <div class="num_bg2">
+                <ul>
+                    <!--轮播图片的图标 开始 -->
+                    #foreach($banner in $banners)
+                        #if($velocityCount == 1)
+                            <li class="focus_num2 tb">
+                                <a href="#" onmouseover="SetActiveIndex($('.main_flash_bg>.focusPic>.lbp'), $('.main_flash_bg>.focusPic>.num_bg2>ul>li'),${velocityCount} - 1,this);"></a>
+                            </li>
+                        #else
+                            <li class="tb" id="${velocityCount} - 1">
+                                <a href="#" onmouseover="SetActiveIndex($('.main_flash_bg>.focusPic>.lbp'), $('.main_flash_bg>.focusPic>.num_bg2>ul>li'), ${velocityCount} - 1,this);"></a>
+                            </li>
+                        #end
+                    #end
+                </ul>
+            </div>
+        </div>
+<!--轮播图片的图标 开始
+	    <div class="num_bg1 scrollbutton smallImgDown">
+	        #if($!weekAdes)
+	            <ul class="po_re">
+	                <span class="chevron chevron_top"><i class="fa-chevron-up" onclick=""></i></span>
+	                <span class="chevron chevron_bottom"><i class="fa-chevron-down" onclick=""></i></span>
+	                <h3 class="font_14b hei_32 font_fe">本周推荐</h3>
+	                #foreach($weekAd in $weekAdes)
+	                    #if($velocityCount<= 4 )
+	                        <li class="po_re">
+	                            <a onclick="adVisit('$!weekAd.id','$!weekAd.adURL',1)" class="cursor" title="$!weekAd.title">
+	                                <img src="$!imageServerAddr$weekAd.adSrc" width="270" height="80"/>
+	                            </a>
+	                        </li>
+	                    #end
+	                #end
+	
+	            </ul>
+	        #end
+	    </div>
+-->
+    </div>
+
+</div>
+</div>
+<!--轮播图结束-->
+
+
+ <div id="content">
+  <!--广告banner 开始 -->  
+  <div class="clear"></div>
+  <div class="banner"></div>
+  <!--广告banner 结束 --> 
+
+  <!--购买流程 begin --> 
+  <div id="salesProcess" style="width:1200px;height:100px;float:left;display:none;margin-top:10px">
+  </div>
+  <!--购买流程 end --> 
+  
+  <!--广告推荐位开始 -->  
+  <div class="group_list group_list_ie web_tran">
+      <ul class='clearfix'>
+      	#foreach($advertise in $advertises)
+      		#if($velocityCount<= 4 )
+      			<li>
+      				<a onclick="return adVisit('$!advertise.id',1)" target="_blank" href="#if($!advertise.adURL.indexOf('http://')==-1)http://#end$!advertise.adURL" class="cursor" title="$!advertise.title">
+      					<img  class='fadeInDown animated1s delays$velocityCount' src="$!imageServerAddr$advertise.adSrc"/>
+      				</a>
+        		</li>
+
+      		#end
+      	#end
+      </ul>
+  </div>
+  <!--广告推荐位结束 --> 
+
+  <!--推荐组合-->
+  <div id="combo" class="Recommend mar_b10">
+  		<a href='javascript:;'><img src="$staticPath/images/text_bj_3.png"></a>
+  		<span onclick="toUrl(true)" class="fr font_fe Recommend_more cursor">查看更多+</span>
+  </div>
+  <div id="combo1">
+  </div>
+  <div id="combo2">
+  </div>  
+  <div id="combo3">
+  </div>
+  <!--推荐组合 end-->
+  <!--热卖单品start-->
+	
+  <div id="floorTOP">
+	#foreach($floor in $floorTop)
+		<div id="floorTop$velocityCount" name="floor$velocityCount">
+			<div>
+  				<img style="margin: 10px auto auto 600px;" src="$staticPath/images/loading-4.gif">
+  				<script type="text/javascript">
+  					$(document).ready(function(){
+  						$("#floorTop$velocityCount").load("$request.contextPath/floor?fid=$floor.idDTO&num=$velocityCount&type=1");
+  					})
+  				</script>
+			</div>
+  		</div>
+  	#end
+  </div>
+  <!--热卖单品end-->
+  <!--猜你喜欢  --> 
+  <div class="Recommend mar_tb10">
+  		<a href="javascript:;"><img src="$staticPath/images/recommended_service.png" style="display: inline;"></a>
+  </div>	
+  <div id="guessLove" style="height:300px; margin-bottom:0px;"></div>
+  <!--猜你喜欢 end -->
+  
+
+  <!-- 楼层开始 -->
+  <div id="floors">
+	#foreach($floor in $floors)
+		<div id="floor$velocityCount" name="floor$velocityCount">
+			<div style="width: 100%; height: 380px; line-height: 380px;">
+  				<img style="margin: 10px auto auto 600px;" src="$staticPath/images/loading-4.gif">
+  				<script type="text/javascript">
+  					$(document).ready(function(){
+  						$("#floor$velocityCount").load("$request.contextPath/floor?fid=$floor.idDTO&num=$velocityCount");
+  					})
+  				</script>
+			</div>
+  		</div>
+  	#end
+  </div>
+
+<!-- 楼层导航功能条 -->
+	<div id="leftBar">
+		#foreach($floor in $floors)
+			<div>
+	    		<a href="#" class="border-5" code="$velocityCount">
+	      			<span class="floor_s">${velocityCount}F</span>
+	      			<span class="floor_h">${floor.titleDTO}</span>
+	    		</a>
+			</div>
+		#end
+	</div>
+</div>
+<!-- 楼层导航功能条 -->
+<script language="javascript">
+ var LR_username='$!userId';
+ var LR_userdata="舒适100";
+ function openZoosUrl_UserDefine(){
+     //你们的判断登录跳转功能，也可以在这里进行判断
+     if( '$!userId' ==  ''){
+         alert("你目前处于非登录状态，请先登录再联系客服！");
+         this.location.href="$request.contextPath/user/login";
+         return true;
+     }
+     $.ajax({
+         type: "post",
+         dataType: "json",
+         url:"$request.contextPath/shopCart/ifLogin_shopCustomer",
+         success: function(data){
+             if(data.ifLogin_shopCustomer == false){
+                 alert("你目前处于非登录状态，请先登录再联系客服！");
+                 this.location.href="$request.contextPath/user/login";
+                 return true;
+             }else{
+            	 if(data.stationId){
+            		//弹出QQ客服聊天框
+            		 var url = "http://wpa.qq.com/msgrd?v=3&uin="+data.stationId+"&site=qq&menu=yes";
+            		 window.open(url,"_blank");
+            	 }
+             }
+         }
+     });
+ }
+</script>

@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.goodscenter.dao.ItemEvaluationDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="itemEvaluationMap" type="itemEvaluationQueryOutDTO">
+		<result property="id" column="id"/>
+		<result property="userId" column="user_id"/>
+		<result property="userShopId" column="user_shop_id"/>
+		<result property="byUserId" column="by_user_id"/>
+		<result property="byShopId" column="by_shop_id"/>
+		<result property="orderId" column="order_id"/>
+		<result property="itemId" column="item_id"/>
+		<result property="skuId" column="sku_id"/>
+		<result property="skuScope" column="sku_scope"/>
+		<result property="content" column="content"/>
+		<result property="type" column="type"/>
+		<result property="createTime" column="create_time"/>
+		<result property="modifyTime" column="modify_time"/>
+		<result property="itemName" column="item_name"/>
+		<result property="resource" column="resource"/>
+		<discriminator column="is_reply" javaType="String">
+			 <case value="1" resultType="itemEvaluationQueryOutDTO">  
+	            <collection property="itemEvaluationReplyList" resultMap="itemEvaluationReplyMap" />
+	        </case>  
+		</discriminator>
+	</resultMap>
+	
+	<resultMap id="itemEvaluationReplyMap" type="itemEvaluationReplyDTO">
+		<result property="id" column="reply_id"/>
+		<result property="evaluationId" column="reply_evaluation_id"/>
+		<result property="content" column="reply_content"/>
+		<result property="createTime" column="reply_create_time"/>
+		<result property="modifyTime" column="reply_modify_time"/>
+	</resultMap>
+	
+	<resultMap id="itemEvaluationTotalMap" type="itemEvaluationTotalQueryDTO">
+		<result property="scope" column="scope"/>
+		<result property="scopeCount" column="scope_count"/>
+		<result property="scopeSum" column="scope_sum"/>
+		<result property="allCount" column="all_count"/>
+		<result property="allSum" column="all_sum"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<sql id="selectAllColumns">
+		SELECT
+		  t.id,
+		  t.user_id,
+		  t.user_shop_id,
+		  t.by_user_id,
+		  t.by_shop_id,
+		  t.order_id,
+		  t.item_id,
+		  t.sku_id,
+		  t.sku_scope,
+		  t.content,
+		  t.type,
+		  t.resource,
+		  t.create_time
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	<sql id="where_fragement">
+		where 1 = 1
+		<if test="entity!=null">
+			<if test="entity.contentEmpty != null  and entity.contentEmpty == 0 ">
+				and (t.content is null or t.content = '')
+			</if>
+			<if test="entity.contentEmpty != null  and entity.contentEmpty == 1 ">
+				<![CDATA[ and t.content is not null and t.content <> '' ]]>
+			</if>
+			<if test="entity.itemId != null and entity.itemId !=''">
+				<![CDATA[ and t.item_id like CONCAT('%',#{entity.itemId},'%')]]>
+			</if>
+			<if test="entity.skuId!=null and entity.skuId !=''">
+				<![CDATA[ and t.sku_id like CONCAT('%',#{entity.skuId},'%')]]>
+			</if>
+			<if test="entity.userIds != null ">
+				 and t.user_id in
+				<foreach collection="entity.userIds" item="userId" index="index" open="(" separator="," close=")">
+	                #{userId}
+	  	        </foreach>
+			</if>
+			<if test="entity.orderId!=null and entity.orderId !=''">
+				<![CDATA[ and t.order_id like CONCAT('%',#{entity.orderId},'%')]]>
+			</if>
+			<if test="entity.beginTime!=null">
+				<![CDATA[ and DATE_FORMAT(t.create_time,'%Y-%m-%d') >= DATE_FORMAT(#{entity.beginTime},'%Y-%m-%d') ]]>
+			</if>
+			<if test="entity.endTime!=null">
+				<![CDATA[ and DATE_FORMAT(t.create_time,'%Y-%m-%d') <= DATE_FORMAT(#{entity.endTime},'%Y-%m-%d') ]]>
+			</if>
+			<if test="entity.type!=null and entity.type !=''">
+				<![CDATA[ and t.type = #{entity.type}]]>
+			</if>
+			<if test="entity.byUserId!=null and entity.byUserId !=''">
+				<![CDATA[ and t.by_user_id = #{entity.byUserId}]]>
+			</if>
+			<if test="entity.byShopId!=null and entity.byShopId !=''">
+				<![CDATA[ and t.by_shop_id = #{entity.byShopId}]]>
+			</if>
+			<if test="entity.scope!=null">
+				<![CDATA[ and t.sku_scope = #{entity.scope}]]>
+			</if>
+			<if test="entity.beginScope!=null">
+				<![CDATA[ and t.sku_scope >= #{entity.beginScope}]]>
+			</if>
+			<if test="entity.endScope!=null">
+				<![CDATA[ and t.sku_scope <= #{entity.endScope}]]>
+			</if>
+			<if test="entity.itemName!=null and entity.itemName !=''">
+				<![CDATA[ and item_.item_name like CONCAT('%',#{entity.itemName},'%')]]>
+			</if>
+			<if test="entity.resource!=null and entity.resource !=''">
+				<![CDATA[ and t.resource = #{entity.resource}]]>
+			</if>
+			<if test="entity.hasShow != null">
+				and t.has_show = #{entity.hasShow}
+			</if>
+			<if test="entity.shopCid != null">
+				and item_.shop_cid = #{entity.shopCid}
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法 -->
+    <!-- =========================================================== -->
+	<!-- 保存商品评价 -->
+	<insert id="insertItemEvaluation" keyProperty="id" useGeneratedKeys="true" parameterType="Object">
+		insert into item_evaluation(
+				user_id,
+				user_shop_id,
+				by_user_id,
+				by_shop_id,
+				order_id,
+				item_id,
+				sku_id,
+				sku_scope,
+				content,
+				type,
+				resource,
+				create_time,
+				modify_time
+		)values(
+				#{userId},
+				#{userShopId},
+				#{byUserId},
+				#{byShopId},
+				#{orderId},
+				#{itemId},	
+				#{skuId},
+				#{skuScope},
+				#{content},
+			    #{type},
+			    #{resource},
+				now(),
+				now()
+		)
+		<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+			select @@IDENTITY
+		</selectKey>
+	</insert>
+	
+	
+	<!-- 保存商品评价回复 -->
+	<insert id="insertItemEvaluationReply" keyProperty="id" useGeneratedKeys="true" parameterType="Object">
+		insert into item_evaluation_reply(
+				evaluation_id,
+				content,
+				create_time,
+				modify_time
+		)values(
+				#{evaluationId},
+				#{content},
+				now(),
+				now()
+		)
+		<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+			select @@IDENTITY
+		</selectKey>
+	</insert>
+	
+	<!-- 查询总数量 -->
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		item_evaluation t
+		left join item item_ on item_.item_id = t.item_id
+		<include refid="where_fragement" />
+		order by t.create_time desc
+	</select>
+	
+	<!-- 分页查询评价,不包含回复信息 -->
+	<select id="queryItemEvaluationList" resultMap="itemEvaluationMap">
+		<include refid="selectAllColumns" />
+		  ,item_.item_name
+		<if test="entity.reply==null or entity.reply == 0">
+			,'0' is_reply
+		</if>
+		<if test="entity.reply!=null and entity.reply == 1 ">
+			,'1' is_reply
+			,reply_.id reply_id
+			,reply_.evaluation_id reply_evaluation_id
+			,reply_.content reply_content
+			,reply_.create_time reply_create_time
+			,reply_.modify_time reply_modify_time
+		</if>
+		from item_evaluation t
+		left join item item_ on item_.item_id = t.item_id
+		<if test="entity.reply!=null and entity.reply ==1">
+			left join item_evaluation_reply reply_ on reply_.evaluation_id = t.id
+		</if>
+		<include refid="where_fragement" />
+		order by t.create_time desc
+		<if test="entity.reply!=null and entity.reply ==1">
+			,reply_create_time desc
+		</if>
+		
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	
+	<!-- 评价统计  对商品评价/对买家评价 -->
+	<select id="queryItemEvaluationTotal" resultMap="itemEvaluationTotalMap">
+		SELECT 
+			sku_scope scope,
+			COUNT(sku_scope) scope_count,
+			sum(sku_scope) scope_sum,
+			(SELECT SUM(sku_scope) FROM item_evaluation t <include refid="where_fragement" /> ) all_sum,
+			(SELECT count(sku_scope) FROM item_evaluation t <include refid="where_fragement" /> ) all_count
+			FROM item_evaluation t
+		<include refid="where_fragement" />
+		GROUP BY sku_scope
+	</select>
+	<select id="queryItemEvaluationReplyList" resultMap="itemEvaluationReplyMap">
+	select id reply_id ,evaluation_id reply_evaluation_id ,content reply_content,create_time reply_create_time,modify_time  reply_modify_time
+	from item_evaluation_reply  reply
+	where 1=1
+		<if test="itemEvaluationReplyDTO !=null and itemEvaluationReplyDTO.id != null">
+			and reply.id = #{itemEvaluationReplyDTO.id}
+		</if>
+		<if test="itemEvaluationReplyDTO !=null and itemEvaluationReplyDTO.evaluationId != null">
+			and reply.evaluation_id = #{itemEvaluationReplyDTO.evaluationId}
+		</if>
+		<if test="itemEvaluationReplyDTO !=null and itemEvaluationReplyDTO.content != null">
+			and reply.content = #{itemEvaluationReplyDTO.content}
+		</if>
+		<if test="itemEvaluationReplyDTO !=null and itemEvaluationReplyDTO.createTime != null">
+			and reply.create_time = #{itemEvaluationReplyDTO.createTime}
+		</if>
+		<if test="itemEvaluationReplyDTO !=null and itemEvaluationReplyDTO.modifyTime != null">
+			and reply.modify_time = #{itemEvaluationReplyDTO.modifyTime}
+		</if>
+		order by reply.create_time asc
+	    <if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	
+	</select>
+	<!-- 查询总数量 -->
+	<select id="queryTotal" resultType="long">
+		select count(1) from item_evaluation_reply reply
+		where 1=1
+		<if test="itemEvaluationReplyDTO !=null and itemEvaluationReplyDTO.id != null">
+			and reply.id = #{itemEvaluationReplyDTO.id}
+		</if>
+		<if test="itemEvaluationReplyDTO !=null and itemEvaluationReplyDTO.evaluationId != null">
+			and reply.evaluation_id = #{itemEvaluationReplyDTO.evaluationId}
+		</if>
+		<if test="itemEvaluationReplyDTO !=null and itemEvaluationReplyDTO.content != null">
+			and reply.content = #{itemEvaluationReplyDTO.content}
+		</if>
+		<if test="itemEvaluationReplyDTO !=null and itemEvaluationReplyDTO.createTime != null">
+			and reply.create_time = #{itemEvaluationReplyDTO.createTime}
+		</if>
+		<if test="itemEvaluationReplyDTO !=null and itemEvaluationReplyDTO.modifyTime != null">
+			and reply.modify_time = #{itemEvaluationReplyDTO.modifyTime}
+		</if>
+	</select>
+	
+	<sql id="conditionOnSpuOrSku">
+		<if test="entity.itemId != null">
+		AND	eval.item_id = #{entity.itemId}
+		</if>
+		<if test="entity.skuId != null">
+		AND	eval.sku_id = #{entity.skuId}
+		</if>
+	</sql>
+	
+	<select id="queryEvalCount" resultType="int">
+		SELECT
+			count(*)
+		FROM
+			item_evaluation eval
+		WHERE eval.type = 1
+		<include refid="conditionOnSpuOrSku" />
+	</select>
+	
+	<select id="queryEvalShowCount" resultType="int">
+		SELECT
+			count(DISTINCT eval.id)
+		FROM
+			item_evaluation eval
+		INNER JOIN item_evaluation_show eval_show ON eval.id = eval_show.evaluation_id
+		AND eval.type = 1
+		<include refid="conditionOnSpuOrSku" />
+	</select>
+	
+	<select id="queryAvgSkuScope" resultType="float">
+		SELECT
+			round(avg(eval.sku_scope), 1)
+		FROM
+			item_evaluation eval
+		WHERE 1=1
+		<include refid="conditionOnSpuOrSku" />
+	</select>
+	
+	<update id="setHasShow">
+		UPDATE
+			item_evaluation
+		SET
+			has_show = 1
+		WHERE
+			id = #{evaluationId}
+	</update>
+	
+</mapper>

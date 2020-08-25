@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.maketcenter.dao.CentralPurchasingActivitesDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="centralPurchasingActivites" type="com.camelot.centralPurchasing.domain.CentralPurchasingActivites">
+		<result property="centralPurchasingId" column="central_purchasing_id"/>
+		<result property="activityNum" column="activity_num"/>
+		<result property="activityName" column="activity_name"/>
+		<result property="activityImg" column="activity_img"/>
+		<result property="refUrl" column="ref_url"/>
+		<result property="activityBeginTime" column="activity_begin_time"/>
+		<result property="activitySignUpTime" column="activity_sign_up_time"/>
+		<result property="activitySignUpEndTime" column="activity_sign_up_end_time"/>
+		<result property="activityEndTime" column="activity_end_time"/>
+		<result property="activityStatus" column="activity_status"/>
+		<result property="activityType" column="activity_type"/>
+		<result property="shopId" column="shop_id"/>
+		<result property="platformId" column="platform_id"/>
+		<result property="insertTime" column="insert_time"/>
+		<result property="insertBy" column="insert_by"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateBy" column="update_by"/>
+
+	</resultMap>
+	
+	<resultMap id="queryCentralPurchasingDTO" type="com.camelot.maketcenter.dto.QueryCentralPurchasingDTO">
+		<result property="centralPurchasingId" column="central_purchasing_id"/>
+		<result property="activityNum" column="activity_num"/>
+		<result property="activityName" column="activity_name"/>
+		<result property="activityImg" column="activity_img"/>
+		<result property="refUrl" column="ref_url"/>
+		<result property="activityBeginTime" column="activity_begin_time"/>
+		<result property="activitySignUpTime" column="activity_sign_up_time"/>
+		<result property="activitySignUpEndTime" column="activity_sign_up_end_time"/>
+		<result property="activityEndTime" column="activity_end_time"/>
+		<result property="activityStatus" column="activity_status"/>
+		<result property="activityType" column="activity_type"/>
+		<result property="shopId" column="shop_id"/>
+		<result property="platformId" column="platform_id"/>
+		
+		<result property="activitesDetailsId" column="activites_details_id"/>
+		<result property="itemId" column="item_id"/>
+		<result property="skuId" column="sku_id"/>
+		<result property="cid" column="cid"/>
+		<result property="estimatePrice" column="estimate_price"/>
+		<result property="centralPurchasingPrice" column="central_purchasing_price"/>
+		<result property="originalPrice" column="original_price"/>
+		<result property="signUpNum" column="sign_up_num"/>
+		<result property="placeOrderNum" column="place_order_num"/>
+		<result property="paidNum" column="paid_num"/>
+		<result property="perPerchaseMaxNum" column="per_perchase_max_num"/>
+		<result property="releaseGoodsMaxNum" column="release_goods_max_num"/>
+		<result property="insertTime" column="insert_time"/>
+		<result property="insertBy" column="insert_by"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateBy" column="update_by"/>
+		
+		<result property="detailedStatus" column="detailedStatus"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			central_purchasing_id,
+			activity_num,
+			activity_name,
+			activity_img,
+			ref_url,
+			activity_begin_time,
+			activity_sign_up_time,
+			activity_sign_up_end_time,
+			activity_end_time,
+			activity_status,
+			activity_type,
+			shop_id,
+			platform_id,
+			insert_time,
+			insert_by,
+			update_time,
+			update_by
+		FROM 
+		CENTRAL_PURCHASING_ACTIVITES activites_
+		]]>
+	</sql>
+	
+	<sql id="selectAllJoinColumns">
+		<![CDATA[
+		select
+ 			activites_.central_purchasing_id,
+			activites_.activity_num,
+			activites_.activity_name,
+			activites_.activity_img,
+			activites_.ref_url,
+			activites_.activity_begin_time,
+			activites_.activity_sign_up_time,
+			activites_.activity_sign_up_end_time,
+			activites_.activity_end_time,
+			activites_.activity_status,
+			activites_.activity_type,
+			activites_.shop_id,
+			activites_.platform_id,
+			details_.activites_details_id,
+ 			details_.item_id,
+ 			details_.sku_id,
+ 			details_.cid,
+ 			details_.estimate_price,
+ 			details_.central_purchasing_price,
+ 			details_.original_price,
+ 			details_.sign_up_num,
+ 			details_.place_order_num,
+ 			details_.paid_num,
+ 			details_.per_perchase_max_num,
+ 			details_.release_goods_max_num,
+ 			details_.insert_time,
+ 			details_.insert_by,
+ 			details_.update_time,
+ 			details_.update_by,
+ 			CASE 
+				WHEN activity_status=0 THEN 0
+				WHEN activity_sign_up_time<=NOW() AND activity_sign_up_end_time>NOW() AND activity_status=1 THEN 2
+				WHEN activity_sign_up_time>NOW() AND activity_begin_time>activity_sign_up_time AND activity_status=1 THEN 3
+				WHEN activity_begin_time>NOW() AND activity_status=1 THEN 4
+				WHEN activity_status=3 THEN 6
+				WHEN activity_end_time<=NOW() AND activity_status=1 THEN 7
+				WHEN activity_status=2 OR release_goods_max_num<=(SELECT SUM(PURCHASE_NUM) FROM central_purchasing_ref_order ref_order_ WHERE ref_order_.ACTIVITES_DETAILS_ID=details_.ACTIVITES_DETAILS_ID) THEN 5
+				WHEN activity_begin_time<=NOW() AND activity_end_time>NOW() AND activity_status=1 THEN 1
+				ELSE 7 END detailedStatus
+		FROM 
+		CENTRAL_PURCHASING_ACTIVITES activites_ join CENTRAL_PURCHASING_ACTIVITES_DETAILS details_
+		on activites_.central_purchasing_id=details_.central_purchasing_id
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		<![CDATA[ where activites_.activity_status <> 4 ]]>
+		<if test="entity!=null">
+			<if test="entity.centralPurchasingId != null">
+				<![CDATA[ and activites_.central_purchasing_id = #{entity.centralPurchasingId} ]]>
+			</if>
+			<if test="entity.activityNum != null and entity.activityNum !=''">
+				<![CDATA[ and activites_.activity_num = #{entity.activityNum} ]]>
+			</if>
+			<if test="entity.activityName != null and entity.activityName !=''">
+				<![CDATA[ and activites_.activity_name = #{entity.activityName} ]]>
+			</if>
+			<if test="entity.activityImg != null and entity.activityImg !=''">
+				<![CDATA[ and activites_.activity_img = #{entity.activityImg} ]]>
+			</if>
+			<if test="entity.refUrl != null and entity.refUrl !=''">
+				<![CDATA[ and activites_.ref_url = #{entity.refUrl} ]]>
+			</if>
+			<if test="entity.activityBeginTime != null">
+				<![CDATA[ and activites_.activity_begin_time = #{entity.activityBeginTime} ]]>
+			</if>
+			<if test="entity.activitySignUpTime != null">
+				<![CDATA[ and activites_.activity_sign_up_time = #{entity.activitySignUpTime} ]]>
+			</if>
+			<if test="entity.activitySignUpEndTime != null">
+				<![CDATA[ and activites_.activity_sign_up_end_time = #{entity.activitySignUpEndTime} ]]>
+			</if>
+			<if test="entity.activityEndTime != null">
+				<![CDATA[ and activites_.activity_end_time = #{entity.activityEndTime} ]]>
+			</if>
+			<if test="entity.activityStatus != null">
+				<![CDATA[ and activites_.activity_status = #{entity.activityStatus} ]]>
+			</if>
+			<if test="entity.activityType != null">
+				<![CDATA[ and activites_.activity_type = #{entity.activityType} ]]>
+			</if>
+			<if test="entity.shopId != null">
+				<![CDATA[ and activites_.shop_id = #{entity.shopId} ]]>
+			</if>
+			<if test="entity.platformId != null">
+				<![CDATA[ and activites_.platform_id = #{entity.platformId} ]]>
+			</if>
+			<if test="entity.insertTime != null">
+				<![CDATA[ and activites_.insert_time = #{entity.insertTime} ]]>
+			</if>
+			<if test="entity.insertBy != null">
+				<![CDATA[ and activites_.insert_by = #{entity.insertBy} ]]>
+			</if>
+			<if test="entity.updateTime != null">
+				<![CDATA[ and activites_.update_time = #{entity.updateTime} ]]>
+			</if>
+			<if test="entity.updateBy != null">
+				<![CDATA[ and activites_.update_by = #{entity.updateBy} ]]>
+			</if>
+		</if>
+	</sql>
+	
+	<sql id="where_join_fragement">
+		<![CDATA[ where activites_.activity_status <> 4 ]]>
+		<if test="entity!=null">
+			<if test="entity.cids.size()>0">
+					<![CDATA[ and details_.cid  in ]]>
+				<foreach collection="entity.cids" item="item" index="index" open="(" separator="," close=")">
+					<![CDATA[ #{item} ]]>
+				</foreach>
+			</if>
+			<if test="entity.centralPurchasingId != null and entity.centralPurchasingId !=''">
+				<![CDATA[ and activites_.central_purchasing_id = #{entity.centralPurchasingId} ]]>
+			</if>
+			<if test="entity.activityNum != null and entity.activityNum !=''">
+				<![CDATA[ and activites_.activity_num = #{entity.activityNum} ]]>
+			</if>
+			<if test="entity.activityName != null and entity.activityName !=''">
+				<![CDATA[ and activites_.activity_name like CONCAT('%',TRIM(#{entity.activityName}),'%') ]]>
+			</if>
+			<if test="entity.activityImg != null and entity.activityImg !=''">
+				<![CDATA[ and activites_.activity_img = #{entity.activityImg} ]]>
+			</if>
+			<if test="entity.refUrl != null and entity.refUrl !=''">
+				<![CDATA[ and activites_.ref_url = #{entity.refUrl} ]]>
+			</if>
+			<if test="entity.activityBeginTime != null">
+				<![CDATA[ and activites_.activity_begin_time = #{entity.activityBeginTime} ]]>
+			</if>
+			<if test="entity.activitySignUpTime != null">
+				<![CDATA[ and activites_.activity_sign_up_time = #{entity.activitySignUpTime} ]]>
+			</if>
+			<if test="entity.activitySignUpEndTime != null">
+				<![CDATA[ and activites_.activity_sign_up_end_time = #{entity.activitySignUpEndTime} ]]>
+			</if>
+			<if test="entity.activityEndTime != null">
+				<![CDATA[ and activites_.activity_end_time = #{entity.activityEndTime} ]]>
+			</if>
+			<if test="entity.activityStatus != null">
+				<![CDATA[ and activites_.activity_status = #{entity.activityStatus} ]]>
+			</if>
+			<if test="entity.activityStatusList!=null and entity.activityStatusList.size()>0 ">
+			    <![CDATA[ AND activites_.activity_status in]]>
+			    <foreach collection="entity.activityStatusList" item="status" open="(" separator="," close=")">
+			    	#{status}
+			    </foreach>
+			</if>
+			<if test="entity.itemIds!=null and entity.itemIds.size()>0 ">
+			    <![CDATA[ AND details_.item_id in]]>
+			    <foreach collection="entity.itemIds" item="itemId" open="(" separator="," close=")">
+			    	#{itemId}
+			    </foreach>
+			</if>
+			<if test="entity.notActivityStatusList!=null and entity.notActivityStatusList.size()>0 ">
+			    <![CDATA[ AND activites_.activity_status not in]]>
+			    <foreach collection="entity.notActivityStatusList" item="status" open="(" separator="," close=")">
+			    	#{status}
+			    </foreach>
+			</if>
+			<if test="entity.activityType != null">
+				<![CDATA[ and activites_.activity_type = #{entity.activityType} ]]>
+			</if>
+			<if test="entity.shopId != null">
+				<![CDATA[ and activites_.shop_id = #{entity.shopId} ]]>
+			</if>
+			<if test="entity.platformId != null">
+				<![CDATA[ and activites_.platform_id = #{entity.platformId} ]]>
+			</if>
+			<if test="entity.activitesDetailsId != null and entity.activitesDetailsId != ''">
+				<![CDATA[ and details_.activites_details_id = #{entity.activitesDetailsId} ]]>
+			</if>
+			<if test="entity.itemId != null and entity.itemId != ''">
+				<![CDATA[ and details_.item_id = #{entity.itemId} ]]>
+			</if>
+			<if test="entity.skuId != null and entity.skuId != ''">
+				<![CDATA[ and details_.sku_id = #{entity.skuId} ]]>
+			</if>
+			<if test="entity.insertTime != null">
+				<![CDATA[ and details_.insert_time = #{entity.insertTime} ]]>
+			</if>
+			<if test="entity.insertBy != null">
+				<![CDATA[ and details_.insert_by = #{entity.insertBy} ]]>
+			</if>
+			<if test="entity.updateTime != null">
+				<![CDATA[ and details_.update_time = #{entity.updateTime} ]]>
+			</if>
+			<if test="entity.updateBy != null">
+				<![CDATA[ and details_.update_by = #{entity.updateBy} ]]>
+			</if>
+			<if test="entity.detailedStatus != null and entity.detailedStatus != ''">
+				<if test="entity.detailedStatus == 100">
+					<![CDATA[ and ((activity_sign_up_time>NOW() AND activity_begin_time>activity_sign_up_time AND activity_status=1) or (activity_begin_time>NOW() AND activity_status=1)) ]]>
+				</if>
+				<if test="entity.detailedStatus == 200">
+					<![CDATA[ and ((activity_begin_time<=NOW() AND activity_end_time>NOW() AND activity_status=1) or (activity_sign_up_time<=NOW() AND activity_sign_up_end_time>NOW() AND activity_status=1)) ]]>
+				</if>
+				<if test="entity.detailedStatus == 300">
+					<![CDATA[ and ((activity_status=2 OR release_goods_max_num<=(SELECT SUM(PURCHASE_NUM) FROM central_purchasing_ref_order ref_order_ WHERE ref_order_.ACTIVITES_DETAILS_ID=details_.ACTIVITES_DETAILS_ID)) or (activity_status=3) or (activity_end_time<=NOW() AND activity_status=1)) ]]>
+				</if>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="centralPurchasingActivites" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where activites_.central_purchasing_id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="centralPurchasingActivites" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+			CENTRAL_PURCHASING_ACTIVITES activites_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryCentralPurchasingActivites" resultMap="queryCentralPurchasingDTO" >
+		<include refid="selectAllJoinColumns"/>
+		<include refid="where_join_fragement" />
+		<choose>
+			<when test="null != entity.orderByType">
+				order by details_.insert_time desc
+			</when>
+			<otherwise>
+				order by detailedStatus asc,details_.insert_time desc
+			</otherwise>
+		</choose>
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<!-- 查询数量 -->
+	<select id="queryCentralPurchasingActivitesCount" resultType="long">
+		<include refid="count_Tail" />
+			CENTRAL_PURCHASING_ACTIVITES activites_ join CENTRAL_PURCHASING_ACTIVITES_DETAILS details_
+			on activites_.central_purchasing_id=details_.central_purchasing_id
+		<include refid="where_join_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="add" useGeneratedKeys="true" keyProperty="centralPurchasingId" parameterType="com.camelot.centralPurchasing.domain.CentralPurchasingActivites">
+		<![CDATA[
+		insert into CENTRAL_PURCHASING_ACTIVITES (
+				activity_num,
+				activity_name,
+				activity_img,
+				ref_url,
+				activity_begin_time,
+				activity_sign_up_time,
+				activity_sign_up_end_time,
+				activity_end_time,
+				activity_status,
+				activity_type,
+				shop_id,
+				platform_id,
+				insert_time,
+				insert_by,
+				update_time,
+				update_by
+		   )values(
+				#{activityNum},
+				#{activityName},
+				#{activityImg},
+				#{refUrl},
+				#{activityBeginTime},
+				#{activitySignUpTime},
+				#{activitySignUpEndTime},
+				#{activityEndTime},
+				#{activityStatus},
+				#{activityType},
+				#{shopId},
+				#{platformId},
+				now(),
+				#{insertBy},
+				now(),
+				#{updateBy}
+
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.centralPurchasing.domain.CentralPurchasingActivites">
+		<![CDATA[
+			update CENTRAL_PURCHASING_ACTIVITES set 
+			central_purchasing_id = #{centralPurchasingId}
+		]]>
+		<if test="activityNum != null and activityNum !=''">,activity_num = #{activityNum}</if>
+		<if test="activityName != null and activityName !=''">,activity_name = #{activityName}</if>
+		<if test="activityImg != null and activityImg !=''">,activity_img = #{activityImg}</if>
+		<if test="refUrl != null and refUrl !=''">,ref_url = #{refUrl}</if>
+		<if test="activityBeginTime != null">,activity_begin_time = #{activityBeginTime}</if>
+		<if test="activitySignUpTime != null">,activity_sign_up_time = #{activitySignUpTime}</if>
+		<if test="activitySignUpEndTime != null">,activity_sign_up_end_time = #{activitySignUpEndTime}</if>
+		<if test="activityEndTime != null">,activity_end_time = #{activityEndTime}</if>
+		<if test="activityStatus != null">,activity_status = #{activityStatus}</if>
+		<if test="activityType != null">,activity_type = #{activityType}</if>
+		<if test="shopId != null">,shop_id = #{shopId}</if>
+		<if test="platformId != null">,platform_id = #{platformId}</if>
+		<if test="updateTime != null">,update_time = #{updateTime}</if>
+		<if test="updateBy != null">,update_by = #{updateBy}</if>
+		<![CDATA[
+		 	where central_purchasing_id = #{centralPurchasingId}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from CENTRAL_PURCHASING_ACTIVITES where central_purchasing_id = #{id}
+		]]>
+	</delete>
+	
+	<!-- 根据集采活动详情ID查询集采活动 -->
+	<select id="queryByDetailId" parameterType="long" resultMap="queryCentralPurchasingDTO" >
+		<include refid="selectAllJoinColumns"/>
+		where details_.activites_details_id = #{activitesDetailsId}
+	</select>
+	<select id="checkUniqueSku" resultType="int">
+		<![CDATA[SELECT COUNT(1) FROM DUAL WHERE 
+			EXISTS (SELECT * FROM 
+				CENTRAL_PURCHASING_ACTIVITES activites_ join CENTRAL_PURCHASING_ACTIVITES_DETAILS details_
+				on activites_.central_purchasing_id=details_.central_purchasing_id  WHERE not (find_in_set(activites_.ACTIVITY_STATUS,"3,4")
+				or (activites_.ACTIVITY_STATUS = 1 and now() > activites_.ACTIVITY_END_TIME) )]]>
+				<if test="entity.activitesDetailsId != null">
+					and details_.ACTIVITES_DETAILS_ID != #{entity.activitesDetailsId}
+				</if>
+				<if test="entity.skuId != null and entity.activitySignUpTime != null and entity.activityEndTime != null">
+					and details_.sku_id = #{entity.skuId} and (activites_.ACTIVITY_SIGN_UP_TIME BETWEEN #{entity.activitySignUpTime} and #{entity.activityEndTime} or
+						activites_.ACTIVITY_END_TIME BETWEEN #{entity.activitySignUpTime} and #{entity.activityEndTime} or
+						#{entity.activitySignUpTime} BETWEEN activites_.ACTIVITY_SIGN_UP_TIME and activites_.ACTIVITY_END_TIME
+					)
+				</if>
+			)
+	</select>
+	<update id="deleteBatch">
+		update CENTRAL_PURCHASING_ACTIVITES activity,central_purchasing_activites_details details set 
+			activity.ACTIVITY_STATUS = 4 where activity.CENTRAL_PURCHASING_ID = details.CENTRAL_PURCHASING_ID and 
+			FIND_IN_SET (details.ACTIVITES_DETAILS_ID,#{ids})
+			
+	</update>
+</mapper>

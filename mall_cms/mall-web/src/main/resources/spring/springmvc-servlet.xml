@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+    ">
+
+	<!-- spring mvc related -->
+	<!-- mvc controller -->
+	<context:component-scan base-package="com.camelot">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+<!-- 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service" /> -->
+	</context:component-scan>
+	
+	<!-- handle static resource -->
+<!-- 	<mvc:default-servlet-handler /> -->
+	
+<!-- 	<mvc:annotation-driven /> -->
+
+    <!-- 避免IE提示下载返回的json数据 -->
+    <mvc:annotation-driven ignoreDefaultModelOnRedirect="true">
+    	<mvc:message-converters register-defaults="true">
+<!-- 	    	<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"> -->
+<!-- 		        <property name="supportedMediaTypes" value="text/html;charset=UTF-8"/> -->
+<!-- 	    	</bean>  -->
+			<bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+				<property name="supportedMediaTypes" value="text/html;charset=UTF-8"/>
+			</bean>
+	    	<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+		        <property name="supportedMediaTypes" value="text/html;charset=UTF-8"/>
+	    	</bean>
+    	</mvc:message-converters>
+    </mvc:annotation-driven>
+    
+    
+	<!-- 拦截器 -->  
+    <mvc:interceptors>
+        <!-- 拦截所有请求，添加TDK信息 -->
+        <bean class="com.camelot.mall.interceptor.HeaderTopInterceptor" />
+        <!-- seo tdk -->
+        <bean class="com.camelot.mall.interceptor.TdkInterceptor" />
+        <!-- 地域 -->
+        <bean class="com.camelot.mall.interceptor.CityInterceptor" />
+		<!-- 省市信息 -->
+        <mvc:interceptor>  
+			<mvc:mapping path="/sellcenter/sellProduct/**" />
+           	<bean class="com.camelot.mall.interceptor.ProvinceCitysInterceptor"/>  
+        </mvc:interceptor>
+		<!-- 多个拦截器,顺序执行   -->
+		<!-- 登录拦截器   -->
+        <mvc:interceptor>  
+				<!-- 如果不配置或/*,将拦截所有的Controller -->
+				<!-- 个人收藏 -->
+				<mvc:mapping path="/favourite/**"/>
+				<mvc:mapping path="/buyercenter/**"/>
+				<mvc:mapping path="/sellcenter/**"/>
+				<mvc:mapping path="/security/**"/>
+				<!-- 订单系列的请求  -->
+				<mvc:mapping path="/order/**"/>
+
+				<!-- 订单再次购买-->
+				<mvc:mapping path="/shopCart/buyAgain"/>
+				<!-- 去结算和提交订单校验 -->
+				<mvc:mapping path="/shopCart/validate"/>
+				<!-- 订单核对 -->
+				<mvc:mapping path="/shopCart/toOrderView"/>
+				<!-- 立即购买订单核对 -->
+				<mvc:mapping path="/shopCart/toOrderViewPromptly"/>
+				<!-- 提交订单 -->
+				<mvc:mapping path="/shopCart/orderSubmit"/>
+				<!-- 订单支付-->
+				<mvc:mapping path="/shopCart/payOrder"/>
+				<!-- 马上付款-->
+				<mvc:mapping path="/shopCart/payView"/>
+				<!-- 商品详情页，创建咨询-->
+				<mvc:mapping path="/productController/addConsult"/>
+				<!-- 商品详情页，收藏店铺-->
+				<mvc:mapping path="/favourite/addShop"/>
+				<!-- 商品详情页，收藏商品-->
+				<mvc:mapping path="/favourite/addItem"/>
+				<!-- 发布闲置 -->
+				<mvc:mapping path="/secondGoods/initRelease" />
+				<!-- 一键转卖 -->
+				<mvc:mapping path="/secondGoods/initResell" />
+                <!-- 卖家中心 -->
+                <mvc:mapping path="/information/informationSeller/initLoad" />
+                <!-- 类目管理 -->
+                <mvc:mapping path="/categoryController/**" />
+                <!-- 店铺基本信息 -->
+                <mvc:mapping path="/shopBaseInfoController/**" />
+                <mvc:mapping path="/shopManageBrandController/**" />
+                <mvc:mapping path="/shopManageCategoryController/**" />
+                <!--店铺装修-->
+                <mvc:mapping path="/shopItemListIndexController/toTempleList/**" />
+                <mvc:mapping path="/shopItemListIndexController/templeEdit/**" />
+                <!-- 买家 消息中心 -->
+                <mvc:mapping path="/buyer/**"/>
+				<!-- 二手商品 -->
+				<mvc:mapping path="/usedMarket/usedGoodsList"/>
+				<mvc:mapping path="/usedMarket/goodsPublish"/>
+				<!-- 投诉 -->
+				<mvc:mapping path="/complain/**"/>
+				<mvc:mapping path="/citic/**"/>
+				<!-- 权限，子账号 -->
+				<mvc:mapping path="/shopAuthorityManageController/**"/>
+				<!-- 评价 -->
+				<mvc:mapping path="/sellerEvaluation/submitSellerToBuyers"/>
+                <mvc:mapping path="/sellerEvaluation/initProduct"/>
+                <!--站内信 -->
+                <mvc:mapping path="/seller/**"/>
+                <!-- 报表统计 -->
+                <mvc:mapping path="/businessAnalysis/**"/>
+                <!-- 销售分析 -->
+                <mvc:mapping path="/salesAnalysis/**"/>
+                <!-- 运营情况分析 -->
+                <mvc:mapping path="/businessAnalysis/init"/>
+                <mvc:mapping path="/businessAnalysis/export"/>
+                <!-- 销售分页页面展示 -->
+                <mvc:mapping path="/salesAnalysis/init"/>
+                <mvc:mapping path="/salesAnalysis/export"/>
+                <!-- 创建求购 -->
+                <mvc:mapping path="/askItemInfoJavaController/addTranslationInfo"/>
+                <!-- 获取求购明细信息,订单明细信息 -->
+                <mvc:mapping path="/askItemInfoJavaController/getDetaiInfo"/>
+                <!-- 求购删除 -->
+                <mvc:mapping path="/askItemInfoJavaController/deleteTranslation"/>
+                <!-- 求购提交 -->
+                <mvc:mapping path="/askItemInfoJavaController/commitTranslation"/>
+                <!-- 求购审核 -->
+                <mvc:mapping path="/askItemInfoJavaController/auditTranslation"/>
+                <!-- 卖家保存报价信息 -->
+                <mvc:mapping path="/askItemInfoJavaController/saveRepTranslationInfo"/>
+                <!-- 卖家确认价格 -->
+                <mvc:mapping path="/askItemInfoJavaController/commitRepTranslationInfo"/>
+                <!-- 重新求购 -->
+                <mvc:mapping path="/askItemInfoJavaController/commitTranslationRe"/>
+                <!-- 买家确认价格 -->
+                <mvc:mapping path="/askItemInfoJavaController/acceptTranslationInfo"/>
+                <!-- 买家基本信息加载 -->
+                <mvc:mapping path="/buyercenter/loadBuyerCenter"/>
+                <mvc:mapping path="/askItemInfoController/askItemInfo"/>
+                <mvc:mapping path="/askItemInfoController/askItemInfoCreatePage"/>
+                <mvc:mapping path="/askItemInfoController/askItemInfoUpdate"/>
+                <mvc:mapping path="/askItemInfoController/repAskItemInfo"/>
+                <mvc:mapping path="/askItemInfoController/repAskItemInfoUpdate"/>
+                <mvc:mapping path="/askItemInfoController/lookAskItemInfo"/>
+                <!-- 年度协议页面 -->
+                <mvc:mapping path="/contract"/>
+                <!-- 协议搜索 -->
+                <mvc:mapping path="/searchContractInfo"/>
+                <mvc:mapping path="/contractCreate"/>
+                <mvc:mapping path="/contractUpdate"/>
+                <!-- 协议审批 -->
+                <mvc:mapping path="/approveContractInfo"/>
+                <!-- 协议确认 -->
+                <mvc:mapping path="/confirmContractInfo"/>
+                <!-- 跳转协议下单 -->
+                <mvc:mapping path="/contract/contractOrder"/>
+                <!-- 协议订单详情 -->
+                <mvc:mapping path="/contract/getContractOrder"/>
+                <!-- 询价 -->
+                <mvc:mapping path="/requestPriceController/requestPrice"/>
+                <mvc:mapping path="/requestPriceController/requestPriceCreate"/>
+                <!-- 询价编辑界面 -->
+                <mvc:mapping path="/requestPriceController/requestPriceUpdate"/>
+                <!-- 供应商查询询价界面 -->
+                <mvc:mapping path="/requestPriceController/responsePrice"/>
+                <mvc:mapping path="/requestPriceController/responsePriceUpdate"/>
+                <!-- 查询询价信息 -->
+                <mvc:mapping path="/requestPriceController/queryRequestPrice"/>
+                <mvc:mapping path="/requestPriceController/requestPriceLook"/>
+                <mvc:mapping path="/seller/news"/>
+                <mvc:mapping path="/seller/sysnews"/>
+                <!-- 买家订单列表查询 -->
+                <mvc:mapping path="/order/queryBuyer"/>
+                <!-- 卖家订单查询 -->
+                <mvc:mapping path="/order/querySeller"/>
+                <mvc:mapping path="/order/export"/>
+                <!-- 安全信息设置页面 -->
+                <mvc:mapping path="/security/securitypage"/>
+                <!-- 设置支付密码页面 -->
+                <mvc:mapping path="/security/setpaypwdpage"/>
+                <!-- 修改支付密码页面 -->
+                <mvc:mapping path="/security/modifypaypwdpage"/>
+                <!-- 找回支付密码页面 -->
+                <mvc:mapping path="/security/findpaypwdpage"/>
+                <!-- 找回支付密码 -->
+                <mvc:mapping path="/security/findpaypwd"/>
+                <!-- 支付账户管理页面 -->
+                <mvc:mapping path="/security/payaccount"/>
+                <!-- 校验用户是否存在 -->
+                <mvc:mapping path="/security/verifyuser"/>
+                <!-- 选择银行页面 -->
+                <mvc:mapping path="/security/selectBank"/>
+                <!-- 保存发票信息 -->
+                <mvc:mapping path="/invoice/save"/>
+                <mvc:mapping path="/invoice/updateTradeOrderInvoice"/>
+                <!-- 运费 -->
+                <mvc:mapping path="/storecenter/freightTemplate/**"/>
+				<!-- 积分兑换 -->
+				<mvc:mapping path="/integralMall/integralOrderDetail"/> 
+				<!-- 积分兑换提交订单 -->
+				<mvc:mapping path="/shopCart/orderSubmitByIntegral"/>
+                <!-- 立即购买 -->
+                <mvc:mapping path="/shopCart/promptlybuyProducts"/>
+				<!-- 店铺集采活动管理 -->
+				<mvc:mapping path="/centralPurchasing/activitySave"/>
+				<mvc:mapping path="/centralPurchasing/activityUpdate"/>
+				<mvc:mapping path="/centralPurchasing/activityList"/>
+				<mvc:mapping path="/centralPurchasing/initItemInventory"/>
+				<mvc:mapping path="/centralPurchasing/activityAdd"/>
+				<!-- 商品管理 -->
+				<mvc:mapping path="/sellcenter/sellProduct/**"/>
+				<!-- 领取优惠券 -->
+				<mvc:mapping path="/coupons/getCoupons"/>
+				<!-- <mvc:mapping path="/captcha/**"/> -->
+                <mvc:exclude-mapping path="/shopBaseInfoController/message" />
+<!--            <mvc:mapping path="/**" /> -->
+<!--            <mvc:exclude-mapping path="/user/**" /> -->
+<!--            <mvc:exclude-mapping path="/findpwd/**" /> -->
+<!--            <mvc:exclude-mapping path="/static/**" /> -->
+<!--            <mvc:exclude-mapping path="/assets/**" /> -->
+<!--            <mvc:exclude-mapping path="/error" /> -->
+<!--            <mvc:exclude-mapping path="/404" /> -->
+<!--            <mvc:exclude-mapping path="/500" /> -->
+<!--            <mvc:exclude-mapping path="/"/> -->
+           <bean class="com.camelot.mall.interceptor.TokenInterceptor"/>  
+        </mvc:interceptor>  
+		<!--  操作刷新redis  -->
+        <mvc:interceptor>  
+			<!-- 如果不配置或/*,将拦截所有的Controller -->
+			<mvc:mapping path="/**"/>
+           	<bean class="com.camelot.mall.interceptor.FlushTokenInterceptor"/>  
+        </mvc:interceptor>
+
+        <!-- 防止重复提交 -->
+        <mvc:interceptor>
+			<mvc:mapping path="/shopCart/toOrderView"/>
+			<mvc:mapping path="/shopCart/toOrderViewPromptly"/>
+			<mvc:mapping path="/shopCart/toOrderDetail"/>
+			<mvc:mapping path="/shopCart/toOrderDetail2"/>
+			<mvc:mapping path="/buyerEvaluation/initTrading"/> 
+       		<bean class="com.camelot.mall.interceptor.TokenHandlerInterceptor"/>  
+        </mvc:interceptor>
+        <mvc:interceptor>
+			<mvc:mapping path="/shopCart/toOrderDetail"/>
+			<mvc:mapping path="/shopCart/toOrderDetail2"/>
+			<mvc:mapping path="/shopCart/orderSubmit"/>
+			<mvc:mapping path="/shopCart/orderApproveSubmit"/>
+			<mvc:mapping path="/buyerEvaluation/submitTrading"/> 
+       		<bean class="com.camelot.mall.interceptor.TokenValidHandler"/>  
+        </mvc:interceptor>
+        <!-- 防止用户随意输入订单号/商品编号/店铺编号 -->
+        <mvc:interceptor>
+			<mvc:mapping path="/order/queryOrderInfoBuyer"/>
+			<mvc:mapping path="/order/queryOrderInfoSeller"/>
+			<mvc:mapping path="/order/toPrint"/>
+			<!-- 商品编辑、查看页面 -->
+			<!-- <mvc:mapping path="/sellcenter/sellProduct/plantForm"/>
+			<mvc:mapping path="/sellcenter/sellProduct/form"/>
+			退款详情页
+			<mvc:mapping path="/order/refundInfoSeller"/>
+			查看退款、退货详情页
+			<mvc:mapping path="/order/refundSubmitSucc"/>
+			查看投诉协议
+			<mvc:mapping path="/complain/gocomplainsellerdetail"/>
+			查看卖家仲裁
+			<mvc:mapping path="/complain/gocomplainselleradd"/>
+			查看买家仲裁
+			<mvc:mapping path="/complain/gocomplainadd"/>
+			查看买家仲裁
+			<mvc:mapping path="/complain/gocomplaindetail"/>
+			买家 申请退款/退货、申请售后
+			<mvc:mapping path="/order/refundAgreement"/>
+			<mvc:mapping path="/order/refundInfoBuyer"/> -->
+			
+       		<bean class="com.camelot.mall.interceptor.PassKeyInterceptor"/>
+        </mvc:interceptor>
+        <!-- 防止重复提交 -->
+        <!--  发送站内信拦截器  -->
+        <mvc:interceptor>  
+			<mvc:mapping path="/shopCart/orderSubmit"/>
+			<mvc:mapping path="/order/cancelOrder"/>
+			<mvc:mapping path="/order/deliverOrder"/>
+			<mvc:mapping path="/order/confirmReceipt"/>
+			<mvc:mapping path="/buyerEvaluation/submitTrading"/> 
+			<mvc:mapping path="/sellerEvaluation/submitSellerToBuyers"/> 
+			<mvc:mapping path="/productController/addInquiry"/> 
+			<mvc:mapping path="/productController/addConsult"/> 
+			<mvc:mapping path="/sellercenter/modifyInquiry"/> 
+			<mvc:mapping path="/sellercenter/modifyConsult"/> 
+			<mvc:mapping path="/order/refundAgreementSubmit"/> 
+			<mvc:mapping path="/order/updateTradeReturn"/> 
+			<mvc:mapping path="/security/modifypwd"/> 
+			<mvc:mapping path="/security/modifypaypwd"/> 
+			<mvc:mapping path="/security/setpaypwd"/> 
+			<mvc:mapping path="/security/withdraw"/> 
+			<mvc:mapping path="/sellcenter/withdraw/deposit"/> 
+			<!-- 订单支付结果反馈 -->
+			<mvc:mapping path="/information/informationSeller/newAuthEdit"/> 
+			<mvc:mapping path="/shopCart/payCallBack/*"/> 
+			<mvc:mapping path="/shopCart/payResult/*"/> 
+			<mvc:mapping path="/shopCart/checkCITICStatus"/> 
+			<mvc:mapping path="/complain/complainadd"/> 
+			<mvc:mapping path="/order/modifyOrderPayStatus"/> 
+			<mvc:mapping path="/information/register/submitEnterprise"/> 
+			<mvc:mapping path="/information/register/submitPersonal"/> 
+			<mvc:mapping path="/information/informationBuyer/modifyBuyer"/> 
+			<mvc:mapping path="/information/informationSeller/modifySeller"/> 
+			<mvc:mapping path="/information/informationSeller/modifySeller"/>
+			<!-- 卖家回复买家评价 -->
+			<mvc:mapping path="/sellerEvaluation/replyBuyers"/>
+			<!-- 改价 -->
+			<mvc:mapping path="/order/modifyOrderPrice"/>
+			<!-- 询价 -->
+			<mvc:mapping path="/requestPriceJavaController/immediately"/>
+			<mvc:mapping path="/requestPriceJavaController/commitInquiry"/>
+			<mvc:mapping path="/requestPriceJavaController/resopnseModifyInquiry"/>
+			<mvc:mapping path="/requestPriceJavaController/commitInquiryYes"/>
+			<!-- 求购 -->
+			<mvc:mapping path="/askItemInfoJavaController/commitTranslation"/>
+			<!-- 卖家保存报价信息 -->
+            <mvc:mapping path="/askItemInfoJavaController/saveRepTranslationInfo"/>
+            <!-- 买家确认价格 -->
+            <mvc:mapping path="/askItemInfoJavaController/acceptTranslationInfo"/>
+			<!-- 协议 -->
+			<mvc:mapping path="/confirmContractInfo"/>
+			<mvc:mapping path="/immediatelyup"/>
+			<mvc:mapping path="/approveContractInfo"/>
+			<mvc:mapping path="/deleteContractInfo"/>
+			<mvc:mapping path="/requestPriceJavaController/commitInquiryYes"/>
+			
+           	<bean class="com.camelot.mall.interceptor.SendMessageHandlerInterceptor"/>  
+           	 
+        </mvc:interceptor>
+        
+      
+
+        
+        <!--  用户积分  -->
+        <mvc:interceptor>  
+			<mvc:mapping path="/buyerEvaluation/submitTrading"/>
+			<mvc:mapping path="/order/confirmReceipt"/>
+           	<bean class="com.camelot.mall.interceptor.UserIntegralHandlerInterceptor"/>  
+        </mvc:interceptor>
+          <!--成长值拦截器  -->
+        <mvc:interceptor>  
+			<!-- 评价拦截  -->
+			<mvc:mapping path="/buyerEvaluation/submitTrading"/> 
+			<!-- 购物拦截  -->
+			<mvc:mapping path="/order/confirmReceipt"/> 
+           	<bean class="com.camelot.mall.interceptor.GrowthValueInterceptor"/>   
+       </mvc:interceptor>
+       <mvc:interceptor>  
+			<!-- 登录拦截  拦截所有路径，自动登录的解决方案-->
+			<mvc:mapping path="/user/homepage"/> 
+           	<bean class="com.camelot.mall.interceptor.GrowthValueForLoginInterceptor"/>   
+       </mvc:interceptor>  
+    </mvc:interceptors>
+
+
+	<!-- static resources -->
+	<mvc:resources location="/static/" mapping="/static/**"
+		cache-period="864000" /><!-- 24 * 3600 * 10 -->
+	<!-- static resources -->
+	<mvc:resources location="/assets/" mapping="/assets/**"
+		cache-period="864000" /><!-- 24 * 3600 * 10 -->
+
+	<!-- velocityEngine -->
+	<!-- <bean id="velocityEngine"
+		class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+		<property name="resourceLoaderPath" value="/WEB-INF/views/" />
+		<property name="velocityProperties">
+			<props>
+				<prop key="input.encoding">UTF-8</prop>
+				<prop key="output.encoding">UTF-8</prop>
+				<prop key="contentType">text/html;charset=UTF-8</prop>
+				<prop key="userdirective">com.camelot.velocity.PageVelocity</prop>
+			</props>
+		</property>
+	</bean> -->
+	<!-- template view -->
+	<bean id="velocityConfig"
+		class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+		<property name="resourceLoaderPath" value="/WEB-INF/views/" />
+		<property name="velocityProperties">
+			<props>
+				<prop key="input.encoding">UTF-8</prop>
+				<prop key="output.encoding">UTF-8</prop>
+				<prop key="contentType">text/html;charset=UTF-8</prop>
+				<!-- 自定义velocity标签,多个使用","隔开。add by zzq -->
+				<prop key="userdirective">com.camelot.velocity.PageVelocity</prop>
+			</props>
+		</property>
+	</bean>
+	<bean id="velocityViewResolver"
+		class="org.springframework.web.servlet.view.velocity.VelocityLayoutViewResolver">
+		<property name="layoutUrl" value="layout.vm" />
+		<property name="cache" value="false" />
+		<property name="suffix" value=".vm" />
+		<property name="exposeSpringMacroHelpers" value="true" />
+		<property name="exposeRequestAttributes" value="true" />
+		<property name="dateToolAttribute" value="date" />
+		<property name="numberToolAttribute" value="number" />
+		<property name="contentType" value="text/html;charset=UTF-8" />
+	</bean>
+
+<!-- 开发期间暂注 -->
+<!-- 	<bean -->
+<!-- 		class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver"> -->
+<!-- 		定义默认的异常处理页面，当该异常类型的注册时使用 -->
+<!-- 		<property name="defaultErrorView" value="error"></property> -->
+<!-- 		定义异常处理页面用来获取异常信息的变量名，默认名为exception -->
+<!-- 		<property name="exceptionAttribute" value="ex"></property> -->
+<!-- 		定义需要特殊处理的异常，用类名或完全路径名作为key，异常也页名作为值 -->
+<!-- 		<property name="exceptionMappings"> -->
+<!-- 			<props> -->
+<!-- 				<prop key="java.lang.Exception">error</prop> -->
+<!-- 				这里还可以继续扩展对不同异常类型的处理 -->
+<!-- 			</props> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
+
+	<mvc:view-controller path="/error" view-name="error" />
+	<mvc:view-controller path="/404" view-name="404" />
+	<mvc:view-controller path="/500" view-name="error" />
+	<mvc:view-controller path="/reSubmit" view-name="re_submit"/>
+
+	<!-- 添加cookie 的拦截器 -->
+	
+	<!-- 上传文件拦截，设置最大上传文件大小   10M=10*1024*1024(B)=10485760 bytes -->  
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">  
+        <property name="maxUploadSize" value="${web.maxUploadSize}" />  
+    </bean>
+	<bean id="ftpUtils" class="com.camelot.openplatform.common.FTPUtils">
+		<constructor-arg index="0" value="192.168.1.100" />
+		<constructor-arg index="1" value="camelot" />
+		<constructor-arg index="2" value="camelot" />
+	</bean>
+
+	<!-- 注册XmlViewResolver，用于iReport & JasperReports报表生成 -->
+	<bean id="jasperReportResolver" class="org.springframework.web.servlet.view.ResourceBundleViewResolver">
+		<property name="order">
+			<value>0</value>
+		</property>
+		<property name="basename">
+			<value>jasper</value>
+		</property>
+	</bean>
+	
+</beans>

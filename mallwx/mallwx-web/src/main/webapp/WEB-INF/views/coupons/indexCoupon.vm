@@ -1,0 +1,169 @@
+#set($layout = "common/blanklayout.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>优惠券</title>
+<link href="$request.contextPath/assets/css/detail.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="$request.contextPath/assets/js/iscroll.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/tab.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	if($("#type").val() == '2'){
+		changeIconToRed(2);
+	}
+    //绑定下拉分页事件
+    var o_url = "$request.contextPath" + $("#actionUrl").val();
+    var totalCount = $("#totalCount").val();
+	$.dropDownFresh('5',o_url, totalCount , "queryDiv","wrapper");
+	if(totalCount == '0'){
+		toast("暂无优惠券");
+		return ;
+	}
+	//初始加载优惠券信息
+	addLoadMask();
+	$.ajax({
+		   type: "POST",
+		   url: "$request.contextPath" + $("#actionUrl").val(),
+		   dataType: "html",
+		   success: function(data){
+			   $("#queryDiv").html(data);
+			   setTimeout(addback,1000);
+		   }
+		});
+});
+
+function addback(){
+	removeLoadMask();
+	var lasturl = document.referrer;
+	var _param={}
+  _param.id="gobackShopFromCoupons";
+  _param.callback=function(){
+	  //history.back(-1);
+  	  window.location.href=lasturl;
+  }
+  registerGoBackte(_param);
+}
+
+function registerGoBackte(_option){
+	  //return;//屏蔽掉
+	  var _key=_option.key;//预留参数key
+	  var _fun=_option.callback;//返回时的回调
+	  var _param={};
+	  _param.key=_key;
+	  history.pushState(_param,"nothing");
+	  window.onpopstate=function(e){
+	      _fun();
+	      window.onpopstate=null;
+	  }
+	  if(_option.fires){//绑定多个触发回调的事件
+	      for(var _i=0;_i<_option.fires.length;_i++){
+	          var _fire=(_option.fires)[_i];
+	          var _e=_fire.event||'click';
+	          $(_fire.selector).unbind(_e);
+	          $(_fire.selector).bind(_e,function(){
+	              history.back();
+	          })
+	      }
+	  }
+	  if(_option.selector){//绑定一个触发回调的事件
+	      var _e=_option.event||'click';
+	      $(_option.selector).unbind(_e);
+	      $(_option.selector).bind(_e,function(){
+	          history.back();
+	      })
+	  }
+	}
+
+//领取优惠券
+function getCoupons(couponId,obj){
+	kltconfirm("确认领取优惠券？",function(){
+		addLoadMask();
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "$request.contextPath/coupons/getCoupons",
+			data: {
+				couponId: couponId
+			},
+			success: function(data){
+    			if(data.resultMessage == "领取成功"){
+    				$(obj).removeAttr("onclick");
+    	    		$(obj).removeAttr("class");
+    	    		$(obj).find('div span')[0].innerHTML = "已领取";
+    			} 
+    			removeLoadMask();
+    			toast(data.resultMessage);
+			}
+		});
+	});
+}
+
+//删除用户已经领取的优惠券
+function deleteUserCoupons(id){
+	kltconfirm("确认删除优惠券？",function(){
+		addLoadMask();
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: $("#contextPath").val()+"/coupons/couponsUserUpdate",
+			data: {
+				id: id
+			},
+			success: function(data){
+				removeLoadMask();
+				toast(data.result);
+				if(data.result=='删除成功'){
+					window.location.href = window.location.href;
+				}
+			}
+		});
+	});
+}
+//选中地址
+function selectedCoupons(Couponsid){
+	$("#form").attr("action","$request.contextPath/orderWx/toOrder?couponId="+Couponsid+"").submit();
+	
+	
+}
+
+</script>
+<script type="text/javascript" src="$request.contextPath/assets/js/dropDownFresh/dropDownFresh.js"></script>
+</head>
+<body class="bg_02">
+
+	
+	<div id="main" class="po_re">
+	<form action="" id="form" method="post">
+	<input type="hidden" id="contextPath" value="$request.getContextPath()" />
+	<input type="hidden" id="totalCount" value="$!totalCount" />
+	<input type="hidden" id="actionUrl" value="$!actionUrl" />
+	<input type="hidden" id="myCart" value="$!myCart" />
+	<input type="hidden" id="type" value="$!type" />
+	<input type="hidden" id="paymentMethod" value="$!paymentMethod" />
+	<input id="invoiceType" name="invoiceType" value="$!{invoiceType}" type="hidden"/>
+	<input id="invoiceTitle" name="invoiceTitle" value="$!{invoiceTitle}" type="hidden"/>
+	<input id="address" name="address" value="$!{address}" type="hidden"/>
+	
+		<div class="nTab">
+			<div class="TabContent">
+				<div class="content" id="wrapper" style="overflow-x: hidden;">
+					<div class="TabContent mar_t10" >
+						<div id="myTab0_Content0">
+							<div class="coupon bg_02">
+								<ul id="queryDiv">
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		</form>
+	</div>
+	#parse("common/footer.vm")
+</body>
+</html>

@@ -1,0 +1,146 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<link href="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="$staticPath/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/jquery-validation/1.11.1/additional-methods.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/jquery-validation/1.11.1/messages_zh.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/jquery-migrate-1.1.0.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.shadow.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.ifixpng.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.fancyzoom.js"></script>
+<script type="text/javascript">
+	$(function(){
+		//加载左侧菜单
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+		//加载基本信息编辑页面
+		$("#myTab0_Content0").load("$request.getContextPath()/shopBaseInfoController/toEdit");
+	});
+	/**点击tab页签时，跳转*/
+	function nTabs(index){
+		var lilist = $("#myTab0 li");
+		//tab页签样式切换
+		for(var i=0; i<lilist.length; i++){
+			if(index == i){
+				$(lilist[i]).removeClass("normal").addClass("active");
+				$("#myTab0_Content"+i).removeClass("none");
+			}else{
+				$(lilist[i]).removeClass("active").addClass("normal");
+				$("#myTab0_Content"+i).addClass("none");
+			}
+			$("#myTab0_Content"+i).html("");//清空所有区域内容
+		}
+		//tab页签加载内容
+		$.post("$request.getContextPath()/shopBaseInfoController/judgeForward",{"tabIndex":index},function(response){
+			$("#myTab0_Content"+index).load("$request.getContextPath()"+response.loadurl);//重新加载
+		},"json");
+	}
+	
+	/**
+	 * 省市区数据填充
+	 * parentCode 父级编码
+	 * opitonId 需要填充数据的下拉列表框的id
+	 * selectVal 默认选中的值
+	 * name 服务器返回的数据中，作为下拉框option的text字段名，默认为"name"
+	 * code 服务器返回的数据中，作为下拉框option的value的字段名，默认为"code"
+	 */
+	function optionItems(url, parentCode, optionId, selectVal, name, code){
+		$.ajax({
+			url:url,
+			type:"post",
+			data:{
+				parentCode:parentCode
+			},
+			dataType: "json",
+			success:function(data){
+				var optionItem = $("#"+optionId);
+				optionItem.empty();
+				optionItem.append($("<option>").text("请选择").val(""));
+				$.each(data, function (n, address) {
+					if(!name){
+						name = "name"; 
+					}
+					if(!code){
+						code = "code";
+					}
+					var option = $("<option>").text(address[name]).val(address[code]);
+					if(address.code == selectVal){
+						option.attr("selected",true);
+					}
+					optionItem.append(option);
+				});
+			}
+		});
+	}
+	
+	/**验证id是否存在于一个数组中*/
+	function containsId(idArray, id){
+		var ids = idArray.split(",");
+		for(var i=0; i<ids.length; i++){
+			if(ids[i]==id){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**移除一个数组中的某个元素并返回移除元素后的该数组对象*/
+	function removeEle(idArrayStr, id){
+		var ids = idArrayStr.split(",");
+		for(var i=0; i<ids.length; i++){
+			if(ids[i]==id){
+				delete ids[i];
+				return ids;
+			}
+		}
+		return ids;
+	}
+	
+	//跳转到店铺基本信息首页
+	function forwardToShopIndex(){
+		window.location.href = "$request.getContextPath()/shopBaseInfoController/toView";
+	}
+</script>
+<div id="main">
+<!--中间部分开始-->
+
+<!-- left start -->
+<div id="leftSeller" class="border-4">
+                                      
+</div>
+<!--left end -->
+
+<!--右边部分开始-->
+<div id="right">
+  <div id="right_bot">
+     <div class="nTab">
+            <!-- 标题开始 -->
+            <div class="TabTitle">
+              <ul id="myTab0">
+                <li class="active" onclick="nTabs(0);">基本信息</li>
+                <li class="normal" onclick="nTabs(1);">经营类目</li>
+                <li class="normal" onclick="nTabs(2);">经营品牌</li>
+              </ul>
+            </div>
+            <!-- tab页开始 -->
+            <div class="TabContent">
+              <!-- tab1内容 -->
+              <div id="myTab0_Content0">
+				    
+              </div>
+               <!-- tab2内容 -->
+              <div id="myTab0_Content1" class="none">
+              
+              </div>
+              <!-- tab3内容 -->
+              <div id="myTab0_Content2" class="none">
+              
+              </div>
+              <!-- tab页结束 -->
+            </div>
+          </div>
+	</div>
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->

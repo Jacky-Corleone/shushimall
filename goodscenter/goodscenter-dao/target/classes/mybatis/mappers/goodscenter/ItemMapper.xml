@@ -1,0 +1,902 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.goodscenter.dao.ItemMybatisDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="itemMap" type="item">
+		<result property="itemId" column="item_id"/>
+		<result property="itemName" column="item_name"/>
+		<result property="cid" column="cid"/>
+		<result property="sellerId" column="seller_id"/>
+		<result property="itemStatus" column="item_status"/>
+		<result property="attributes" column="attributes"/>
+		<result property="attrSale" column="attr_sale"/>
+		<result property="created" column="created"/>
+		<result property="modified" column="modified"/>
+		<result property="shopCid" column="shop_cid"/>
+		<result property="brand" column="brand"/>
+		<result property="marketPrice" column="market_price"/>
+		<result property="marketPrice2" column="market_price2"/>
+		<result property="inventory" column="inventory"/>
+		<result property="weight" column="weight"/>
+		<result property="productId" column="product_id"/>
+		<result property="describeUrl" column="describe_url"/>
+		<result property="packingList" column="packing_list"/>
+		<result property="afterService" column="after_service"/>
+		<result property="ad" column="ad"/>
+		<result property="timingListing" column="timing_listing"/>
+		<result property="listtingTime" column="listting_time"/>
+		<result property="delistingTime" column="delisting_time"/>
+		<result property="operator" column="operator"/>
+		<result property="statusChangeReason" column="status_change_reason"/>
+		<result property="shopId" column="shop_id"/>
+		<result property="guidePrice" column="guide_price"/>
+		<result property="origin" column="origin"/>
+		<result property="addSource" column="add_source"/>
+		<result property="platLinkStatus" column="plat_link_status"/>
+		<result property="hasPrice" column="has_price"/>
+		<result property="plstItemId" column="plst_item_id"/>
+		<result property="weightUnit" column="weight_unit"/>
+		<result property="shopFreightTemplateId" column="shop_freight_template_id"/>
+		<result property="searched" column="searched"/>
+		<result property="placedTop" column="placed_top"/>
+		<result property="specification" column="specification"/>
+		<result property="housetype" column="house_type"/>
+	</resultMap>
+	
+	<resultMap id="itemDTOMap" type="itemQueryOutDTO">
+		<result property="itemId" column="item_id"/>
+		<result property="itemName" column="item_name"/>
+		<result property="cName" column="c_name"/>
+		<result property="itemStatus" column="item_status"/>
+		<result property="marketPrice" column="market_price"/>
+		<result property="marketPrice2" column="market_price2"/>
+		<result property="productId" column="product_id"/>
+		<result property="hasPrice" column="has_price"/>
+		<result property="shopId" column="shop_id"/>
+		<result property="pictureUrl" column="picture_url"/>
+		<result property="platLinkStatus" column="plat_link_status"/>
+		<result property="cid" column="cid"/>
+		<result property="guidePrice" column="guide_price"/>
+		<result property="ad" column="ad"/>
+		<result property="shopCid" column="shop_cid"/>
+		<result property="addSource" column="add_source"/>
+		<result property="created" column="created"/>
+		<result property="modified" column="modified"/>
+		<result property="timingListing" column="timing_listing"/>
+		<result property="keywords" column="keywords" />
+		<result property="copied" column="copied" />
+		<result property="statusChangeReason" column="status_change_reason"/>
+		<result property="platformId" column="platform_id"/>
+		<result property="operator" column="operator"/>
+		<result property="plstItemId" column="plst_item_id"/>
+		<result property="shopFreightTemplateId" column="shop_freight_template_id"/>
+		<result property="volume" column="volume"/>
+		<result property="attrSaleStr" column="attr_sale"/>
+		<result property="searched" column="searched"/>
+		<result property="placedTop" column="placed_top"/>
+		<result property="specification" column="specification"/>
+		<result property="housetype" column="house_type"/>
+	</resultMap>
+	
+	<resultMap id="itemDTOMapper" type="com.camelot.goodscenter.dto.ItemDTO">
+		<result property="itemId" column="item_id" />
+		<result property="itemName" column="item_name" />
+		<result property="cid" column="cid" />
+		<result property="cName" column="c_name" />
+		<result property="sellerId" column="seller_id" />
+		<result property="itemStatus" column="item_status" />
+		<result property="attributesStr" column="attributes" />
+		<result property="attrSaleStr" column="attr_sale" />
+		<result property="created" column="created" />
+		<result property="modified" column="modified" />
+		<result property="shopCid" column="shop_cid" />
+		<result property="brand" column="brand" />
+		<result property="brandName" column="brand_name" />
+		<result property="marketPrice" column="market_price" />
+		<result property="marketPrice2" column="market_price2" />
+		<result property="inventory" column="inventory" />
+		<result property="weight" column="weight" />
+		<result property="productId" column="product_id" />
+		<result property="describeUrl" column="describe_url" />
+		<result property="packingList" column="packing_list" />
+		<result property="afterService" column="after_service" />
+		<result property="ad" column="ad" />
+		<result property="timingListing" column="timing_listing" />
+		<result property="listtingTime" column="listting_time" />
+		<result property="delistingTime" column="delisting_time" />
+		<result property="operator" column="operator" />
+		<result property="statusChangeReason" column="status_change_reason" />
+		<result property="shopId" column="shop_id" />
+		<result property="guidePrice" column="guide_price" />
+		<result property="origin" column="origin" />
+		<result property="addSource" column="add_source" />
+		<result property="platLinkStatus" column="plat_link_status" />
+		<result property="hasPrice" column="has_price" />
+		<result property="plstItemId" column="plst_item_id" />
+		<result property="keywords" column="keywords" />
+		<result property="copied" column="copied" />
+		<result property="weightUnit" column="weight_unit"/>
+		<result property="authentication" column="authentication"/>
+		<result property="platformId" column="platform_id"/>
+		<result property="shopFreightTemplateId" column="shop_freight_template_id"/>
+		<result property="volume" column="volume"/>
+		<result property="searched" column="searched"/>
+		<result property="placedTop" column="placed_top"/>
+		<result property="specification" column="specification"/>
+		<result property="housetype" column="house_type"/>
+	</resultMap>
+	
+	<resultMap id="itemSkuInfoMap" type="com.camelot.goodscenter.dto.SkuInfo"> 
+		<result property="skuId" column="sku_id"/>
+		<result property="attributes" column="attributes"/>
+		<result property="skuType" column="sku_type"/>
+		<!-- sku商品编号映射 -->
+		<result property="skuProductId" column="product_id"/>
+	</resultMap>
+	
+	<resultMap id="itemSkuMap" type="com.camelot.goodscenter.domain.ItemSku"> 
+		<result property="skuId" column="sku_id"/>
+		<result property="itemId" column="item_id"/>
+		<result property="itemStatus" column="item_status"/>
+		<result property="itemName" column="item_name"/>
+		<result property="sellerId" column="seller_id"/>
+		<result property="skuStatus" column="sku_status"/>
+		<result property="skuType" column="sku_type"/>
+		<result property="ad" column="ad"/>
+		<result property="attributes" column="attributes"/>
+		<result property="created" column="created"/>
+		<result property="modified" column="modified"/>
+		<result property="shopId" column="shop_id"/>
+		<result property="cid" column="cid"/>
+		<result property="skuScope" column="sku_scope"/>
+		<result property="hasPrice" column="has_price"/>
+		
+		<!-- 商品编号映射 -->
+		<result property="productId" column="product_id"/>
+	</resultMap>
+	
+	<resultMap id="skuPicDTOMap" type="com.camelot.goodscenter.dto.SkuPictureDTO"> 
+		<result property="skuId" column="sku_id"/>
+		<result property="picUrl" column="picture_url"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	
+	<!-- 搜索商品 -->
+	<sql id="search_Item">
+		SELECT
+ 			 t.item_id
+ 			,t.item_name
+ 			,t.item_status
+ 			,t.guide_price price
+ 			,t.has_price
+ 			,t.brand
+ 			,t.attributes
+ 			,t.seller_id
+			,t.shop_cid
+			,t.shop_id
+			,t.ad
+			,t.cid
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+    <!-- 根据id查询 -->
+	<select id="queryById" resultMap="itemMap">
+		<![CDATA[select * from item where item_id = #{itemId}]]>
+	</select>
+	
+   <!-- 根据id查询 -->
+	<select id="queryItemById" resultMap="itemDTOMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		and item_.item_id = #{itemId}
+		]]>
+	</select>
+	<sql id="selectAllColumns">
+		<![CDATA[
+	select
+ 			 item_.*
+ 			,item_category_.c_name c_name
+            ,item_.cid
+            ,item_.guide_price
+            FROM 
+            ]]>
+	</sql>
+	<sql id="where_fragement">
+			
+ 		item item_,item_category item_category_
+ 		
+ 		<if test="entity!=null and entity.skuId != null  and entity.skuId !=''">
+			,item_sku item_sku_
+		</if>
+		where item_.cid=item_category_.cid
+		
+		<if test="entity.itemIds != null">
+			and item_.item_id not in
+			<foreach collection="entity.itemIds" item="iid" index="index" open="(" separator="," close=")">
+                #{iid}
+  	        </foreach>
+		</if>
+		<if test="entity!=null and entity.skuId != null  and entity.skuId !=''">
+			and item_sku_.item_id = item_.item_id
+		</if>
+		<if test="entity!=null">
+			<if test="entity.itemName != null  and entity.itemName !=''">
+				<![CDATA[ and item_.item_name like CONCAT('%',#{entity.itemName},'%')]]>
+			</if>
+			<if test="entity.cid != null  and entity.cid !=''">
+				<![CDATA[ and FIND_IN_SET(item_.cid,(SELECT queryChildCategory(#{entity.cid}))) ]]>
+			</if>
+			<if test="entity.cids!=null">
+					<![CDATA[ and item_.cid   in ]]>
+				<foreach collection="entity.cids" item="item"  index="index" open="("  separator="," close=")">
+					<![CDATA[ #{item} ]]>
+				</foreach>
+				
+			</if>
+			<if test="entity.productId != null  and entity.productId !=''">
+				<![CDATA[ and item_.product_id  =#{entity.productId} ]]>
+			</if>
+			<if test="entity.itemStatus != null  and entity.itemStatus !=''">
+				<![CDATA[ and item_.item_status  =#{entity.itemStatus}]]>
+			</if>
+			<if test="entity.shopIds != null  and entity.shopIds !=''">
+				 and item_.shop_id  in
+				<foreach collection="entity.shopIds" item="shopId" index="index" open="(" separator="," close=")">
+	                #{shopId}
+	  	        </foreach>
+			</if>
+			<if test="entity.operator != null  and entity.operator !=''">
+				<![CDATA[ and item_.operator  =#{entity.operator} ]]>
+			</if>
+			<if test="entity.skuId != null  and entity.skuId !=''">
+				<![CDATA[ 
+					and item_sku_.sku_id  =#{entity.skuId} 
+					and item_sku_.sku_status=1
+				]]>
+			</if>
+			<if test="entity.id!=null and entity.id !=''">
+			    and item_.item_id=#{entity.id}
+			</if>
+			<if test="entity.platLinkStatus!=null and entity.platLinkStatus !=''">
+			    and item_.plat_link_status=#{entity.platLinkStatus}
+			</if>
+			<if test="entity.hasPrice!=null and entity.hasPrice !=''">
+			    and item_.has_price=#{entity.hasPrice}
+			</if>
+			<if test="entity.shopCid!=null and entity.shopCid !=''">
+			    <![CDATA[ AND item_.shop_cid=#{entity.shopCid}]]>
+			</if>
+			<if test="entity.minInvetory!=null ">
+			    <![CDATA[ AND item_.inventory >=#{entity.minInvetory} ]]>
+			</if>
+			<if test="entity.maxInvetory!=null">
+			   <![CDATA[  AND item_.inventory <=#{entity.maxInvetory}]]>
+			</if>
+			<if test="entity.minPrice!=null ">
+			    <![CDATA[ AND item_.market_price>=#{entity.minPrice}]]>
+			</if>
+			<if test="entity.maxPrice!=null ">
+			    <![CDATA[ AND item_.market_price<=#{entity.maxPrice}]]>
+			</if>
+            <if test="entity.platItemId!=null ">
+			    <![CDATA[ AND item_.plst_item_id=#{entity.platItemId}]]>
+			</if>
+			 <if test="entity.startTime!=null ">
+			    <![CDATA[ AND item_.timing_listing >=#{entity.startTime}]]>
+			</if>
+			 <if test="entity.endTime!=null ">
+			    <![CDATA[ AND item_.timing_listing <=#{entity.endTime}]]>
+			</if>
+			<if test="entity.copied!=null ">
+			    <![CDATA[ AND item_.copied =#{entity.copied}]]>
+			</if>
+			<if test="entity.itemStatusList!=null and entity.itemStatusList.size()>0 ">
+			    <![CDATA[ AND item_.item_status in]]>
+			    <foreach collection="entity.itemStatusList" item="status" open="(" separator="," close=")">
+			    	#{status}
+			    </foreach>
+			</if>
+			<if test="entity.brandIdList!=null and entity.brandIdList.size()>0 ">
+			    <![CDATA[ AND item_.brand in]]>
+			    <foreach collection="entity.brandIdList" item="brand" open="(" separator="," close=")">
+			    	#{brand}
+			    </foreach>
+			</if>
+			<if test="entity.xgjFlag != null  and entity.xgjFlag !=''">
+				and item_.shop_id IS NOT NULL
+			</if>
+			<if test="entity.platformId!=null">
+		      <if test="entity.platformId==''">
+		      and item_.platform_id is null
+		      </if>
+		      <if test="entity.platformId !=''">
+		      and item_.platform_id =#{entity.platformId}
+		      </if>
+		    </if>
+			<if test="entity.shopFreightTemplateId != null">
+				and item_.shop_freight_template_id = #{entity.shopFreightTemplateId}
+			</if>
+			<if test="entity.addSource!=null ">
+			    <![CDATA[ AND item_.add_source=#{entity.addSource}]]>
+			</if>
+			<if test="entity.placedTop != null and entity.placedTop != ''">
+				AND
+				<choose>
+					<when test="entity.placedTop == 1">item_.placed_top = 1</when>
+					<otherwise>(item_.placed_top IS NULL OR item_.placed_top = 2)</otherwise>
+				</choose>
+			</if>
+		</if>
+	   <!--  
+		order by item_.created DESC,item_.modified DESC,item_.listting_time desc
+		-->
+	</sql>
+	<!-- mysql 排序 -->
+	<sql id="pagination_order">
+		<choose>
+			<when test="page.sort != null  and page.sort !='' and page.order != null and page.order != ''">
+				<![CDATA[order by item_.${page.sort} ${page.order} ]]>
+			</when>
+			<otherwise>
+				<![CDATA[order by item_.modified DESC,item_.listting_time desc ]]>
+			</otherwise>
+		</choose>
+	</sql>
+	
+		<!-- mysql 排序 -->
+	<sql id="pagination_orderByCreateTime">
+		<choose>
+			<when test="page.sort != null  and page.sort !='' and page.order != null and page.order != ''">
+				<![CDATA[order by item_.${page.sort} ${page.order} ]]>
+			</when>
+			<otherwise>
+				<![CDATA[order by item_.created DESC,item_.listting_time desc ]]>
+			</otherwise>
+		</choose>
+	</sql>
+	<!-- 分页查询 -->
+	<select id="queryItemList" resultMap="itemDTOMap">
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_order" />
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<!-- 分页查询  个人中心商品列表 改为按上传时间排序-->
+	<select id="queryItemListByCreateTime" resultMap="itemDTOMap">
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_orderByCreateTime" />
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="updateItemStatusBatch">
+		update item set
+   			status_change_reason=#{changeReason}
+   			,item_status =#{itemStatus}
+   			,modified = now()
+   			<if test="itemStatus==4">
+	  		,listting_time = now()
+	  		</if>
+	  		<if test="itemStatus==5">
+	  		,delisting_time = now()
+	  		</if>
+		    where item_id in
+	
+		<foreach collection="ids" item="id" index="index" open="(" separator="," close=")">
+	        #{id}
+	  	</foreach>
+	  	<if test="itemStatus==20">
+	  		and item_status = 2
+	  	</if>
+	  	<if test="itemStatus==5">
+	  		and item_status = 4
+	  	</if>
+	  	<if test="itemStatus==4">
+	  		and (item_status = 5 or item_status = 3)
+	  	</if>
+	</update>
+	
+	<update id="updateShopItemStatus">
+		update item set
+   			status_change_reason=#{changeReason}
+   			,item_status =#{itemStatus}
+   			,modified = now()
+	  		<if test="itemStatus==5">
+	  		,delisting_time = now()
+	  		</if>
+		    where shop_id=#{shopId}
+	  	<if test="itemStatus==5">
+	  		and item_status = 4
+	  	</if>
+	  	
+	</update>
+	
+	<!-- 保存商品的基本信息和类目属性选中的的键值组 -->
+	<insert id="addItem" keyProperty="itemId" useGeneratedKeys="true" parameterType="Object">
+		insert into item(
+				item_id,
+				seller_id,
+				shop_cid,
+				item_name,
+				ad,
+				cid,
+				brand,
+				attributes,
+				attr_sale,
+				has_price,
+				product_id,
+				market_price,
+				market_price2,
+				inventory,
+				weight,
+				weight_unit,
+				item_status,
+				created,
+				modified,
+				describe_url,
+				packing_list,
+				after_service,
+				timing_listing,
+				listting_time,
+				delisting_time,
+				operator,
+				status_change_reason,
+				shop_id,
+				guide_price,
+				origin,
+				add_source,
+				plat_link_status,
+				plst_item_id,
+				keywords,
+				authentication,
+				platform_id,
+				shop_freight_template_id,
+				volume,
+				searched,
+				specification,
+				house_type
+		)values(
+				#{itemId},
+				#{sellerId},
+				#{shopCid},
+				#{itemName},
+				#{ad},
+				#{cid},
+				#{brand},	
+				#{attributes},
+				#{attrSale},
+				#{hasPrice},
+			    #{productId},
+				#{marketPrice},
+				#{marketPrice2},
+				#{inventory},
+				#{weight},
+				#{weightUnit},
+				#{itemStatus},
+				now(),
+				now(),
+				#{describeUrl},
+				#{packingList},
+				#{afterService},
+				#{timingListing},
+				#{listtingTime},
+				#{delistingTime},
+				#{operator},
+				#{statusChangeReason},
+				#{shopId},
+				#{guidePrice},
+				#{origin},
+				#{addSource},
+				#{platLinkStatus},
+				#{plstItemId},
+				#{keywords},
+				#{authentication},
+				#{platformId},
+				#{shopFreightTemplateId},
+				#{volume},
+				#{searched},
+				#{specification},
+				#{housetype}
+		)
+	</insert>
+	
+	<select id="getItemDTOById" resultMap="itemDTOMapper">
+		SELECT
+			i.*,b.brand_name
+		FROM
+			item i inner join item_brand b on i.brand = b.brand_id
+		WHERE i.item_id = #{id}
+	</select>  
+	
+	<select id="queryItemDTOByAttr" resultMap="itemDTOMapper">
+		SELECT
+			i.*,b.brand_name
+		FROM
+			item i INNER JOIN item_brand b ON i.brand = b.brand_id
+		WHERE i.attributes LIKE CONCAT('%',TRIM(#{attr}),'%');
+	</select>  
+	
+	<select id="queryItemSkuInfo" resultMap="itemSkuInfoMap">
+		SELECT 
+		  s.sku_id,
+		  s.attributes,
+		  s.sku_type,
+		  s.product_id
+		FROM
+		  item_sku s 
+		WHERE s.item_id =#{id}
+		and s.sku_status=1
+	</select>
+		
+	<update id="updateItem" parameterType="com.camelot.goodscenter.dto.ItemDTO">
+		UPDATE 
+		  item 
+		SET
+			modified = now()
+		<if test="itemName!=null and itemName!=''">
+		  ,item_name = #{itemName}
+		</if>
+		<if test="cid!=null">
+		  ,cid = #{cid}
+		</if>
+		<if test="sellerId!=null">
+		  ,seller_id = #{sellerId}
+		</if>
+		<if test="itemStatus!=null ">
+		  ,item_status = #{itemStatus}
+		</if>
+		<if test="attributesStr!=null and attributesStr!=''">
+		  ,attributes = #{attributesStr}
+		</if>
+		<if test="attrSaleStr!=null and attrSaleStr!=''">
+		  ,attr_sale = #{attrSaleStr}
+		</if>
+		<if test="shopCid!=null">
+		  ,shop_cid = #{shopCid}
+		</if>
+		<if test="brand!=null">
+		  ,brand = #{brand}
+		</if>
+		<if test="marketPrice!=null">
+		  ,market_price = #{marketPrice}
+		</if>
+		<if test="marketPrice2!=null">
+		  ,market_price2 = #{marketPrice2}
+		</if>
+		<if test="inventory!=null">
+		  ,inventory = #{inventory}
+		</if>
+		<if test="weight!=null">
+		  ,weight = #{weight}
+		</if>
+		<if test="weightUnit!=null and weightUnit!=''">
+		  ,weight_unit = #{weightUnit}
+		</if>
+		<if test="volume!=null">
+		  ,volume = #{volume}
+		</if>
+		<if test="productId!=null and productId!=''">
+		  ,product_id = #{productId}
+		</if>
+		<if test="describeUrl!=null and describeUrl!=''">
+		  ,describe_url = #{describeUrl}
+		</if>
+		<if test="packingList!=null and packingList!=''">
+		  ,packing_list = #{packingList}
+		</if>
+		<if test="afterService!=null and afterService!=''">
+		  ,after_service = #{afterService}
+		</if>
+		<if test="ad!=null and ad!=''">
+		  ,ad = #{ad}
+		</if>
+		<if test="timingListing!=null and timingListing!=''">
+		  ,timing_listing = #{timingListing}
+		</if>
+		<if test="operator!=null and operator!=''">
+		  ,operator = #{operator}
+		</if>
+		<if test="statusChangeReason!=null and statusChangeReason!=''">
+		  ,status_change_reason = #{statusChangeReason}
+		</if>
+		<if test="shopId!=null">
+		  ,shop_id = #{shopId}
+		</if>
+		<if test="guidePrice!=null">
+		  ,guide_price = #{guidePrice}
+		</if>
+		<if test="origin!=null and origin!=''">
+		  ,origin = #{origin}
+		</if>
+		<if test="addSource!=null">
+		  ,add_source = #{addSource}
+		</if>
+		<if test="platLinkStatus!=null">
+		  ,plat_link_status = #{platLinkStatus}
+		</if>
+		<if test="hasPrice!=null and hasPrice!=''">
+		  ,has_price = #{hasPrice}
+		</if>
+		<if test="plstItemId!=null">
+		  ,plst_item_id = #{plstItemId}
+		</if>
+		<if test="keywords!=null and keywords!=''">
+		  ,keywords = #{keywords}
+		</if>
+		<if test="copied!=null">
+		  ,copied = #{copied}
+		</if>
+		<if test="authentication!=null">
+		  ,authentication = #{authentication}
+		</if>
+		<if test="shopFreightTemplateId!=null">
+		  ,shop_freight_template_id = #{shopFreightTemplateId}
+		</if>
+		<if test="searched!=null">
+		  ,searched = #{searched}
+		</if>
+		<if test="placedTop!=null">
+		  ,placed_top = #{placedTop}
+		</if>
+		<if test="specification!=null">
+		  ,specification = #{specification}
+		</if>
+		<if test="housetype!=null">
+		  ,house_type = #{housetype}
+		</if>
+		WHERE item_id = #{itemId}
+	</update>
+	
+	
+	<update id="update" parameterType="com.camelot.goodscenter.dto.ItemDTO">
+		UPDATE 
+		  item 
+		SET
+		   modified = now()
+		  ,item_name = #{itemName}
+		  ,cid = #{cid}
+		  ,seller_id = #{sellerId}
+		  ,item_status = #{itemStatus}
+		  ,attributes = #{attributesStr}
+		  ,attr_sale = #{attrSaleStr}
+		  ,shop_cid = #{shopCid}
+		  ,brand = #{brand}
+		  ,market_price = #{marketPrice}
+		  ,market_price2 = #{marketPrice2}
+		  ,inventory = #{inventory}
+		  ,weight = #{weight}
+		  ,weight_unit = #{weightUnit}
+		  ,volume = #{volume}
+		  ,product_id = #{productId}
+		  ,describe_url = #{describeUrl}
+		  ,packing_list = #{packingList}
+		  ,after_service = #{afterService}
+		  ,ad = #{ad}
+		  ,timing_listing = #{timingListing}
+		  ,operator = #{operator}
+		  ,status_change_reason = #{statusChangeReason}
+		  ,shop_id = #{shopId}
+		  ,guide_price = #{guidePrice}
+		  ,origin = #{origin}
+		  ,add_source = #{addSource}
+		  ,plat_link_status = #{platLinkStatus}
+		  ,has_price = #{hasPrice}
+		  ,plst_item_id = #{plstItemId}
+		  ,keywords = #{keywords}
+		  ,copied = #{copied}
+		  ,authentication = #{authentication}
+		  ,shop_freight_template_id = #{shopFreightTemplateId}
+		  ,searched = #{searched}
+		  ,placed_top = #{placedTop}
+		  ,specification = #{specification}
+		  ,house_type = #{housetype}
+		WHERE item_id = #{itemId}
+	</update>
+	
+	<insert id="insertItemPrice" >
+		INSERT INTO item_price (
+		  item_id,
+		  sell_price,
+		  min_num,
+		  max_num,
+		  price_status,
+		  created,
+		  modified,
+		  area_id,
+		  area_name,
+		  seller_id,
+		  shop_id,
+		  step_index
+		)
+		VALUES
+		<foreach collection="list" item="obj" index="index" separator="," open="(" close=")">  
+       	#{itemId},#{sellPrice},#{minNum},#{maxNum},1,now(),now(),#{areaId},#{areaName},#{sellerId},#{shopId},#{stepIndex}
+    	</foreach>
+	</insert>
+	
+	<select id="getItemSkuById" resultMap="itemSkuMap">
+		SELECT 
+		  s.sku_id,
+		  s.item_id,
+		  s.seller_id,
+		  s.sku_status,
+		  s.sku_type,
+		  s.ad,
+		  s.attributes,
+		  s.created,
+		  s.modified,
+		  s.shop_id,
+		  i.item_name,
+		  i.item_status,
+		  i.cid,
+		  i.has_price,
+		  i.product_id,
+		  ifnull(item_evaluation_.sku_scope,0) sku_scope
+		FROM
+		  item_sku s 
+		  LEFT JOIN (SELECT 
+				t.sku_id sku_id,
+				IFNULL(ROUND(AVG(t.sku_scope), 0),0) sku_scope 
+			FROM
+				item_evaluation t 
+			GROUP BY t.sku_id) item_evaluation_ ON item_evaluation_.sku_id = s.sku_id,
+		  item i
+		WHERE s.item_id = i.item_id
+		  AND s.sku_id = #{param.skuId}
+		  AND s.shop_id = #{param.shopId}
+		  AND s.item_id = #{param.itemId}
+	</select>
+	
+	<update id="modifyItemAdBatch" >
+		UPDATE item 
+	    SET ad = CASE item_id 
+	    <foreach collection="ads" item="ad">
+	      WHEN #{ad.itemId} THEN #{ad.ad}
+	    </foreach>
+	    END
+		WHERE item_id IN 
+		<foreach collection="ads" item="ad" open="(" separator="," close=")">
+			#{ad.itemId}
+		</foreach>
+	</update>
+	
+	<update id="modifyItemShopCidBatch" >
+		UPDATE item 
+	    SET shop_cid = CASE item_id 
+	    <foreach collection="cids" item="cid">
+	      WHEN #{cid.itemId} THEN #{cid.shopCid}
+	    </foreach>
+	    END
+		WHERE item_id IN 
+		<foreach collection="cids" item="cid" open="(" separator="," close=")">
+			#{cid.itemId}
+		</foreach>
+	</update>
+	
+	
+	
+	<select id="querySkuPics" resultMap="skuPicDTOMap">
+		SELECT 
+		  t.sku_id,
+		  t.picture_url 
+		FROM
+		  item_sku_picture t 
+		WHERE t.sku_id =#{skuId}
+		and t.picture_status = 1
+	</select>
+	
+	
+	<select id="getItemId" resultType="long">
+		select get_item_id()
+	</select>
+	
+	
+	<select id="querySellerItems" resultMap="itemDTOMapper">
+		<![CDATA[
+		select * from item t 
+		where t.plst_item_id = #{itemId}
+		]]>
+	</select>
+	
+	
+	<select id="queryShopIdByPlatItemId" resultType="long">
+		<![CDATA[
+			select t.shop_id
+			from item t 
+			where t.plst_item_id=#{itemId}
+			group by t.shop_id
+		]]>
+		<if test="page!=null">
+			<include refid="pagination_tail"></include>
+		</if>
+	</select>
+	
+	<select id="queryShopCountByPlatItemId" resultType="long">
+		<![CDATA[
+			select count(*)
+			from (
+				select t.shop_id
+				from item t 
+				where t.plst_item_id=#{itemId}
+				group by t.shop_id
+			) tt
+		]]>
+	</select>
+	
+	<update id="updateItemPlatStatus">
+		update item
+		set item.plat_link_status=#{status}
+		where item.item_id in 
+		<foreach collection="ids" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>	
+	</update>
+	<update id="updateTimingListing">
+	UPDATE 
+		  item 
+		SET
+			timing_listing = #{timingListing}
+	WHERE item_id = #{itemId}
+	</update>
+	<!-- 根据商品名称查询 -->
+	<select id="queryItemByItemNameAndShopId" resultMap="itemDTOMapper">
+		SELECT
+			i.*,b.brand_name
+		FROM
+			item i inner join item_brand b on i.brand = b.brand_id
+		WHERE i.item_name = #{itemName} and i.shop_id = #{shopId}
+	</select>
+	
+	
+	
+	<select id="getItemDTOByItemIds" resultMap="itemDTOMapper">
+		SELECT
+			i.*,b.brand_name
+		FROM
+			item i inner join item_brand b on i.brand = b.brand_id
+		WHERE i.item_id in 
+		<foreach collection="iids" item="id" open="(" separator="," close=")">
+		  #{id}
+		</foreach>
+	</select>
+	
+	<update id="updatePlacedTop">
+		UPDATE
+			item
+		SET
+			placed_top = #{placedTop}
+		WHERE
+			item_id IN
+		<foreach collection="items" item="itemId" open="(" close=")" separator=",">
+		#{itemId}
+		</foreach>
+	</update>
+</mapper>

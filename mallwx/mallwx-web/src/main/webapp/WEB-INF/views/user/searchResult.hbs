@@ -1,0 +1,26 @@
+{{#each records}}
+<dl >
+    <dt class="fl" onclick="window.location='product/toDetail?id={{itemId}}&skuId={{skuId}}'">
+       <img src="{{imgGix picUrl}}" >
+    </dt>
+    <dd class="fr" style="position: relative;">
+        <p onclick="window.location='product/toDetail?id={{itemId}}&skuId={{skuId}}'">{{itemName}}</p>
+        {{#each attributes}}
+        <div>
+            {{name}}：
+            {{#each values}}
+                {{name}}
+            {{/each}}
+        </div>
+        {{/each}}
+        <h4 style="" class="font_e5">价格：￥{{price}}</h4>
+         <span class="po_ab pa_05">
+	        <i class=" demo-icons  font_14 fa-trash"></i>
+	           <a href="javascript:delShopFavourite({{id}});">删除</a>
+	     </span>    
+	    
+    </dd>
+   
+</dl>
+
+{{/each}}

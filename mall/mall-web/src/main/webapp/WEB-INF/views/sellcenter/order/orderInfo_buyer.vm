@@ -1,0 +1,1194 @@
+#set($assetsPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+#set($itemCount = 0)
+<link href="$assetsPath/css/register.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="$assetsPath/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$assetsPath/plugin/jquery-validation/1.11.1/jquery.validate.js"></script>
+<script type="text/javascript" src="$assetsPath/js/jquery-migrate-1.1.0.js"></script>
+<script type="text/javascript" src="$assetsPath/plugin/fancyzoom/jquery.shadow.js"></script>
+<script type="text/javascript" src="$assetsPath/plugin/fancyzoom/jquery.ifixpng.js"></script>
+<script type="text/javascript" src="$assetsPath/plugin/fancyzoom/jquery.fancyzoom.js"></script>
+<!-- 防止重复AJAX -->
+<script type="text/javascript" src="$assetsPath/plugin/common/loadMsg.js"></script>
+ <script type="text/javascript">
+
+        $(document).ready(function() {
+            //图片查看
+            $('.showimg').fancyzoom({
+                overlayColor: '#000',
+                overlay: 0.6,
+                imagezindex:100,
+                showoverlay:false,
+                Speed:400,
+                shadow:true,
+                shadowOpts:{ color: "#000", offset: 4, opacity: 0.2 },
+                imgDir: '$assetsPath/plugin/fancyzoom/ressources/',
+                imgResizeScript:null,
+                autoresize:true
+            });
+        });
+    </script>
+<script type="text/javascript">
+	function todetails(path){
+		window.open(path);
+	}
+	function initDisabled(){
+		// 禁用弹框的input
+		$("#invoice_title input").attr("readonly","readonly");
+		$("#addedValueTaxInvoice input").attr("readonly","readonly");
+		// 去掉弹框的input的边框
+		// $("#invoice_title input").css("border","0");
+		// $("#addedValueTaxInvoice input").css("border","0");
+		// 禁用弹框的select
+		$("#addedValueTaxInvoice select").attr("disabled","disabled");
+		// 禁用上传
+		$("#addedValueTaxInvoice .z-upload").hide();
+		// 禁用保存按钮
+		$(".js_invoice_submit").hide();
+	}
+	function openDisabled(){
+		// 开启弹框的input
+		$("#invoice_title input").removeAttr("readonly");
+		$("#addedValueTaxInvoice input").removeAttr("readonly");
+		// 开启弹框的input的边框
+		// $("#invoice_title input").css("border","1px solid #e8e8e8");
+		// $("#addedValueTaxInvoice input").css("border","1px solid #e8e8e8");
+		// 开启弹框的select
+		$("#addedValueTaxInvoice select").removeAttr("disabled");
+		// 开启上传
+		$("#addedValueTaxInvoice .z-upload").show();
+		// 开启保存按钮
+		$(".js_invoice_submit").show();
+	}
+	$(document).ready(function(){
+	
+		// 禁用
+		initDisabled();
+		// 取消弹框
+		$(".js_invoice_cancle").click(function(){
+			$(".js_invoice").hide();
+		});
+		$(".js_invoice_edit").click(function(){
+			openDisabled();
+		});
+		// 保存发票
+		$(".js_invoice_submit").click(function(){
+			var invoice = "$!tradeOrder.invoice";
+			var orderId = "$!tradeOrder.orderId";
+			if(invoice == "2"){// 普通发票
+				var invoiceTitle = $.trim($("#invoiceTitle_").val());
+				// 校验
+    			if(invoiceTitle==''){
+    				$("#invoiceTitle_errorMsg").text("请填写发票抬头");
+    				return;
+    			}else{
+    				$("#invoiceTitle_errorMsg").text("");
+    			}
+				
+				// 禁用
+    			initDisabled();
+    			$("#invoice_title button").attr('disabled','disabled');
+				
+				// 保存
+    			$.ajax({
+    				url: "$request.contextPath/invoice/updateTradeOrderInvoice",
+        			type: "post",
+        			data: {
+    					invoice : 2,
+    					invoiceTitle : invoiceTitle,
+						orderId : orderId
+    				},
+        			dataType: 'json',
+        			success: function(data){
+        				if(data.success){
+    						// console.info(data);
+							$("#invoice_tip").text("发票抬头：" + invoiceTitle);
+                			$(".js_invoice").hide();
+        				}else{
+							openDisabled();// 不禁用
+        					alert("保存失败！");
+        				}
+            			$("#invoice_title button").removeAttr('disabled');
+        			},
+    				error: function(data){
+						openDisabled();// 不禁用
+    					$("#invoice_title button").removeAttr('disabled');
+						alert("保存失败，请检查您的网络！");
+    				}
+        		});
+			}else if(invoice == "3"){// 增值税发票
+        		// 单位名称
+        		var companyName = $.trim($("#companyName_").val());
+        		// 纳税人识别码
+        		var taxpayerCode = $.trim($("#taxpayerCode_").val());
+        		// 注册地址
+        		var registeredAddress = $.trim($("#registeredAddress_").val());
+        		// 注册电话
+        		var registeredPhone = $.trim($("#registeredPhone_").val());
+        		// 开户银行
+        		var bankName = $.trim($("#bankName_").val());
+        		// 银行账户
+        		var bankAccount = $.trim($("#bankAccount_").val());
+        		// 营业执照
+        		var businessLicensePicUrl = $.trim($("#businessLicensePicUrl_1").val());
+        		// 税务登记证
+        		var taxRegistrationCertificatePicUrl = $.trim($("#taxRegistrationCertificatePicUrl_1").val());
+        		// 一般纳税人证明
+        		var generalTaxpayerPicUrl = $.trim($("#generalTaxpayerPicUrl_1").val());
+    			
+    			// 发票内容：明细
+    			var normalContent = "$!invoiceDTO.normalContent";
+    			// 收票人姓名
+    			var consigneeName = $.trim($("#consigneeName_").val());
+    			// 收票人手机
+    			var consigneeMobile = $.trim($("#consigneeMobile_").val());
+    			// 省
+    			var provinceId = $.trim($("#invoice_province").find("option:selected").val());
+    			// 市
+    			var cityId = $.trim($("#invoice_city").find("option:selected").val());
+    			// 县
+    			var countyId = $.trim($("#invoice_county").find("option:selected").val());
+    			// 详细地址
+    			var detailAddress = $.trim($("#detailAddress_").val());
+				
+				// 校验单位名称
+        		if(companyName==''){
+            		$("#companyName_errorMsg").text("请填写单位名称");
+					$("#companyName_").focus();
+            		return;
+            	}else{
+        			if(companyName.length<2){
+            			$("#companyName_errorMsg").text("请填写完整单位名称");
+						$("#companyName_").focus();
+                		return;
+        			}
+        			if(companyName.length>100){
+            			$("#companyName_errorMsg").text("单位名称过长,请重新输入");
+						$("#companyName_").focus();
+                		return;
+        			}
+        			$("#companyName_errorMsg").text("");
+        		}
+            	// 校验纳税人识别码
+        		if(taxpayerCode==''){
+        			$("#taxpayerCode_errorMsg").text("请填写纳税人识别码");
+					$("#taxpayerCode_").focus();
+        			return;
+        		}else{
+        			var reg_number = /^([a-zA-Z0-9]){15,20}$/;
+                    if (!reg_number.test(taxpayerCode)) {
+                    	$("#taxpayerCode_errorMsg").text("纳税人识别码错误");
+						$("#taxpayerCode_").focus();
+        				return;
+                    }
+        			$("#taxpayerCode_errorMsg").text("");
+        		}
+            	// 校验注册地址
+        		if(registeredAddress==''){
+        			$("#registeredAddress_errorMsg").text("请填写注册地址");
+					$("#registeredAddress_").focus();
+        			return;
+        		}else{
+                    if (registeredAddress.replace(/[^\x00-\xff]/g, "**").length < 2) {
+        				$("#registeredAddress_errorMsg").text("注册地址错误");
+						$("#registeredAddress_").focus();
+        				return;
+                    }
+                    if (registeredAddress.length > 250) {
+        				$("#registeredAddress_errorMsg").text("注册地址过长，请重新输入");
+						$("#registeredAddress_").focus();
+        				return;
+                    }
+        			$("#registeredAddress_errorMsg").text("");
+        		}
+            	// 校验注册电话
+        		if(registeredPhone==''){
+        			$("#registeredPhone_errorMsg").text("请填写注册电话");
+					$("#registeredPhone_").focus();
+        			return;
+        		}else{
+        			var reg1 = /^1\d{10}$/;
+        			var reg2 = /^0\d{2,3}-?\d{7,8}$/;
+                    if (registeredPhone.length > 50) {
+                    	$("#registeredPhone_errorMsg").text("注册电话过长，请重新输入");
+						$("#registeredPhone_").focus();
+        				return;
+                    }
+        			$("#registeredPhone_errorMsg").text("");
+        		}
+            	// 校验开户银行
+        		if(bankName==''){
+        			$("#bankName_errorMsg").text("请填写开户银行");
+					$("#bankName_").focus();
+        			return;
+        		}else{
+                    if (bankName.replace(/[^\x00-\xff]/g, "**").length < 2) {
+        				$("#bankName_errorMsg").text("开户银行错误");
+						$("#bankName_").focus();
+        				return;
+                    }
+                    if (bankName.length > 100) {
+        				$("#bankName_errorMsg").text("开户银行过长，请重新输入");
+						$("#bankName_").focus();
+        				return;
+                    }
+        			$("#bankName_errorMsg").text("");
+        		}
+            	// 校验银行账户
+            	if(bankAccount==''){
+        			$("#bankAccount_errorMsg").text("请填写银行账户");
+					$("#bankAccount_").focus();
+        			return;
+        		}else{
+        			$("#bankAccount_errorMsg").text("");
+        		}
+        		// 校验营业执照
+        		if(businessLicensePicUrl==''){
+        			$("#businessLicensePicUrl_errorMsg1").text("请上传营业执照");
+					$("#businessLicensePicUrl_1").focus();
+        			return;
+        		}else{
+        			$("#businessLicensePicUrl_errorMsg1").text("");
+        		}
+        		// 税务登记证
+        		if(taxRegistrationCertificatePicUrl==''){
+        			$("#taxRegistrationCertificatePicUrl_errorMsg1").text("请上传税务登记证");
+					$("#taxRegistrationCertificatePicUrl_1").focus();
+        			return;
+        		}else{
+        			$("#taxRegistrationCertificatePicUrl_errorMsg1").text("");
+        		}
+        		// 一般纳税人证明
+        		if(generalTaxpayerPicUrl==''){
+        			$("#generalTaxpayerPicUrl_errorMsg1").text("请上传一般纳税人证明");
+					$("#generalTaxpayerPicUrl_1").focus();
+        			return;
+        		}else{
+        			$("#generalTaxpayerPicUrl_errorMsg1").text("");
+        		}
+				
+				// 校验收票人姓名
+    			if(consigneeName==''){
+    				$("#consigneeName_errorMsg").text("请填写收票人姓名");
+					$("#consigneeName_").focus();
+    				return;
+    			}else{
+    				$("#consigneeName_errorMsg").text("");
+    			}
+    			
+    			// 校验收票人手机
+    			if(consigneeMobile==''){
+    				$("#consigneeMobile_errorMsg").text("请填写收票人手机");
+					$("#consigneeMobile_").focus();
+    				return;
+    			}else{
+    				var chrnum = /^[1]([3|5|7|8][0-9]{1}|59|58|88|89)[0-9]{8}$/;
+    				if(!chrnum.test(consigneeMobile)){
+    					$("#consigneeMobile_errorMsg").text("手机号码格式不正确");
+        				$("#consigneeMobile_").focus();
+        				return;
+    				}
+    				$("#consigneeMobile_errorMsg").text("");
+    			}
+    			
+    			// 校验省
+    			if(provinceId==''){
+    				$("#invoice_province_errorMsg").text("请选择省");
+					$("#invoice_province").focus();
+    				return;
+    			}else{
+    				$("#invoice_province_errorMsg").text("");
+    			}
+    			
+    			// 校验市
+    			if(cityId==''){
+    				$("#invoice_province_errorMsg").text("请选择市");
+					$("#invoice_city").focus();
+    				return;
+    			}else{
+    				$("#invoice_province_errorMsg").text("");
+    			}
+    			
+    			// 校验县
+    			if(countyId==''){
+    				$("#invoice_province_errorMsg").text("请选择县");
+					$("#invoice_county").focus();
+    				return;
+    			}else{
+    				$("#invoice_province_errorMsg").text("");
+    			}
+    			
+    			// 校验详细地址
+    			if(detailAddress==''){
+    				$("#detailAddress_errorMsg").text("请填写详细地址");
+					$("#detailAddress_").focus();
+    				return;
+    			}else{
+    				$("#detailAddress_errorMsg").text("");
+    			}
+    			
+    			// 禁用
+    			initDisabled();
+    			$("#addedValueTaxInvoice button").attr('disabled','disabled');
+						
+				// 保存
+    			$.ajax({
+    				url: "$request.contextPath/invoice/updateTradeOrderInvoice",
+        			type: "post",
+        			data: {
+    					invoice : 3,
+    					orderId : orderId,
+    					companyName : companyName,
+    					taxpayerCode : taxpayerCode,
+    					registeredAddress : registeredAddress,
+    					registeredPhone : registeredPhone,
+    					bankName : bankName,
+    					bankAccount : bankAccount,
+    					businessLicensePicUrl : businessLicensePicUrl,
+    					taxRegistrationCertificatePicUrl : taxRegistrationCertificatePicUrl,
+    					generalTaxpayerPicUrl : generalTaxpayerPicUrl,
+    					normalContent : normalContent,
+    					consigneeName : consigneeName,
+    					consigneeMobile : consigneeMobile,
+    					provinceId : provinceId,
+    					cityId : cityId,
+    					countyId : countyId,
+    					detailAddress : detailAddress
+    				},
+        			dataType: 'json',
+        			success: function(data){
+        				if(data.success){
+    						$("#invoice_tip").text("单位名称：" + companyName);
+                			$(".js_invoice").hide();
+        				}else{
+							openDisabled();// 不禁用
+        					alert("保存失败！");
+        				}
+            			$("#addedValueTaxInvoice button").removeAttr('disabled');
+        			},
+    				error: function(data){
+    					openDisabled();// 不禁用
+            			$("#addedValueTaxInvoice button").removeAttr('disabled');
+						alert("保存失败，请检查您的网络！");
+    				}
+        		});
+			}
+		});
+		//图片查看
+		$('.po_re_img').fancyzoom({
+			Speed:400,
+			showoverlay:false,
+			imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+		});
+		// 省市县回显
+		if("$!invoiceDTO.invoice"=='3'){
+			order_optionItems(0,"invoice_province","$!invoiceDTO.provinceId");
+			order_optionItems("$!invoiceDTO.provinceId","invoice_city","$!invoiceDTO.cityId");
+			order_optionItems("$!invoiceDTO.cityId","invoice_county","$!invoiceDTO.countyId");
+		}
+	});
+	/*工具方法：上传图片*/
+    function startUpload(fileElementId, showImg, urlInput){
+    	//判断图片格式
+    	var fileInput = $("#"+fileElementId).val();
+    	var extStart = fileInput.lastIndexOf(".");
+    	var ext = fileInput.substring(extStart,fileInput.length).toUpperCase();
+    	if(ext!=".JPG" && ext!=".jpg" && ext!=".JPEG" && ext!=".jpeg" && ext!=".PNG" && ext!=".png" && ext!=".BMP" && ext!=".bmp"){
+    		alert("图片限于jpg,jpeg,png,bmp格式");
+    		return false;
+    	}
+    	$.ajaxFileUpload({
+    		url: '$request.getContextPath()/fileUpload/fixedUpload?size=307200&date='+new Date(), //用于文件上传的服务器端请求地址
+    		secureuri: false, //是否需要安全协议，一般设置为false
+    		fileElementId: fileElementId, //文件上传域的ID
+    		dataType: 'json', //返回值类型 一般设置为json
+    		type:"post",
+    		success: function (data, status){  //服务器成功响应处理函数
+    			if(!data.success){
+    				alert(data.msg);
+    				return false;
+    			}
+    			$("#"+showImg).attr("src","$!imageServerAddr"+data.url);
+    			$("#"+urlInput).val(data.url);
+    			$("#"+fileElementId).val("");
+    			
+    			//图片查看
+    			$('.po_re_img').fancyzoom({
+    				Speed:400,
+    				showoverlay:false,
+    				imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+    			});
+    		},
+    		error: function (data, status, e){//服务器响应失败处理函数
+    		}
+    	});
+    };
+	/**
+     * 省市区数据填充
+     * parentCode 父级编码
+     * opitonId 需要填充数据的下拉列表框的id
+     * selectVal 默认选中的值
+     * name 服务器返回的数据中，作为下拉框option的text的字段名，默认为"name"
+     * code 服务器返回的数据中，作为下拉框option的value的字段名，默认为"code"
+     */
+    function order_optionItems(parentCode, optionId, selectVal, name, code){
+    	$.ajax({
+    		url:"$request.getContextPath()/address/query",
+    		type:"post",
+    		data:{
+    			id:parentCode
+    		},
+    		dataType: "json",
+    		success:function(data){
+    			var optionItem = $("#"+optionId);
+    			optionItem.empty();
+    			optionItem.append($("<option>").text("请选择").val(""));
+    			$.each(data, function (n, address) {
+    				if(!name){
+    					name = "name"; 
+    				}
+    				if(!code){
+    					code = "code";
+    				}
+    				var option = $("<option>").text(address[name]).val(address[code]);
+    				if(address.code == selectVal){
+    					option.attr("selected",true);
+    				}
+    				optionItem.append(option);
+    			});
+    		}
+    	});
+    }
+	// 查看发票
+	function showInvoice(){
+		$(".js_invoice").show();
+	}
+	
+	
+	function startUploadEnclosure(){
+		var fileInput = $("#tradeOrdersEnclosure").val();
+		var nameStart = fileInput.lastIndexOf("\\");
+		var fileName = stripscript(fileInput.substring(nameStart+1,fileInput.length));
+		if($("#"+fileName).length<=0){
+		    $.ajaxFileUpload({
+		        url: '$request.getContextPath()/fileUpload/uploadzise?size=2048000', //用于文件上传的服务器端请求地址
+		        secureuri: false, //是否需要安全协议，一般设置为false
+		        fileElementId: 'tradeOrdersEnclosure', //文件上传域的ID
+		        dataType: 'json', //返回值类型 一般设置为json
+		        type:"post",
+		        success: function (data, status){  //服务器成功响应处理函数
+		            if(data.success){
+		               var s_url = "$!imageServerAddr";
+		               var name = stripscript(data.name);
+		               var a_url = "<span id='"+name+"'><a href='"+ s_url + data.url+"' target='_blank'>"+data.name+"</a> </span>"
+		               $("#enclosureName").append(a_url);
+		               var orderId = "$!tradeOrder.orderId";
+		               addEnclosure(data.url,orderId,data.name,0,null);
+		            }
+		        },
+		        error: function (data, status, e){//服务器响应失败处理函数
+		            alert("亲系统繁忙，请稍后再试");
+		        }
+		    });
+		}else{
+			alert("该文件已经上传，请勿重复上传。");
+		}
+	}
+	
+	function addremark(){
+		var id = "$!enclosureId";
+		var orderId = "$!tradeOrder.orderId";
+		var remark = $("#remark").val();
+		if(remark==null || remark==""){
+			alert("输入备注信息");
+			return;
+		}
+		if(id==null || id==""){
+			id=0;
+		}
+		addEnclosure(null,orderId,null,id,remark);
+	}
+	function addEnclosure(url,orderId,enclosureName,id,remark){
+		$.ajax({
+			url: "$request.contextPath/order/addEnclosure",
+			type: "post",
+			data: {
+				url : url,
+				orderId : orderId,
+				enclosureName : enclosureName,
+				remark : remark,
+				id : id
+			},
+			dataType: 'json',
+			success: function(data){
+				if(data.resultMessage == 'success'){
+					if(url != null){
+						var del= "<i class='icon-del' title='删除' onclick='delEnclosure(this,"+data.result+")'>&nbsp;&nbsp;&nbsp;&nbsp;</i>&nbsp;&nbsp;&nbsp;&nbsp";
+						var name = stripscript(enclosureName);
+						$("#"+name).append(del);
+					}
+					alert('操作成功');
+				}else{
+					alert('操作失败');
+				}
+			}
+		});
+	}
+	
+	function delEnclosure(obj,id){
+		$.ajax({
+			url: "$request.contextPath/order/delEnclosure",
+			type: "post",
+			data: {
+				id : id
+			},
+			dataType: 'json',
+			success: function(data){
+				if(data.resultMessage == 'success'){
+					$(obj).parent('span').remove();
+					alert('操作成功');
+				}else{
+					alert('操作失败');
+				}
+			}
+		});
+	}
+	
+	function stripscript(s) {
+	    var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）&mdash;—|{}【】‘；：”“'。，、 ？　]")
+	        var rs = "";
+	    for (var i = 0; i < s.length; i++) {
+	        rs = rs + s.substr(i, 1).replace(pattern, '');
+	    }
+	    return rs;
+	}
+</script>
+<style type="text/css">
+	.select{
+		height:26px; 
+		line-height:26px; 
+		border:1px solid #e8e8e8; 
+		text-align:left; 
+		padding-left:8px; 
+		margin-left:5px; 
+		color:#999; 
+		overflow:hidden; 
+		outline:none;
+	}
+	.freight{ width:96%; height:25px;line-height:25px; margin:10px auto; padding:5px 0px;background:#fffdf3;border: 2px solid #f1ddb5;}
+    .freight dl{ width:100%; height:25px; margin:0; border:none;}
+    .freight dd{ width:100%; height:25px;float:right;text-align:right; margin-right:10px;}
+    .freight dd span{ display:inline-block;}
+</style>
+<div id="main">
+<!--中间部分开始-->
+    <!--下面订单信息 start -->
+    <div class="Order_Review border-4">
+    #if($!tradeOrder.state == 6)
+		<h3 class="hei_35 font_20 font_fe"><i class="demo-icons fa-exclamation-triangle"></i>订单已取消</h3>
+	#elseif($!tradeOrder.state == 7)
+		<h3 class="hei_35 font_20 font_fe"><i class="demo-icons fa-exclamation-triangle"></i>订单已关闭</h3>
+	#else
+		<div class="stepflex_order">
+			<!--正在哪个流程就加入 doing 这个样式 -->
+			#if($!tradeOrder.approveStatus=='0'||$!tradeOrder.approveStatus=='2')
+			<dl class="first doing">
+				<dt class="s-num">1</dt>
+				<dd class="s-text">
+					待审核<s></s><b></b><br/>
+				</dd>
+			</dl>
+			<dl class="normal done">
+				<dt class="s-num">2</dt>
+				<dd class="s-text">
+				  待付款<s></s><b></b><br/>
+				</dd>
+			</dl>
+			<dl class="normal done">
+				<dt class="s-num">3</dt>
+				<dd class="s-text">
+				  #if($!isServiceItem=='1')
+				  	待配送
+				  #else
+				  	待服务
+				  #end<s></s><b></b><br/>
+				</dd>
+			</dl>
+			<dl class="normal done">
+				<dt class="s-num">4</dt>
+				<dd class="s-text">
+				  #if($!isServiceItem=='1')
+				  	待收货
+				  #else
+				       待验收
+				  #end
+				  <s></s><b></b><br/>
+				</dd>
+			</dl>
+			<dl class="normal done">
+				<dt class="s-num">5</dt>
+				<dd class="s-text">
+				  待评价<s></s><b></b><br/>
+				</dd>
+			</dl>
+			#elseif($!tradeOrder.approveStatus=='1'||"$!{tradeOrder.approveStatus}"=="")
+			<dl class="first #if($!tradeOrder.state == 1)doing #elseif($!tradeOrder.state > 1) done #end">
+				<dt class="s-num">1</dt>
+				<dd class="s-text">
+					待付款<s></s><b></b><br/>
+				</dd>
+			</dl>
+			<dl class="normal #if($!tradeOrder.state == 2)doing #elseif($!tradeOrder.state > 2) done #end">
+				<dt class="s-num">2</dt>
+				<dd class="s-text"> 
+				  #if($!isServiceItem=='1')
+				  	待配送
+				  #else
+				  	待服务
+				  #end<s></s><b></b><br/>
+				</dd>
+			</dl>
+			<dl class="normal #if($!tradeOrder.state == 3)doing #elseif($!tradeOrder.state > 3) done #end">
+				<dt class="s-num">3</dt>
+				<dd class="s-text">
+				  #if($!isServiceItem=='1')
+				 	待收货
+				  #else
+				  	待验收
+				  #end<s></s><b></b></dd>
+			</dl>
+			<dl class="normal #if($!tradeOrder.state == 4)doing #elseif($!tradeOrder.state > 4) done #end">
+				<dt class="s-num">4</dt>
+				<dd class="s-text">待评价<s></s><b></b></dd>
+			</dl>
+			<dl class="last #if($!tradeOrder.state == 5)doing#end">
+				<dt class="s-num"><i class="fa-check"></i></dt>
+				<dd class="s-text">完成<s></s><b></b></dd>
+			</dl>
+			#end
+		</div><!--stepflex end -->
+	#end
+      <div class="bg_05 hei_35 border-4 wid_940 mar_cen pad_l10 font_14b">
+      	  订单信息
+      </div>
+      <div class="mar_lr20 min-hei border-6 mar_t10">
+        <h4 class="hei_35">收货人信息</h4>
+        <p class="hei_30">收&nbsp&nbsp货&nbsp&nbsp人：$!tradeOrder.name</p>
+        <p class="hei_30 over_ell" title="$!tradeOrder.fullAddress">地&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp址：$!tradeOrder.fullAddress</p>
+        <p class="hei_30">手机号码：$!tradeOrder.mobile</p>
+        <p class="hei_30 mar_b10">固定号码：$!tradeOrder.phone</p>
+      </div>
+      <div class="mar_lr20 min-hei border-6 mar_t10">
+        <h4 class="hei_30">支付及配送方式</h4>
+		<p class="hei_30">支付类型：#if($!tradeOrder.shipmentType == 1)立即支付#elseif($!tradeOrder.shipmentType == 2)延期付款($!tradeOrder.payPeriod天)#end </p>		
+        <!-- <p class="hei_30">支付方式：#if($!tradeOrder.paymentMethod == 1)个人支付 #elseif($!tradeOrder.paymentMethod == 2)企业支付 #elseif($!tradeOrder.paymentMethod == 3)积分支付#else延期付款 #end </p> -->
+        <p class="hei_30">付款方式：#if($!tradeOrder.paymentType == 0)支付宝#elseif($!tradeOrder.paymentType == 1)京东支付#elseif($!tradeOrder.paymentType == 2)小印支付/INPAY#elseif($!tradeOrder.paymentType == 3)线下付款#elseif($!tradeOrder.paymentType == 4)支付宝其他银行#elseif($!tradeOrder.paymentType == 5||$!tradeOrder.paymentType == 6)微信支付#elseif($!tradeOrder.paymentType == 7)积分支付#elseif($!tradeOrder.paymentType == 8)银联支付#elseif($!tradeOrder.paymentType == 100)支付宝手机端#elseif($!tradeOrder.paymentType == 101)京东支付手机端#end </p>
+        <p class="hei_30">付款时间：$!date.format('yyyy-MM-dd HH:mm:ss ',$!tradeOrder.paymentTime ) &nbsp&nbsp#if($!tradeOrder.paymentTime && $!tradeOrder.paymentType == 2) <a href="javascript:showCiticTrade($!date.format('yyyyMMdd',$!tradeOrder.paymentTime ),'buyer')" class="font_65">银行交易回单打印 </a>#end</p>
+        <p class="hei_30">运&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp费：#if($tradeOrder.freight || $tradeOrder.freight==0)￥$!tradeOrder.freight#end</p>
+		<!-- <p class="hei_30">优&nbsp&nbsp惠&nbsp&nbsp码：$!tradeOrder.promoCode</p> -->
+		<p class="hei_30">备&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp注：$!tradeOrder.memo</p>
+		
+		<p class="hei_35"><span class="fl">设&nbsp&nbsp计&nbsp&nbsp图：</span>
+			<span>
+			#foreach($enclosureDTO in $EnclosureList)
+				#if($enclosureDTO.type == 1 && $!enclosureDTO.enclosureName != "")
+					<a class = "showimg" href='$!imageServerAddr$!enclosureDTO.enclosureUrl' target="_blank">$!enclosureDTO.enclosureName</a>
+					<a class="down" title="下载原图"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				#end
+			#end
+			</span>
+		</p>
+		#if($!projectRemark)
+			<p class="hei_30">备&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp注：$!projectRemark</p>
+		#end
+		<p class="hei_40"><span class="fl">房&nbsp&nbsp型&nbsp&nbsp图：</span>
+			<span class="hei_40 mar_l10 z-upload fl" >
+				<button class="button_4 font_12 border-1 button_small hei_30" id="enclosureButton" type="button">
+			 		文件上传
+			 	</button>
+                <input type="file" id="tradeOrdersEnclosure" class="file-img" name="file" onchange="startUploadEnclosure();" />
+			</span>
+			<span id="enclosureName">
+				#foreach($enclosureDTO in $EnclosureList)
+					#if($enclosureDTO.type == 0 && $!enclosureDTO.enclosureName !="")
+						<span>
+							<a class="showimg" href='$!imageServerAddr$!enclosureDTO.enclosureUrl' target="_blank">$!enclosureDTO.enclosureName</a>
+							<i class="icon-del" title="删除" onclick="delEnclosure(this,'$!enclosureDTO.id')">&nbsp;&nbsp;&nbsp;&nbsp;</i>&nbsp;&nbsp;&nbsp;&nbsp;
+						</span>
+					#end
+				#end
+			</span>
+		</p>
+		<p class="hei_120">
+			<span>备&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp注：</span>
+				<textarea name="remark" maxlength="300" id="remark" class="wid_260 min-hei" placeholder="不能超过300字" style="border:#e8e8e8 1px solid;">$!enclosureRemark</textarea>
+		</p>
+		<p class="hei_60">
+			<span>
+				<button type="button" onclick="addremark()" class="button_2 hei_35 font_14b business_class_show cursor" style="margin:22px 7px 0px -10px;width:110px;padding-right:12px" >保存备注</button>
+     		</span>
+     	</p>
+      </div>
+	  
+	  #if($!tradeOrder.invoice == 2)
+      <div class="mar_lr20 min-hei border-6 mar_t10">
+        <h4 class="hei_30">普通发票信息</h4>
+		#if(!$invoiceDTO.invoiceTitle)
+			<p class="hei_30"><i id="invoice_tip">发票抬头：$!tradeOrder.invoiceTitle</i></p>
+		#else
+			<p class="hei_30"><i id="invoice_tip">发票抬头：$!invoiceDTO.invoiceTitle</i><!--&nbsp;&nbsp;&nbsp;<a href="javascript:showInvoice()" style="color:#ff0000;">点击查看</a>--></p>
+		#end
+      </div>
+	  #end
+	  #if($!tradeOrder.invoice == 3)
+      <div class="mar_lr20 min-hei border-6 mar_t10">
+        <h4 class="hei_30">增值税发票信息</h4>
+        <p class="hei_30"><i id="invoice_tip">单位名称：$!invoiceDTO.companyName</i>&nbsp;&nbsp;&nbsp;<a href="javascript:showInvoice()" style="color:#ff0000;">点击查看</a></p>
+      </div>
+	  #end
+        <!--订单信息开始 -->
+      <div class="right_top mar_cen">
+      	<h4 class="hei_35 wid_950 mar">商品清单</h4>
+          <ul class="list_top bg_08 font_14b wid_950 border-6 mar">
+              <li class="wid_150 font_cen hei_35">商品编号</li>
+              <li class="wid_100 font_cen hei_35">商品图片</li>
+              <li class="wid_180 font_cen hei_35">商品名称</li>
+              <li class="wid_180 font_cen hei_35">商品属性</li>
+              <li class="wid_150 font_cen hei_35">售价</li>
+              <li class="wid_100 font_cen hei_35">商品数量</li>
+              <li class="wid_90 font_cen hei_35">操作</li>
+          </ul>
+         <!--每一笔订单可以循环一下内容 开始-->
+		 #foreach($deliveryType in $!tradeOrder.groupItems.keySet())
+         <div class="wid_950 border-4 mar_cen">
+			<!-- 每一个商品信息 -->
+			#foreach( $item in $!tradeOrder.groupItems.get($deliveryType))
+			<ul class="list_top hei_80 font_14b wid_content">
+                <li class="wid_150 font_cen">
+                  <span>$!item.itemId</span>
+                </li>
+                <li class="wid_100 font_cen">
+					<a href="$request.getContextPath()/productController/details?id=$!item.itemId&skuId=$!item.skuId" target="_blank">
+						<img src="$!imageServerAddr#foreach( $array in $!jsonArray)#if($!array.skuId == $!item.skuId)$!array.skuPicUrl#end#end" width="65" height="40"/>
+					</a>
+                </li>
+                <li class="wid_160 hei_min_80 pad_lr10">
+					<div style="width:160px; padding-bottom:10px; padding-top:30px; text-align:center; ">
+    				    #foreach( $array in $!jsonArray)
+    						#if($!array.skuId == $!item.skuId)
+    							<a href="$request.getContextPath()/productController/details?id=$!item.itemId&skuId=$!item.skuId" target="_blank" title="$!array.itemName">
+    							$!array.itemName
+    							</a>
+    						#end
+    					#end
+                    </div>    
+				</li>
+                <li class="wid_160 hei_min_80 pad_lr10">
+				   <div style="width:160px; padding-bottom:10px; padding-top:30px; text-align:center;" title="#foreach( $array in $!jsonArray)#if($!array.skuId == $!item.skuId)$!array.itemAttrTitle#end#end">
+						#foreach( $array in $!jsonArray)
+    						#if($!array.skuId == $!item.skuId)
+    							#foreach($itemAttrName in $!array.itemAttr)
+                            		<span>
+                    				    $itemAttrName.name :
+                        				#foreach($itemAttrValue in $itemAttrName.values)
+                        					$itemAttrValue.name 
+            							#end
+            						</span>
+									<br>
+                    			#end
+    						#end
+    					#end
+                    </div>     
+				</li>
+                #if($!tradeOrder.paymentMethod == 3)
+					<li class="wid_150 font_cen font_65">$!number.integer($!item.payPrice)积分</li>
+				#else
+					<li class="wid_150 font_cen font_65">￥$!item.payPrice</li>
+				#end
+                
+                <li class="wid_100 font_cen">#set($itemCount =$itemCount + $!item.num)$!item.num</li>
+                <li class="wid_90 font_cen">
+					<!-- <a href="$request.getContextPath()/productController/details?id=$!item.itemId&skuId=$!item.skuId" target="_blank"> -->
+					<button type="button" onclick="todetails('$request.getContextPath()/productController/details?id=$!item.itemId&skuId=$!item.skuId')" class="button_2 hei_35 font_14b business_class_show cursor" style="margin:22px 7px 0px -10px;width:40px;padding-right:12px" >还要买</button>
+					<!--</a> -->
+                </li>
+			</ul>
+			<!-- 套餐单品开始 -->
+			#foreach( $subItem in $!subItemsMap.get($!item.skuId))
+				<ul class="list_top hei_80 font_14b wid_content bg_09" style="border-bottom:1px dashed #e8e8e8;margin-bottom:0px;min-width:950px">
+                    <li class="wid_150 font_cen">
+                      <span>$!subItem.itemId</span>
+                    </li>
+                    <li class="wid_100 font_cen">
+    					<a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank">
+    						<img src="$!imageServerAddr$!subItem.skuPicUrl" width="65" height="40"/>
+    					</a>
+                    </li>
+                    <li class="wid_160 hei_min_80 pad_lr10">
+    					<div style="width:160px; padding-bottom:10px; padding-top:30px; text-align:center; ">
+        				    <a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank" title="$!subItem.itemName">
+    							$!subItem.itemName
+    						</a>
+                        </div>
+    				</li>
+                    <li class="wid_160 hei_min_80 pad_lr10">
+    				   <div style="width:160px; padding-bottom:10px; padding-top:30px; text-align:center;" title="">
+    						#foreach($itemAttrName in $!subItem.itemAttr)
+                        		<span>
+                				    $itemAttrName.name :
+                    				#foreach($itemAttrValue in $itemAttrName.values)
+                    					$itemAttrValue.name 
+        							#end
+        						</span>
+								<br>
+                			#end
+                        </div>
+    				</li>
+                    <li class="wid_150 font_cen font_65">￥$!subItem.skuPrice</li>
+                    
+                    <li class="wid_100 font_cen">$!subItem.num</li>
+                    <li class="wid_90 font_cen">
+    					<!-- <a href="$request.getContextPath()/productController/details?id=$!item.itemId&skuId=$!item.skuId" target="_blank"> -->
+    					<button type="button" onclick="todetails('$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId')" class="button_2 hei_35 font_14b business_class_show cursor" style="margin:22px 7px 0px -10px;width:40px;padding-right:12px" >还要买</button>
+    					<!--</a> -->
+                    </li>
+    			</ul>
+			#end
+			<!-- 套餐单品结束 -->
+			<!-- 基础服务开始 -->
+			#foreach( $subItem in $!basicMap.get($!item.skuId))
+				<ul class="list_top hei_80 font_14b wid_content bg_09" style="border-bottom:1px dashed #e8e8e8;margin-bottom:0px;min-width:950px">
+                    <li class="wid_150 font_cen">
+                      <span>$!subItem.itemId</span>
+                    </li>
+                    <li class="wid_100 font_cen">
+    					<a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank">
+    						<img src="$!imageServerAddr$!subItem.skuPicUrl" width="65" height="40"/>
+    					</a>
+                    </li>
+                    <li class="wid_160 hei_min_80 pad_lr10">
+    					<div style="width:160px; padding-bottom:10px; padding-top:30px; text-align:center; ">
+        				    <a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank" title="$!subItem.itemName">
+    							$!subItem.itemName
+    						</a>
+                        </div>
+    				</li>
+                    <li class="wid_160 hei_min_80 pad_lr10">
+    				   <div style="width:160px; padding-bottom:10px; padding-top:30px; text-align:center;" title="">
+    						#foreach($itemAttrName in $!subItem.itemAttr)
+                        		<span>
+                				    $itemAttrName.name :
+                    				#foreach($itemAttrValue in $itemAttrName.values)
+                    					$itemAttrValue.name 
+        							#end
+        						</span>
+								<br>
+                			#end
+                        </div>
+    				</li>
+                    <li class="wid_150 font_cen font_65">￥$!subItem.skuPrice</li>
+                    
+                    <li class="wid_100 font_cen">$!subItem.num</li>
+                    <li class="wid_90 font_cen">
+    					<!-- <a href="$request.getContextPath()/productController/details?id=$!item.itemId&skuId=$!item.skuId" target="_blank"> -->
+    					<button type="button" onclick="todetails('$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId')" class="button_2 hei_35 font_14b business_class_show cursor" style="margin:22px 7px 0px -10px;width:40px;padding-right:12px" >还要买</button>
+    					<!--</a> -->
+                    </li>
+    			</ul>
+			#end
+			<!-- 基础服务结束 -->
+			<!-- 辅料类型开始 -->
+			#foreach( $subItem in $!auxiliaryMap.get($!item.skuId))
+				<ul class="list_top hei_80 font_14b wid_content bg_09" style="border-bottom:1px dashed #e8e8e8;margin-bottom:0px;min-width:950px">
+                    <li class="wid_150 font_cen">
+                      <span>$!subItem.itemId</span>
+                    </li>
+                    <li class="wid_100 font_cen">
+    					<a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank">
+    						<img src="$!imageServerAddr$!subItem.skuPicUrl" width="65" height="40"/>
+    					</a>
+                    </li>
+                    <li class="wid_160 hei_min_80 pad_lr10">
+    					<div style="width:160px; padding-bottom:10px; padding-top:30px; text-align:center; ">
+        				    <a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank" title="$!subItem.itemName">
+    							$!subItem.itemName
+    						</a>
+                        </div>
+    				</li>
+                    <li class="wid_160 hei_min_80 pad_lr10">
+    				   <div style="width:160px; padding-bottom:10px; padding-top:30px; text-align:center;" title="">
+    						#foreach($itemAttrName in $!subItem.itemAttr)
+                        		<span>
+                				    $itemAttrName.name :
+                    				#foreach($itemAttrValue in $itemAttrName.values)
+                    					$itemAttrValue.name 
+        							#end
+        						</span>
+								<br>
+                			#end
+                        </div>
+    				</li>
+                    <li class="wid_150 font_cen font_65">￥$!subItem.skuPrice</li>
+                    
+                    <li class="wid_100 font_cen">$!subItem.num</li>
+                    <li class="wid_90 font_cen">
+    					<!-- <a href="$request.getContextPath()/productController/details?id=$!item.itemId&skuId=$!item.skuId" target="_blank"> -->
+    					<button type="button" onclick="todetails('$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId')" class="button_2 hei_35 font_14b business_class_show cursor" style="margin:22px 7px 0px -10px;width:40px;padding-right:12px" >还要买</button>
+    					<!--</a> -->
+                    </li>
+    			</ul>
+			#end
+			<!-- 辅料类型结束 -->
+			<!-- 增值服务开始 -->
+			#foreach( $subItem in $!valueAddedMap.get($!item.skuId))
+				<ul class="list_top hei_80 font_14b wid_content bg_09" style="border-bottom:1px dashed #e8e8e8;margin-bottom:0px;min-width:950px">
+                    <li class="wid_150 font_cen">
+                      <span>$!subItem.itemId</span>
+                    </li>
+                    <li class="wid_100 font_cen">
+    					<a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank">
+    						<img src="$!imageServerAddr$!subItem.skuPicUrl" width="65" height="40"/>
+    					</a>
+                    </li>
+                    <li class="wid_160 hei_min_80 pad_lr10">
+    					<div style="width:160px; padding-bottom:10px; padding-top:30px; text-align:center; ">
+        				    <a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank" title="$!subItem.itemName">
+    							$!subItem.itemName
+    						</a>
+                        </div>
+    				</li>
+                    <li class="wid_160 hei_min_80 pad_lr10">
+    				   <div style="width:160px; padding-bottom:10px; padding-top:30px; text-align:center;" title="">
+    						#foreach($itemAttrName in $!subItem.itemAttr)
+                        		<span>
+                				    $itemAttrName.name :
+                    				#foreach($itemAttrValue in $itemAttrName.values)
+                    					$itemAttrValue.name 
+        							#end
+        						</span>
+								<br>
+                			#end
+                        </div>
+    				</li>
+                    <li class="wid_150 font_cen font_65">￥$!subItem.skuPrice</li>
+                    
+                    <li class="wid_100 font_cen">$!subItem.num</li>
+                    <li class="wid_90 font_cen">
+    					<!-- <a href="$request.getContextPath()/productController/details?id=$!item.itemId&skuId=$!item.skuId" target="_blank"> -->
+    					<button type="button" onclick="todetails('$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId')" class="button_2 hei_35 font_14b business_class_show cursor" style="margin:22px 7px 0px -10px;width:40px;padding-right:12px" >还要买</button>
+    					<!--</a> -->
+                    </li>
+    			</ul>
+			#end
+			<!-- 增值服务结束 -->
+			#end
+			<div class="freight">
+                <dl>
+    				<dd>
+        				<span class="wid_70">运送方式：</span>
+                        <span>#if($deliveryType==1)快递#elseif($deliveryType==2)EMS#elseif($deliveryType==3)平邮#else 无#end</span>
+    				</dd>
+    			</dl>
+    		</div>
+        </div>
+		#end
+         <!--每一笔订单可以循环一下内容 结束-->
+    </div><!--right_bot end -->
+    
+       <div class="Order_Review_bottom">
+			<h2><span>共计$itemCount件商品</span><span class="mar_lr20">商品总金额：#if($tradeOrder.totalPrice || $tradeOrder.totalPrice==0)￥$!tradeOrder.totalPrice#else￥0.00#end</span></h2>
+			<dl><dt>优惠金额：</dt><dd>#if($tradeOrder.totalDiscount || $tradeOrder.totalDiscount==0)￥$!tradeOrder.totalDiscount #else ￥0.00 #end</dd></dl>
+			<dl><dt>运费金额：</dt><dd>#if($tradeOrder.freight || $tradeOrder.freight==0)￥$!tradeOrder.freight #else ￥0.00 #end</dd></dl>
+			<!--<dl><dt>积分抵扣：</dt><dd>#if($totalIntegralDiscount || $totalIntegralDiscount==0)￥$!totalIntegralDiscount #else ￥0.00 #end</dd></dl>-->
+			<div class="clear"></div>
+			<dl><dt><b>支付金额：</b></dt><dd><i class="font_fe font_14b">
+				#if($!tradeOrder.paymentMethod == 3)
+					$!tradeOrder.integral积分
+				#else
+					￥$!tradeOrder.paymentPrice
+				#end
+			</i></dd></dl>
+      </div>    
+      <div class="clear"></div> 
+    <!--下面订单信息 Order_Review end -->
+</div>
+
+
+<!--#main end -->
+<!-- 发票信息 开始-->
+<div class="po_fai moban js_invoice" style="display:none;">
+    <div class="po_fai_bg"></div>
+    <div class="po_main" style="z-index:100">
+    	<div class="hei_32 bg_05 pad_l10 "><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor js_invoice_cancle"></i>发票信息</div>
+		<!--普通发票-->
+		#if($invoiceDTO.invoice==2)
+        <div id="invoice_title">
+			<dl class="wid_500 hei_40 mar_t20 po_re">
+    			<dt class="fl hei_30 wid_100 font_right"><i class="demo-icons font_fs">*</i>发票抬头：</dt>
+    			<dd class="fl hei_30 wid_350">
+    				<input type="text" class="input_Style2 hei_30" value="$!invoiceDTO.invoiceTitle" id="invoiceTitle_" maxlength="30" style="width:200px;line-height:24px;height:26px"/>
+					<span id="invoiceTitle_errorMsg" style="color:red;padding-top: 14px;"></span>
+    			</dd>
+			</dl>
+			<div class="mar_tb10 mar_r20 font_cen" style="display:none">
+    			<button class="button_1 hei_30 js_invoice_edit" style="width:90px">编辑</button>
+    			<button class="button_1 hei_30 js_invoice_submit" style="width:90px;margin-left:10px;">保存</button>
+    			<button class="button_5 hei_30 mar_l10 demo-icons js_invoice_cancle">取消</button>
+    		</div>
+		</div>
+		#end
+		<!--增值税发票-->
+		#if($invoiceDTO.invoice==3)
+		<div id="addedValueTaxInvoice" style="height:350px;overflow-y: auto;">
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right">发票内容：</dt>
+    			<dd class="fl hei_30">
+					<span>明细</span>
+    			</dd>
+			</dl>
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs">*</i>单位名称：</dt>
+    			<dd class="fl hei_30 wid_350">
+    				<input type="text" class="input_Style2 hei_30" value="$!invoiceDTO.companyName" id="companyName_" maxlength="30" style="width:200px;line-height:24px;height:26px"/>
+					<span id="companyName_errorMsg" style="color:red;padding-top: 14px;"></span>
+    			</dd>
+			</dl>
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs">*</i>纳税人识别码：</dt>
+    			<dd class="fl hei_30 wid_350">
+    				<input type="text" class="input_Style2 hei_30" value="$!invoiceDTO.taxpayerCode" id="taxpayerCode_" maxlength="20" style="width:200px;line-height:24px;height:26px"/>
+					<span id="taxpayerCode_errorMsg" style="color:red;padding-top: 14px;"></span>
+    			</dd>
+			</dl>
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs">*</i>注册地址：</dt>
+    			<dd class="fl hei_30 wid_350">
+    				<input type="text" class="input_Style2 hei_30" value="$!invoiceDTO.registeredAddress" id="registeredAddress_" maxlength="50" style="width:200px;line-height:24px;height:26px"/>
+					<span id="registeredAddress_errorMsg" style="color:red;padding-top: 14px;"></span>
+    			</dd>
+			</dl>
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs">*</i>注册电话：</dt>
+    			<dd class="fl hei_30 wid_350">
+    				<input type="text" class="input_Style2 hei_30" value="$!invoiceDTO.registeredPhone" id="registeredPhone_" maxlength="50" style="width:200px;line-height:24px;height:26px"/>
+					<span id="registeredPhone_errorMsg" style="color:red;padding-top: 14px;"></span>
+    			</dd>
+			</dl>
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs">*</i>开户银行：</dt>
+    			<dd class="fl hei_30 wid_350">
+    				<input type="text" class="input_Style2 hei_30" value="$!invoiceDTO.bankName" id="bankName_" maxlength="50" style="width:200px;line-height:24px;height:26px"/>
+					<span id="bankName_errorMsg" style="color:red;padding-top: 14px;"></span>
+    			</dd>
+			</dl>
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs">*</i>银行账户：</dt>
+    			<dd class="fl hei_30 wid_350">
+    				<input type="text" class="input_Style2 hei_30" value="$!invoiceDTO.bankAccount" id="bankAccount_" maxlength="50" style="width:200px;line-height:24px;height:26px"/>
+					<span id="bankAccount_errorMsg" style="color:red;padding-top: 14px;"></span>
+    			</dd>
+			</dl>
+			#foreach( $picUrl in $invoiceDTO.businessLicensePicUrl )
+				<dl class="wid_500 hei_40 mar_t20 po_re">
+        			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs"></i>营业执照：</dt>
+					<dd class="fl hei_30">
+    					<img id="businessLicenseImg$velocityCount" src="$!imageServerAddr$!picUrl"
+                         alt="" width="55" height="55" class="mar_lr10 fl po_re_img" title="点击查看大图">
+						 <input type="hidden" id="businessLicensePicUrl_$velocityCount" value="$!picUrl">
+					</dd>
+                    <dd class="fl">
+                        <p class="hei_40 fl z-upload">
+                            <button type="button" class="button_4 font_12 border-1 button_small">上传图片</button>
+                            <input type="file" id="businessLicenseFile$velocityCount" class="file-img" name="file" onchange="startUpload('businessLicenseFile$velocityCount','businessLicenseImg$velocityCount','businessLicensePicUrl_$velocityCount')">
+                        </p>
+						<span id="businessLicensePicUrl_errorMsg$velocityCount" style="color:red;padding-top: 14px;"></span>
+                    </dd>
+    			</dl>
+			#end
+			#foreach( $picUrl in $invoiceDTO.taxRegistrationCertificatePicUrl )
+				<dl class="wid_500 hei_40 mar_t20 po_re">
+        			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs"></i>税务登记证：</dt>
+					<dd class="fl hei_30">
+    					<img id="taxRegistrationCertificateImg$velocityCount" src="$!imageServerAddr$!picUrl"
+                         alt="" width="55" height="55" class="mar_lr10 fl po_re_img" title="点击查看大图">
+						 <input type="hidden" id="taxRegistrationCertificatePicUrl_$velocityCount" value="$!picUrl">
+					</dd>
+                    <dd class="fl">
+						<p class="hei_40 fl z-upload">
+                            <button type="button" class="button_4 font_12 border-1 button_small">上传图片</button>
+                            <input type="file" id="taxRegistrationCertificateFile$velocityCount" class="file-img" name="file" onchange="startUpload('taxRegistrationCertificateFile$velocityCount','taxRegistrationCertificateImg$velocityCount','taxRegistrationCertificatePicUrl_$velocityCount')">
+                        </p>
+						<span id="taxRegistrationCertificatePicUrl_errorMsg$velocityCount" style="color:red;padding-top: 14px;"></span>
+					</dd>
+    			</dl>
+			#end
+			#foreach( $picUrl in $invoiceDTO.generalTaxpayerPicUrl )
+				<dl class="wid_500 hei_40 mar_t20 po_re">
+        			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs"></i>一般纳税人证明：</dt>
+					<dd class="fl hei_30">
+    					<img id="generalTaxpayerImg$velocityCount" src="$!imageServerAddr$!picUrl"
+                         alt="" width="55" height="55" class="mar_lr10 fl po_re_img" title="点击查看大图">
+						 <input type="hidden" id="generalTaxpayerPicUrl_$velocityCount" value="$!picUrl">
+					</dd>
+                    <dd class="fl">
+						<p class="hei_40 fl z-upload">
+                            <button type="button" class="button_4 font_12 border-1 button_small">上传图片</button>
+                            <input type="file" id="generalTaxpayerFile$velocityCount" class="file-img" name="file" onchange="startUpload('generalTaxpayerFile$velocityCount','generalTaxpayerImg$velocityCount','generalTaxpayerPicUrl_$velocityCount')">
+                        </p>
+						<span id="generalTaxpayerPicUrl_errorMsg$velocityCount" style="color:red;padding-top: 14px;"></span>
+					</dd>
+    			</dl>
+			#end
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs">*</i>收票人姓名：</dt>
+    			<dd class="fl hei_30 wid_350">
+    				<input type="text" class="input_Style2 hei_30" value="$!invoiceDTO.consigneeName" id="consigneeName_" maxlength="50" style="width:200px;line-height:24px;height:26px"/>
+					<span id="consigneeName_errorMsg" style="color:red;padding-top: 14px;"></span>
+    			</dd>
+			</dl>
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs">*</i>收票人手机：</dt>
+    			<dd class="fl hei_30 wid_350">
+    				<input type="text" class="input_Style2 hei_30" value="$!invoiceDTO.consigneeMobile" id="consigneeMobile_" maxlength="50" style="width:200px;line-height:24px;height:26px"/>
+					<span id="consigneeMobile_errorMsg" style="color:red;padding-top: 14px;"></span>
+    			</dd>
+			</dl>
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs">*</i>收票人省份：</dt>
+                <dd class="fl hei_30">
+    				<select id="invoice_province" class="wid_80 select">
+						<option value="">请选择</option>
+					</select>
+					<i>-</i>
+    				<select id="invoice_city" class="wid_80 select">
+						<option value="">请选择</option>
+					</select>
+					<i>-</i>
+    				<select id="invoice_county" class="wid_80 select">
+						<option value="">请选择</option>
+					</select>
+					<span id="invoice_province_errorMsg" style="color:red;padding-top: 14px;"></span>
+				</dd>
+			</dl>
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs">*</i>详细地址：</dt>
+    			<dd class="fl hei_30 wid_350">
+    				<input type="text" class="input_Style2 hei_30" value="$!invoiceDTO.detailAddress" id="detailAddress_" maxlength="50" style="width:200px;line-height:24px;height:26px"/>
+					<span id="detailAddress_errorMsg" style="color:red;padding-top: 14px;"></span>
+    			</dd>
+			</dl>
+			<div class="mar_tb10 mar_r20 font_cen" style="display:none">
+				#if($!tradeOrder.state == 1 || $!tradeOrder.state == 2)
+    			<button class="button_1 hei_30 js_invoice_edit" style="width:90px">编辑</button>
+    			<button class="button_1 hei_30 js_invoice_submit" style="width:90px;margin-left:10px;">保存</button>
+				#end
+    			<button class="button_5 hei_30 mar_l10 demo-icons js_invoice_cancle">取消</button>
+    		</div>
+			#end
+        </div>
+    </div>
+</div>
+<!-- 发票信息 end -->
+
+<!-- 弹出层  交易信息列表DIV -->
+#parse("/bank/citic_trade_index.vm")

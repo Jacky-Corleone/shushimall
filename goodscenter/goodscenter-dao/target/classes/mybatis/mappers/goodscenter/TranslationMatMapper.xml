@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.goodscenter.dao.TranslationMatDAO">
+	<resultMap id="translationMatMapper" type="com.camelot.goodscenter.dto.TranslationMatDTO">
+			<result property="id" column="id" />
+			<result property="translationNo" column="translation_no" />
+			<result property="matCd" column="mat_cd" />
+			<result property="matDesc" column="mat_desc" />
+			<result property="matAttribute" column="mat_attribute"/>
+			<result property="lable1Cd" column="lable1_cd" />
+			<result property="lable1Desc" column="lable1_desc" />
+			<result property="lable2Cd" column="lable2_cd" />
+			<result property="lable2Desc" column="lable2_desc" />
+			<result property="lable3Cd" column="lable3_cd" />
+			<result property="lable3Desc" column="lable3_desc" />
+			<result property="matSpec" column="mat_spec" />
+			<result property="matBrand" column="mat_brand" />
+			<result property="matDiscount" column="mat_discount" />
+			<result property="matPrice" column="mat_price" />
+			<result property="matUnit" column="mat_unit" />
+		    <result property="quantity" column="quantity" />
+			<result property="beginDate" column="begin_date" />
+			<result property="endDate" column="end_date" />
+			<result property="printerId" column="printer_id" />
+			<result property="supplierId" column="supplier_id" />
+			<result property="shopId" column="shop_id" />
+			<result property="beginDate" column="begin_date" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="status" column="status" />
+			<result property="activeFlag" column="active_flag" />
+			<result property="categoryId" column="category_id" />
+	</resultMap>
+	
+	<sql id="where">
+		<where>
+			<if test="translationMat.id != null and translationMat.id != '' ">
+				and  translationMat.id = #{translationMat.id}
+			</if>
+			<if test="translationMat.translationNo != null and translationMat.translationNo != '' ">
+				and  translationMat.translation_no = #{translationMat.translationNo}
+			</if>
+			<if test="translationMat.matCd != null and translationMat.matCd != '' ">
+				and  translationMat.mat_cd = #{translationMat.matCd}
+			</if>
+			<if test="translationMat.matAttribute != null and translationMat.matAttribute != '' ">
+				and  translationMat.mat_attribute = #{translationMat.matAttribute}
+			</if>
+			<if test="translationMat.matDesc != null and translationMat.matDesc != '' ">
+				and translationMat.mat_desc like CONCAT('%',#{translationMat.matDesc},'%')
+			</if>
+			<if test="translationMat.lable1Cd != null and translationMat.lable1Cd != '' ">
+				and  translationMat.lable1_cd = #{translationMat.lable1Cd}
+			</if>
+			<if test="translationMat.lable1Desc != null and translationMat.lable1Desc != '' ">
+				and  translationMat.lable1_desc = #{translationMat.lable1Desc}
+			</if>
+			<if test="translationMat.lable2Cd != null and translationMat.lable2Cd != '' ">
+				and  translationMat.lable2_cd = #{translationMat.lable2Cd}
+			</if>
+			<if test="translationMat.lable2Desc != null and translationMat.lable2Desc != '' ">
+				and  translationMat.lable2_desc = #{translationMat.lable2Desc}
+			</if>
+			<if test="translationMat.lable3Cd != null and translationMat.lable3Cd != '' ">
+				and  translationMat.lable3_cd = #{translationMat.lable3Cd}
+			</if>
+			<if test="translationMat.lable3Desc != null and translationMat.lable3Desc != '' ">
+				and  translationMat.lable3_desc = #{translationMat.lable3Desc}
+			</if>
+			<if test="translationMat.matSpec != null and translationMat.matSpec != '' ">
+				and  translationMat.mat_spec = #{translationMat.matSpec}
+			</if>
+			<if test="translationMat.matBrand != null and translationMat.matBrand != '' ">
+				and  translationMat.mat_brand = #{translationMat.matBrand}
+			</if>
+			<if test="translationMat.matDiscount != null and translationMat.matDiscount != '' ">
+				and  translationMat.mat_discount = #{translationMat.matDiscount}
+			</if>
+			<if test="translationMat.matPrice != null and translationMat.matPrice != '' ">
+				and  translationMat.mat_price = #{translationMat.matPrice}
+			</if>
+			<if test="translationMat.matUnit != null and translationMat.matUnit != '' ">
+				and  translationMat.mat_unit = #{translationMat.matUnit}
+			</if>
+			<if test="translationMat.beginDate != null and translationMat.beginDate != '' ">
+				<![CDATA[and  translationMat.begin_date <= #{translationMat.beginDate}]]>
+			</if>
+			<if test="translationMat.endDate != null and translationMat.endDate != '' ">
+				<![CDATA[and  translationMat.end_date >= #{translationMat.endDate}]]>
+			</if>
+			<if test="translationMat.printerId != null and translationMat.printerId != '' ">
+				and  translationMat.printer_id = #{translationMat.printerId}
+			</if>
+			<if test="translationMat.supplierId != null and translationMat.supplierId != '' ">
+				and  translationMat.supplier_id = #{translationMat.supplierId}
+			</if>
+			<if test="translationMat.shopId != null and translationMat.shopId != '' ">
+				and  translationMat.shop_id = #{translationMat.shopId}
+			</if>
+			<if test="translationMat.createBy != null and translationMat.createBy != '' ">
+				and  translationMat.create_by = #{translationMat.createBy}
+			</if>
+			<if test="translationMat.createDate != null and translationMat.createDate != '' ">
+				and  translationMat.create_date = #{translationMat.createDate}
+			</if>
+			<if test="translationMat.updateBy != null and translationMat.updateBy != '' ">
+				and  translationMat.update_by = #{translationMat.updateBy}
+			</if>
+			<if test="translationMat.updateDate != null and translationMat.updateDate != '' ">
+				and  translationMat.update_date = #{translationMat.updateDate}
+			</if>
+			<if test="translationMat.status != null and translationMat.status != '' ">
+				and  translationMat.status = #{translationMat.status}
+			</if>
+
+			<if test="translationMat.activeFlag != null and translationMat.activeFlag != '' ">
+				and  translationMat.active_flag = #{translationMat.activeFlag}
+			</if>
+		</where>
+	</sql>
+	
+	<select id="queryPage" resultType="map">
+		SELECT
+		*
+		FROM
+		translation_mat translationMat
+		LEFT JOIN item_category itemCategory
+		ON translationMat.category_id = itemCategory.cid 
+		<include refid="where"/>
+		ORDER BY translationMat.mat_price ASC
+		limit #{pager.pageOffset},#{pager.rows}
+	</select>
+	
+	<select id="queryPageCount" resultType="long">
+		select count(0) from translation_mat translationMat
+		<include refid="where"/>
+	</select>
+	
+	<select id="findById" resultMap="translationMatMapper" >
+		select * from translation_mat translationMat
+		where id = #{id}
+	</select>
+
+	<select id="findByTranslationMatDTO" resultMap="translationMatMapper">
+		select * from translation_mat translationMat
+		<include refid="where"/>
+	</select>
+	<insert id="insert" parameterType="com.camelot.goodscenter.dto.TranslationMatDTO" useGeneratedKeys="true" keyProperty="id">
+		insert into translation_mat(
+				id,
+				translation_no,
+				mat_cd,
+				mat_desc,
+				mat_attribute,
+				lable1_cd,
+				lable1_desc,
+				lable2_cd,
+				lable2_desc,
+				lable3_cd,
+				lable3_desc,
+				mat_spec,
+				mat_brand,
+				mat_discount,
+				mat_price,
+				mat_unit,
+				quantity,
+				begin_date,
+				end_date,
+				printer_id,
+				supplier_id,
+				shop_id,
+				create_by,
+				create_date,
+				update_by,
+				update_date,
+				status,
+				active_flag,
+				category_id
+		)values(
+				#{id},
+				#{translationNo},
+				#{matCd},
+				#{matDesc},
+				#{matAttribute},
+				#{lable1Cd},
+				#{lable1Desc},
+				#{lable2Cd},
+				#{lable2Desc},
+				#{lable3Cd},
+				#{lable3Desc},
+				#{matSpec},
+				#{matBrand},
+				#{matDiscount},
+				#{matPrice},
+				#{matUnit},
+				#{quantity},
+				#{beginDate},
+				#{endDate},
+				#{printerId},
+				#{supplierId},
+				#{shopId},
+				SYSDATE(),
+				#{createDate},
+				#{updateBy},
+				#{updateDate},
+				#{status},
+				#{activeFlag},
+				#{categoryId}
+		)
+	</insert>
+	
+	<update id="update">
+		update translation_mat set
+				id = #{id},
+				translation_no = #{translationNo},
+				mat_cd = #{matCd},
+				mat_attribute=#{matAttribute},
+				mat_desc = #{matDesc},
+				lable1_cd = #{lable1Cd},
+				lable1_desc = #{lable1Desc},
+				lable2_cd = #{lable2Cd},
+				lable2_desc = #{lable2Desc},
+				lable3_cd = #{lable3Cd},
+				lable3_desc = #{lable3Desc},
+				mat_spec = #{matSpec},
+				mat_brand = #{matBrand},
+				mat_discount = #{matDiscount},
+				mat_price = #{matPrice},
+				mat_unit = #{matUnit},
+				quantity=#{quantity},
+				begin_date=#{beginDate},
+				end_date=#{beginDate},
+				printer_id = #{printerId},
+				supplier_id = #{supplierId},
+				create_by = #{createBy},
+				create_date = #{createDate},
+				update_by = #{updateBy},
+				update_date = #{updateDate},
+				status=#{status},
+				active_flag = #{activeFlag}
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from translation_mat
+		<if test=" codes != null and codes.size() > 0 ">
+			where id in
+			<foreach collection="codes" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test=" codes == null or codes.size() == 0 ">
+			where 1 = 3
+		</if>
+	</delete>
+	
+	<select id="findAll" resultType="map">
+		select * from translation_mat translationMat
+		LEFT JOIN item_category itemCategory
+		ON translationMat.category_id = itemCategory.cid
+		<include refid="where"/>
+	</select>
+</mapper>

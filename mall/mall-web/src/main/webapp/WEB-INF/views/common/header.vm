@@ -1,0 +1,103 @@
+#parse("/common/header_top.vm")
+<script type="text/javascript" src="$staticPath/js/respond.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+       // $("#loginArea").load("$request.contextPath/loginFragement");
+
+
+        // 左侧导航菜单
+        $(".Nav_classify").load("$request.contextPath/allCategory");
+
+        $("[module='$!module']").addClass("first_current");
+
+       
+        $("#buyer").on("mouseenter",function(){
+            $("#loginArea").load("$request.contextPath/loginFragement?type=buyer");
+            $("#loginArea").show();
+            $(this).addClass("Nav_focus");
+            $("#seller").removeClass();
+        });
+        $("#seller").on("mouseenter",function(){
+            $("#loginArea").load("$request.contextPath/loginFragement?type=seller");
+            $("#loginArea").show();
+            $(this).addClass("Nav_focus");
+            $("#buyer").removeClass();
+        });
+        $("#loadcenter").on("mouseleave",function(){
+            $("#loginArea").hide();
+            $("#seller").removeClass();
+            $("#buyer").removeClass();
+        });
+    });
+    
+    function top_banner(){
+        $("#top_banner").slideUp("slow");
+    }
+
+   
+	function closeMenu(){
+		$.cookie('clicked_menu', null, {path:'/'});
+	}
+
+</script>
+<div id="top_banner" class="top_banner" style="display:none;">
+    <div class="top_img  po_re">
+        <a class="adVisitCount cursor" target="_blank">
+            <img src="" width="1450px" height="80px"/>
+        </a>
+        <i class="fa-times-circle po_ab font_ff font_16 cancel" onclick="top_banner()"></i>
+    </div>
+</div>
+#parse("/common/search.vm")
+
+<!--导航菜单开始-->
+<div class="Nav_bg">
+    <div class="Nav" >
+        <div class="Nav_left po_re wid_200 fl bj_1" style='background: #00a2ea;'>
+            <h2 class="all_select text_c">
+                <a href="$request.contextPath/categoryes" class='dispi text_wl'>
+                   	所有商品分类
+                    <i class="fa fa-angle-down" style='font-size:18px;'></i>
+                </a>
+            </h2>
+            <div class="Nav_classify hide">
+
+            </div>
+
+        </div>
+
+
+
+        <div class="menu_mid_new">
+            <ul class="fl">
+            	
+            
+                <li module="index"><a href="$request.contextPath/">首页</a></li>
+                <!-- <li module="pmarket"><a href="$request.contextPath/productController/categoryItems">产品商城<i class='menu_hot1 menu_hot_box'>N</i>  </a></li>
+                <li module="bmarket"><a href="$request.contextPath/brandMarket">服务商城</a></li>
+                <li module="umarket"><a href="$request.contextPath/usedMarket">聚优惠<i class='menu_hot2 menu_hot_box'>H</i></a></li>
+                <li module="umarket"><a href="$request.contextPath/usedMarket">舒适攻略</a></li>
+                <li module="umarket"><a href="$request.contextPath/usedMarket">咨询中心</a></li> -->
+                <!--<li module="umarket"><a href="$request.contextPath/usedMarket">服务支持</a></li>-->
+                <!--<li module="umarket"><a href="$request.contextPath/centralPurchasing">集采活动</a></li>-->
+                <!--<li module="umarket"><a href="$request.contextPath/coupons">优惠券</a></li>-->
+                <!--<li module="umarket"><a href="$request.contextPath/integralMall">积分商城</a></li>-->
+                <!--<li module="umarket"><a href="http://screenprint.printhome.com">网印 +</a></li>-->
+                <!--
+                <li currentClass="first_current"><a href="javascript:void(0);">平台活动</a></li>
+                -->
+            </ul>
+        </div>
+       <!--
+        <div id="loadcenter" class="fr wid_300 Nav_right po_re ">
+            <h2 id="buyer" ><i class="demo-icons fa-unlock font_16 mar_r10"></i><a href="$request.contextPath/buyercenter/loadBuyerCenter" onclick="closeMenu()">个人中心</a></h2>
+            <b class="fl">|</b>
+            <h2 id="seller" ><i class="demo-icons fa-unlock-alt font_16 mar_r10"></i><a href="$request.contextPath/information/informationSeller/initLoad" onclick="closeMenu()">卖家中心</a></h2>
+            <div id="loginArea" class="loginArea border-4 po_ab box-shadow1 hide" style="display: none;margin-top: -2px;">
+                <img src="$staticPath/images/loading-1j.gif">
+            </div>
+        </div>
+        -->
+    </div>
+</div>
+<!--导航菜单结束-->

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.payment.dao.BankSettleDetailDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="bankSettleDetailMap" type="bankSettleDetail">
+		<result property="id" column="ID"/>
+		<result property="outTradeNo" column="out_trade_no"/>
+		<result property="orderAmount" column="order_amount"/>
+		<result property="factorage" column="factorage"/>
+		<result property="orderStatus" column="order_status"/>
+		<result property="liquidateStatus" column="liquidate_status"/>
+		<result property="completedTime" column="completed_time"/>
+		<result property="callBankTime" column="call_bank_time"/>
+		<result property="bankType" column="bank_type"/>
+		<result property="dealFlag" column="deal_flag"/>
+		<result property="remark1" column="remark1"/>
+		<result property="remark2" column="remark2"/>
+		<result property="createId" column="create_id"/>
+		<result property="created" column="created"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			ID
+ 			,out_trade_no
+ 			,order_amount
+ 			,factorage
+ 			,order_status
+ 			,liquidate_status
+ 			,completed_time
+ 			,call_bank_time
+ 			,bank_type
+ 			,deal_flag
+ 			,remark1
+ 			,remark2
+ 			,create_id
+ 			,created
+		FROM 
+		bank_settle_detail bank_settle_detail_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.outTradeNo != null  and entity.outTradeNo !=''">
+				<![CDATA[ and bank_settle_detail_.out_trade_no  =#{entity.outTradeNo} ]]>
+			</if>
+			<if test="entity.orderStatus != null  and entity.orderStatus !=''">
+				<![CDATA[ and bank_settle_detail_.order_status  =#{entity.orderStatus} ]]>
+			</if>
+			<if test="entity.liquidateStatus != null  and entity.liquidateStatus !=''">
+				<![CDATA[ and bank_settle_detail_.liquidate_status  =#{entity.liquidateStatus} ]]>
+			</if>
+			<if test="entity.bankType != null  and entity.bankType !=''">
+				<![CDATA[ and bank_settle_detail_.bank_type  =#{entity.bankType} ]]>
+			</if>
+			<if test="entity.dealFlag != null  and entity.dealFlag !=''">
+				<![CDATA[ and bank_settle_detail_.deal_flag  =#{entity.dealFlag} ]]>
+			</if>
+			<if test="entity.comletedTimeStart !=null and entity.comletedTimeStart != ''">
+			
+				<![CDATA[ and date_format(bank_settle_detail_.completed_time,'%Y-%m-%d')  >= date_format(#{entity.comletedTimeStart},'%Y-%m-%d')]]>
+			</if>
+			<if test="entity.comletedTimeEnd !=null and entity.comletedTimeEnd != ''">
+			
+				<![CDATA[ and date_format(bank_settle_detail_.completed_time,'%Y-%m-%d')  <= date_format(#{entity.comletedTimeEnd},'%Y-%m-%d')]]>
+			</if>
+		</if>
+		 ORDER BY bank_settle_detail_.created DESC
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="bankSettleDetailMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		bank_settle_detail bank_settle_detail_
+		<include refid="where_fragement" />
+	</select>
+	<select id="selectBankSettleByOutTradeNo" resultMap="bankSettleDetailMap" >
+		<include refid="selectAllColumns" /> where bank_settle_detail_.out_trade_no=#{outTradeNo}
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="adds">
+		insert into bank_settle_detail (
+		    	 out_trade_no
+		    	 ,order_amount
+		    	 ,factorage
+		    	 ,order_status
+		    	 ,liquidate_status
+		    	 ,completed_time
+		    	 ,call_bank_time
+		    	 ,bank_type
+		    	 ,remark1
+		    	 ,remark2
+		    	 ,create_id
+		    	 ,created
+		   )values
+	   <foreach collection="listBankSettleDetail" item="item" index="index"  open="" close="" separator=",">  
+	    	(
+	    	#{item.outTradeNo}
+	    	,#{item.orderAmount}
+	    	,#{item.factorage}
+	    	,#{item.orderStatus}
+	    	,#{item.liquidateStatus}
+	    	,#{item.completedTime}
+	    	,#{item.callBankTime}
+	    	,#{item.bankType}
+	    	,#{item.remark1}
+	    	,#{item.remark2}
+	    	,#{item.createId}
+	    	,now()
+	    	)
+	   </foreach> 
+	</insert>
+	
+	<update id="updateDealByOutTradeNo" >
+		update bank_settle_detail set deal_flag =''
+		 where out_trade_no = #{outTradeNo}
+	</update>
+	
+</mapper>

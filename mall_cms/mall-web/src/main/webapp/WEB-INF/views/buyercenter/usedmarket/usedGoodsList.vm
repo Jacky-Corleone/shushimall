@@ -1,0 +1,339 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+<script type="text/javascript" src="$staticPath/js/common.js"></script>
+<script type="text/javascript">
+
+	var usedgoodlist = {
+		
+		initEvent:{
+			initPage:function()
+			{
+				this.initItemCategoryLevelOne();
+				this.initItemCategoryLevelTwo();
+				this.initCheckAllBox();
+			},
+			initItemCategoryLevelOne:function()
+			{
+				$("#itemCategoryLevelOne").bind("change",function(){
+					usedgoodlist.doCatLevelchange('itemCategoryLevelOne');
+				});
+			},
+			
+			initItemCategoryLevelTwo:function()
+			{
+				$("#itemCategoryLevelTwo").bind("change",function(){
+					usedgoodlist.doCatLevelchange('itemCategoryLevelTwo');
+				});
+			},
+			initCheckAllBox:function()
+			{
+				$("#all_select").bind('click', function()
+				{
+					usedgoodlist.doAllCheckBox();
+				});
+			}
+		},
+		
+		doCatLevelchange:function(lev)
+		{
+			//一级类目改变
+			if(lev == 'itemCategoryLevelOne')
+			{
+				$("#itemCategoryLevelTwo").empty();
+				$("#itemCategoryLevelThree").empty();
+				$("#itemCategoryLevelThree").append($("<option>").text("三级分类").val(""));
+				if(!$("#itemCategoryLevelOne").val()){
+					$("#itemCategoryLevelTwo").append($("<option>").text("二级分类").val(""));
+				}else{
+					optionItems("$request.contextPath/usedMarket/getShopCategory", $("#itemCategoryLevelOne").val(), "itemCategoryLevelTwo", "-1", "categoryCName", "categoryCid");
+				}
+				//二级类目改变
+			}else if(lev == 'itemCategoryLevelTwo')
+			{
+				$("#itemCategoryLevelThree").empty();
+				if(!$("#itemCategoryLevelTwo").val()){
+					$("#itemCategoryLevelThree").append($("<option>").text("三级分类").val(""));
+				}else{
+					optionItems("$request.contextPath/usedMarket/getShopCategory", $("#itemCategoryLevelTwo").val(), "itemCategoryLevelThree", "-1", "categoryCName", "categoryCid");
+				}
+			}
+		},
+	
+		doAllCheckBox:function()
+		{
+			$('input:checkbox[name="itemId"]').prop('checked', $('#all_select')[0].checked);
+		},
+		
+		//查看或编辑二手商品
+		initRelease:function(itemId, opr)
+		{
+			window.open("$request.contextPath/secondGoods/initRelease?id="+itemId+"&releaseState=" + opr);
+		},
+		
+		//批量更新
+		publishMore:function(status)
+		{
+			var checkboxs = $("input[name='itemId']:checked")
+			if(checkboxs.length == 0){
+				this.showDiv('showErrorMsg');
+			}else{
+			  var checks = "";
+			  var message = "";
+			  //获取选中的所有商品
+			  $("input:checkbox[name='itemId']").each(function(){
+		         if($(this).is(':checked')){
+		        	 //判断选中商品的状态
+		        	 var itemStatus = $(this).attr("itemStatus");
+		        	 var itemName = $(this).attr("itemName");
+		        	 //上架判断
+		        	 if(itemStatus != '3' && itemStatus != '5' && status == '4'){
+		        		 message += "【"+itemName+"】 ";
+		        	 }
+		        	 if(itemStatus != '4' && status == '5'){
+		        		 message += "【"+itemName+"】 ";
+		        	 }
+		        	//动态拼取选中的checkbox的值，用“,”符号分隔
+		        	 if(checks != ""){
+		        		 checks += ",";
+		        	 }
+		             checks += $(this).val();           
+		         }
+		      })
+		      if(message != ""){
+		    	  alert("商品"+message+"不允许执行此操作！");
+		    	  return false;
+		      }
+			  if(checks != ""){
+				  this.publish(checks,status);
+			  }
+		   }
+		},
+		
+		//上下架: 4:上架,5:下架，8：删除
+		publish:function(itemIds,status){
+			if(status == 8 && !confirm('是否确认删除?'))
+			{
+				return;
+			}
+			$.ajax({
+				type:'post',
+				url:'$request.contextPath/usedMarket/goodsPublish',
+				dataType:'json',
+				data:{
+					itemIdStr:itemIds,
+					status:status
+				},
+				success:function(result){
+					alert(result.message);
+					window.location.href="$request.contextPath/usedMarket/usedGoodsList";
+				}
+			});
+		},
+		
+		hideDiv:function(id){
+			$("#"+id).hide();
+		},
+		
+		showDiv:function(id){
+			$("#"+id).show();
+		}
+		
+	};
+	
+	//到指定的分页页面
+	function topage(page){
+		//form.page.value=page;
+		$("#page").val(page);
+		$("#searchForm").submit();
+	}
+
+	$(function(){
+		//加载左侧菜单
+		$("#leftBuyer").load("$request.contextPath/leftBuyer");
+		usedgoodlist.initEvent.initPage();
+	});
+	
+
+</script>
+<div id="main">
+<!--中间部分开始-->
+<div id="leftBuyer" class="border-4">
+</div><!--left end -->
+<!--右边部分开始-->
+<div id="right">
+    <div id="right_top" class="right_top border-4 bg_06">
+	<form method="post" id="searchForm" action="$request.contextPath/usedMarket/usedGoodsList">
+		<input type="hidden" name="page" id="page" />
+		<div class="right_top_l">
+			<ul class="list">
+				<li class="wid_250">
+					<span class="font_wid mar_l30">商品名称：</span><input value="$!itemOldDTO.itemName" class="input_Style2 wid_120 hei_30" type="text" name="itemName"/>
+				</li>
+				<li class="wid_250">
+					<span class="font_wid mar_l30">商品编码：</span><input value="$!itemOldDTO.itemId" onkeyup="numInput(this,0)" onbeforepaste="numInput(this,0)" type="text" maxlength="10" class="input_Style2 wid_120 hei_30" name="itemId" />
+				</li>
+				<li>
+					<span class="font_wid mar_l30">所属类目：</span>
+					<select class="input_Style2 hei_30 wid_95" id="itemCategoryLevelOne" name="firstLevelC">
+		        		<option value="">一级分类</option>
+		        		 #foreach( $itemCategoryDTO in $firstItemCategoryDTOList) 
+		                   	 <option #if($!itemCategoryDTO.categoryCid == $!firstLevlC) selected="selected" #end value="$!itemCategoryDTO.categoryCid">$!itemCategoryDTO.categoryCName</option>
+						 #end
+		        	</select>
+		        	<select class="input_Style2 hei_30 wid_95" id="itemCategoryLevelTwo" name="secondLevelC">
+		        		<option value="">二级分类</option>
+		        		 #foreach( $itemCategoryDTO in $secondItemCategoryDTOList) 
+		                   	 <option #if($!itemCategoryDTO.categoryCid == $!secondLevelC) selected="selected" #end value="$!itemCategoryDTO.categoryCid">$!itemCategoryDTO.categoryCName</option>
+						 #end
+		        	</select>
+		        	<select class="input_Style2 hei_30 wid_90" id="itemCategoryLevelThree" name="cid">
+		        		<option value="">三级分类</option>
+		        		#foreach( $itemCategoryDTO in $thirdItemCategoryDTOList) 
+		                   	 <option #if($!itemCategoryDTO.categoryCid == $!itemOldDTO.cid) selected="selected" #end value="$!itemCategoryDTO.categoryCid">$!itemCategoryDTO.categoryCName</option>
+						 #end
+		        	</select>
+				</li>
+				<li><span class="font_wid">商品状态：</span>
+					<select name="status" class="input_Style2 wid_90 mar_r10 hei_35 ">
+						<option value="">请选择</option>
+						<option value="2" #if($!itemOldDTO.status == 2) selected="selected" #end>待审核</option>
+						<option value="3" #if($!itemOldDTO.status == 3) selected="selected" #end>待上架</option>
+						<option value="4" #if($!itemOldDTO.status == 4) selected="selected" #end>在售</option>
+						<option value="5" #if($!itemOldDTO.status == 5) selected="selected" #end>已下架</option>
+						<option value="20" #if($!itemOldDTO.status == 20) selected="selected" #end>审核驳回</option>
+					</select>
+				</li>		
+			</ul>
+		</div>
+    </form>
+		<div class="right_top_r ">
+			<button type="button" class="button_4 but_cx1" onclick="topage(1)">
+				<a class="font_1c hei_24" >查 询</a>
+			</button>
+		</div>
+	</div>
+	<!-- right结束 -->
+
+	<div id="right_bot" class="right_bot border-4 mar_t10 bg_06">
+    <!-- 商品列表开头 -->
+		<div class="right_xinxi mar_l14">
+		
+			<ul class="list_top bg_08 font_14b">
+				<li class="wid_120 font_cen hei_35">商品编码</li>
+				<li class="wid_270 font_cen hei_35">商品图片名称</li>
+				<li class="wid_140 font_cen hei_35">所属类目</li>
+				<li class="wid_120  hei_35 font_cen">原价</li>
+				<li class="wid_120  hei_35 font_cen">当前价</li>
+				<li class="wid_90 font_cen hei_35">商品状态</li>
+				<li class="wid_90 font_cen hei_35">操作</li>
+			</ul>
+			
+			<ul class="right_select">
+		        <li><input type="checkbox" class="mar_l10 hei_22" id="all_select"/>全选</li>
+		        <li><button type="button" class="button_4 mar_l10 hei_24" onclick="usedgoodlist.publishMore(4);">批量上架</button></li>
+		        <li><button type="button" class="button_4 mar_l10 hei_24" onclick="usedgoodlist.publishMore(5);">批量下架</button></li>
+		    </ul>
+      
+      <!-- 商品信息 -->
+      <table class="information" id="information ">
+		#foreach($goods in $pager.records)
+		<tr>
+          <td class="wid_120 border-1 hei_60" style="width:117px">
+            <input type="checkbox" value="$!goods.itemId" name="itemId" itemName="$!goods.itemName" itemStatus="$!goods.status" />
+            $!goods.itemId
+          </td>
+          <td class="hei_60 border-1 border-12" style="width:80px">
+          	<a style="cursor: pointer;" href='$request.contextPath/usedMarket/details?id=$!goods.itemId'">
+          		<img style="cursor: pointer;" src="$!imageServerAddr$!goods.imgUrl" width="75" height="50"/>
+             </a>
+          </td>
+          <td class="wid_190 border-6 border-9" style="width:185px">$!goods.itemName</td>
+          <!-- 所属类目 -->
+          <td class="wid_140 border-1 font_cen" style="width:137px">$!goods.cName</td>
+          <td class="wid_120 border-1 font_cen" style="width:117px">
+          	$!goods.priceOld
+          </td>
+          <td class="wid_120 border-1 font_cen " style="width:117px">$!goods.price</td>
+          <td class="wid_90 border-1 font_cen" style="width:87px">
+          	#if($!goods.status == 1)
+          		未发布
+			#elseif($!goods.status == 2)
+				待审核
+			#elseif($!goods.status == 3)
+				待上架
+			#elseif($!goods.status == 4)
+				在售
+			#elseif($!goods.status == 5)
+				已下架
+			#elseif($!goods.status == 6)
+				锁定
+			#elseif($!goods.status == 7)
+				申请解锁
+			#elseif($!goods.status == 20)
+				审核驳回
+			#end
+          </td>
+          <td class="wid_90 border-1 " style="width:87px">
+          	<p class="mar_l32 wid_30">
+          		<!--上架状态-->
+         		#if($goods.status == 4)
+					<a class="font_1c" style="cursor:pointer" onclick="usedgoodlist.publish($!goods.itemId,5);">下架</a>
+					<br/>
+					<a class="font_1c" style="cursor: pointer;" onclick="usedgoodlist.initRelease($!goods.itemId, 'view');">查看</a>
+				<!-- 下架状态 -->
+				#elseif($goods.status == 5)
+					<a class="font_1c" style="cursor:pointer" onclick="usedgoodlist.publish($!goods.itemId,4);">上架</a>
+					<br/>
+					<a class="font_1c" style="cursor: pointer;" onclick="usedgoodlist.initRelease($!goods.itemId, 'edit');">编辑</a>
+          			<br/>
+          			<a class="font_1c" style="cursor: pointer;" onclick="usedgoodlist.initRelease($!goods.itemId, 'view');">查看</a>
+          			<br/>
+          			<a class="font_1c" style="cursor:pointer" onclick="usedgoodlist.publish($!goods.itemId,8);">删除</a>
+          		<!-- 待审核状态 -->
+          		#elseif($goods.status == 2)
+          			<a class="font_1c" style="cursor: pointer;" onclick="usedgoodlist.initRelease($!goods.itemId, 'view');">查看</a>
+          		<!-- 待上架状态 -->
+          		#elseif($goods.status == 3)
+          			<a class="font_1c" style="cursor:pointer" onclick="usedgoodlist.publish($!goods.itemId,4);">上架</a>
+					<br/>
+					<a class="font_1c" style="cursor: pointer;" onclick="usedgoodlist.initRelease($!goods.itemId, 'edit');">编辑</a>
+          			<br/>
+          			<a class="font_1c" style="cursor: pointer;" onclick="usedgoodlist.initRelease($!goods.itemId, 'view');">查看</a>
+          			<br/>
+          			<a class="font_1c" style="cursor:pointer" onclick="usedgoodlist.publish($!goods.itemId,8);">删除</a>
+          		<!-- 审核驳回 -->
+          		#elseif($goods.status == 20)
+					<a class="font_1c" style="cursor: pointer;" onclick="usedgoodlist.initRelease($!goods.itemId, 'edit');">编辑</a>
+          			<br/>
+          			<a class="font_1c" style="cursor: pointer;" onclick="usedgoodlist.initRelease($!goods.itemId, 'view');">查看</a>
+          			<br/>
+          			<a class="font_1c" style="cursor:pointer" onclick="usedgoodlist.publish($!goods.itemId,8);">删除</a>
+				#end
+          	</p>
+          </td>
+		</tr>
+		#end
+      </table>
+      #pageVelocity($pager)
+      <div class="clear"></div>
+	  </div>
+	</div>
+      
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->
+
+<!--以下为弹出层-->
+<div class="po_fai" id="showErrorMsg" style="display:none">
+    <div class="po_fai_bg"></div>
+    <div class="po_main1">
+      <div class="tit bg_05 hei_30 pad_l10">提示</div>
+    <ul>
+        <li>请选择需要设置的商品！</li>
+        <li><button type="button" class="button_1 hei_35" onclick="usedgoodlist.hideDiv('showErrorMsg')" id="showMsgBtn">确定</button></li>
+    </ul>
+  </div>
+</div>
+<!--以上为弹出层-->
+
+

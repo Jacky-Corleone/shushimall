@@ -1,0 +1,716 @@
+#set($layout = "common/order.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>订单管理</title>
+#parse("common/scriptAndCss.vm")
+<script type="text/javascript">
+// $(document).ready(function(){
+// 	$("#wrapper").scroll(function(){alert("asdf");});
+// });
+$(document).ready(function(){
+	//pageSize,url,totalItem, appendId,selectElement,data, ,callback
+	var Num = $("#orderStatus").val();
+	var url = "$request.contextPath/orderWx/toOrderSubmit?orderSource=$!{orderSource}&orderStatus="+Num;
+	var totalItem = '$!{totalItem}';
+	$.dropDownFresh('3',url, totalItem , "myTab0_Content" + Num,"wrapper");
+});
+$(document).ready(function(){
+	if("buyers"=='$!{orderSource}'){
+		changeIconToRed(2);
+	}else{
+		changeIconToRed(3);
+	}
+});
+
+$(document).ready(function(){
+	var orderStatus = $!{orderStatus};
+	if(orderStatus){
+		var obj = $("#myTab0 :eq(" + orderStatus + ")")[0];
+// 		console.debug("obj",obj);
+		changeOrderStatus(obj, orderStatus);
+	}
+});
+
+$(document).ready(function(){
+	var ind = $("#orderStatus").val();
+	$("#myTab0_Content0").hide();
+	$("#myTab0").find("li").each(function () {
+         if ($(this).find("class").context.className == 'active') {
+        	 changeOrderStatus($("#myTab0").find("li[class='active']")[0],ind);
+             ind ++;
+         }
+     });
+});
+//html5 无刷新改变页面的url
+function changeURL(Num){
+    var url = "$request.contextPath/orderWx/toOrderSubmitByStatue?orderSource=$!{orderSource}&orderStatus="+Num;
+    window.history.pushState({},0,url);      
+}
+
+function changeOrderStatus(thisObj, Num){
+	changeURL(Num);
+	addLoadMask();
+	$("#myTab0_Content5")[0].style.display = "none";
+	
+// 	if (thisObj.className == "active")
+// 		return;
+	var tabObj = thisObj.parentNode.id;
+	var tabList = document.getElementById(tabObj).getElementsByTagName("li");
+	for (i = 0; i < tabList.length; i++) {
+		if (i == Num) {//选中
+			//订单状态 1:待付款，2：待配送，3：待确认送货，4：待评价，5：已完成 
+			$.ajax({
+			   type: "POST",
+			   url: "$request.contextPath/orderWx/toOrderSubmit?orderSource=$!{orderSource}&orderStatus="+Num,
+			   dataType: "html",
+			   success: function(data){
+				   if(data.replace(/\s+/g,"") == ""){
+					   data = "<div id='nothing' style='margin-right: 40%;'>"
+					   		+ "<ul class='pad_lr5'>"
+					   		+ "<li class='hei_32'><p class='fr'>没有更多订单了..</p></li>"
+					   		+ "</ul></div>";
+				   }
+				   
+				   if("0"==Num){
+					   var obj = $(".pad_lr5");
+					   console.debug("obj",obj);
+					   $("#"+tabObj + "_Content" + Num).empty().append(obj[0].outerHTML).append(data);
+					   $("#myTab0_Content0").show();
+				   }else{
+					   $("#"+tabObj + "_Content" + Num).empty().append(data);
+				   }
+				   
+				   var url = "$request.contextPath/orderWx/toOrderSubmit?orderSource=$!{orderSource}&orderStatus="+Num;
+				   var totalItem = $("#totalItem").val();
+// 				   alert("totalItem="+totalItem);
+				   $.dropDownFresh('3',url, totalItem , "myTab0_Content" + Num,"wrapper");
+				   removeLoadMask();
+			   }
+			});
+			thisObj.className = "active";
+			document.getElementById(tabObj + "_Content" + i).style.display = "block";
+		} else {//未选中
+			tabList[i].className = "normal";
+			document.getElementById(tabObj + "_Content" + i).style.display = "none";
+			if('0'==Num){
+				var obj = $(".pad_lr5");
+				$("#"+tabObj + "_Content" + Num).empty().append(obj[0].outerHTML);
+			}else{
+				$("#"+tabObj + "_Content" + Num).empty();
+			}
+		}
+	}
+}
+
+//查询待审核的协议订单
+function queryNeedApprove(){
+	for(var i = 1 ;i<5 ; i++){
+		$("#myTab0_Content"+i)[0].style.display = "none"; 
+	}
+	
+	$("#myTab0_Content5")[0].style.display = "block";
+	
+	$.ajax({
+	   type: "POST",
+	   url: "$request.contextPath/orderWx/queryApprove?approve=loadApprove",
+	   dataType: "html",
+	   success: function(data){
+		   $("#myTab0_Content0").children(".pad_lr5").not("ul").remove();
+		   $("#myTab0_Content5").empty().append(data);
+	   },
+	   error:function(){
+		   alert("系统出错...");
+	   }
+	});
+}
+//查询待确认的订单
+function queryNeedConfirm(){
+	for(var i = 1 ;i<5 ; i++){
+		$("#myTab0_Content"+i)[0].style.display = "none"; 
+	}
+	
+	$("#myTab0_Content5")[0].style.display = "block";
+	
+	$.ajax({
+	   type: "POST",
+	   url: "$request.contextPath/orderWx/queryNeedConfirm",
+	   dataType: "html",
+	   success: function(data){
+		   console.debug(data);
+// 		   var obj = $(".mar_lr5");
+// 		   $("myTab0_Content5").empty().append(obj[0].outerHTML).append(data);
+
+		   $("#myTab0_Content0").children(".pad_lr5").not("ul").remove();
+		   $("#myTab0_Content5").empty().append(data);
+	   },
+	   error:function(){
+		   alert("系统出错...");
+	   }
+	});
+}
+
+//审核
+function approve(orderId,value){
+	if("待审核"==value){
+		$.ajax({
+		   type: "POST",
+		   url: "$request.contextPath/orderWx/approveContractOrder?orderId="+orderId,
+		   dataType: "text",
+		   success: function(data){
+			   if("true"==data){
+				   $("#approve").text("已审核");
+			   }else{
+				   alert("审核失败");
+			   }
+		   },
+		   error:function(){
+			   alert("系统出错...");
+		   }
+		});
+	}else{
+		alert("已审核");
+	}
+}
+//确认
+function needConfirm(orderId,value){
+	if("待确认"==value){
+		$.ajax({
+		   type: "POST",
+		   url: "$request.contextPath/orderWx/confirmContractOrder?orderId="+orderId,
+		   dataType: "text",
+		   success: function(data){
+			   if("true"==data){
+				   $("#confirm").text("已确认");
+			   }else{
+				   alert("确认失败");
+			   }
+		   }
+		});
+	}else{
+		alert("已确认");
+	}
+}
+//退款
+function refund(orderId,value){
+	window.location.href="$request.contextPath/orderWx/refund?orderId="+orderId;
+}
+
+//订单状态处理
+function cancleOrder(obj, orderId, orderStatus){
+	kltconfirm("确认要取消订单吗？",function(){
+		if("已取消"==$(obj).text()){
+			toast("订单已取消");
+			return false;
+		}
+		addLoadMask();
+    	 $.ajax({
+ 			type: "POST",
+ 			dataType: "text",
+ 			url: "$request.getContextPath()/orderWx/cancelOrder",
+ 			data: {
+ 				orderId: orderId,
+ 				orderStatus: orderStatus
+ 			},
+ 			success: function(data){
+ 				data = eval("("+data+")");
+ 				console.debug(JSON.stringify(data));
+ 				if(data.success){
+ 					$("#"+orderId).text("已取消");
+ 					console.debug($(obj).parent().children("button").not("#orderDetail"));
+ 					$(obj).parent().children("button").not("#orderDetail").remove();
+ 					var qx = $("#myTab0 :eq(" + 6 + ")")[0];
+ 					changeOrderStatus(qx, 6);
+ 					removeLoadMask();
+ 				}else{
+ 					alert(data.errorMessages);
+ 				}
+ 			}
+ 		});
+	});
+	return false;
+}
+//付款
+function pay(orderId,paymentPrice){
+	window.location.href="$request.contextPath/person/pay?orderNo="+orderId+"&paymentPrice="+paymentPrice;
+}
+//买家和卖家的评价
+function initTrading(orderId,userType){
+	window.location.href="$request.getContextPath()/orderWx/initTrading?orderId="+orderId+"&userType="+userType;
+}
+//查看退款进度
+function refundSubmitSucc(orderId,returnId){
+	window.location.href="$request.getContextPath()/orderWx/refundSubmitSucc?returnId="+returnId+"&orderSource=$!{orderSource}";
+}
+
+//查看物流信息
+function addLogistics(obj, orderId ,logisticsNo, logisticsCompany,flag){//flag=1 填写物流   flag=2 查看物流
+// 	$("#logisticsNo").val(logisticsNo);
+// 	$("#logisticsCompany").val(logisticsCompany);
+// 	alert(encodeURI(logisticsCompany));
+// 	alert(encodeURI(encodeURI(logisticsCompany)));
+// 	return false;
+	window.location.href="$request.getContextPath()/orderWx/addLogistics?logisticsNo="+logisticsNo+"&logisticsCompany="+encodeURI(encodeURI(logisticsCompany))+"&orderId="+orderId+"&flag="+flag;
+
+}
+//订单详情
+function orderDetail(orderId){
+	window.location.href="$request.getContextPath()/orderWx/queryOrderInfoBuyer?orderId="+orderId+"&orderSource=$!{orderSource}";
+}
+function orderDetailApprove(orderId){
+	window.location.href="$request.getContextPath()/orderWx/queryOrderInfoBuyer?orderId="+orderId+"&approve=true";
+}
+//确认收货
+function openBomb(orderId, refund,paymentPrice){
+	if(refund==2){
+		kltconfirm("您申请的退款/退货正在处理中，点击“确认收货”会关闭卖家未处理或拒绝退款的申请，请确认是否继续？",function(){	
+			$("#orderId_pay").val(orderId);
+			$("#pPrice").text(paymentPrice);
+			$("#divPay").show();
+			$("#refund").val(refund);
+		});
+	}else{
+		$("#orderId_pay").val(orderId);
+		$("#pPrice").text(paymentPrice);
+		$("#divPay").show();
+		$("#refund").val(refund);
+	}
+}
+//确认收货
+function confirmReceipt(){
+	var orderId = $("#orderId_pay").val();
+	var paypwd = $("#paypwd").val();
+	if(orderId==null || $.trim(orderId)==""){
+// 		alert("请指定要操作的订单");
+		$("#payerror").html("请指定要操作的订单");
+		return;
+	}
+	if(paypwd==null || $.trim(paypwd)==""){
+// 		alert("请输入支付密码");
+		$("#payerror").html("请输入支付密码");
+		return;
+	}
+	
+	closeBomb();
+	kltconfirm("点击确定之后，您的付款将直接到卖家账户里，请务必收到货后再确定",function(){	
+		$.ajax({
+			type: "POST",
+			dataType: "text",
+			url: "$request.getContextPath()/orderWx/confirmReceipt",
+			data: {
+				orderId: orderId,
+				paypwd: paypwd
+			},
+			success: function(data){
+				var data = eval("("+data+")");
+				if(data.success){
+					window.location.href="$request.getContextPath()/orderWx/toOrderSubmit?orderSource=$!{orderSource}";
+				}else{
+					$("#divPay").show();
+					$("#payerror").html(data.errorMessages);
+				}
+			}
+		});
+	});
+	
+}
+
+function closeBomb(){
+	$("#divPay").hide();
+}
+
+//确定发货
+function orderStatusHandle(obj, orderId, state, refund){
+	var param = {};
+    param.callback = function () {
+    	window.location.href="$request.contextPath/orderWx/toOrderSubmit?orderSource=saler";
+    };
+    registerGoBack(param);
+	if(refund==2){
+		kltconfirm("点击确认发货将关闭您未同意的退款申请，请谨慎操作，是否继续？",function(){	
+			$.ajax({
+				type: "POST",
+				dataType: "json",
+				url: "$request.getContextPath()/orderWx/deliverOrder",
+				data: {
+					orderId: orderId,
+					state: state
+				},
+				success: function(data){
+					if(data.success){
+						var obj = $("#myTab0 :eq(" + 3 + ")")[0];
+						changeOrderStatus(obj, 3);
+					}
+				}
+			});
+		});
+	}else{
+		kltconfirm("您确定要发货吗？",function(){
+			$.ajax({
+				type: "POST",
+				dataType: "json",
+				url: "$request.getContextPath()/orderWx/deliverOrder",
+				data: {
+					orderId: orderId,
+					state: state
+				},
+				success: function(data){
+					if(data.success){
+						var obj = $("#myTab0 :eq(" + 3 + ")")[0];
+						changeOrderStatus(obj, 3);
+					}
+				}
+			});
+		});
+	}
+}
+//确认付款
+function confirmPayment(obj, orderId){
+	
+	if("已收款"==$(obj).text()){
+		alert("订单已收款");
+		return false;
+	}
+	
+	var param = {};
+    param.callback = function () {
+    	window.location.href="$request.contextPath/orderWx/toOrderSubmit?orderSource=saler";
+    };
+    registerGoBack(param);
+    
+	
+	kltconfirm("请确认您是否收到了货款？",function(){
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "$request.getContextPath()/orderWx/modifyOrderPayStatus",
+			data: {
+				orderId: orderId,
+				paymentType: 3
+			},
+			success: function(data){
+				if(data.success){
+// 					window.location.href="$request.getContextPath()/orderWx/toOrderSubmitByStatue?orderStatus=2&orderSource=$!{orderSource}";
+// 				var orderStatus = $!{orderStatus};
+// 				if(orderStatus){
+					var obj = $("#myTab0 :eq(" + 2 + ")")[0];
+			// 		console.debug("obj",obj);
+					changeOrderStatus(obj, 2);
+// 				}
+// 					$("#"+orderId).text("已收款");
+// 					$(obj).text("已收款");
+				}else{
+					alert("失败："+data.errorMessages);
+				}
+				
+			}
+		});
+	});
+}
+//点击  申请退款/退货   申请售后   查看进度  跳转到新页面
+function fuck(fuckStatus){
+	var status = 1;
+	if("待付款" == fuckStatus){
+		status = 1;
+	}else if("待配送" == fuckStatus){
+		status = 2;
+	}else if("待收货" == fuckStatus){
+		status = 3;
+	}else if("待评价" == fuckStatus){
+		status = 4;
+	}else if("已完成" == fuckStatus){
+		status = 5;
+	}else if("已取消" == fuckStatus){
+		status = 6;
+	}else if("待审核" == fuckStatus){
+		status = 7;
+	}else if("待确认" == fuckStatus){
+		status = 8;
+	}
+	window.location.href="$request.getContextPath()/orderWx/toOrderSubmit?orderSource=$!{orderSource}&fuckStatus="+status;
+}
+
+//申请退换货和申请售后
+function refundAgreement(orderId){
+	window.location.href="$request.getContextPath()/orderWx/refundAgreement?orderId="+orderId;
+}
+
+//查看详情
+function refundSubmitSuccDetail(orderId,refundId){
+	if("buyers"=='$!{orderSource}'){
+		window.location.href="$request.getContextPath()/orderWx/refundInfoBuyer?returnGoodId="+refundId;
+	}else{
+		window.location.href="$request.getContextPath()/orderWx/refundInfoSeller?returnGoodId="+refundId;
+	}
+}
+
+//审核通过
+function approveSubmit(orderId,status,parentId){
+	if(window.confirm("您确定要审核通过吗？")){
+		$.ajax({
+			url:"$request.contextPath/orderWx/approveSubmit",
+			type:"post",
+			dataType:"text",
+			data:{
+				orderId:orderId,
+				status:status,
+				parentId:parentId
+			},
+			success:function(data){
+				data = eval("("+data+")");
+				alert(data.msg);
+				$("input[name='approveStatus']").val(0);
+				$("#queryForm").submit();
+			},
+			error:function(data){
+				alert(data.msg);
+				$("input[name='approveStatus']").val(0);
+				$("#queryForm").submit();
+			}
+		});
+	};
+}
+
+//审核驳回
+function approveReject(orderId,status){
+	$("#rejectDiv").show();
+	$("#orderId").val(orderId);
+	$("#status").val(status);
+}
+
+function actionSet(){
+	var orderId=$("#orderId").val();
+	var status=$("#status").val();
+	var reason=$("#reasonId").val();
+	if($.trim(reason)==""){
+		alert("请填写驳回原因！");
+	}else{
+		$.ajax({
+			url:"$request.contextPath/orderWx/approveReject",
+			type:"post",
+			data:{
+				orderId:orderId,
+				status:status,
+				reason:reason
+			},
+			dataType: "text",
+			success:function(data){
+				data = eval("("+data+")");
+				$("#rejectDiv").hide();
+				alert(data.msg);
+				$("input[name='approveStatus']").val(0);
+				$("#queryForm").submit();
+			},
+			error:function(data){
+// 				$("#rejectDiv").hide();
+// 				alert(data.msg);
+				data = eval("("+data+")");
+				$("#errorMsg").html(data.msg);
+				$("input[name='approveStatus']").val(0);
+				$("#queryForm").submit();
+			}
+		});
+	}
+}
+
+function hideSetDiv(){
+	$("#rejectDiv").hide();
+}
+
+function showDiv(id,content){
+    $("#contentId").html(content);
+	$("#"+id).show();
+}
+
+function hideDiv(){
+	$("#rejectReasonId").hide();
+}
+</script>
+<script type="text/javascript" src="$request.contextPath/assets/js/dropDownFresh/dropDownFresh.js"></script>
+</head>
+<body>
+<div id="main" class="bg_02 po_re">
+
+	##parse("common/headerWx.vm")
+	<div class="block po_ab" style="display: none" id="divPay">
+	    <div class="block_bg"></div>
+		<div class="block_box po_ab">
+			<input type="hidden" id="orderId_pay" value="" />
+			<input type="hidden" id="orderStatus" value="${orderStatus}" />
+	        <p class="hei_34 border_2 mar_t20" style="display:none" id="pPrice">3.99</p>
+	        <div class="clear"></div>
+	        	请输入确认收货密码（注：与支付密码相同）<p class="mar_t10"><input type="password" class="hei_32 wid_87" id="paypwd"/> </p>
+	        	<ul><li class="msg font_14" id="payerror" style="color: red;"></li></ul>
+	        <p class="font_cen mar_cen"><button class="button_2 wid_30 hei_34" onclick="closeBomb();">取消</button><button class="button_2 wid_30 hei_34 mar_l2" onclick="confirmReceipt();">提交</button></p>
+	    </div>
+    </div>
+  <div class="nTab " style="padding-bottom: -10px">
+            <!-- 标题开始 -->
+            <div class="TabTitle bg_01" >
+              <ul id="myTab0" class="myTab2 ">
+<!--               订单状态 1:待付款，2：待配送，3：待确认送货，4：待评价，5：已完成  -->
+                <li class="active" onclick="changeOrderStatus(this,0);">全部</li>
+                <li class="normal" onclick="changeOrderStatus(this,1);">待付款</li>
+                <li class="normal" onclick="changeOrderStatus(this,2);">待配送</li>
+                <li class="normal" onclick="changeOrderStatus(this,3);">待收货</li>
+                <li class="normal" onclick="changeOrderStatus(this,4);">待评价</li>
+              </ul>
+            </div><!-- 标题开始 end-->
+            </div>
+    <!-- 中间内容 -->
+    <div class="TabContent po_ab" style="top:40px;left:0px;right:0px;bottom:0px;">
+     <div class="content" id="wrapper" style="overflow-x:hidden;">
+        
+            <!-- 内容开始 -->
+            <div class="TabContent mar_t10" style="margin-top: -5px">
+                <!-- 切换内容    1   -->     
+                <div id="myTab0_Content0">
+                    <ul class="pad_lr5"></ul>
+                    #if("0"==${orderStatus})
+	                    #parse("order/order_submit_detail.vm")
+                    #end
+                </div><!-- 切换内容    1   -->  
+                <!-- 切换内容    1   -->     
+                <div id="myTab0_Content1" class="none">
+                    #if("1"==${orderStatus})
+	                    #parse("order/order_submit_detail.vm")
+                    #end
+                </div><!-- 切换内容    1   -->  
+                <!-- 切换内容    1   -->     
+                <div id="myTab0_Content2" class="none">
+                    #if("2"==${orderStatus})
+	                    #parse("order/order_submit_detail.vm")
+                    #end
+                </div><!-- 切换内容    1   -->  
+                <!-- 切换内容    1   -->     
+                <div id="myTab0_Content3" class="none"> 
+                    #if("3"==${orderStatus})
+	                    #parse("order/order_submit_detail.vm")
+                    #end
+                </div><!-- 切换内容    1   -->  
+                <!-- 切换内容    1   -->     
+                <div id="myTab0_Content4" class="none"> 
+                    #if("4"==${orderStatus})
+	                    #parse("order/order_submit_detail.vm")
+                    #end
+                </div><!-- 切换内容    1   -->  
+                
+                
+                <div id="myTab0_Content5" class="none"> 
+                    #parse("order/order_submit_detail.vm")
+                </div>
+            </div>
+        </div>
+     </div>
+   </div><!-- 中间内容 end-->
+   <!--===========================添加物流信息DIV start================================-->
+<div id="deliveryAddPage_div" class="bombbox moban js_logistics" style="display: none; position: fixed;">
+    <!-- 物流信息 开始-->
+    <div class="po_main">
+    	<div class="hei_32 bg_02 pad_l5 ">物流信息</div>
+        <input type="hidden" id="deliveryOrderItemId" value="">
+        <input type="hidden" id="deliveryItemId" value="">
+        <input type="hidden" id="deliveryOrderId" value="">
+        <input type="hidden" id="deliveryShopFreightTemplateId" value="">
+		<ul class="wid_20 hei_45 mar_t20 pad_l5 po_re">
+          <li>
+            <span style="display:inline-block; width:20%; text-align:right;">物流编号：</span>
+            <input type="text" class="wid_150 hei_30 input_Style2" id="deliveryNumber" name="deliveryNumber" maxlength="30" onblur="checkOrderCode(this)" onkeyup="this.value=this.value.replace(/[^A-Za-z0-9]/g,'')">
+          </li>
+       	</ul>
+		<ul class="wid_20 hei_45 mar_t20 pad_l5 po_re">
+          <li>
+          	<span style="display:inline-block; width:20%; text-align:right;">物流公司：</span>
+            <input type="hidden" id="deliveryCompanyCode" name="deliveryCompanyCode" value="">
+				<input type="text" class="wid_150 input_Style2 hei_30 cursor" value="" onclick="getDeliveryCompany(1)" readonly="true" placeholder="点击此处选择物流公司" id="deliveryCompanyName" name="deliveryCompanyName">
+          </li>
+		</ul>
+		<ul class="wid_20 hei_45 mar_t20 pad_l5 po_re">
+          <li>
+          	<span style="display:inline-block; width:20%; text-align:right; float:left;">备注：</span>
+            <textarea class="input_Style2 wid_350 hei_60 mar_r10" style="width:60%;" id="deliveryRemark" maxlength="100" placeholder="不能超过100字" rows="4"></textarea>
+          </li>		
+		</ul>
+		<ul class="wid_20 hei_45 mar_t20 pad_l5 po_re">
+			<li class="fl wid_250 font_right" style="height:30px;">是否将物流应用到相同运费模版的其他商品：</li>
+			<li class="fl">
+				<input type="radio" style="height:30px;" class="radio_Style2 wid_20 mar_r10 font_right" id="isSametemplate_yes" name="isSametemplate" value="yes"><span style="height:30px;">是</span>
+				<input type="radio" style="height:30px;" class="radio_Style2 wid_20 mar_r10 font_right" id="isSametemplate_no" name="isSametemplate" value="no"><span style="height:30px;">否</span>
+			</li>
+		</ul>
+		<ul class="wid_500 hei_30 po_re">
+			<span style="color:red;margin-left: 10px;">提示：单独编辑商品物流信息时，请选择“否”。</span>
+		</ul>
+		<div class=" mar_tb10 mar_r20 font_cen">
+			<button class="button_1 hei_30 js_logistics_submit" style="padding:2% 10%;">确定</button>
+			<button class="button_5 hei_30 mar_l10 demo-icons js_logistics_cancle" style="padding:2% 10%;"><a href="#">取消</a></button>
+		</div>
+    </div>
+    <!-- 物流信息 end -->
+    
+    <!--========================物流信息DIV内部，物流公司列表信息DIV start==============-->
+    <input id="contextPath" type="hidden" value="$request.getContextPath()">
+    <div class="" id="DeliveryCompanyDIV" style="display:none; position:fixed; top:10%; left:5%; z-index:999; width:90%; height:80%; background:#fff; box-shadow:0px 0px 15px #ccc;">
+	    <div class="po_main_Mess pad_t10">
+	        <ul class="t_ul">
+				<li>
+			        <span style="display:inline-block; width:30%; text-align:right;">物流公司名称：</span>
+			        <input type="text" class="input_Style2 hei_30 cursor" id="deliveryCompany_DIV" name="deliveryCompany_DIV" placeholder="请输入名称">
+			        <span class="button" onclick="getDeliveryCompany(1)">查询</span>
+			  </li>
+			</ul>
+	        <!--标题 end -->
+	        <div id="partBDetail">
+	        
+	        </div>
+	        <!--内容div end -->
+	    </div>
+	    <!--po_main_Mess end-->
+	</div>
+	<!--========================物流信息DIV内部，物流公司列表信息DIV end==============-->
+</div>
+<!--===========================添加物流信息DIV end================================-->
+
+
+<!--===========================查看物流信息DIV start================================-->
+<div class="bombbox moban js_logistics_buyer" style="display: none; position: fixed;">
+    <div class="po_main" >
+    	<div class="hei_32 bg_02 pad_l5">物流信息</div>
+        <input type="hidden" id="deliveryOrderItemId_buyer" value=""/>
+        <ul class="wid_20 hei_45 mar_t10 pad_l5 po_re">
+          <li>
+            <span style="display:inline-block; width:20%; text-align:right;">物流编号：</span>
+            <input type="text" readonly="true" class="wid_150 hei_30 input_Style2" id="deliveryNumber_buyer" name="deliveryNumber">
+          </li>
+       	</ul>
+       	<ul class="wid_20 hei_45 mar_t10 pad_l5 po_re">
+          <li>
+          	<span style="display:inline-block; width:20%; text-align:right;">物流公司：</span>
+            <input type="text" readonly="true" class="wid_150 input_Style2" id="deliveryCompanyName_buyer" name="deliveryCompanyName" value="" />
+          </li>
+		</ul>
+		<ul class="wid_20 hei_45 mar_t10 pad_l5 po_re">
+          <li>
+          	<span style="display:inline-block; width:20%; text-align:right; float:left;">备注：</span>
+            <span class="" id="deliveryRemark_buyer"/></span>
+          </li>		
+		</ul>
+		<div class="mar_b10">
+    		<div style="max-height: 200px;overflow-y: auto;min-height: 100px;">
+    			<ul class='list_top font_7b information' id="deliveryMessage_buyer"></ul>
+    		</div>
+        </div>
+		<br/>
+		<div class=" mar_tb10 mar_r20 font_cen">
+			<button class="button_1 hei_30 js_logistics_cancle_buyer" style="padding:2% 10%;">确定</button>
+		</div>
+    </div>
+</div>
+<!--===========================查看物流信息DIV end================================-->
+</div>
+    #parse("common/footer.vm")
+</body>
+</html>

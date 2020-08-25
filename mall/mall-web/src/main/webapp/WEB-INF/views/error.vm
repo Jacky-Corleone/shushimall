@@ -1,0 +1,11 @@
+#set($staticPath="$request.contextPath/assets")
+<div id="content" style="height: 300px;">
+    <div class="error_500">
+        <img src="$staticPath/images/500.png" alt="" /> 
+        <p class=" font_left"><i class="font_36 mar_r10">sorry!</i>系统错误，工程师搬砖去了！！！<br/>
+       	<button type="button" class="button_1 hei_30 mar_tb10" onclick="location.href='$request.contextPath/'">
+       		返回首页
+       	</button>
+        </p>
+   </div>
+</div>

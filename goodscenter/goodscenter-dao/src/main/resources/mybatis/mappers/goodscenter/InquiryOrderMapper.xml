@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.goodscenter.dao.InquiryOrderDAO">
+	<resultMap id="inquiryOrderMapper" type="com.camelot.goodscenter.dto.InquiryOrderDTO">
+			<result property="id" column="id" />
+			<result property="inquiryNo" column="inquiry_no" />
+			<result property="orderNo" column="order_no" />
+			<result property="state" column="state" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="activeFlag" column="active_flag" />
+			<result property="remark" column="remark" />
+	</resultMap>
+	
+	<sql id="where">
+		<where>
+			<if test="inquiryOrder.id != null and inquiryOrder.id != '' ">
+				and  inquiryOrder.id = #{inquiryOrder.id}
+			</if>
+			<if test="inquiryOrder.inquiryNo != null and inquiryOrder.inquiryNo != '' ">
+				and  inquiryOrder.inquiry_no = #{inquiryOrder.inquiryNo}
+			</if>
+			<if test="inquiryOrder.orderNo != null and inquiryOrder.orderNo != '' ">
+				and  inquiryOrder.order_no = #{inquiryOrder.orderNo}
+			</if>
+			<if test="inquiryOrder.state != null and inquiryOrder.state != '' ">
+				and  inquiryOrder.state = #{inquiryOrder.state}
+			</if>
+			<if test="inquiryOrder.createBy != null and inquiryOrder.createBy != '' ">
+				and  inquiryOrder.create_by = #{inquiryOrder.createBy}
+			</if>
+			<if test="inquiryOrder.createDate != null and inquiryOrder.createDate != '' ">
+				and  inquiryOrder.create_date = #{inquiryOrder.createDate}
+			</if>
+			<if test="inquiryOrder.updateBy != null and inquiryOrder.updateBy != '' ">
+				and  inquiryOrder.update_by = #{inquiryOrder.updateBy}
+			</if>
+			<if test="inquiryOrder.updateDate != null and inquiryOrder.updateDate != '' ">
+				and  inquiryOrder.update_date = #{inquiryOrder.updateDate}
+			</if>
+			<if test="inquiryOrder.activeFlag != null and inquiryOrder.activeFlag != '' ">
+				and  inquiryOrder.active_flag = #{inquiryOrder.activeFlag}
+			</if>
+			<if test="inquiryOrder.remark != null and inquiryOrder.remark != '' ">
+				and  inquiryOrder.remark = #{inquiryOrder.remark}
+			</if>
+		</where>
+	</sql>
+	
+	<select id="queryPage" resultMap="inquiryOrderMapper">
+		select * from inquiry_order inquiryOrder
+		<include refid="where"/>
+		limit #{pager.pageOffset},#{pager.rows}
+	</select>
+	
+	<select id="queryPageCount" resultType="long">
+		select count(0) from inquiry_order inquiryOrder
+		<include refid="where"/>
+	</select>
+	
+	<select id="findById" resultMap="inquiryOrderMapper" >
+		select * from inquiry_order inquiryOrder
+		where id = #{id}
+	</select>
+	<select id="findByInquiryOrderDTO" resultMap="inquiryOrderMapper">
+		select * from inquiry_order inquiryOrder
+		<include refid="where"/>
+	</select>
+
+	<insert id="insert" parameterType="com.camelot.goodscenter.dto.InquiryOrderDTO" useGeneratedKeys="true" keyProperty="id">
+		insert into inquiry_order(
+				id,
+				inquiry_no,
+				order_no,
+				state,
+				create_by,
+				create_date,
+				update_by,
+				update_date,
+				active_flag,
+				remark
+		)values(
+				#{id},
+				#{inquiryNo},
+				#{orderNo},
+				#{state},
+				#{createBy},
+				SYSDATE(),
+				#{updateBy},
+				#{updateDate},
+				#{activeFlag},
+				#{remark}
+		)
+	</insert>
+	
+	<update id="update">
+		update inquiry_order set
+				id = #{id},
+				inquiry_no = #{inquiryNo},
+				order_no = #{orderNo},
+				state=#{state},
+				create_by = #{createBy},
+				create_date = #{createDate},
+				update_by = #{updateBy},
+				update_date = #{updateDate},
+				active_flag = #{activeFlag},
+				remark = #{remark}
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from inquiry_order
+		<if test=" codes != null and codes.size() > 0 ">
+			where id in
+			<foreach collection="codes" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test=" codes == null or codes.size() == 0 ">
+			where 1 = 3
+		</if>
+	</delete>
+	
+	<select id="findAll" resultType="map">
+		select * from inquiry_order inquiryOrder
+		<include refid="where"/>
+	</select>
+</mapper>

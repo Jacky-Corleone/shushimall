@@ -1,0 +1,13 @@
+
+<!-- 头部 -->
+<header class="po_re">
+	<div class="top_l fl">
+		<i class="fa fa-angle-left"></i>返回
+	</div>
+	<div class="top_c fl font_cen wid_50">确认订单</div>
+	<div class="top_r fr">
+		<img src="$request.contextPath/assets/images/more.png" />
+	</div>
+	<div class="clear"></div>
+</header>
+<!-- 头部 end-->

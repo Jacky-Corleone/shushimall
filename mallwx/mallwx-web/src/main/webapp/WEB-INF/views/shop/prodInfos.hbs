@@ -1,0 +1,24 @@
+{{#each pager.records}}
+	<a href="product/toDetail?id={{itemId}}" >
+		<dl>
+		    <dt class=""><img src="{{../gix}}{{picUrl}}" width="90%" height="90%"></dt>
+		    <dd>
+		        <p class="mar_l2">{{itemName}}</p>
+		        <p class="font_e5">
+		        
+		        {{#if skuInquiryPirce}}
+	                           询价价格: ￥{{skuInquiryPirce}} 
+            {{else}} 
+        	{{#compare hasPrice "==" "1"}}
+            	价格：{{skuPrice}}
+            {{else}}  
+            	欢迎询价
+          {{/compare}}
+             {{/if}}
+		        
+		        
+		        </p>
+		    </dd>
+		</dl>
+	</a>
+{{/each}}

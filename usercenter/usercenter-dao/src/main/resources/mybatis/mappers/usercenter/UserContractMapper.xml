@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.usercenter.dao.UserContractMybatisDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="userContractMap" type="userContractDTO">
+				<result property="id" column="id"/>
+				<result property="contractId" column="contract_id"/>
+				<result property="shopId" column="shop_id"/>
+				<result property="contractType" column="contract_type"/>
+				<result property="contractStarttime" column="contract_starttime"/>
+				<result property="contractEndtime" column="contract_endtime"/>
+				<result property="creatorId" column="creator_id"/>
+				<result property="contractJssAddr" column="contract_jss_addr"/>
+				<result property="contractStatus" column="contract_status"/>
+				<result property="contractRemark" column="contract_remark"/>
+				<result property="createdTime" column="created_time"/>
+				<result property="modified" column="modified"/>
+				
+				<result property="companyName" column="company_name"/>
+				<result property="auditRemark" column="audit_remark"/>
+				
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{pager.pageOffset} , #{pager.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			user_contract_.id
+ 			,user_contract_.contract_id
+ 			,user_contract_.shop_id
+ 			,user_contract_.contract_type
+ 			,user_contract_.contract_starttime
+ 			,user_contract_.contract_endtime
+ 			,user_contract_.creator_id
+ 			,user_contract_.contract_jss_addr
+ 			,user_contract_.contract_status
+ 			,user_contract_.contract_remark
+ 			,user_contract_.created_time
+ 			,user_contract_.modified
+ 			,user_extends_.company_name
+ 			,audit_remark
+		FROM 
+		user_contract user_contract_,user_extends user_extends_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where user_extends_.user_id=user_contract_.creator_id
+		<if test="entity!=null">
+			<if test="entity.contractId != null">
+				<![CDATA[ and user_contract_.contract_id =#{entity.contractId} ]]>
+			</if>
+			<if test="entity.shopId != null">
+				<![CDATA[ and user_contract_.shop_id  =#{entity.shopId} ]]>
+			</if>
+			<if test="entity.contractType != null">
+				<![CDATA[ and user_contract_.contract_type  =#{entity.contractType} ]]>
+			</if>
+			<if test="entity.contractStatus != null  and entity.contractStatus !=''">
+				<![CDATA[ and user_contract_.contract_status  =#{entity.contractStatus}]]>
+			</if>
+			<if test="entity.creatorId!= null">
+				<![CDATA[ and user_contract_.creator_id  LIKE CONCAT('%',#{entity.creatorId},'%') ]]>
+			</if>
+			<if test="entity.companyName != null  and entity.companyName !=''">
+				<![CDATA[ and user_extends_.company_name  LIKE CONCAT('%',#{entity.companyName},'%')]]>
+			</if>
+			<if test="entity.createdBegin != null  and entity.createdBegin !=''">
+				<![CDATA[ and user_contract_.created_time >DATE_FORMAT(#{entity.createdBegin},'%Y-%m-%d') ]]>
+			</if>
+			<if test="entity.createdEnd != null  and entity.createdEnd !=''">
+				<![CDATA[ and user_contract_.created_time <DATE_FORMAT(#{entity.createdEnd},'%Y-%m-%d')]]>
+			</if>
+		</if>
+		order by user_contract_.created_time desc
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="selectById" resultMap="userContractMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where user_extends_.user_id=user_contract_.creator_id and user_contract_.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="selectList" resultMap="userContractMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="pager!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectCount" resultType="long">
+		<include refid="count_Tail" />
+		user_contract user_contract_,user_extends user_extends_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="userContractDTO" useGeneratedKeys="true" keyProperty="id">
+		<![CDATA[
+		insert into user_contract (
+		    	 creator_id
+		    	 ,created_time
+		    	 ,shop_id
+		    	 ,contract_status
+		   )values(
+		    	#{creatorId}
+		    	,now()
+		    	,#{shopId}
+		    	,#{contractStatus}
+		   )
+	    ]]>	
+	</insert>
+	
+	<update id="update" parameterType="userContractDTO">
+		update user_contract set
+			modified = now()
+			<if test="shopId != null">
+	   			,shop_id = #{shopId}
+   			</if>
+   			<if test="contractType != null">
+	   			,contract_type = #{contractType}
+	   		</if>
+   			<if test="contractStarttime != null ">
+	   			,contract_starttime = #{contractStarttime}
+	   		</if>
+   			<if test="contractEndtime != null">
+	   			,contract_endtime = #{contractEndtime}
+	   		</if>
+   			<if test="contractJssAddr != null  and contractJssAddr !=''">
+	   			,contract_jss_addr = #{contractJssAddr}
+	  		</if>
+   			<if test="contractStatus != null">
+	   			,contract_status = #{contractStatus}
+	   		</if>
+   			<if test="contractRemark != null  and contractRemark !=''">
+	   			,contract_remark = #{contractRemark}
+	   		</if>
+   			<if test="contractId != null">
+	   			,contract_id = #{contractId}
+	   		</if>
+	   		<if test="auditRemark != null">
+	   			,audit_remark = #{auditRemark}
+	   		</if>
+	   		
+		 where id = #{id}
+	</update>
+	
+	 <!-- 根据userid查询 -->
+	<select id="selectByUId" resultMap="userContractMap" parameterType="long">
+		
+		<![CDATA[
+		select
+ 			user_contract_.id
+ 			,user_contract_.contract_id
+ 			,user_contract_.shop_id
+ 			,user_contract_.contract_type
+ 			,user_contract_.contract_starttime
+ 			,user_contract_.contract_endtime
+ 			,user_contract_.creator_id
+ 			,user_contract_.contract_jss_addr
+ 			,user_contract_.contract_status
+ 			,user_contract_.contract_remark
+ 			,user_contract_.created_time
+ 			,user_contract_.modified
+ 			,user_extends_.company_name
+ 			,user_contract_.audit_remark
+		FROM 
+		user_contract user_contract_,user_extends user_extends_
+		where user_extends_.user_id=user_contract_.creator_id and user_contract_.creator_id = #{uid}
+		]]>
+	</select>
+
+    <delete id="delete" parameterType="long">
+        <![CDATA[
+		delete from user_contract where id = #{id}
+		]]>
+    </delete>
+</mapper>

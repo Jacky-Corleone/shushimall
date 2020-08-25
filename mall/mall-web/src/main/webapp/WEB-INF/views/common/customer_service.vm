@@ -1,0 +1,36 @@
+#set($staticPath_="$request.contextPath/assets")
+<link type="text/css" href="$staticPath_/css/baidu_kefu.css" rel="stylesheet"/>
+<script type="text/javascript" src="$staticPath_/js/baidu_kefu_chart.js"></script>
+
+<script>
+    $(document).ready(function(){
+        $('.suspension_up').on('click',function(){
+            if($('.suc_ul_list').attr('class') =='suc_ul_list hide'){
+                $(this).find('img').attr('src','$request.contextPath/assets/images/customer_service_images/stop_up.png');
+                $('.suc_ul_list').removeClass('hide');
+
+            }else{
+                $(this).find('img').attr('src','$request.contextPath/assets/images/customer_service_images/open_right.png');
+                $('.suc_ul_list').addClass('hide');
+
+            }
+        })
+    })
+</script>
+<!--右侧悬浮start-->
+<div class="suspension_box posf">
+    <div class="suspension_com posr">
+        <i class="posa spn_top"></i>
+        <a href="javascript:;" onclick="online_advice()" class="suspension_logo posa"><img src="$request.contextPath/assets/images/customer_service_images/right_logo.png"></a>
+        <ul class="suc_ul_list hide" >
+            <!-- <li><a href="javascript:;"><img src="$request.contextPath/assets/images/customer_service_images/near.png"></a></li>
+            <li><a href="javascript:;"><img src="$request.contextPath/assets/images/customer_service_images/timer.png"></a></li>
+            <li><a href="javascript:;"><img src="$request.contextPath/assets/images/customer_service_images/free_design.png"></a></li> -->
+            <li><a href="#top"><img src="$request.contextPath/assets/images/customer_service_images/up_top.png"></a></li>
+        </ul>
+        <a href="javascript:;" class="suspension_up posa"><img src="$request.contextPath/assets/images/customer_service_images/open_right.png"></a>
+        <i class="posa spn_bot"></i>
+    </div>
+</div>
+<div id="BDBridgeFixedWrap"></div>
+<script type="text/javascript" src="$staticPath_/js/baidu_kefu.js"></script>

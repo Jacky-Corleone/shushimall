@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.goodscenter.dao.ItemAttrValueItemDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="itemAttrValueItemMap" type="com.camelot.goodscenter.dto.ItemAttrValueItemDTO">
+				<result property="id" column="id"/>
+				<result property="attrId" column="attr_id"/>
+				<result property="valueId" column="value_id"/>
+				<result property="itemId" column="item_id"/>
+				<result property="attrType" column="attr_type"/>
+				<result property="sortNumber" column="sort_number"/>
+				<result property="status" column="status"/>
+				<result property="created" column="created"/>
+				<result property="modified" column="modified"/>
+	</resultMap>
+	
+	<resultMap id="ItemAttrMap" type="com.camelot.goodscenter.dto.ItemAttr">
+				<result property="id" column="attr_id"/>
+				<result property="name" column="attr_name"/>
+	</resultMap>
+	
+	
+	<resultMap id="ItemAttrValueMap" type="com.camelot.goodscenter.dto.ItemAttrValue">
+				<result property="id" column="value_id"/>
+				<result property="name" column="value_name"/>
+	</resultMap>
+	
+
+	
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,attr_id
+ 			,value_id
+ 			,item_id
+ 			,attr_type
+ 			,sort_number
+ 			,status
+ 			,created
+ 			,modified
+		FROM 
+		item_attr_value_item item_attr_value_item_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		<if test="entity!=null">
+			<if test="entity.id != null  and entity.id !=''">
+				<![CDATA[ and item_attr_value_item_.id  = #{entity.id} ]]>
+			</if>
+			<if test="entity.attrId != null  and entity.attrId !=''">
+				<![CDATA[ and item_attr_value_item_.attr_id  = #{entity.attrId} ]]>
+			</if>
+			<if test="entity.valueId != null  and entity.valueId !=''">
+				<![CDATA[ and item_attr_value_item_.value_id  = #{entity.valueId} ]]>
+			</if>
+			<if test="entity.itemId != null  and entity.itemId !=''">
+				<![CDATA[ and item_attr_value_item_.item_id  = #{entity.itemId} ]]>
+			</if>
+			<if test="entity.attrType != null  and entity.attrType !=''">
+				<![CDATA[ and item_attr_value_item_.attr_type  = #{entity.attrType} ]]>
+			</if>
+			<if test="entity.created != null  and entity.created !=''">
+				<![CDATA[ and item_attr_value_item_.created  = #{entity.created} ]]>
+			</if>
+			<if test="entity.modified != null  and entity.modified !=''">
+				<![CDATA[ and item_attr_value_item_.modified  = #{entity.modified} ]]>
+			</if>
+		</if>
+		
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="itemAttrValueItemMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where item_attr_value_item_.id = #{id}
+		]]>
+	</select>
+	
+	<select id="queryAttrList" resultMap="ItemAttrMap">
+		select item_attribute_.attr_name,item_attribute_.attr_id from 
+			item_attr_value_item item_attr_value_item_,
+			item_attribute  item_attribute_
+			where item_attr_value_item_.attr_id=item_attribute_.attr_id
+			and item_attr_value_item_.`status`=1 and item_attribute_.`status`=1
+		<include refid="where_fragement" />
+		 GROUP BY item_attr_value_item_.attr_id
+		 ORDER BY item_attr_value_item_.sort_number,item_attr_value_item_.attr_id ASC
+	</select>
+	<select id="queryValueList" resultMap="ItemAttrValueMap">
+		select item_attribute_value_.value_name,item_attribute_value_.value_id
+			from item_attr_value_item item_attr_value_item_,item_attribute_value item_attribute_value_
+			where item_attr_value_item_.value_id=item_attribute_value_.value_id
+			and item_attr_value_item_.attr_id=item_attribute_value_.attr_id
+			and item_attr_value_item_.status=1
+			and item_attribute_value_.status=1
+			<include refid="where_fragement" />
+		 ORDER BY item_attr_value_item_.sort_number,item_attr_value_item_.value_id ASC
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="itemAttrValueItemMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		item_attr_value_item item_attr_value_item_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="com.camelot.goodscenter.dto.ItemAttrValueItemDTO">
+		<![CDATA[
+		insert into item_attr_value_item (
+		    	 attr_id
+		    	 ,value_id
+		    	 ,item_id
+		    	 ,attr_type
+		    	 ,sort_number
+		    	 ,status
+		    	 ,created
+		    	 ,modified
+		   )values(
+		    	#{attrId}
+		    	,#{valueId}
+		    	,#{itemId}
+		    	,#{attrType}
+		    	,#{sortNumber}
+		    	,1
+		    	,now()
+		    	,now()
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.goodscenter.dto.ItemAttrValueItemDTO">
+		<![CDATA[
+		update item_attr_value_item set
+   			attr_id = #{attrId}
+   			,value_id = #{valueId}
+   			,item_id = #{itemId}
+   			,attr_type = #{attrType}
+   			,sort_number = #{sortNumber}
+   			,status = #{status}
+   			,modified = now()
+		 where id = #{id}
+		]]>
+	</update>
+	
+	<update id="updatestatus" parameterType="long">
+		<![CDATA[
+		update item_attr_value_item set
+   			status = 2
+   			,modified = now()
+		 where item_id = #{item_id}
+		]]>
+	</update>
+		<update id="updatestatusbyValueId" parameterType="long">
+		<![CDATA[
+		update item_attr_value_item set
+   			status = 2
+   			,modified = now()
+		 where value_id = #{valueId}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from item_attr_value_item where value_id = #{id}
+		]]>
+	</delete>
+</mapper>

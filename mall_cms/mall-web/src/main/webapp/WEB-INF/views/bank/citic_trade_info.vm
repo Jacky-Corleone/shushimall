@@ -1,0 +1,19 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+<meta charset="UTF-8">
+#parse("/common/tdk.vm")
+<link href="$staticPath/css/basic.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body class="login_bg">
+	<div id="container">
+		<form name="form" id="form"  action="https://enterprise.bank.ecitic.com/corporbank/cb060400_reBill_adh.do">
+
+			<input name="subAccNo" id="subAccNo" size ="10" TYPE="hidden" value="$!subAccNo" />
+			<input name="printVerifyCode" id="printVerifyCode" size ="10" TYPE="hidden" value="$!printVerifyCode" />
+		</form>
+		<script type="text/javascript">
+			document.getElementById("form").submit();
+		</script>
+	</div>
+</body>

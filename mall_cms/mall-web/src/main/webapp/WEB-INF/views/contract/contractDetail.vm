@@ -1,0 +1,26 @@
+#set($layout = "/none_layout.vm")
+<table width="98%" class="add_inf mar" id="information">
+    <!--表头 开始 -->
+    <tr class="font_cen bg_05">
+        <td class="border-1 wid_180">所属类目</td>
+        <td class="border-1 wid_180">物品名称</td>
+        <td class="border-1 wid_200">品牌/规格</td>
+        <td class="border-1 wid_120">单位</td>
+        <td class="border-1 wid_120">合约单价</td>
+    </tr>
+    <!--表头 结束 -->
+
+    <!--内容 开始 -->
+    #foreach($contract in $pager.records)
+        <tr>
+            <td class="border-1 wid_180">$!contract.get("cid")</td>
+            <td class="border-1 wid_180">$!contract.get("itemName")</td>
+            <td class="border-1 wid_200">$!contract.get("matSpec")</td>
+            <td class="border-1 wid_120">$!contract.get("weightUnit")</td>
+            <td class="border-1 wid_120">$!contract.get("matPrice")</td>
+        </tr>
+    #end
+    <!--内容 结束 -->
+</table>
+
+#pageVelocity($pager)

@@ -1,0 +1,181 @@
+#set($layout = "common/blanklayout.vm")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<base href="$request.contextPath/"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<title>对账单信息</title>
+<link href="$request.contextPath/assets/css/detail.css" rel="stylesheet" type="text/css" />
+##<script type="text/javascript" src="$request.contextPath/assets/js/tab.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/iscroller5/iscroll.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/iscroller5/iscroll-probe.js"></script>
+    <script type="text/javascript" src="assets/js/handlebars-v3.0.3.js"></script>
+    <script type="text/javascript" src="assets/handlebars/hbs_helpers.js"></script>
+    <script type="text/javascript" src="assets/js/statement/statement.js"></script>
+<script type="text/x-handlebars-template" id="orderDetailTpt">
+	#include("statement/orderDetail.hbs")
+</script>
+<script type="text/x-handlebars-template" id="statementDetailTpt">
+	#include("statement/statementDetail.hbs")
+</script>
+	<style type="text/css">
+        .wrapper {
+			position: absolute;
+            width: 100%;
+			top:124px;right:0;bottom: 0;
+            z-index: 1;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            -ms-touch-action: none;
+        }
+
+        .scroller {
+            position: absolute;
+            z-index: 2;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+            width: 100%;
+            -webkit-transform: translateZ(0);
+            -moz-transform: translateZ(0);
+            -ms-transform: translateZ(0);
+            -o-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-text-size-adjust: none;
+            -moz-text-size-adjust: none;
+            -ms-text-size-adjust: none;
+            -o-text-size-adjust: none;
+            text-size-adjust: none;
+        }
+	</style>
+</head>
+<body class="bg_02">
+<input type="hidden" id="contextPath" value="$request.getContextPath()" />
+<input type="hidden" id="_userType" value="$userType" />
+	<div id="main" class="po_re">
+		<!-- 中间内容 -->
+		<div class="content">
+			<div class="nTab">
+				<!-- 标题开始 -->
+				<div class="TabTitle bg_01 po_ab" style="top:0;left:0;right:0;">
+					<ul id="_myTab0" class="myTab0">
+						<li class="active" style="width: 49%;" onclick="queryRquestPriceInfo(this,0);">对账单</li>
+						<li class="normal" style="width: 49%;" onclick="queryRquestPriceInfo(this,1);">创建对账单</li>
+					</ul>
+				</div>
+				<!-- 标题开始 end-->
+				<!-- 内容开始 -->
+
+				<div class="TabContent po_ab" style="top:40px;left:0px;right:0px;bottom:0px;">
+				
+					<!-- 切换内容    1   -->
+					<div id="myTab0_Content0" istabcontent class="bg_01 po_ab" style="top:0;left:0;right:0;bottom:0px;">
+						<div id="queryInfo_0 " class="bg_01 po_ab border_bt000" style="top:0px;left:0px;right:0px;">
+							<ul class="font_t pad_lr5">
+								<form id="searchForm">
+									<input type="hidden" name="userType" value="$userType" />
+									<li  class="hei_32">
+										<p class="wid_25 fl font_right pad_r5">生成时间</p>
+										<input type="date" name="createDate" id="supplierName" class="form-control wid_50 hei_20" />
+									</li>
+									<li class="hei_32">
+										<p class="wid_25 fl font_right pad_r5">对账单编号</p><input
+										class="form-control wid_50 hei_20" id="inquiryNo"
+										name="statementId" />
+									</li>
+                                </form>
+							</ul>
+							<div>
+								<button class="button_1 pad_lr5 hei_32 fr" id="queryInquiry"
+									onclick="showGenarteOrder();">对账单查询</button>
+								<button class="button_1 pad_lr5 hei_32 fr" onclick="resetBtn();">重置</button>
+							</div>
+							<div class="clear"></div>
+						</div>
+						<div id="myTab0_Content_1" class="bg_02" style="position: absolute;top:170px;left:0px;right:0px;bottom:0px;overflow-y: auto">
+
+						</div>
+					</div>
+					<!-- 切换内容    1  end -->
+					<!-- 切换内容    2   -->
+					<div id="myTab0_Content1" istabcontent class="bg_02 po_ab" style="display: none;top:0px;left:0px;right:0px;bottom: 0px;">
+								<ul class="ct_state_title">
+									<!-- 	选择年份         -->
+									<li style="width: 29%;border-right: 1px #eee solid;border-bottom: 1px #eee solid;">
+										<input  id="yyyyid" type="text" class="wid_50 input_3" name="yyyyid" maxlength="4" placeholder="例：2015" onkeyup="this.value=this.value.replace(/[^\d]/g,'') " onafterpaste="this.value=this.value.replace(/[^\d]/g,'')"/>
+<!-- 										<input type="date" name="createDate" id="supplierName" class="form-control wid_50 hei_20" /> -->
+<!-- 										<select name="yyyyid" id="yyyyid" -->
+<!-- 										onchange="setDays(this,FormDate.Month,FormDate.Day)"> -->
+<!-- 											<option value="2016">2013</option> -->
+<!-- 											<option value="2016">2014</option> -->
+<!-- 											<option value="2015">2015</option> -->
+<!-- 											<option value="2016">2016</option> -->
+<!-- 											<option value="2017">2017</option> -->
+<!-- 											<option value="2018">2018</option> -->
+<!-- 											<option value="2019">2019</option> -->
+<!-- 											<option value="2020">2020</option> -->
+<!-- 										</select> -->
+										<label >年</label>
+									</li>
+									<li style="width: 70%; height:50px; border-bottom: 1px #eee solid;">
+										<div style="height: 40px;overflow: hidden;">
+											<div style="height:50px;overflow-x: scroll;">
+												<ul style="width: 660px;height:50px;">
+													<li style="width: 55px" class="normal" onclick="changeOrderStatus(1);">一月</li>
+													<li style="width: 55px" class="normal" onclick="changeOrderStatus(2);">二月</li>
+													<li style="width: 55px" class="normal" onclick="changeOrderStatus(3);">三月</li>
+													<li style="width: 55px" class="normal" onclick="changeOrderStatus(4);">四月</li>
+													<li style="width: 55px" class="normal" onclick="changeOrderStatus(5);">五月</li>
+													<li style="width: 55px" class="normal" onclick="changeOrderStatus(6);">六月</li>
+													<li style="width: 55px" class="normal" onclick="changeOrderStatus(7);">七月</li>
+													<li style="width: 55px" class="normal" onclick="changeOrderStatus(8);">八月</li>
+													<li style="width: 55px" class="normal" onclick="changeOrderStatus(9);">九月</li>
+													<li style="width: 55px" class="normal" onclick="changeOrderStatus(10);">十月</li>
+													<li style="width: 55px" class="normal" onclick="changeOrderStatus(11);">十一月</li>
+													<li style="width: 55px" class="normal" onclick="changeOrderStatus(12);">十二月</li>
+                                                    <div class="clear"></div>
+												</ul>
+											</div>
+                                        </div>
+									</li>
+								</ul>
+							<div class="bg_01 border_bt000">
+                                <p class="hei_32 bg_01 fl mar_t10"><i onclick="checkAll(this);" id="allCheckBtn"  class="fa fa-circle-thin  font_3 "></i>全选</p>
+								<button class="button_1 pad_lr5 hei_32 fr" id="queryInquiry"
+									onclick="genarteOrder();">生成对账单</button>
+								<div class="clear"></div>
+
+							</div>
+						<div class="clear"></div>
+						<!-- 内容开始 -->
+						<div class="wrapper bg_02">
+							<div class="scroller">
+								<div id="ImyTab0_Content"></div>
+
+<!-- 						<p id="pullUpLabel" class="font_cen">该月没有订单记录</p>  -->
+
+								<p id="pullUpLabel" class="font_cen">上拉显示更多</p>
+
+                        	</div>
+                        </div>
+                        <div class="clear"></div>
+					</div>
+					<!-- 切换内容    2  end -->
+				</div>
+			</div>
+		</div>
+	</div>
+	#parse("common/footer.vm")
+</body>
+
+</html>
+

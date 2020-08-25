@@ -1,0 +1,118 @@
+﻿#set($assetsPath="$request.contextPath/assets")
+
+<link href="$assetsPath/css/basic.css" rel="stylesheet" type="text/css" />
+<link href="$assetsPath/css/product.css" rel="stylesheet" type="text/css" />
+<script language="javascript" type="text/javascript" src="$assetsPath/js/all_classify.js"></script>
+<script language="javascript" type="text/javascript" src="$assetsPath/js/js.js"></script>
+<script language="javascript" type="text/javascript" src="$assetsPath/js/tab.js"></script>
+
+ <!-- 中间内容 -->
+<div id="content">
+	<div class="product_pic"><img src="$assetsPath/pic/45.jpg"  alt=""/></div><!--广告图片-->
+    <div class="mar_tb20 activity_int bg_07 border-4">
+    <img src="$assetsPath/images/pic.png" width="100" height="100" alt=""/>
+    <ul class="po_re">
+    	<li><h1>活动时间：$!date.format('yyyy-MM-dd ',$!promotionItems.promotionInfo.startTime)到$!date.format('yyyy-MM-dd ',$!promotionItems.promotionInfo.endTime)</h1></li>
+    	<li>
+			满<i class="font_fe font_14b mar_lr10">500</i>减100
+		</li>
+		
+        <button type="button" class="button_2 hei_30 pa_04 po_ab">返回店铺</button>
+    </ul>
+     </div><!--活动介绍内容-->
+     <div class="Search_list">
+              <!--每个产品的div开始-->
+              <div class="Product_box">
+                  <div class="big_img"><img src="$assetsPath/pic/pic41.jpg" /></div>
+                  <div class="n_font">爆款清仓 EyesonU 韩版优雅短袖蝙蝠针织衫休闲宽松条纹<span class="red">毛衣外套 M6014 无袖绿条</span></div>
+                  <div class="jiaqian font_14b font_fe">￥69.00</div>
+                  <div class="pingfen"><span class="star sa5"></span><!--评论里的星星级别可以从sa5到sa0--><a href="#" style="float:left;color:#005AA0">已有2202人评价</a></div>
+              </div>
+              <!--每个产品的div结束-->
+              <!--每个产品的div开始-->
+              <div class="Product_box">
+                  <div class="big_img"><img src="$assetsPath/pic/pic41.jpg" /></div>
+                  <div class="n_font">爆款清仓 EyesonU 韩版优雅短袖蝙蝠针织衫休闲宽松条纹<span class="red">毛衣外套 M6014 无袖绿条</span></div>
+                  <div class="jiaqian font_14b font_fe">￥69.00</div>
+                  <div class="pingfen"><span class="star sa5"></span><!--评论里的星星级别可以从sa5到sa0--><a href="#" style="float:left;color:#005AA0">已有2202人评价</a></div>
+              </div>
+              <!--每个产品的div结束-->
+              <!--每个产品的div开始-->
+              <div class="Product_box">
+                  <div class="big_img"><img src="$assetsPath/pic/pic41.jpg" /></div>
+                  <div class="n_font">爆款清仓 EyesonU 韩版优雅短袖蝙蝠针织衫休闲宽松条纹<span class="red">毛衣外套 M6014 无袖绿条</span></div>
+                  <div class="jiaqian font_14b font_fe">￥69.00</div>
+                  <div class="pingfen"><span class="star sa5"></span><!--评论里的星星级别可以从sa5到sa0--><a href="#" style="float:left;color:#005AA0">已有2202人评价</a></div>
+              </div>
+              <!--每个产品的div结束-->
+              <!--每个产品的div开始-->
+              <div class="Product_box">
+                  <div class="big_img"><img src="$assetsPath/pic/pic41.jpg" /></div>
+                  <div class="n_font">爆款清仓 EyesonU 韩版优雅短袖蝙蝠针织衫休闲宽松条纹<span class="red">毛衣外套 M6014 无袖绿条</span></div>
+                  <div class="jiaqian font_14b font_fe">￥69.00</div>
+                  <div class="pingfen"><span class="star sa5"></span><!--评论里的星星级别可以从sa5到sa0--><a href="#" style="float:left;color:#005AA0">已有2202人评价</a></div>
+              </div>
+              <!--每个产品的div结束-->
+              <!--每个产品的div开始-->
+              <div class="Product_box">
+                  <div class="big_img"><img src="$assetsPath/pic/pic41.jpg" /></div>
+                  <div class="n_font">爆款清仓 EyesonU 韩版优雅短袖蝙蝠针织衫休闲宽松条纹<span class="red">毛衣外套 M6014 无袖绿条</span></div>
+                  <div class="jiaqian font_14b font_fe">￥69.00</div>
+                  <div class="pingfen"><span class="star sa5"></span><!--评论里的星星级别可以从sa5到sa0--><a href="#" style="float:left;color:#005AA0">已有2202人评价</a></div>
+              </div>
+              <!--每个产品的div结束-->
+              <!--每个产品的div开始-->
+              <div class="Product_box">
+                  <div class="big_img"><img src="$assetsPath/pic/pic41.jpg" /></div>
+                  <div class="n_font">爆款清仓 EyesonU 韩版优雅短袖蝙蝠针织衫休闲宽松条纹<span class="red">毛衣外套 M6014 无袖绿条</span></div>
+                  <div class="jiaqian font_14b font_fe">￥69.00</div>
+                  <div class="pingfen"><span class="star sa5"></span><!--评论里的星星级别可以从sa5到sa0--><a href="#" style="float:left;color:#005AA0">已有2202人评价</a></div>
+              </div>
+              <!--每个产品的div结束-->
+              <!--每个产品的div开始-->
+              <div class="Product_box">
+                  <div class="big_img"><img src="$assetsPath/pic/pic41.jpg" /></div>
+                  <div class="n_font">爆款清仓 EyesonU 韩版优雅短袖蝙蝠针织衫休闲宽松条纹<span class="red">毛衣外套 M6014 无袖绿条</span></div>
+                  <div class="jiaqian font_14b font_fe">￥69.00</div>
+                  <div class="pingfen"><span class="star sa5"></span><!--评论里的星星级别可以从sa5到sa0--><a href="#" style="float:left;color:#005AA0">已有2202人评价</a></div>
+              </div>
+              <!--每个产品的div结束-->
+              <!--每个产品的div开始-->
+              <div class="Product_box">
+                  <div class="big_img"><img src="$assetsPath/pic/pic41.jpg" /></div>
+                  <div class="n_font">爆款清仓 EyesonU 韩版优雅短袖蝙蝠针织衫休闲宽松条纹<span class="red">毛衣外套 M6014 无袖绿条</span></div>
+                  <div class="jiaqian font_14b font_fe">￥69.00</div>
+                  <div class="pingfen"><span class="star sa5"></span><!--评论里的星星级别可以从sa5到sa0--><a href="#" style="float:left;color:#005AA0">已有2202人评价</a></div>
+              </div>
+              <!--每个产品的div结束-->
+              <!--每个产品的div开始-->
+              <div class="Product_box">
+                  <div class="big_img"><img src="$assetsPath/pic/pic41.jpg" /></div>
+                  <div class="n_font">爆款清仓 EyesonU 韩版优雅短袖蝙蝠针织衫休闲宽松条纹<span class="red">毛衣外套 M6014 无袖绿条</span></div>
+                  <div class="jiaqian font_14b font_fe">￥69.00</div>
+                  <div class="pingfen"><span class="star sa5"></span><!--评论里的星星级别可以从sa5到sa0--><a href="#" style="float:left;color:#005AA0">已有2202人评价</a></div>
+              </div>
+              <!--每个产品的div结束-->
+  </div>  
+  <!-- 分页 -->
+  <div class="page ml14px" style="margin:30px 0px; ">
+    <ul>
+      <li class="lastPage"><a href="">上一页</a></li>
+      <li><a  class="curr"href="">1</a></li>
+      <li><a href="">2</a></li>
+      <li><a href="">3</a></li>
+      <li><a href="">4</a></li>
+      <li><a href="">5</a></li>
+      <li><a href="">6</a></li>
+      <li><a href="">7</a></li>
+      <li><a href="">8</a></li>
+      <li><a href="">9</a></li>
+      <li><a href="">10</a></li>
+      <li><a href="">...</a></li>
+      <li><a href="">20</a></li>
+      <li class="nextPage"><a href="">下一页</a></li>
+  </ul>
+</div><!-- 分页 end -->
+</div><!-- content end-->
+ <!-- 中间内容 end-->
+

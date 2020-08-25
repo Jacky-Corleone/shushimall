@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.goodscenter.dao.ItemFavouriteDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="favouriteMapper" type="com.camelot.goodscenter.dto.ItemFavouriteDTO">
+		<result property="id" column="id"/>
+		<result property="userId" column="user_id"/>
+		<result property="sellerId" column="seller_id"/>
+		<result property="shopId" column="shop_id"/>
+		<result property="itemId" column="item_id"/>
+		<result property="skuId" column="sku_id"/>
+		<result property="skuAttributeStr" column="attributes"/>
+		<result property="createdDate" column="created_date"/>
+		<result property="itemName" column="item_name"/>
+		<result property="price" column="market_price"/>
+		<result property="pictureUrl" column="picture_url"/>
+		<result property="favouriteCount" column="favouriteCount" />
+	</resultMap>
+	
+	<insert id="add" keyProperty="itemId" >
+		insert into item_favourite(
+			user_id,
+			seller_id,
+			shop_id,
+			item_id,
+			sku_id,
+			created_date
+		)values(
+			#{userId},
+			#{sellerId},
+			#{shopId},
+			#{itemId},
+			#{skuId},
+			now()
+		)
+	</insert>
+	
+	
+	
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+		limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	
+	
+	<sql id="where">
+		<if test="entity.itemName != null and entity.itemName != '' ">
+			and i.item_name like concat('%',#{entity.itemName},"%")
+		</if>
+		<if test="entity.userId != null and entity.userId != '' ">
+			and ifa.user_id = #{entity.userId}
+		</if>
+		<if test=" entity.userIdList!= null and entity.userIdList.size() > 0 ">
+			  <![CDATA[ and ifa.user_id in]]>
+			  <foreach collection="entity.userIdList" item="userId" index="index" open="(" separator="," close=")">
+			   	<![CDATA[   #{userId } ]]>
+			  </foreach>
+		</if>
+		<if test="entity.itemId != null">
+			and ifa.item_id = #{entity.itemId}
+		</if>
+		<if test="entity.skuId != null">
+			and ifa.sku_id = #{entity.skuId}
+		</if>
+	</sql>
+	
+	<select id="queryPage" resultMap="favouriteMapper">
+		select ifa.*,item_sku_.attributes from item_favourite ifa,item i,item_sku item_sku_
+		where ifa.item_id = i.item_id and ifa.sku_id = item_sku_.sku_id
+		<include refid="where"/>
+		<include refid="pagination_tail"/>
+	</select>
+	
+	<select id="queryPageCount" resultType="int">
+		select count(0) from item_favourite ifa,item i
+		where ifa.item_id = i.item_id
+		<include refid="where"/>
+	</select>
+	
+	<delete id="del">
+		delete from item_favourite
+		where user_id = #{uid}
+		and id = #{id}
+	</delete>
+	
+	<select id="list" resultMap="favouriteMapper">
+		select ifa.* from item_favourite ifa,item i
+		where ifa.item_id = i.item_id
+		<include refid="where"/>
+	</select>
+	
+	<select id="queryFavouriteCount" resultMap="favouriteMapper">
+		select 
+		COUNT(sku_id) favouriteCount,item_id,sku_id,shop_id
+		FROM 
+		item_favourite
+		where shop_id=#{shopId} 
+		GROUP BY shop_id,item_id,sku_id 
+		order by favouriteCount desc 
+		<if test="pager!=null">
+			limit #{pager.pageOffset} , #{pager.rows}
+		</if>
+	</select>
+	<select id="queryCountFavouriteCount" resultType="Long">
+		select count(1) from (
+			select 
+			COUNT(sku_id) c,item_id,sku_id,shop_id
+			FROM 
+			item_favourite
+			where shop_id=#{shopId}
+			GROUP BY shop_id,item_id,sku_id 
+			order by c desc 
+		) as aa
+	</select>
+	
+	
+</mapper>

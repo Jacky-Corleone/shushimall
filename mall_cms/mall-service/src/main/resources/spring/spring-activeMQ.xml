@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jms="http://www.springframework.org/schema/jms"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+    http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+    http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-3.2.xsd"
+    >
+	<!-- 真正可以产生Connection的ConnectionFactory，由对应的 JMS服务厂商提供--> 
+	<bean id="targetConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+		<property name="brokerURL" value="${activemq.host}"/>
+	</bean>
+	
+	<!-- 配置Spring提供的ConnectionFactory -->
+	<bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+		<!-- 目标ConnectionFactory对应真实的可以产生JMS Connection的ConnectionFactory -->  
+    	<property name="targetConnectionFactory" ref="targetConnectionFactory"/>
+    	<!-- Session缓存数量 -->
+    	<property name="sessionCacheSize" value="10"></property>
+	</bean>
+	
+	<!-- Spring提供的JMS工具类，它可以进行消息发送、接收等 -->  
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">  
+    	<!-- 这个connectionFactory对应的是我们定义的Spring提供的那个ConnectionFactory对象 -->  
+    	<property name="connectionFactory" ref="connectionFactory"/>  
+	</bean>
+	
+	
+	
+	<!-- 短信通知消息     消息队列 -->
+	<!--这个是队列目的地，点对点的,消息一旦被处理就不在队列中存在-->  
+	<bean id="smsNoticQueueDestination" class="org.apache.activemq.command.ActiveMQQueue">  
+	    <constructor-arg>  
+	        <value>smsNoticQueue</value>  
+	    </constructor-arg>  
+	</bean>  
+	
+	<bean id="smsNoticQueueListenerAdapter" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+		<constructor-arg >
+			<bean class="com.camelot.activeMQ.service.impl.SmsNoticQueueConsumerListenerImpl"></bean>
+		</constructor-arg>
+	</bean>
+	<!-- 消息消费者，一般使用spring的MDP异步接收queue模式 -->
+	<!-- 通知类型的消息队列消息监听容器 -->  
+	<bean id="smsNoticQueueContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">  
+	    <property name="connectionFactory" ref="connectionFactory" />  
+	    <property name="destination" ref="smsNoticQueueDestination" />  
+	    <property name="messageListener" ref="smsNoticQueueListenerAdapter" />  
+	    <property name="concurrentConsumers" value="${activemq.sms_notic_current_consumers}"></property>
+	    <property name="maxConcurrentConsumers" value="${activemq.sms_notic_max_consumers}"></property>
+	</bean>
+	
+	
+	<!-- 邮件通知消息     消息队列 -->
+	<!--这个是队列目的地，点对点的,消息一旦被处理就不在队列中存在-->  
+	<bean id="emailNoticQueueDestination" class="org.apache.activemq.command.ActiveMQQueue">  
+	    <constructor-arg>  
+	        <value>emailNoticQueue</value>  
+	    </constructor-arg>  
+	</bean>  
+	
+	<bean id="emailNoticQueueListenerAdapter" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+		<constructor-arg >
+			<bean class="com.camelot.activeMQ.service.impl.EmailNoticQueueConsumerListenerImpl"></bean>
+		</constructor-arg>
+	</bean>
+	<!-- 消息消费者，一般使用spring的MDP异步接收queue模式 -->
+	<!-- 通知类型的消息队列消息监听容器 -->  
+	<bean id="emailNoticQueueContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">  
+	    <property name="connectionFactory" ref="connectionFactory" />  
+	    <property name="destination" ref="emailNoticQueueDestination" />  
+	    <property name="messageListener" ref="emailNoticQueueListenerAdapter" />  
+	    <property name="concurrentConsumers" value="${activemq.email_notic_current_consumers}"></property>
+	    <property name="maxConcurrentConsumers" value="${activemq.email_notic_max_consumers}"></property>
+	</bean>
+	
+	
+	 
+	<!-- 短信验证码    消息队列 -->
+	<bean id="smsVerifyCodeDestination" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg>
+			<value>smsVerifyCodeQueue</value>
+		</constructor-arg>
+	</bean>
+	<bean id="smsVerifyCodeQueueListenerAdapter" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+		<constructor-arg >
+			<bean class="com.camelot.activeMQ.service.impl.SmsVerifyCodeQueueConsumerListenerImpl"></bean>
+		</constructor-arg>
+	</bean>
+	
+	<!-- 通知类型的消息队列消息监听容器 -->  
+	<bean id="smsVerifyCodeQueueContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">  
+	    <property name="connectionFactory" ref="connectionFactory" />  
+	    <property name="destination" ref="smsVerifyCodeDestination" />  
+	    <property name="messageListener" ref="smsVerifyCodeQueueListenerAdapter" />  
+	    <property name="concurrentConsumers" value="${activemq.sms_verifycode_current_consumers}"></property>
+	    <property name="maxConcurrentConsumers" value="${activemq.sms_verifycode_max_consumers}"></property>
+	</bean>
+	
+	
+	<!-- 邮箱验证码    消息队列 -->
+	<bean id="emailVerifyCodeDestination" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg>
+			<value>emailVerifyCodeQueue</value>
+		</constructor-arg>
+	</bean>
+	<bean id="emailVerifyCodeQueueListenerAdapter" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+		<constructor-arg >
+			<bean class="com.camelot.activeMQ.service.impl.EmailVerifyCodeQueueConsumerListenerImpl"></bean>
+		</constructor-arg>
+	</bean>
+	
+	<!-- 通知类型的消息队列消息监听容器 -->  
+	<bean id="emailVerifyCodeQueueContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">  
+	    <property name="connectionFactory" ref="connectionFactory" />  
+	    <property name="destination" ref="emailVerifyCodeDestination" />  
+	    <property name="messageListener" ref="emailVerifyCodeQueueListenerAdapter" />  
+	    <property name="concurrentConsumers" value="${activemq.email_verifycode_current_consumers}"></property>
+	    <property name="maxConcurrentConsumers" value="${activemq.email_verifycode_max_consumers}"></property>
+	</bean>
+	
+</beans>

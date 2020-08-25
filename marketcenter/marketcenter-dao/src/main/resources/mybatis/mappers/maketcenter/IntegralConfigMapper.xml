@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.maketcenter.dao.IntegralConfigDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="integralConfig" type="com.camelot.centralPurchasing.domain.IntegralConfig">
+		<result property="configId" column="config_id"/>
+		<result property="integralType" column="integral_type"/>
+		<result property="startPrice" column="start_price"/>
+		<result property="endPrice" column="end_price"/>
+		<result property="getIntegral" column="get_integral"/>
+		<result property="useIntegral" column="use_integral"/>
+		<result property="exchangeRate" column="exchange_rate"/>
+		<result property="state" column="state"/>
+		<result property="platformId" column="platform_id"/>
+		<result property="insertTime" column="insert_time"/>
+		<result property="insertBy" column="insert_by"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateBy" column="update_by"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			config_id
+ 			,integral_type
+ 			,start_price
+ 			,end_price
+ 			,get_integral
+ 			,use_integral
+ 			,exchange_rate
+ 			,state
+ 			,platform_id
+ 			,insert_time
+ 			,insert_by
+ 			,update_time
+ 			,update_by
+		FROM 
+		INTEGRAL_CONFIG config_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		<![CDATA[ where 1 = 1  ]]>
+		<if test="entity!=null">
+			<if test="entity.configId != null and entity.configId !=''"><![CDATA[ and config_id = #{entity.configId} ]]></if>
+			<if test="entity.integralType != null and entity.integralType !=''"><![CDATA[ and integral_type = #{entity.integralType} ]]></if>
+			<if test="entity.startPrice != null and entity.startPrice !=''"><![CDATA[ and start_price = #{entity.startPrice} ]]></if>
+			<if test="entity.endPrice != null and entity.endPrice !=''"><![CDATA[ and end_price = #{entity.endPrice} ]]></if>
+			<if test="entity.getIntegral != null and entity.getIntegral !=''"><![CDATA[ and get_integral = #{entity.getIntegral} ]]></if>
+			<if test="entity.useIntegral != null and entity.useIntegral !=''"><![CDATA[ and use_integral = #{entity.useIntegral} ]]></if>
+			<if test="entity.exchangeRate != null and entity.exchangeRate !=''"><![CDATA[ and exchange_rate = #{entity.exchangeRate} ]]></if>
+			<if test="entity.state != null and entity.state !=''"><![CDATA[ and state = #{entity.state} ]]></if>
+			<if test="entity.platformId != null "><![CDATA[ and platform_id = #{entity.platformId} ]]></if>
+			<if test="entity.insertTime != null and entity.insertTime !=''"><![CDATA[ and insert_time = #{entity.insertTime} ]]></if>
+			<if test="entity.insertBy != null and entity.insertBy !=''"><![CDATA[ and insert_by = #{entity.insertBy} ]]></if>
+			<if test="entity.updateTime != null and entity.updateTime !=''"><![CDATA[ and update_time = #{entity.updateTime} ]]></if>
+			<if test="entity.updateBy != null and entity.updateBy !=''"><![CDATA[ and update_by = #{entity.updateBy} ]]></if>
+		</if>
+	</sql>
+	
+	<sql id="where_frage">
+		<![CDATA[ where 1 = 1  ]]>
+		<if test="entity!=null">
+			<if test="entity.configId != null and entity.configId !=''"><![CDATA[ and config_id = #{entity.configId} ]]></if>
+			<if test="entity.integralType != null and entity.integralType !=''"><![CDATA[ and integral_type = #{entity.integralType} ]]></if>
+			<if test="entity.startPrice != null and entity.startPrice !=''"><![CDATA[ and start_price = #{entity.startPrice} ]]></if>
+			<if test="entity.endPrice != null and entity.endPrice !=''"><![CDATA[ and end_price = #{entity.endPrice} ]]></if>
+			<if test="entity.getIntegral != null and entity.getIntegral !=''"><![CDATA[ and get_integral = #{entity.getIntegral} ]]></if>
+			<if test="entity.useIntegral != null and entity.useIntegral !=''"><![CDATA[ and use_integral = #{entity.useIntegral} ]]></if>
+			<if test="entity.exchangeRate != null and entity.exchangeRate !=''"><![CDATA[ and exchange_rate = #{entity.exchangeRate} ]]></if>
+			<if test="entity.state != null and entity.state !=''"><![CDATA[ and state = #{entity.state} ]]></if>
+			<if test="entity.platformId != null "><![CDATA[ and platform_id = #{entity.platformId} ]]></if>
+			<if test="entity.insertTime != null and entity.insertTime !=''"><![CDATA[ and insert_time = #{entity.insertTime} ]]></if>
+			<if test="entity.insertBy != null and entity.insertBy !=''"><![CDATA[ and insert_by = #{entity.insertBy} ]]></if>
+			<if test="entity.updateTime != null and entity.updateTime !=''"><![CDATA[ and update_time = #{entity.updateTime} ]]></if>
+			<if test="entity.updateBy != null and entity.updateBy !=''"><![CDATA[ and update_by = #{entity.updateBy} ]]></if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="integralConfig" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where config_id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryOneType" resultMap="integralConfig" >
+		select  DISTINCT INTEGRAL_TYPE , platform_id From integral_config config_
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+		<![CDATA[
+		order by config_.platform_id ,config_.INTEGRAL_TYPE
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="integralConfig" >
+		<include refid="selectAllColumns"></include>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+			INTEGRAL_CONFIG config_
+		<include refid="where_fragement" />
+	</select>
+
+	<!-- 插入记录 -->
+	<insert id="add" useGeneratedKeys="true" keyProperty="configId" parameterType="com.camelot.centralPurchasing.domain.IntegralConfig">
+		<![CDATA[
+		insert into INTEGRAL_CONFIG (
+	 			integral_type
+	 			,start_price
+	 			,end_price
+	 			,get_integral
+	 			,use_integral
+	 			,exchange_rate
+	 			,state
+	 			,platform_id
+	 			,insert_time
+	 			,insert_by
+	 			,update_time
+	 			,update_by
+		   )values(
+ 				#{integralType}
+ 				,#{startPrice}
+ 				,#{endPrice}
+ 				,#{getIntegral}
+ 				,#{useIntegral}
+ 				,#{exchangeRate}
+ 				,#{state}
+ 				,#{platformId}
+ 				,now()
+ 				,#{insertBy}
+ 				,now()
+ 				,#{updateBy}
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.centralPurchasing.domain.IntegralConfig">
+		<![CDATA[
+			update INTEGRAL_CONFIG set 
+			update_time = now()
+		]]>
+		<if test="integralType != null">,integral_type = #{integralType}</if>
+		<if test="startPrice != null">,start_price = #{startPrice}</if>
+		<if test="endPrice != null">,end_price = #{endPrice}</if>
+		<if test="getIntegral != null">,get_integral = #{getIntegral}</if>
+		<if test="useIntegral != null">,use_integral = #{useIntegral}</if>
+		<if test="exchangeRate != null">,exchange_rate = #{exchangeRate}</if>
+		<if test="state != null">,state = #{state}</if>
+		<if test="platformId != null">,platform_id = #{platformId}</if>
+		<if test="updateBy != null and updateBy !=''">,update_by = #{updateBy}</if>
+		<![CDATA[
+		 	where config_id = #{configId}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from INTEGRAL_CONFIG where config_id = #{id}
+		]]>
+	</delete>
+	
+	<delete id="deleteByType" parameterType="com.camelot.centralPurchasing.domain.IntegralConfig">
+		delete from INTEGRAL_CONFIG 
+		<include refid="where_frage"></include>
+	</delete>
+	
+	<select id="queryByMoney" resultMap="integralConfig">
+		<include refid="selectAllColumns" />
+		 where 1 = 3
+		<if test="money != null">
+			<![CDATA[or (start_price <= #{money} and end_price > #{money} and platform_id = #{platformId})]]>
+		</if>
+	</select>
+</mapper>

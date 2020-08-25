@@ -1,0 +1,22 @@
+
+<div class="Center_head">
+   <div class="Center_head_min">
+     <div class="Center_head_midtab">
+		<span class="home_title" style="cursor:pointer;" onclick="location.href='$request.contextPath/'">首页</span>
+     </div>
+     <!--Center_head_midtab end -->
+	  <!--Center_head_Search 
+     <form id="shopSearchForm" method="get">
+	     <div class="Center_head_Search">
+	       <select class="Center_Search_list" id="searchType">
+	        <option value="s">店  铺</option>
+	        <option value="g">宝  贝</option>
+	        </select>
+	       <span class="Center_Search_input_box"><input name="keyword" id="keyword" type="text" class="Center_Search_input" placeholder="搜索店铺/搜索产品" onpaste="return true;" autocomplete="off" style="color: rgb(153,153,153);outline: none;"></span>
+	       <span class="Center_Search_btn fa-search" id="shopSearch"></span>
+	     </div>
+     </form>
+     -->
+     <!--Center_head_Search end-->
+   </div><!--Center_head_min end-->
+ </div>

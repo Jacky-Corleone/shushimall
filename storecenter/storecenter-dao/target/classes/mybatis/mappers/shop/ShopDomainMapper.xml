@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.storecenter.dao.ShopDomainDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="shopDomainMapperMap" type="com.camelot.storecenter.dto.ShopDomainDTO">
+				<result property="id" column="id"/>
+				<result property="sellerId" column="seller_id"/>
+				<result property="shopId" column="shop_id"/>
+				<result property="domain" column="domain"/>
+				<result property="state" column="state"/>
+				<result property="createTime" column="create_time"/>
+				<result property="updateTime" column="update_time"/>
+				<result property="reviewer" column="reviewer"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,seller_id
+ 			,shop_id
+ 			,domain
+ 			,state
+ 			,create_time
+ 			,update_time
+ 			,reviewer
+		FROM 
+		shop_domain_mapper shop_domain_mapper_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.id != null  and entity.id !=''">
+				<![CDATA[ and shop_domain_mapper_.id  = #{entity.id} ]]>
+			</if>
+			<if test="entity.sellerId != null  and entity.sellerId !=''">
+				<![CDATA[ and shop_domain_mapper_.seller_id  = #{entity.sellerId} ]]>
+			</if>
+			<if test="entity.shopId != null  and entity.shopId !=''">
+				<![CDATA[ and shop_domain_mapper_.shop_id  = #{entity.shopId} ]]>
+			</if>
+			<if test="entity.domain != null  and entity.domain !=''">
+				<![CDATA[ and shop_domain_mapper_.domain  = #{entity.domain} ]]>
+			</if>
+			<if test="entity.state != null  and entity.state !=''">
+				<![CDATA[ and shop_domain_mapper_.state  = #{entity.state} ]]>
+			</if>
+			<if test="entity.createTime != null  and entity.createTime !=''">
+				<![CDATA[ and shop_domain_mapper_.create_time  = #{entity.createTime} ]]>
+			</if>
+			<if test="entity.updateTime != null  and entity.updateTime !=''">
+				<![CDATA[ and shop_domain_mapper_.update_time  = #{entity.updateTime} ]]>
+			</if>
+			<if test="entity.reviewer != null  and entity.reviewer !=''">
+				<![CDATA[ and shop_domain_mapper_.reviewer  = #{entity.reviewer} ]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="shopDomainMapperMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where shop_domain_mapper_.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="shopDomainMapperMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectCountByCondition" resultType="long">
+		<include refid="count_Tail" />
+		shop_domain_mapper shop_domain_mapper_
+		<include refid="where_fragement" />
+	</select>
+	
+	<select id="existShopUrl" resultType="long">
+		<!-- <include refid="count_Tail" />
+		shop_domain_mapper shop_domain_mapper_ where shop_domain_mapper_.domain=#{shopUrl}
+		 -->
+		select count(1) from shop_info where shop_url = #{shopUrl} and shop_id != #{shopId}
+	</select>
+	
+	<select id="existShopUrlByPlatformId" resultType="long">
+		select count(1) from shop_info where shop_url = #{shopUrl} and platform_id = #{platformId} and shop_id != #{shopId}
+	</select>
+
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="com.camelot.storecenter.dto.ShopDomainDTO">
+		<![CDATA[
+		insert into shop_domain_mapper (
+		    	 id
+		    	 ,seller_id
+		    	 ,shop_id
+		    	 ,domain
+		    	 ,state
+		    	 ,create_time
+		    	 ,update_time
+		    	 ,reviewer
+		   )values(
+		    	#{id}
+		    	,#{sellerId}
+		    	,#{shopId}
+		    	,#{domain}
+		    	,#{state}
+		    	,#{createTime}
+		    	,#{updateTime}
+		    	,#{reviewer}
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.storecenter.dto.ShopDomainDTO">
+		<![CDATA[
+		update shop_domain_mapper set
+   			id = #{id}
+   			,seller_id = #{sellerId}
+   			,shop_id = #{shopId}
+   			,domain = #{domain}
+   			,state = #{state}
+   			,create_time = #{createTime}
+   			,update_time = #{updateTime}
+   			,reviewer = #{reviewer}
+		 where id = #{id}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from shop_domain_mapper where id = #{id}
+		]]>
+	</delete>
+</mapper>

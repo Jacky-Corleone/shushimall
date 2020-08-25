@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+	<!-- dubbo服务取调用其他模块的dubbo服务 -->
+	<dubbo:reference id="userExportService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.usercenter.service.UserExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+	<dubbo:reference id="baseWebSiteMessageService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.basecenter.service.BaseWebSiteMessageService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+	<dubbo:reference id="baseSendMessageService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.basecenter.service.BaseSendMessageService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+	<dubbo:reference id="baseConsultingSmsService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.basecenter.service.BaseConsultingSmsService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+		
+	<dubbo:reference id="paymentExportService" registry="qingdaoRegistry"
+		owner="storecenter" interface="com.camelot.payment.PaymentExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+	<dubbo:reference id="FinanceWithdrawApplyExportService" registry="qingdaoRegistry"
+		owner="storecenter" interface="com.camelot.payment.FinanceWithdrawApplyExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+	<!-- 运营分析报表 -->
+	<dubbo:reference id="orderDealReportService" registry="qingdaoRegistry"
+		owner="tradecenter" interface="com.camelot.report.service.OrderDealReportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<!-- 销售分析报表 -->
+	<dubbo:reference id="itemSkuSellReportService" registry="qingdaoRegistry"
+		owner="tradecenter" interface="com.camelot.report.service.ItemSkuSellReportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	
+	<dubbo:reference id="dictionaryService" registry="qingdaoRegistry"
+		owner="tradecenter" interface="com.camelot.basecenter.service.DictionaryService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+	<dubbo:reference id="deliveryService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.delivery.service.DeliveryService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+	
+</beans>

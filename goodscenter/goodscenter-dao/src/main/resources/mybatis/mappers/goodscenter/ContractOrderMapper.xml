@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.goodscenter.dao.ContractOrderDAO">
+	<resultMap id="contractOrderMapper" type="com.camelot.goodscenter.dto.ContractOrderDTO">
+			<result property="id" column="id" />
+			<result property="contractNo" column="contract_no" />
+			<result property="orderNo" column="order_no" />
+			<result property="state" column="state" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="activeFlag" column="active_flag" />
+			<result property="remark" column="remark" />
+	</resultMap>
+	
+	<sql id="where">
+		<where>
+			<if test="contractOrder.id != null and contractOrder.id != '' ">
+				and  contractOrder.id = #{contractOrder.id}
+			</if>
+			<if test="contractOrder.contractNo != null and contractOrder.contractNo != '' ">
+				and  contractOrder.contract_no = #{contractOrder.contractNo}
+			</if>
+			<if test="contractOrder.orderNo != null and contractOrder.orderNo != '' ">
+				and  contractOrder.order_no = #{contractOrder.orderNo}
+			</if>
+			<if test="contractOrder.state != null and contractOrder.state != '' ">
+				and  contractOrder.state = #{contractOrder.state}
+			</if>
+			<if test="contractOrder.createBy != null and contractOrder.createBy != '' ">
+				and  contractOrder.create_by = #{contractOrder.createBy}
+			</if>
+			<if test="contractOrder.createDate != null and contractOrder.createDate != '' ">
+				and  contractOrder.create_date = #{contractOrder.createDate}
+			</if>
+			<if test="contractOrder.updateBy != null and contractOrder.updateBy != '' ">
+				and  contractOrder.update_by = #{contractOrder.updateBy}
+			</if>
+			<if test="contractOrder.updateDate != null and contractOrder.updateDate != '' ">
+				and  contractOrder.update_date = #{contractOrder.updateDate}
+			</if>
+			<if test="contractOrder.activeFlag != null and contractOrder.activeFlag != '' ">
+				and  contractOrder.active_flag = #{contractOrder.activeFlag}
+			</if>
+			<if test="contractOrder.remark != null and contractOrder.remark != '' ">
+				and  contractOrder.remark = #{contractOrder.remark}
+			</if>
+			<if test=" contractOrder.ids != null and contractOrder.ids.size() > 0 ">
+				and  contractOrder.create_by IN
+				<foreach collection="contractOrder.ids" open="(" separator="," close=")" item="id">
+					#{id}
+				</foreach>
+			</if>
+			<if test=" contractOrder.contractNos != null and contractOrder.contractNos.size() > 0 ">
+				and  contractOrder.contract_no IN
+				<foreach collection="contractOrder.contractNos" open="(" separator="," close=")" item="contractNo">
+					#{contractNo}
+				</foreach>
+			</if>
+
+		</where>
+	</sql>
+	
+	<select id="queryPage" resultMap="contractOrderMapper">
+		select * from contract_order contractOrder
+		<include refid="where"/>
+		limit #{pager.pageOffset},#{pager.rows}
+	</select>
+	
+	<select id="queryPageCount" resultType="long">
+		select count(0) from contract_order contractOrder
+		<include refid="where"/>
+	</select>
+	
+	<select id="findById" resultMap="contractOrderMapper" >
+		select * from contract_order contractOrder
+		where id = #{id}
+	</select>
+	<select id="findByContractOrderDTO" resultMap="contractOrderMapper">
+		select * from contract_order contractOrder
+		<include refid="where"/>
+	</select>
+	<insert id="insert" parameterType="com.camelot.goodscenter.dto.ContractOrderDTO" useGeneratedKeys="true" keyProperty="id">
+		insert into contract_order(
+				contract_no,
+				order_no,
+				state,
+				create_by,
+				create_date,
+				update_by,
+				update_date,
+				active_flag,
+				remark
+		)values(
+				#{contractNo},
+				#{orderNo},
+				#{state},
+				#{createBy},
+				SYSDATE(),
+				#{updateBy},
+				#{updateDate},
+				#{activeFlag},
+				#{remark}
+		)
+	</insert>
+	
+	<update id="update">
+		update contract_order set
+				contract_no = #{contractNo},
+				order_no = #{orderNo},
+				state=#{state},
+				create_by = #{createBy},
+				create_date = #{createDate},
+				update_by = #{updateBy},
+				update_date = #{updateDate},
+				active_flag = #{activeFlag},
+				remark = #{remark}
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from contract_order
+		<if test=" codes != null and codes.size() > 0 ">
+			where id in
+			<foreach collection="codes" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test=" codes == null or codes.size() == 0 ">
+			where 1 = 3
+		</if>
+	</delete>
+	
+	<select id="findAll" resultType="map">
+		select * from contract_order contractOrder
+		<include refid="where"/>
+	</select>
+</mapper>

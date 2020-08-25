@@ -1,0 +1,395 @@
+#set($layout="common/order.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>卖家申请仲裁</title>
+#parse("common/scriptAndCss.vm")
+#parse("common/common.vm")
+<script type="text/javascript" src="$request.contextPath/assets/js/ajaxfileupload.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	changeIconToRed(3);
+	var pictuerUrl="$!complainDTO.complainPicUrl";
+   	var array = pictuerUrl.split(";");
+   	$.each(array,function(n,item){
+		if(item!=""){
+			appendtable(item,n+1,true);			
+		}   		
+   	});
+})
+$(document).ready(function(){
+	if($!progressBar==1){//退款完成
+		$("#refundHand").parent().attr("class","normal");
+		$("#refundHand").attr("class","s-num num-bg-1");
+		$("#refundHand").html("2");
+		
+		$("#writeContent").parent().attr("class","normal doing");
+		$("#writeContent").attr("class","s-num num-bg-2");
+		$("#writeContent").html("<i class='fa-check'></i>");
+	}else if($!progressBar==2){
+		$("#refundHand").parent().attr("class","normal");
+		$("#refundHand").attr("class","s-num num-bg-1");
+		$("#refundHand").html("2");
+		
+		$("#refundHand").parent().attr("class","normal doing");
+		$("#refundHand").attr("class","s-num num-bg-2");
+		$("#refundHand").html("<i class='fa-check'></i>");
+	}else{
+		$("#refundHand").parent().attr("class","normal");
+		$("#refundHand").attr("class","s-num num-bg-1");
+		$("#refundHand").html("2");
+		
+		$("#refundSuccess").parent().attr("class","normal doing");
+		$("#refundSuccess").attr("class","s-num num-bg-2");
+		$("#refundSuccess").html("<i class='fa-check'></i>");
+	}
+});
+function validatecomplain(){
+    //电话号
+    var buyermobile=$("#buyermobileid").val();
+    //买家邮箱
+    var buyeremail=$("#buyeremailid").val();
+    //投诉原因
+    var complainResion=$("#complainResionid").val();
+    //投诉说明
+    var remark=$("#remark").val();
+    //上传的凭证
+    var imgtable=$("#imgtable input");
+    if(buyermobile){
+        var phonejy = /^(((1[0-9]{2}))+\d{8})$/;
+        if(!phonejy.test(buyermobile)){
+            alert("请输入正确的手机号");
+            return false;
+        }
+    }else{
+        alert("请输入您的电话号码");
+        return false;
+    }
+    if(buyeremail){
+        var emailyz = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+        if(!emailyz.test(buyeremail)){
+            alert("请输入正确的邮箱");
+            return false;
+        }
+    }
+    if(!complainResion){
+        alert("请选择投诉原因");
+        return false;
+    }
+    if(!imgtable||imgtable.length<1){
+        alert("尚未上传凭证");
+        return false;
+    }
+    if(!remark){
+        alert("请填写投诉说明");
+        return false;
+    }
+    return true;
+}
+//立即申请退款 提交
+function addcomplain(){
+    var va=validatecomplain();
+    if(!va){
+        return false;
+    }
+    //订单号
+    var orderId=$("#orderId").val();
+    //退货id
+    var thid=$("#thid").val();
+    //退款id
+    var tkid=$("#tkid").val();
+    //电话号
+    var buyermobile=$("#buyermobileid").val();
+    //买家邮箱
+    var buyeremail=$("#buyeremailid").val();
+    //投诉原因
+    var complainResion=$("#complainResionid").val();
+    //退款说明
+    var remark=$("#remark").val();
+    var type=$("#typeid").val();
+    var imgtable=$("#imgtable input");
+    var url="";
+    if(imgtable){
+        $(imgtable).each(function(){
+            if($(this).val()){
+                url=url+$(this).val()+";";
+            }
+        });
+    }
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: "$request.getContextPath()/orderWx/complainadd",
+		data: {
+			orderId: orderId,
+            thid: thid,
+            tkid: tkid,
+			remark:remark,
+            buyermobile:buyermobile,
+            buyeremail:buyeremail,
+            complainResion:complainResion,
+            url:url,
+            type:'$!type',
+            buyerid:'$!buyerid',
+            sellerid:'$!sellerid',
+            sellerOrBuyer:'$!sellerOrBuyer'
+		},
+		success: function(data){
+			if(data.success){
+//                 $("#tousunr").html("投诉内容:"+data.obj.complainContent);
+//                 $("#tjtime").html("提交时间;"+data.obj.date);
+//                 $("#zcstace").html("状态:待平台处理");
+//                 $("#tousuren").html("投诉方:卖家");
+//                 showmsg();
+// 				alert("12123");
+// 				window.location.href="$request.getContextPath()/orderWx/gocomplainadd?tradeReturnid=${tradeReturnid}&status=$!{complainStatus}";
+				window.location.href="$request.getContextPath()/orderWx/refundSeller?back=1";
+			}else{
+				alert(data.msg);
+			}
+		},error:function(){
+            alert("系统繁忙，请稍后再试");
+        }
+	});
+}
+
+function showmsg(){
+    $("#right1").attr("style","display:none");
+    $("#right").attr("style","display:block");
+}
+
+var imgcount=0;
+var sccount=0;
+function startUpload(){
+	console.debug(imgcount);
+    if(imgcount>4){
+        alert("最多只能上传5张图片！");
+        return false;
+    }
+    //判断图片格式
+    var fileInput = $("#fileInput").val();
+    var extStart = fileInput.lastIndexOf(".");
+    var ext = fileInput.substring(extStart,fileInput.length).toUpperCase();
+    if(ext!=".JPG" && ext!=".jpg" && ext!=".BMP"&&ext!=".bmp"&& ext!=".PNG"&&ext!=".PNG"&& ext!=".JPEG" && ext!=".jpeg"){
+        alert("上传图片仅支持png、bmp、jpg、jpeg格式！");
+        return false;
+    }
+    $.ajaxFileUpload({
+        url: '$request.getContextPath()/orderWx/upload?size=1024000', //用于文件上传的服务器端请求地址
+        secureuri: false, //是否需要安全协议，一般设置为false
+        fileElementId: 'fileInput', //文件上传域的ID
+        dataType: 'text', //返回值类型 一般设置为json
+        type:"post",
+        success: function (data, status){  //服务器成功响应处理函数
+        	var dataStr = data;
+        	if(dataStr.indexOf("<pre>") != -1){
+        		dataStr = dataStr.replace("<pre>","")
+        	}
+        	if(dataStr.indexOf("<pre style=\"word-wrap: break-word; white-space: pre-wrap;\">") != -1){
+        		dataStr = dataStr.replace("<pre style=\"word-wrap: break-word; white-space: pre-wrap;\">","")
+        	}
+        	if(dataStr.indexOf("</pre>") != -1){
+        		dataStr = dataStr.replace("</pre>","")
+        	}
+        	var data = eval("("+dataStr+")");
+            if(data.success){
+                sccount=sccount+1;
+                var trid="trid"+sccount;
+                appendtable(data.url,trid);
+            }else{
+                alert(data.msg);
+                $("#fileInput").replaceWith('<input type="file" id="fileInput" class="input_3 wid_95 mar_r2" name="file" onchange="startUpload();" />');
+            }
+        },
+        error: function (data, status, e){//服务器响应失败处理函数
+            alert("亲系统繁忙，请稍后再试");
+            $("#fileInput").replaceWith('<input type="file" id="fileInput" class="input_3 wid_95 mar_r2" name="file" onchange="startUpload();" />');
+        }
+    });
+}
+
+function appendtable(url,id,flag){
+	var imgtable=$("#imgtable");
+    var urlqd='$!imageServerAddr';
+    var td=$("<td>").attr("id",id).attr("align","center");
+    var div=$("<div>").attr("class","shop_order mar_l4 wid_29 mar_t10").attr("style","float:center");//创建div
+    var p=$("<p>").attr("class","shop_order_img"); //创建<p>
+    var p1=$("<p>").attr("class","lin_24");; //创建<p>
+    var img=$("<img>").attr("src",urlqd+url).attr("width","75px").attr("height","75px");
+    var input=$("<input>").attr("value",url).attr("type","hidden");
+	p.append(img);
+	p.append(input);
+	div.append(p);
+    var a=$("<a>").text("删除").attr("href","javascript:cancleimg('"+id+"')");
+    p1.append(a);
+    div.append(p1);
+    td.append(div);
+    
+ 	if(imgcount == 0){
+ 		 var tr=$("<tr>").attr("id","tr_one").attr("align","center");
+ 		 imgtable.append(tr);
+    }else if(imgcount == 3){
+    	var tr=$("<tr>").attr("id","tr_two").attr("align","center");
+		 imgtable.append(tr);
+    }
+ 	
+   if(imgcount < 3){
+		 $("#tr_one").append(td);
+   }else{
+	   $("#tr_two").append(td);
+   }
+    imgcount=imgcount+1;
+    $("#fileInput").replaceWith('<input type="file" id="fileInput" class="input_3 wid_95 mar_r2" name="file" onchange="startUpload();" />');
+    if(imgcount > 4){
+    	$("#fileInput").attr("disabled","disabled");
+    }
+}
+//清除指定tr
+function cancleimg(id){
+	var pid = $("#" + id).parent().attr('id');
+    $("#"+id).remove();
+    
+    if(pid == 'tr_one' && imgcount > 3){
+    	$("#tr_one").append($("#tr_two")[0].firstChild);
+    	if(imgcount == 4){
+    		$("#tr_two").remove();
+    	}
+    }
+    
+    imgcount=imgcount-1;
+    if(imgcount < 5){
+    	$("#fileInput").removeAttr("disabled");
+    }
+    
+    if(imgcount == 0){
+    	$("#tr_one").remove();
+    }else if(imgcount == 3){
+    	$("#tr_one").append($("#tr_two").html());
+    	$("#tr_two").remove();
+    }
+}
+</script>
+</head>
+<body>
+<div id="main" class="bg_02 po_re" style="overflow-x: hidden; overflow-y: auto">
+<div class="content" id="wrapper">
+	<div class="stepflex">
+        <dl class="normal">
+            <dt class="s-num num-bg-1" id="writeContent">1</dt>
+            <dd class="s-text">填写投诉内容<s></s><b></b></dd>
+        </dl>
+        <dl class="normal doing">
+            <dt class="s-num num-bg-2" id="refundHand"><i class="fa-check"></i></dt>
+            <dd class="s-text">投诉处理<s></s><b></b></dd>
+        </dl>
+        <dl class="last">
+            <dt class="s-num num-bg-1" id="refundSuccess">3</dt>
+            <dd class="s-text">投诉完成<s></s><b></b></dd>
+        </dl>
+        <div class="clear"></div>
+    </div>
+
+	<div class="td_l">
+		<dl class="hei_34">
+			<dd class="fl font_right wid_35 mar_r2">您的电话<i class="font_e3">※</i></dd>
+               <input type="hidden" value="$!{orderId}" id="orderId"/>
+               <input type="hidden" value="$!thid" id="thid"/>
+               <input type="hidden" value="$!tkid" id="tkid"/>
+               <input type="hidden" value="$!type" id="typeid"/>
+			<dt class="fl wid_57">
+            <input class="input_3 wid_17 mar_r2" style="width: 150px;background:white;" name="buyermobile" maxlength="11" id="buyermobileid" value="$!complainDTO.complainPhone" #if($!complainDTO) disabled="disabled" #end />
+			</dt>
+		</dl>
+		<dl class="hei_34 mar_t10">
+			<dd class="fl font_right wid_35 mar_r2">您的邮箱</dd>
+			<dt class="fl wid_55">
+               <input class="input_3 wid_17 mar_r2" style="width: 150px;background:white;" name="buyeremail" id="buyeremailid" value="$!complainDTO.complainEmail" #if($!complainDTO) disabled="disabled" #end/>
+            </dt>
+		</dl>
+        <div class="clear"></div>
+<!--         <div class="fr hei_40">客服可能以短信、邮件方式联系您，请注意查收。</div> -->
+        <div class="clear"></div>
+		<dl class="hei_34 mar_t10">
+			<dd class="fl font_right wid_35 mar_r2">投诉原因<i class="font_e3">※</i></dd>
+			<dt class="fl wid_55">
+               <select name="complainResion" id="complainResionid"  class="input_3 wid_95 mar_r2" style="width: 155px;background:white;" #if($!complainDTO) disabled="disabled" #end>
+                   <option value="" selected>请选择投诉原因</option>
+                   <option value="交易纠纷投诉" #if($!complainDTO.complainResion=="交易纠纷投诉") selected="selected" #end>交易纠纷投诉</option>
+                   <option value="活动投诉" #if($!complainDTO.complainResion=="活动投诉") selected="selected" #end>活动投诉</option>
+                   <option value="售后投诉" #if($!complainDTO.complainResion=="售后投诉") selected="selected" #end>售后投诉</option>
+               </select>
+           	</dt>
+		</dl>
+        <dl class="hei_34 mar_t15" style="margin-top: 14px" id="uploadimg">
+            <!-- returnPic -->
+            <dd class="fl font_right wid_35 mar_r2">上传凭证<i class="font_e3">※</i></dd>
+            <dt class="fl wid_57">
+            	#if(!$!complainDTO)
+                	<input type="file" id="fileInput" class="input_3 wid_95 mar_r2" name="file" onchange="startUpload();" style="background:white;"/>
+            	#end
+            </dt>
+        </dl>
+        <div class="clear"></div>
+            <div>
+                <table id="imgtable" class="imgtable" align="center">
+
+                </table>
+            </div>
+        <div class="clear"></div>
+<!--         <div class="fr hei_40">建议上传交易过程中的聊天记录、实物照片等&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div> -->
+        <div class="fr wid_65 font_7_5 mar_t10 lin_16 mar_b20">最多上传5张，单张大小不超过1M，格式为png、bmp、jpg或jpeg。</div>
+        <div class="clear"></div>
+		<dl class="hei_34 mar_t15">
+			<dd class="fl font_right wid_35 mar_r2">投诉说明<i class="font_e3">※</i></dd>
+			<dt class="fl wid_55"><textarea name="remark" style="background:white" id="remark" class="input_3 wid_95 hh_100" maxlength="100" #if($!complainDTO) disabled="disabled" #end >$!complainDTO.complainContent</textarea></dt>
+		</dl>
+		<div class="clear"></div>
+		#if(!$!complainDTO)
+			<div class="wid_160 mar_cen font_cen">
+				<button class="button_2 wid_30 hei_34" onclick="addcomplain()" type="button">提交投诉</button>
+			</div>
+		#end
+	</div>
+	
+	
+	<div id="right" style="display: $!right;">
+        <div id="right_bot" class="right_bot border-4 mar_t10 bg_06">
+            <!-- 商品列表开头 -->
+            <div class="right_xinxi mar_l14">
+                <h3>投诉查看</h3>
+                <ul class="list_top bg_08 font_cen font_14b">
+                    <li class="wid_260">涉及订单:$!{orderId}</li>
+                    <li class="wid_260">类型:$!typeName</li>
+                    <li class="wid_160" id="zcstace">状态:$!zcstace</li>
+                    <li class="wid_160" id="tousuren">投诉方:$!tusufang</li>
+                </ul>
+                <!-- 类型选择 -->
+                <!-- 商品信息 -->
+                <table class="information mar_b10" id="information"><!--单双行变色加bg_05这个样式-->
+                    <tr>
+                        <td id="tishimsgid" class="wid_770 font_left font_16" style="padding-left:85px;">
+                                <p class="over hang">投诉的问题客服正在处理，请耐心等待：-）</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="wid_770 font_left font_16" style="padding-left:85px;" id="tousunr">投诉内容:$!remark</td>
+                    </tr>
+                    <tr>
+                        <td class="wid_770 font_left" style="padding-left:85px;" id="tjtime">提交时间:$!createdate</td>
+                    </tr>
+                </table>
+
+            </div><!--right_xinxi end -->
+
+        </div><!--right_bot end -->
+    </div>
+</div>
+</div>
+#parse("common/footer.vm")
+</body>
+</html>

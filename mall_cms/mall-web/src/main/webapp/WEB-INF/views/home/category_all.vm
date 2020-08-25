@@ -1,0 +1,51 @@
+#set($staticPath="$request.contextPath/assets")
+<link href="$staticPath/css/Details.css" rel="stylesheet" type="text/css" />
+<div id="content">
+	<div class="all_shop">
+		<!-- 每一个大类循环 li 开始-->
+		<ul>
+			#foreach($category in $categoryes)
+				#set( $tmp = $velocityCount%2 )
+				#if( $tmp != 0 )
+					<li class="border-4">
+						<h3 class="bg_05 border-6">
+							<i class="demo-icons fa-angle-double-right font_16"></i>$category.categoryCName
+						</h3> 
+						#foreach($cate in $category.children)
+							<dl #if( $velocityCount != $category.children.size() ) class="border-5" #end >
+								<dt class="font_fe font_14b">$cate.categoryCName</dt>
+								<dd>
+									#foreach($c in $cate.children) 
+										<span><a href="$request.contextPath/searchController/searchItemByCategory?cid=$!c.categoryCid">$!c.categoryCName</a></span> 
+									#end
+								</dd>
+							</dl> 
+						#end
+					</li> 
+				#end
+			#end
+		</ul>
+		<ul >
+			#foreach($category in $categoryes)
+				#set( $tmp=$velocityCount%2 )
+				#if( $tmp==0 )
+					<li class="border-4">
+						<h3 class="bg_05 border-6">
+							<i class="demo-icons fa-angle-double-right font_16"></i>$category.categoryCName
+						</h3> 
+						#foreach($cate in $category.children)
+							<dl #if( $velocityCount != $category.children.size() ) class="border-5" #end >
+								<dt class="font_fe font_14b">$cate.categoryCName</dt><!--二级类目是dt不动 -->
+								<dd>
+									#foreach($c in $cate.children) 
+										<span><a href="$request.contextPath/searchController/searchItemByCategory?cid=$!c.categoryCid">$!c.categoryCName</a></span> 
+									#end
+								</dd>
+							</dl> 
+						#end
+					</li> 
+				#end
+			#end
+		</ul>
+	</div>
+</div>

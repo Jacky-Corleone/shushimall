@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.camelot.openplatform.storecenter:storecenter-export:1.0.0.daily-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/camelot/openplatform/storecenter/storecenter-export/1.0.0.daily-SNAPSHOT/storecenter-export-1.0.0.daily-20150424.024604-35.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/camelot/openplatform/storecenter/storecenter-export/1.0.0.daily-SNAPSHOT/storecenter-export-1.0.0.daily-20150424.024604-35-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/camelot/openplatform/storecenter/storecenter-export/1.0.0.daily-SNAPSHOT/storecenter-export-1.0.0.daily-20150424.024604-35-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,38 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+
+<script type="text/javascript">
+	$(function(){
+		//加载左侧菜单
+		$("#leftBuyer").load("$request.contextPath/leftBuyer");
+	});
+</script>
+
+<div id="main">
+<!-- left start -->
+<div id="leftBuyer" style="width: 198px; float: left;">&nbsp;</div>
+<!-- left end -->
+
+<!-- right start-->
+<div id="right">
+	<div id="right_top" class="right_top border-4 bg_06 mar_b10">
+		<br><br>
+		<div class="wid_820 mar_20 ">
+			<font  style="color: #000000;font-family:Microsoft YaHei ;" >
+    			抱歉，此功能仅向企业用户开放！欢迎您进行
+    		</font>
+    		<a href="$request.contextPath/information/register/initRegister?type=buyer">
+    		<font  style="color: red;font-family:Microsoft YaHei ;" >
+    			企业认证
+    		</font>	
+    		</a>
+    		
+    		<font  style="color: #000000;font-family:Microsoft YaHei ;" >
+    			，专享VIP采购管家服务。
+			</font>
+	
+		</div>
+	</div>
+</div>
+<!-- right end-->
+</div>

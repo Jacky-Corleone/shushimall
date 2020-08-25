@@ -1,0 +1,8 @@
+com\camelot\basecenter\domain\Iptable.class
+com\camelot\basecenter\domain\MallDocument.class
+com\camelot\basecenter\domain\BaseWebsiteMessage.class
+com\camelot\basecenter\domain\BaseSmsConfig.class
+com\camelot\basecenter\domain\AddressInfo.class
+com\camelot\basecenter\domain\Growth.class
+com\camelot\basecenter\domain\AddressBase.class
+com\camelot\basecenter\domain\MallClassify.class

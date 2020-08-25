@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<settings>
+		<setting name="cacheEnabled" value="true" />
+		<setting name="lazyLoadingEnabled" value="true" />
+		<setting name="multipleResultSetsEnabled" value="true" />
+		<setting name="useColumnLabel" value="true" />
+		<setting name="useGeneratedKeys" value="false" />
+		<setting name="autoMappingBehavior" value="PARTIAL" />
+		<setting name="defaultExecutorType" value="SIMPLE" /><!-- SIMPLE REUSE BATCH -->
+		<!-- <setting name="defaultExecutorType" value="BATCH" /> -->
+		<setting name="defaultStatementTimeout" value="25000" />
+		<setting name="safeRowBoundsEnabled" value="false" />
+		<setting name="mapUnderscoreToCamelCase" value="false" />
+		<setting name="localCacheScope" value="SESSION" />
+		<!-- <setting name="jdbcTypeForNull" value="OTHER" /> -->
+		<setting name="jdbcTypeForNull" value="NULL" />
+		<setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString" />
+	</settings>
+	<typeAliases>
+		<typeAlias alias="fieldIdentificationAuditDTO" type="com.camelot.usercenter.dto.fieldIdentification.FieldIdentificationAuditDTO"/>
+		<typeAlias alias="fieldIdentificationPictureDTO" type="com.camelot.usercenter.dto.fieldIdentification.FieldIdentificationPictureDTO"/>
+		<typeAlias alias="userDTO" type="com.camelot.usercenter.dto.UserDTO"/>
+		<typeAlias alias="userInfoDTO" type="com.camelot.usercenter.dto.userInfo.UserInfoDTO"/>
+		<typeAlias alias="userContractDTO" type="com.camelot.usercenter.dto.contract.UserContractDTO"/>
+		<typeAlias alias="userContractAuditDTO" type="com.camelot.usercenter.dto.contract.UserContractAuditDTO"/>
+		<typeAlias alias="userAuditDTO" type="com.camelot.usercenter.dto.UserAuditDTO"/>
+		<typeAlias alias="userCompanyDTO" type="com.camelot.usercenter.dto.UserCompanyDTO"/>
+		<typeAlias alias="userComDeviceDTO" type="com.camelot.usercenter.dto.device.UserComDeviceDTO"/>
+		<typeAlias alias="userCompanyDevice" type="com.camelot.usercenter.domain.UserCompanyDevice"/>
+		<typeAlias alias="userPlatformServiceRule" type="com.camelot.usercenter.domain.UserPlatformServiceRule"/>
+		<typeAlias alias="userModifyDetailDTO" type="com.camelot.usercenter.dto.audit.UserModifyDetailDTO"/>
+		<typeAlias alias="userModifyInfoDTO" type="com.camelot.usercenter.dto.audit.UserModifyInfoDTO"/>
+		<typeAlias alias="userAuditLog" type="com.camelot.usercenter.dto.audit.UserAuditLogDTO" />
+        <typeAlias alias="userPersonalInfo" type="com.camelot.usercenter.dto.userInfo.UserPersonalInfoDTO"/>
+	</typeAliases>
+
+	<typeHandlers>
+	  <typeHandler handler="com.camelot.openplatform.dao.orm.mybatis.SerializableTypeHandler"/>
+	</typeHandlers>
+
+	<plugins>
+       <plugin interceptor="com.camelot.openplatform.dao.interceptor.mybatis.StatementHandlerInterceptor">
+           <property name="prop1" value="prop1"/>
+           <property name="prop2" value="prop2"/>
+       </plugin>
+       <plugin interceptor="com.camelot.openplatform.dao.interceptor.mybatis.ResultSetHandlerInterceptor">
+           <property name="prop1" value="prop1"/>
+           <property name="prop2" value="prop2"/>
+       </plugin>
+	</plugins>
+</configuration>

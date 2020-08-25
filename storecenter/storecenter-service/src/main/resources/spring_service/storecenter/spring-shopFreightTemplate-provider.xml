@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+	    <!--运费模板暴露接口-->
+		<dubbo:service interface="com.camelot.storecenter.service.ShopFreightTemplateService"
+					   owner="storecenter" ref="shopFreightTemplateService" version="1.0" protocol="dubbo"
+					   delay="-1" registry="qingdaoRegistry" />
+
+	    <!--优惠方式暴露接口-->
+		<dubbo:service interface="com.camelot.storecenter.service.ShopPreferentialWayService"
+					   owner="storecenter" ref="shopPreferentialWayService" version="1.0" protocol="dubbo"
+					   delay="-1" registry="qingdaoRegistry" />
+
+	    <!--运送方式暴露接口-->
+		<dubbo:service interface="com.camelot.storecenter.service.ShopDeliveryTypeService"
+					   owner="storecenter" ref="shopDeliveryTypeService" version="1.0" protocol="dubbo"
+					   delay="-1" registry="qingdaoRegistry" />
+		</beans>

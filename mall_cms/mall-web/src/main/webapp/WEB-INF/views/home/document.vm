@@ -1,0 +1,129 @@
+
+#set($staticPath="$request.contextPath/assets")
+<link href="$staticPath/css/Details.css" rel="stylesheet" type="text/css"/>
+<!--内容开始-->
+<div id="content">
+	<div class="wid_10">
+	 	
+	 	<!--左侧开始-->
+		<div id="leftSeller">
+        	<div id="shop_left" class="mar_t10">
+    			<dl class="border-1">
+    				#foreach($doc in $documents)
+    					#if($doc.mallClassifyId == $tmp.mallClassifyId)
+    					
+        					<li>
+        						<i class="demo-icons fa-angle-right "></i>
+        						<a href="$request.contextPath/document/$doc.mallType?mallId=$doc.mallId" id="$doc.mallId">$doc.mallTitle</a>
+        					</li>
+        				
+        					#if( $velocityCount == $documents.size() )
+        						</ul>
+        					#end
+        				
+    					#else
+    					
+        					#set($tmp = $doc)
+        				
+        					#if( $velocityCount > 1 )
+        						</ul>
+        					#end
+        				
+    						<dd>$doc.mallClassifyTitle<i class="fa-angle-double-down fr mar_r10"></i></dd>
+        					<ul style="display: none;">
+        						<li>
+        							<i class="demo-icons fa-angle-right"></i>
+        							<a href="$request.contextPath/document/$doc.mallType?mallId=$doc.mallId" id="$doc.mallId">$doc.mallTitle</a>
+        						</li>
+    					#end
+    				
+					#end
+     			</dl>
+     		</div>                                  
+		</div>
+		
+
+	 	<!-- 右侧开始-->
+	 	<div id="right" class="hei_600">
+	 		<!--搜索面包屑开始开始-->
+	 		
+		  	<div class="breadcrumb">
+		  		<i class="fa-th-large demo-icons fl mar_r10 font_14"></i>
+	            <span class="fl"><a class="level" href="$request.contextPath/">首页</a></span>
+	            <i class="demo-icons fa-angle-right fl mar_lr20 font_20"></i>
+	            <span class="fl"><a class="level" href="javascript:void(0);"> $!document.mallClassifyTitle</a></span>
+	        </div>
+	  		<!--搜索面包屑开始开始-->
+	  		
+	      	<!--文档内容开始-->
+	      	<div class="wid_950 mar hei_600">
+	      		<!--标题start-->
+	         	<h3 class="font_cen font_16 border-5 hei_40 mar_b10">$!document.mallTitle</h3>
+	         	<input id="documentContent" type="hidden" value="$!document.mallContentUrl">
+	         	<script type="text/javascript">
+         			$("#documentContent").parent().append($("#documentContent").val());
+	         	</script>
+	      	</div>
+	 	</div>
+	 	<!-- 右侧right结束-->
+	</div>
+</div>
+
+
+<script language="javascript">
+    var LR_username='$!userId';
+    var LR_userdata="舒适100";
+    function openZoosUrl_UserDefine(){
+        //你们的判断登录跳转功能，也可以在这里进行判断
+        if( '$!userId' ==  ''){
+            alert("你目前处于非登陆状态，请先登录再联系客服！");
+            this.location.href="$request.contextPath/user/login";
+            return true;
+        }
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            url:"$request.contextPath/shopCart/ifLogin_shopCustomer",
+            success: function(data){
+                if(data.ifLogin_shopCustomer == false){
+                    alert("你目前处于非登陆状态，请先登录再联系客服！");
+                    this.location.href="$request.contextPath/user/login";
+                    return true;
+                }
+            }
+        });
+    }
+	$(function(){
+		
+		//存储需要高亮显示的菜单
+		$('dl ul li a').click(function(){
+			$.cookie('clicked_docs', this.id, {path:'/'});
+		});
+		
+		//当前点击的菜单高亮显示，判断浏览器地址栏url与a标签href url相同则表示选择的是此菜单
+		$('dl ul li a').each(function(index,item){
+			if(item.id == $.cookie('clicked_docs')){
+				//高亮显示
+				$(item).addClass("font_fe").addClass("font_wei");
+				$.cookie('clicked_docs', item.id,{path:'/'});
+				
+				$(item).parent().parent().show();
+				$(item).parent().parent().prev().children("i").removeClass("fa-angle-double-down").addClass("fa-angle-double-up");
+			}
+		});
+	 	
+		//变换图标样式
+		$("#leftSeller dl dd").click(function(){
+			if($(this).children("i").hasClass("fa-angle-double-down")){
+				$("#leftSeller dl ul").hide();
+				$("#leftSeller dl dd i").removeClass("fa-angle-double-up").addClass("fa-angle-double-down");
+				$(this).children("i").removeClass("fa-angle-double-down").addClass("fa-angle-double-up");
+				$(this).next().show();
+			}else{
+				$(this).children("i").removeClass("fa-angle-double-up").addClass("fa-angle-double-down");
+				$(this).next().hide();
+			}
+		});
+	});
+	
+</script>

@@ -1,0 +1,53 @@
+#set($layout = "/none_layout.vm")
+<input type="hidden" name="shopId" value="$shopId">
+<div style="position: absolute;top:45px;left:0;right:0;bottom: 130px;overflow-y: auto;">
+    #foreach($itemsku in $pager.records)
+        <ul class="Refund_one">
+            <li class="wid_20" style="border: none; padding-top: 15px; text-align: left;">
+            	<input style="text-align:left;" type="checkbox" name="itemOrder" onclick="checkIsChosen(this)" />
+            </li>
+            <li class="wid_80" style="border: none; padding-top: 15px; text-align: left;">
+            	<a href="$request.contextPath/productController/details?id=$itemsku.itemId&skuId=$itemsku.skuId" target="_blank">
+                	<img style="width:70px;height:70px; text-align:left;" class="fl mar_l10 skuPicUrl_js" src="$gix$itemsku.picUrl" name="">
+            	</a>
+            </li>
+            <li class="wid_400" style="border: none; padding-top: 15px; text-align: left;">
+                <p class="mar_l10 over_ell"> 商品编号：<span>$!itemsku.skuId</span></p>
+                <p class="mar_l10 over_ell" title="$!itemsku.itemName"> $!itemsku.itemName </p>
+                <p class="mar_l10 over_ell"> 销售属性：<span>$!itemsku.skuAttributeStr</span> </p>
+                <p class="mar_l10 font_fe font_14b hei_32">原价：<span>$!itemsku.skuPrice</span></p>
+                <input type="hidden" name="attrSale" value="$!itemsku.skuAttributeStr">
+                <input type="hidden" name="proType" value="$!catMap.get($itemsku.cid.toString())">
+                <input type="hidden" name="itemSkuId" value="$!itemsku.skuId">
+                <input type="hidden" name="itemPrice" value="$!itemsku.skuPrice">
+                <input type="hidden" name="itemName" value="$!itemsku.itemName">
+            </li>
+        </ul>
+    #end
+</div>
+<!-- 分页 -->
+<div class="page" style="position: absolute;bottom: 80px;right:10px;">
+    <ul>
+        <li class="lastPage">
+            <a href="javascript:toItemPage(1)">首页</a>
+        </li>
+        <li class="lastPage">
+            <a href="javascript:toItemPage($pager.previewPage)">上一页</a>
+        </li>
+        #foreach($pageNo in [$!pager.startPageIndex .. $!pager.endPageIndex])
+            <li>
+                <a #if($pageNo==$pager.page) class="curr" #end href="javascript:toItemPage($pageNo)">
+                    $pageNo
+                </a>
+            </li>
+        #end
+        <li class="nextPage">
+            <a href="javascript:toItemPage($pager.nextPage)">下一页</a>
+        </li>
+        <li class="nextPage">
+            <a href="javascript:toItemPage($pager.totalPage)">末页</a>
+        </li>
+    </ul>
+</div>
+
+

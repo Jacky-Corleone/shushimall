@@ -1,0 +1,326 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+<script type="text/javascript" src="$request.contextPath/assets/js/common.js"></script>
+
+<script language="javascript" type="text/javascript" src="$request.contextPath/assets/js/tab.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/requestPrice/requestPrice.js"></script>
+<script language="javascript" type="text/javascript" src="$staticPath/js/contract/contract.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<input type="hidden" id="contextPath" value="$request.getContextPath()"/>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        //加载左侧菜单
+        $("#leftBuyer").load("$request.contextPath/leftBuyer");
+    });
+</script>
+<style>
+    .bd {
+        border:1px solid red;
+    }
+</style>
+<input type="hidden" id="contextPath" value="$request.getContextPath()"/>
+
+<div id="main">
+<!--中间部分开始-->
+<div id="leftBuyer" class="border-4"></div>
+<!--left end -->
+
+<!--右边部分开始-->
+<div id="right">
+    <div id="right_top" class="right_top border-4 bg_06">
+		<div class="right_top_l">
+			<form id="queryForm" method="post">
+			<ul class="list">
+				<li class="wid_270">
+					<span class="font_wid">询价名称：</span><input class="input_Style2 wid_150 hei_30" type="text" id="inquiryName"/>
+					<input type="hidden" value = "$!uid" id="createBy"/>
+				</li>
+				<li class="wid_270">
+					<span class="font_wid">供应商：</span>
+					<input class="input_Style2 wid_150 hei_30" type="text" id="supplierName" />				
+				</li>
+				<li class="wid_270">
+					<span class="font_wid">物品：</span>
+					<input class="input_Style2 wid_150 hei_30" type="text" id="itemName" name="itemName"/>			
+				</li>
+			<li class="wid_270"><span class="font_wid mar_l">询价状态：</span>
+				
+					
+					<select id="contractStatus" class="input_Style2 wid_160 mar_r10 hei_35 ">
+									<option value="">请选择</option>
+									<option value="1">待发布</option>
+									<option value="2">报价中</option>
+									<option value="3">已接受</option>
+					</select>
+					
+					
+					
+			</li>	
+			
+			<li class="wid_550">
+							<span class="font_wid">创建日期：</span> 
+	                    	<input id="d4313"  class="input_Style2 wid_160 mar_r10 hei_35 "  name="startTime"  id="startTime" value="$!date.format('yyyy-MM-dd',$!inquiry.startTime)" readonly class="Wdate" type="text" onFocus="WdatePicker({maxDate:'#F{$dp.$D(\'d4314\')}'})" style="line-height: 30px; height: 30px;"/>
+	                    	<i>-</i>
+							<input id="d4314"  class="input_Style2 wid_160 mar_r10 hei_35 " name="endTime" value="$!date.format('yyyy-MM-dd',$!inquiry.endTime)" readonly class="Wdate" type="text" onFocus="WdatePicker({minDate:'#F{$dp.$D(\'d4313\')}'})" style="line-height: 30px; height: 30px;"/>
+			</li>
+			</ul>
+            </form>
+		</div>
+		
+		<div class="right_top_r ">
+			<button type="button" class="button_4 but_cx3" id = "query_info" onclick="toRequestPricePage()">
+				查 询
+			</button>
+		</div>
+	</div>
+	<!-- 查询 结束 -->
+
+	<div class="right_bot border-4 mar_t10 bg_06">
+    <!-- 商品列表开头 -->
+		<div class="right_xinxi mar_l14" id="inquiryModel">
+			<ul class="list_top bg_08 font_cen font_14b">
+				<li class="wid_50">全选</li>
+				<li class="wid_130">询价名称</li>
+				<li class="wid_90">状态</li>
+                <li class="wid_150">录入方</li>
+				<li class="wid_110">创建日期</li>
+				<li class="wid_150">截至报价日期</li>
+				<li class="wid_130">备注</li>
+            </ul>
+      <!-- 类型选择 -->
+      <!-- 类型选择 -->
+      <ul class="right_select">
+        <li class="wid_50 font_cen">  <input type="checkbox" class="mar_l10 hei_22" id="all_select" onclick="select_all(this);"/></li>
+          <li><button type="button" class="button_4 mar_l10 hei_24" onclick="lookInquiryInfo('request','buyer');">查看</button></li>
+          <li><button type="button" class="button_4 mar_l10 hei_24" id="button_update" >修改</button></li>
+          <li><button type="button" class="button_4 mar_l10 hei_24" id="button_delete" onclick="button_delete(this)">删除</button></li>
+          <li><button type="button" class="button_4 mar_l10 hei_24" id="button_commit">发布询价</button></li>
+          <li><button type="button" class="button_4 mar_l10 hei_24" id="button_commit_re">重新询价</button></li>
+          <li><button type="button" class="button_4 mar_l10 hei_24" id="button_commit_accept">接受报价</button></li>
+          <li><button type="button" class="button_4 mar_l10 hei_24" id="button_create_order">下单</button></li>
+     <!--   <li><button type="button" class="button_4 mar_l10 hei_24">下单</button></li>-->
+        <span class="fr mar_tb10"><button type="button" class="button_2 hei_24 " onclick="toRequestPriceCreatePage()">+创建询价</button></span>
+      </ul>
+      <!-- 内容开始 -->
+      #if($pager.totalCount == 0)
+			<p class="wid_500" style="font-size:26px;line-height: 40px;margin-left:350px;">亲,还没有询价的数据哦!</p>
+	  #else
+		 #foreach($page in $pager.records)
+            <ul class="list_top hei_40 list_li" onclick ="onLookInfo(this,'$page.inquiryNo' ,'request');">
+              <li class="wid_50 font_cen">
+				<input type="hidden" name = "status" value="$page.status"/>
+                <input type="checkbox" class="mar_l10 hei_22" name = "inquiryNo" onclick='ischeckAllInquiryNo()' value="$page.inquiryNo"/>
+              </li>
+              <li class="wid_130" style='white-space: nowrap;text-overflow:ellipsis; overflow:hidden;' title="$!page.inquiryName">$!page.inquiryName</li>
+			  #if($!page.status == "1")
+					<li class="wid_90 font_cen">待发布</li>
+			  #elseif($!page.status == "2")
+					<li class="wid_90 font_cen">报价中</li>
+			  #elseif($!page.status == "3")
+					<li class="wid_90 font_cen">已接受</li>
+			  #else
+				   <li class="wid_90 font_cen">&nbsp;</li>
+			  #end
+              <li class="wid_150 font_cen" style="white-space: nowrap;text-overflow:ellipsis; overflow:hidden;" title="$!page.alternate3">$!page.alternate3</li>
+              <li class="wid_110 font_cen">$!date.format('yyyy-MM-dd',$!page.createDate)</li>
+              <li class="wid_150 font_cen">
+                 $!date.format('yyyy-MM-dd HH:mm:ss',$!page.endDate)
+              </li>
+			   <li class="wid_130 font_cen" style="white-space: nowrap;text-overflow:ellipsis; overflow:hidden;" title="$!page.remarks">$!page.remarks</li>
+         </ul>  
+		 #end
+	
+      <!-- 内容结束 -->
+	        <form id="categoryItemsForm"  method="post">
+				<input name="page" type="hidden">
+			</form>
+            <form action="$request.contextPath/shopCart/toOrderView" id="requestPriceForm" method="post">
+                <input type="hidden" name="orderType" id="orderType" value="0"/>
+                <input type="hidden" name="contractNo" id="contractNo" value=""/>
+            </form>
+		    	<!-- 分页 -->
+            #pageVelocity($pager)
+		</div>
+     #end  
+        <div class="att1" style="width:950px;margin:auto;">
+            <div class="att_top">
+                <ul>
+                <li class="hover" id="opt_1" onClick="Set_Tab('opt',1,3,'hover','');">询价明细</li>
+                <li id="opt_2" class="" onClick="Set_Tab('opt',2,3,'hover','');">询价订单</li>
+                </ul>
+            </div><!--标题att_top end -->
+            
+            <!--合同明细 内容开始 -->
+            <div class="att_con1 att_webwrap border-1" id="opt_1_content" style="width:950px;margin:auto;">
+                <table width="98%" class="add_inf mar" id="information1" style="table-layout:fixed">
+				  <tbody id="detailIn">
+					<!--表头 开始 -->
+                  <tr class="font_cen bg_05">
+					<td class="border-1 wid_50 font_cen"><input type="checkbox" id="checkAllDetail_checkAll" onclick="checkAllDetail(this);"/></td>
+                    <td class="border-1 wid_110 font_cen">供应商</td>
+                    <td class="border-1 wid_110 font_cen">物品名称</td>
+                    <td class="border-1 wid_110 font_cen">物品属性</td>
+                    <td class="border-1 wid_110 font_cen">交货日期</td>
+                    <td class="border-1 wid_110 font_cen">有效期(始)</td>
+                    <td class="border-1 wid_110 font_cen">有效期(止)</td>
+                    <td class="border-1 wid_80 font_cen">状态</td>
+                    <td class="border-1 wid_80 font_cen">数量(个)</td>
+                    <td class="font_cen border-1 wid_50 font_cen">单价</td>
+                  </tr>
+                <!--表头 结束 -->
+                  </tbody>
+                </table>
+            </div><!--att_con1 end -->
+            <!--合同订单 内容开始 -->
+            <div class="att_con1 att_webwrap border-1" id="opt_2_content" style="width:950px;margin:auto; display:none">
+                <table width="98%" class="add_inf mar" id="information2">
+					<tbody >
+                        <!--表头 开始 -->
+                          <tr class="font_cen bg_05">
+                            <td class="border-1 wid_110">询价编号</td>
+                            <td class="border-1 wid_110">订单编号</td>
+                            <td class="border-1 wid_110">订单状态</td>
+                              <td class="border-1 wid_80">总金额</td>
+                              <td class='border-1 wid_80'>订单详情</td>
+                          </tr>
+                        <!--表头 结束 -->
+                    </tbody>
+                
+                </table>
+            </div><!--att_con1 end -->
+            
+         </div><!--att1 end -->
+	</div><!--下面列表结束 -->
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->
+
+<!--供应商选择-->
+
+<!--首先设置一个层:-->
+<div id="Idiv" style="display: none; position: absolute; z-index: 20000; border:solid;background:#dedede">
+    <div id="mou_head" style="width:800px; height:500px; border:1px solid red ; z-index: 20001; position: absolute;">
+        <div style="float:center;width:800px;height:30px">
+            <input type="button" value="关闭" onclick="closeDiv();" style="float:right"/>
+        </div>
+        <div class="clear"></div>
+        <form id="partB"  method="post">
+            <input name="page" type="hidden">
+</form>
+<div id="partBDetail" style="background:white;width:800px;height:470px">
+    <table>
+        <tr>
+            <th style="width:150px;height:30px">公司名称</th>
+            <th style="width:150px;height:30px">联系人</th>
+            <th style="width:150px;height:30px">联系方式</th>
+            <th style="width:150px;height:30px">电子邮件</th>
+            <th style="width:150px;height:30px">用户类型</th>
+        </tr>
+        #foreach($userInfo in $page.records)
+            <tr ondblclick="getPartBDetail(this)">
+				<td style="display: none;width:150px;height:30px">$!userInfo.shopId</td>
+                <td style="width:150px;height:30px">$!userInfo.companyName</td>
+                <td style="width:150px;height:30px">$!userInfo.uname</td>
+                <td style="width:150px;height:30px">$!userInfo.umobile</td>
+                <td style="width:150px;height:30px">$!userInfo.userEmail</td>
+                <td style="display:none">$!userInfo.uid</td>
+                <td style="display:none">$!userInfo.parentId</td>
+                #if($!userInfo.usertype==2)
+                    <td style="width:150px;height:30px">买家</td>
+                    #elseif($!userInfo.usertype==3)
+                        <td style="width:150px;height:30px">卖家</td>
+                        #else
+                            <td style="width:150px;height:30px"></td>
+                #end	
+            </tr>
+        #end
+    </table>
+	  <form id="categoryItemsFormSupply"  method="post">
+				<input name="pageSupply" type="hidden">
+			</form>
+    <!-- 分页 -->
+    #pageVelocity($pager)
+</div>
+        </div>
+    </div>
+
+
+
+<!--供应商选择结束-->
+
+<script type="text/javascript">
+function toRequestPriceCreatePage(){
+	window.location="requestPriceCreate";
+}
+
+function toRequestPricePage(){
+var inquiryName = $("#inquiryName").val();
+var supplierName = $("#supplierName").val();
+var contractStatus = $("#contractStatus").val();
+var startTime = $("#d4313").val();
+
+var endTime = $("#d4314").val();
+var createBy = $("#createBy").val();
+var temp = "<tr class='font_cen bg_05'><td class='border-1 wid_50 '><input type='checkbox' id='checkAllDetail_checkAll' checked onclick='checkAllDetail(this);'/></td> <td class='border-1 wid_110'>供应商</td>"+
+        "<td class='border-1 wid_110'>物品名称</td><td class='border-1 wid_110'>物品属性</td><td class='border-1 wid_110'>交货日期</td><td class='border-1 wid_110'>有效期(始)</td><td class='border-1 wid_110'>有效期(止)</td><td class='border-1 wid_80'>状态</td><td class='border-1 wid_80'>数量</td>"+
+        "<td class=''border-1 wid_50'>单价</td></tr>";
+var temp2 = "<tr class='font_cen bg_05'> <td class='border-1 wid_110'>询价编号</td>"+
+                            "<td class='border-1 wid_110'>订单编号</td> <td class='border-1 wid_110'>订单状态</td>   <td class='border-1 wid_80'>总金额</td><td class='border-1 wid_80'>订单详情</td></tr>";
+$("#information1  tbody").html(temp);
+$("#information2   tbody").html(temp2);
+var itemName = $("#itemName").val();
+	$.ajax({
+			type: "post",
+			dataType: "html",
+			url: $("#contextPath").val()+"/requestPriceController/queryRequestPrice"+"?inquiryName="+encodeURIComponent(inquiryName)+"&supplierName="+encodeURIComponent(supplierName)+"&itemName="+encodeURIComponent(itemName)+"&createBy="+createBy+"&contractStatus="+encodeURIComponent(contractStatus)+"&startTime="+startTime+"&endTime="+endTime,
+			data:$("#queryForm").serializeArray(),
+			success: function(data){
+				$("#inquiryModel").html(data);
+			},
+		});
+}
+function topage(page){
+		var form = document.getElementById("categoryItemsForm");
+		form.page.value=page;
+		form.submit();
+	}
+	
+function chooseItem(){
+		window.open('productsListPrice','Derek','height=3000,width=1000,status=yes,toolbar=yes,menubar=no,location=yes');
+	}
+
+<!--此方法接收商品弹出子页面的参数，给商品明细赋值-->
+function goodsDetailInfo(itemId, itemName, itemName2, itemName3 ){
+    $("#matCd").val(itemId);
+    $("#itemName").val(itemName);
+}
+
+// 获取选中的乙方信息
+function getPartBDetail(e){
+	$('#supplierId').val(e.cells[0].innerText);
+	$('#supplierName').val(e.cells[1].innerText);
+	closeDiv();
+}
+// 分页
+function topageSupply(page){
+
+	$.ajax({
+		url : $("#contextPath").val() + "/requestPriceController/getSellerBuyerDetail",
+		data : {
+			"uType" : "1",
+			"page" : page
+		},
+		type : 'post',
+		dataType : 'html',
+		success : function(data) {
+			$("#partBDetail").html(data);
+		}
+		
+	});
+}
+
+</script>
+    
+
+

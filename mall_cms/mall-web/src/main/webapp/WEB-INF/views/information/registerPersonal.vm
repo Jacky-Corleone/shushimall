@@ -1,0 +1,563 @@
+#parse("/information/registerInit.vm")
+
+<script type="text/javascript">
+
+document.onkeydown = function(event) {  
+    var target, code, tag;  
+    if (!event) {  
+        event = window.event; //针对ie浏览器  
+        target = target;  
+        code = event.keyCode;  
+        if (code == 13) {  
+            tag = target.tagName;  
+            if (tag == "TEXTAREA") {
+				if(target.id =="pic_captcha_id"){
+					$("#personalPicCaptchaNextStep").click();
+				}
+				if(target.id =="enterprise_pic_captcha_id"){
+					$("#enterprisePicCaptchaNextStep").click();
+				}
+				
+				return true; 
+			}  
+            else {
+				if(target.id =="pic_captcha_id"){
+					$("#personalPicCaptchaNextStep").click();
+				}
+				if(target.id =="enterprise_pic_captcha_id"){
+					$("#enterprisePicCaptchaNextStep").click();
+				}
+				return false; 
+			}  
+        }  
+    }  
+    else {  
+        target = event.target; //针对遵循w3c标准的浏览器，如Firefox  
+        code = event.keyCode;  
+        if (code == 13) {  
+            tag = target.tagName;
+            if (tag == "INPUT") {
+				if(target.id =="pic_captcha_id"){
+					$("#personalPicCaptchaNextStep").click();
+				}
+				if(target.id =="enterprise_pic_captcha_id"){
+					$("#enterprisePicCaptchaNextStep").click();
+				}
+				return false; 
+			}  
+            else {
+				if(target.id =="pic_captcha_id"){
+					$("#personalPicCaptchaNextStep").click();
+				}
+				if(target.id =="enterprise_pic_captcha_id"){
+					$("#enterprisePicCaptchaNextStep").click();
+				}
+				return true; 
+			}  
+        }  
+    }  
+};  
+
+$(function(){
+//	$.focusblur("#personalLoginName");
+//	$.focusblur("#firstPersonalPassword");
+//	$.focusblur("#secondPersonalPassword");
+//	$.focusblur("#personalPhoneInput");
+
+	//初始化页面开始-------------------------------------------------------------------------------------------------------------------------
+	initPersonalValid();
+	//邮箱格式
+	var mailChrnum = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/;
+	
+	function initPersonalValid(){
+		//主页面
+		$("#personalForm").validate({
+			rules: {
+				"loginname":{
+					required: true,
+					chrnum: true,
+                    remote:"$request.contextPath/information/register/verifyRegisterName"
+				},
+				"firstPersonalPassword":{
+					required: true,
+					passwordlength6: true
+				},
+				"secondPersonalPassword":{
+					required: true,
+					passwordlength6: true,
+                    equalTo: "#firstPersonalPassword"
+				},
+				"personalPhoneInput":{
+					required: true,
+					phone: true,
+                  //   remote:"$request.contextPath/information/register/verifyPersonalMobile"
+				},
+				"personalPhoneCaptchaInput":{
+					required: true
+				}
+			},
+            messages: {
+                loginname: {
+                    remote: "用户名已存在，请重新输入"
+                },
+//                personalPhoneInput: {
+//                    remote: "手机号已注册，继续注册将于原账号解绑"
+//                },
+                secondPersonalPassword:{
+                    equalTo: "两次输入密码不一致"
+                }
+            }
+//			,
+//			fail:function(element) {
+//				if($(element)[0].id=="personalPhoneInput"){
+//    				$('#sendPersonalPhoneCaptchaButton').attr('disabled','disabled');
+//    				$('#sendPersonalPhoneCaptchaButton').html('手机号码已注册');
+//				}
+//			},
+//			success:function(error, element){
+//				if($(element)[0].id=="personalPhoneInput"){
+//					$('#sendPersonalPhoneCaptchaButton').removeAttr('disabled');
+//					$('#sendPersonalPhoneCaptchaButton').html('获取短信验证码');
+//				}
+//			}
+			
+		});
+		//弹出层验证邮箱
+		$("#personalMailCaptchaForm").validate({
+			rules: {
+				"personalMailInput_div":{
+					required: true,
+					mail: true,
+                    remote:"$request.contextPath/information/register/verifyPersonalEmail"
+				},
+				"personalMailCaptchaInput_div":{
+					required: true
+				}
+			},
+            messages: {
+                personalMailInput_div: {
+                    remote: "邮箱已存在，请重新输入"
+                }
+            },
+			
+            fail:function(element) {
+				if($(element)[0].id=="personalMailInput_div"){
+    				$('#sendPersonalMailCaptchaButton_div').attr('disabled','disabled');
+					if(!mailChrnum.test($('#personalMailInput_div').val())){
+						$('#sendPersonalMailCaptchaButton_div').html('邮箱格式不正确');
+					}else{
+						$('#sendPersonalMailCaptchaButton_div').html('邮箱已注册');
+					}
+				}
+			},
+			success:function(error, element){
+				if($(element)[0].id=="personalMailInput_div"){
+					$('#sendPersonalMailCaptchaButton_div').removeAttr('disabled');
+					$("#personalMailInput_div").attr("readonly",false);
+					$('#sendPersonalMailCaptchaButton_div').html('获取邮箱验证码');
+				}
+			}
+			
+		});
+		jQuery.validator.addMethod("passwordlength6", function(value, element) {
+			var chrnum = /^((?=.*?\d)(?=.*?[A-Za-z])|(?=.*?\d)(?=.*?[\W])|(?=.*?[A-Za-z])(?=.*?[\W]))[\dA-Za-z\W]+$$/;
+			return this.optional(element) || (chrnum.test(value));
+		}, "6-20位字符，由数字、字母、符号两个以上组合!");
+		jQuery.validator.addMethod("chrnum", function(value, element) {
+			var chrnum =  /^((?=.*?[0-9])(?=.*?[A-Za-z])|(?=.*?[0-9])(?=.*?[_])|(?=.*?[A-Za-z])(?=.*?[_]))[0-9A-Za-z_]{4,20}$/;
+			return this.optional(element) || (chrnum.test(value));
+		}, "4-20位字符，支持字母、数字、下划线两个以上组合!");
+
+//		jQuery.validator.addMethod("phone", function(value, element) {
+//			var chrnum = /^[1]([3|5|7|8][0-9]{1}|59|58|88|89)[0-9]{8}$/;
+//			return this.optional(element) || (chrnum.test(value));
+//		}, "请输入正确的手机号!");
+		jQuery.validator.addMethod("mail", function(value, element) {
+			//var chrnum = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/;
+			return this.optional(element) || (mailChrnum.test(value));
+		}, "请输入正确的邮箱!");
+	};
+	//初始化页面结束-------------------------------------------------------------------------------------------------------------------------
+
+	//同意协议并注册按钮开始-------------------------------------------------------------------------------------------------------
+    $("#personalBtn").click(function() {
+        //是否同意科印协议商城《用户协议》和《隐私声明》
+        if($("#personal").is(":checked")!=true){
+            alert("请阅读商城协议!");
+            return false;
+        }
+        //验证用户名:唯一
+//		if( !loginname_state ){
+//			alert("请填写用户名!");
+//			return false;
+//		}
+        //表单数据校验
+        var ifPersonalFormValid = $("#personalForm").valid();
+        if( !ifPersonalFormValid ){
+            return false;
+        }
+        //确认密码
+        if($("#firstPersonalPassword").val() != $("#secondPersonalPassword").val()){
+            return false;
+        }
+        //RegisterInfoDTO-loginpwd属性
+        $("#personalPassword").val($("#firstPersonalPassword").val());
+        //RegisterInfoDTO-userEmail属性
+        //$("#personalMail").val($("#personalMailInput_div").val());
+        $("#personalPhone").val($("#personalPhoneInput").val());
+        //判断是否需要验证手机（后门）
+        if($("#personalPhoneCaptchaInput").val()!="111111"){
+            //验证手机
+            var personalPhoneCaptchaBoolean = checkSynchronizedCaptcha("personalPhoneCaptchaKey","personalPhoneCaptchaInput",2,0);
+            if(personalPhoneCaptchaBoolean == false){
+                return false;
+            }
+        }
+		
+		//如果邮箱不为空，再次进行验证
+		if($("#personalMailInput_div").val()!=''){
+			if(mailChrnum.test($("#personalMailInput_div").val())){
+			  if($("#personalMailCaptchaInput_div").val()!="111111"){
+					var personalMailCaptchaInput_div_Boolean = checkSynchronizedCaptcha("personalMailCaptchaKey_div","personalMailCaptchaInput_div",1,1);
+					if(personalMailCaptchaInput_div_Boolean){
+						$("#personalMail").val($("#personalMailInput_div").val());
+					}
+				}else{
+					$("#personalMail").val($("#personalMailInput_div").val());
+				}
+			}
+		}
+        if($("#personalPhoneStatus").val()=="true"){
+            if(confirm("验证手机已注册,继续操作将与原账号解绑，是否继续？")){
+                //同意协议并注册
+                $("#personalBtn").loadingMsg();
+                $.ajax({
+                    type: "post",
+                    dataType: "json",
+                    url:"$request.contextPath/information/register/submitPersonal",
+                    data:$("#personalForm").serializeArray(),
+                    success: function(data){
+                        $("#personalBtn").hideMsg();
+                        if(data.success){
+        					window.location.href = "$request.contextPath/information/register/registerSucceed?loginname="+$("#personalLoginName").val()+"&userType=personal";
+        				}else{
+        					alert(data.message);
+        				}
+                    },
+                    error:function(data){
+                        alert("注册失败，请重新操作！");
+                        $("#personalBtn").hideMsg();
+                    }
+                });
+            }
+//            $("#personBox").show();
+        }else{
+            //同意协议并注册
+            $("#personalBtn").loadingMsg();
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                url:"$request.contextPath/information/register/submitPersonal",
+                data:$("#personalForm").serializeArray(),
+                success: function(data){
+                    $("#personalBtn").hideMsg();
+                    if(data.success){
+    					window.location.href = "$request.contextPath/information/register/registerSucceed?loginname="+$("#personalLoginName").val()+"&userType=personal";
+    				}else{
+    					alert(data.message);
+    				}
+                },
+                error:function(data){
+                    alert("注册失败，请重新操作！");
+                    $("#personalBtn").hideMsg();
+                }
+            });
+        }
+
+
+    });
+
+	$("#queryBtn").click(function(){
+        $("#personBox").hide();
+		//同意协议并注册
+		$("#personalBtn").loadingMsg();
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			url:"$request.contextPath/information/register/submitPersonal",
+			data:$("#personalForm").serializeArray(),
+			success: function(data){
+				 $("#personalBtn").hideMsg();
+				if(data.success){
+					window.location.href = "$request.contextPath/information/register/registerSucceed?loginname="+$("#personalLoginName").val()+"&userType=personal";
+				}else{
+					alert(data.message);
+				}
+			},
+			error:function(data){
+                alert("注册失败，请重新操作！");
+				$("#personalBtn").hideMsg();
+			}
+		});
+	});
+	//同意协议并注册按钮结束-------------------------------------------------------------------------------------------------------
+
+	//弹出层验证邮箱开始--------------------------------------------------------------------------------------------------------------------------------
+	//关闭按钮
+	$("#mailCaptchaDivClose").click(function(){
+		$('#personMailCaptchaDiv').attr('style','display:none');
+	});
+	//下一步按钮
+	var personalMailCaptchaInput_div_Boolean;
+	$("#personalMailNextStep").click(function(){
+		var ifPersonalMailCaptchaFormValid = $("#personalMailCaptchaForm").valid();
+		if( !ifPersonalMailCaptchaFormValid ){
+			return false;
+		}
+		//判断是否需要验证邮箱（后门）
+		if($("#personalMailCaptchaInput_div").val() != "111111"){
+			personalMailCaptchaInput_div_Boolean = checkSynchronizedCaptcha("personalMailCaptchaKey_div","personalMailCaptchaInput_div",1,1);
+			if(personalMailCaptchaInput_div_Boolean == true){
+				$('#personMailCaptchaDiv').attr('style','display:none');
+			}else{
+				alert("邮箱未验证完毕,无法下一步!");
+				return false;
+			}
+		}else{
+			$('#personMailCaptchaDiv').attr('style','display:none');
+		}
+	});
+	//弹出层验证邮箱结束--------------------------------------------------------------------------------------------------------------------------------
+	
+	//弹出层图片验证码开始--------------------------------------------------------------------------------------------------------------------------------
+	//关闭按钮
+	$("#personPicCaptchaDivClose").click(function(){
+		$('#personPicCaptchaDiv').attr('style','display:none');
+	});
+	//下一步按钮
+	var personalPicCaptchaInput_div_Boolean;
+	$("#personalPicCaptchaNextStep").click(function(){
+		var ifPersonalPicCaptchaFormValid = $("#personalPicCaptchaForm").valid();
+		if( !ifPersonalPicCaptchaFormValid ){
+			return false;
+		}
+		//点击下一步，发送手机验证码
+		sendCaptcha('personalPhoneCaptchaKey','sendPersonalPhoneCaptchaButton','personalPhoneInput',1,2,0,'p_register');
+	});
+	//弹出层图片验证码结束------------------------------------------------------------------------------------------------------------------------------
+
+});
+function p_chage(){
+	var img = document.getElementById("p_vc");
+	img.src="$request.contextPath/user/acquire?a=" + new Date().getTime()+"&type=p_register";
+}
+
+function personalPhoneVali(){
+    var content=$('#personalPhoneInput').val();
+    if($.trim(content) == '' ){
+        $("#personalPhoneInputDiv").hide();
+        return false;
+    }
+    $.ajax({
+        type: "post",
+        data:{personalPhoneInput:$('#personalPhoneInput').val()},
+        url:"$request.contextPath/information/register/verifyPersonalMobile",
+        success: function(data){
+            if(!data){
+                $("#personalPhoneStatus").val("true");
+                $("#personalPhoneInputDiv").show();
+            }else{
+                $("#personalPhoneStatus").val("false");
+                $("#personalPhoneInputDiv").hide();
+            }
+        },
+        error:function(data){
+            alert("注册失败，请重新操作！");
+            $("#personalBtn").hideMsg();
+        }
+    });
+
+}
+function hideDiv(obj){
+    $("#"+obj).hide();
+}
+
+</script>
+
+
+<div class="nTab" style="float: none;">
+	<div class="TabTitle">
+		<ul id="myTab0">
+			<li class="active" onclick="nTabs(this,0);">用户注册</li>
+			<li class="normal" onclick="nTabs(this,1);">企业用户</li>
+		</ul>
+	</div>
+	<div class="TabContent">
+		<form id="personalForm" method="post" >
+		<input id="keyPersonalRegisterDuplicateRedis" name="keyPersonalRegisterDuplicateRedis" type="hidden" value="$!keyPersonalRegisterDuplicateRedis"/>
+		<input id="personalPassword" name="loginpwd" type="hidden" />
+		<input id="personalMail" name="userEmail" type="hidden" />
+		<input id="personalPhone" name="userMobile" type="hidden" />
+		<!-- tab外部js需要id="myTab0_Content0"  -->
+		<div id="myTab0_Content0">
+			<div class="register_box_2"><ul>
+				<li>
+					<span class="regist_font"><i class="font_fs">*</i>用户名：</span>
+					<div class="regist_item_ifo">
+						<input id="personalLoginName" name="loginname" type="text" class="input_Style1 wid_350" placeholder="4-20位字符，支持字母、数字、下划线两个以上组合" maxlength="20"/>
+						<span class="register-icon fa-user font_c7"></span>
+					</div>
+					<div id="personalLoginNameDiv" class="regist_text bg_05 border-1 none name">4-20位字符，支持字母、数字、下划线两个以上组合</div>
+				</li>
+				<li class="pr">
+					<span class="regist_font"><i class="font_fs">*</i>请设置密码：</span>
+					<div class="regist_item_ifo">
+						<input id="firstPersonalPassword" name="firstPersonalPassword" type="password" class="input_Style1 wid_350" placeholder="6-20位字符，由数字、字母、符号两个以上组合" maxlength="20" onfocus="$(this).checkPwdIn()" onKeyUp="$(this).checkPwdStrong()" />
+						<span class="register-icon fa-lock font_c7"></span>
+						<div class="password_length" style="margin-top: 5px;">
+                            <span id="pwd_level_1" class="bg_09 font_12" style="display:none">弱</span><!--密码长度为短就用第一个span -->
+                            <span id="pwd_level_2" class="bg_10 font_12" style="display:none">中</span><!--密码长度为中就用到第一个和第二个span -->
+                            <span id="pwd_level_3" class="bg_11 font_12" style="display:none">强</span><!--密码长度为高就用到第一个和第二个和第三个span -->
+                        </div>
+					</div>
+					<div id="firstPersonalPasswordDiv" class="regist_text bg_05 border-1 none pass">6-20位字符，由数字、字母、符号两个以上组合</div>
+				</li>
+				<li>
+					<span class="regist_font"><i class="font_fs">*</i>请确认密码：</span>
+					<div class="regist_item_ifo">
+						<input id="secondPersonalPassword" name="secondPersonalPassword" type="password" class="input_Style1 wid_350" placeholder="请您再次输入密码" maxlength="20"/>
+						<span class="register-icon fa-lock font_c7"></span>
+					</div>
+					<div id="secondPersonalPasswordDiv1" class="regist_text bg_05 border-1 none pass_two">请再次输入密码</div>
+					<div id="secondPersonalPasswordDiv2" class="regist_text bg_05 border-1 none font_fe ">
+						<i class="fa-exclamation-circle font_16 demo-icons"></i>两次输入密码不一致
+					</div>
+				</li>
+				<li>
+					<span class="regist_font"><i class="font_fs">*</i>手机：</span>
+					<div class="regist_item_ifo">
+						<input id="personalPhoneInput" name="personalPhoneInput" type="text" class="input_Style1 wid_220" placeholder="请输入手机号" maxlength="11" onblur="personalPhoneVali();"/>
+                        <span class="register-icon fa-mobile font_c7" style="font-size:24px;"></span>
+					</div>
+					<div id="personalPhoneInputDiv1">
+						<label class="email">或 <a href="#" onclick="$('#personMailCaptchaDiv').attr('style','');" class="font_e3">验证邮箱</a></label>
+					</div>
+					<div id="personalPhoneInputDiv2" class="regist_text bg_05 border-1 none">完成验证后可以用手机号登录和找回密码</div>
+
+				</li>
+                <li style="display:none" id="personalPhoneInputDiv" >
+                    <input type="hidden" id="personalPhoneStatus" />
+                    <span class="regist_font"><i class="font_fs">*</i></span>
+                    <div id="personalPhoneInputDiv2" class="f1 regist_text bg_05 border-1  font_fe ">
+                        <i class="fa-exclamation-circle font_12 demo-icons"></i>手机号已注册，继续注册将与原账号解绑
+                    </div>
+                </li>
+
+				<li>
+					<span class="regist_font"><i class="font_fs">*</i>手机验证码：</span>
+					<div class="regist_item_ifo">
+						<input id="personalPhoneCaptchaKey" type="hidden" />
+						<input id="personalPhoneCaptchaInput" name="personalPhoneCaptchaInput" type="text" class="input_Style1 wid_220 fl" placeholder="请输入手机验证码" maxlength="6"/>
+						<!--<button id="sendPersonalPhoneCaptchaButton" type="button" onclick="sendCaptcha('personalPhoneCaptchaKey','sendPersonalPhoneCaptchaButton','personalPhoneInput',1,2,0)" class="fl button_4 hei_35 mar_l10">获取短信验证码</button>-->
+						<button id="sendPersonalPhoneCaptchaButton" type="button" onclick="isSendCaptcha('personalPhoneInput','p_regiter')" class="fl button_4 hei_35 mar_l10">获取短信验证码</button>
+					</div>
+				</li>
+				<li class="mar_t10" >
+					<p style="margin-left:175px;">
+						<input id="personal" name="personal" type="checkbox" value="111"  checked="checked"/>
+						<a href="#" onclick="$('#mallAgreement').attr('style','');" >同意舒适100《用户协议》和《隐私声明》</a>
+					</p>
+				</li>
+				<li>
+					<button id="personalBtn" class="button_1 hei_40" style="width:260px; margin-left:180px;" loadMsg="正在提交..." type="button">同意协议并注册</button>
+				</li>
+			</ul></div>
+<!--
+ <div class="register_pic_small">
+				<img src="$request.contextPath/assets/images/erweima.png" width="150" height="150" alt="" style="background-color:#666666" />
+				扫描进入手机登陆页			</div>
+-->
+        </div>
+
+		</form>
+		#parse("/information/registerEnterprise.vm")
+	</div>
+</div>
+<!--内容end-->
+
+<!-- 验证邮箱弹出层开始 -->
+<div id="personMailCaptchaDiv" class="po_fai" style="display:none">
+	<form id="personalMailCaptchaForm"  method="post">
+		<div class="po_main" style="width:500px; margin-left:-250px;">
+			<div class="tit pad_l10 hei_35 bg_05" >
+				<span class="fl font_14b">验证邮箱</span><i id="mailCaptchaDivClose" class="fa fa-times-circle fr font_14 mar_r10 cursor"></i>
+			</div>
+			<ul class="mar_tb20">
+				<li>
+					<div class="wid_260 hei_30 font_fe" style="margin-left:120px;">为了提升您的账户安全，请验证邮箱</div>
+				</li>
+				<li>
+					<span class="wid_110 font_right fl mar_r10"><i class="font_fe">*</i>邮箱：</span>
+					<span class="fl margin-top wid_260"><input id="personalMailInput_div" name="personalMailInput_div" type="text" class="input_Style2 hei_32 wid_260 fl" placeholder="请输入邮箱"/></span>
+				</li>
+				<li class="clear"></li>
+				<li>
+					<span class="wid_110 font_right fl mar_r10"><i class="font_fe">*</i>验证码：</span>
+					<input id="personalMailCaptchaKey_div" type="hidden" />
+					<span class="fl margin-top wid_130"><input id="personalMailCaptchaInput_div" name="personalMailCaptchaInput_div" type="text" class="input_Style2 hei_32 wid_110 fl" placeholder="请输入验证码"/></span>
+					<span class="fl margin-top wid_160"><button id="sendPersonalMailCaptchaButton_div" type="button" onclick="sendCaptcha('personalMailCaptchaKey_div','sendPersonalMailCaptchaButton_div','personalMailInput_div',1,1,0)" class="button_5 fl font_12 hei_35">获取邮箱验证码</button></span>
+				</li>
+				<li class="clear"></li>
+				<li>
+					<button id="personalMailNextStep" type="button" class="button_1 hei_35">下一步</button>
+				</li>
+			</ul>
+		</div>
+	</form>
+</div>
+<!-- 验证邮箱弹出层结束 -->
+
+<!-- 图片验证码弹出层开始 -->
+<div id="personPicCaptchaDiv" class="po_fai" style="display:none">
+	<form id="personalPicCaptchaForm"  method="post">
+		<div class="po_main" style="width:300px; margin-left:-250px;">
+			<div class="tit pad_l10 hei_35 bg_05" >
+				<i id="personPicCaptchaDivClose" class="fa fa-times-circle fr font_14 mar_r10 cursor"></i>
+			</div>
+			<ul class="mar_tb20">
+				<li style="text-align:left">
+    				<input name="captcha" type="text" id="pic_captcha_id" class="input_Style1 wid_120" placeholder="验证码" maxlength="6" />
+    				<span class="wid_120">
+    					<img id="p_vc" style="" src="$request.contextPath/user/acquire?type=p_register" />
+    					<a href="javascript:p_chage();">换一张</a>
+    				</span>
+    				<span id="pic_captcha_span" style="margin-top: 3px; margin-left: 7px;"></span>
+    			</li>
+				<li class="clear"></li>
+				<li>
+					<button id="personalPicCaptchaNextStep" type="button" class="button_1 hei_35" loadMsg="正在提交...">确定</button>
+				</li>
+			</ul>
+		</div>
+	</form>
+</div>
+<!-- 弹出层  -->
+<div class="po_fai" style="display:none;" id="personBox">
+    <div class="po_fai_bg"></div>
+    <div class="po_main4 pad_t10" >
+
+        <div class="add_qynm">
+            <p  id="contentId" class="hei_30 font_14b">
+               验证手机已注册
+            </p>
+            <p class="hei_30 font_14b">验证手机已注册,继续操作将与原账号解绑，是否继续？</p>
+        </div>
+        <div class="wid_130 mar_cen">
+            <button type="button"  id="queryBtn"    class="button_small fl">继续</button>
+            <button type="button" id="cancelBtn" onclick="hideDiv('personBox')"  class="button_gary fl"  >取消</button>
+        </div>
+    </div>
+</div>
+<!-- 图片验证码弹出层结束 -->
+
+

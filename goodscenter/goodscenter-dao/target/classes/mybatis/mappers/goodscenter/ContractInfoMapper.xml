@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.goodscenter.dao.ContractInfoDAO">
+    <resultMap id="contractInfoMapper" type="com.camelot.goodscenter.dto.ContractInfoDTO">
+        <result property="id" column="id"/>
+        <result property="contractNo" column="contract_no"/>
+        <result property="contractOrderNo" column="contract_order_no"/>
+        <result property="contractName" column="contract_name"/>
+        <result property="printerId" column="printer_id"/>
+        <result property="supplierId" column="supplier_id"/>
+        <result property="beginDate" column="begin_date"/>
+        <result property="endDate" column="end_date"/> 
+        <result property="payType" column="pay_type"/>
+        <result property="invoiceFlag" column="invoice_flag"/>
+        <result property="invoiceType" column="invoice_type"/>
+        <result property="invoiceName" column="invoice_name"/>
+        <result property="deliverMethod" column="deliver_method"/>
+        <result property="remark" column="remark"/>
+        <result property="confirmBy" column="confirm_by"/>
+        <result property="confirmDate" column="confirm_date"/>
+        <result property="approveBy" column="approve_by"/>
+        <result property="approveDate" column="approve_date"/>
+        <result property="status" column="status"/>
+        <result property="annex" column="annex"/>
+        <result property="createRole" column="create_role"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateDate" column="update_date"/>
+        <result property="activeFlag" column="active_flag"/>
+        <result property="itemName" column="item_name"/>
+        <result property="refusalReason" column="refusal_reason"/>
+        <result property="updatedContractNo" column="updated_contract_no"/>
+         <result property="protocolType" column="contract_type"/>
+    </resultMap>
+
+    <sql id="where">
+        <where>
+            <if test="contractInfo.id != null and contractInfo.id != '' ">
+                and contractInfo.id = #{contractInfo.id}
+            </if>
+            <if test="contractInfo.contractNo != null and contractInfo.contractNo != '' ">
+                and contractInfo.contract_no = #{contractInfo.contractNo}
+            </if>
+            <if test="contractInfo.contractName != null and contractInfo.contractName != '' ">
+                <![CDATA[ and contractInfo.contract_name like CONCAT('%',TRIM(#{contractInfo.contractName}),'%')]]>
+            </if>
+            <if test="contractInfo.printerId != null and contractInfo.printerId != '' ">
+                and contractInfo.printer_id = #{contractInfo.printerId}
+            </if>
+            <if test="contractInfo.supplierId != null and contractInfo.supplierId != '' ">
+                and contractInfo.supplier_id = #{contractInfo.supplierId}
+            </if>
+            <if test="contractInfo.beginDate != null and contractInfo.beginDate != '' ">
+                and contractInfo.begin_date = #{contractInfo.beginDate}
+            </if>
+            <if test="contractInfo.endDate != null and contractInfo.endDate != '' ">
+                and contractInfo.end_date = #{contractInfo.endDate}
+            </if>
+            <if test="contractInfo.payType != null and contractInfo.payType != '' ">
+                and contractInfo.pay_type = #{contractInfo.payType}
+            </if>
+            <if test="contractInfo.invoiceFlag != null and contractInfo.invoiceFlag != '' ">
+                and contractInfo.invoice_flag = #{contractInfo.invoiceFlag}
+            </if>
+            <if test="contractInfo.invoiceType != null and contractInfo.invoiceType != '' ">
+                and contractInfo.invoice_type = #{contractInfo.invoiceType}
+            </if>
+            <if test="contractInfo.invoiceName != null and contractInfo.invoiceName != '' ">
+                and contractInfo.invoice_name = #{contractInfo.invoiceName}
+            </if>
+            <if test="contractInfo.deliverMethod != null and contractInfo.deliverMethod != '' ">
+                and contractInfo.deliver_method = #{contractInfo.deliverMethod}
+            </if>
+            <if test="contractInfo.remark != null and contractInfo.remark != '' ">
+                and contractInfo.remark = #{contractInfo.remark}
+            </if>
+            <if test="contractInfo.confirmBy != null and contractInfo.confirmBy != '' ">
+                and contractInfo.confirm_by = #{contractInfo.confirmBy}
+            </if>
+            <if test="contractInfo.confirmDate != null and contractInfo.confirmDate != '' ">
+                and contractInfo.confirm_date = #{contractInfo.confirmDate}
+            </if>
+            <if test="contractInfo.approveBy != null and contractInfo.approveBy != '' ">
+                and contractInfo.approve_by = #{contractInfo.approveBy}
+            </if>
+            <if test="contractInfo.approveDate != null and contractInfo.approveDate != '' ">
+                and contractInfo.approve_date = #{contractInfo.approveDate}
+            </if>
+            <if test="contractInfo.annex != null and contractInfo.annex != '' ">
+                and contractInfo.annex = #{contractInfo.annex}
+            </if>
+            <if test="contractInfo.status != null and contractInfo.status != '' ">
+                and contractInfo.status = #{contractInfo.status}
+            </if>
+            <if test="contractInfo.createRole != null and contractInfo.createRole != '' ">
+                and contractInfo.create_role = #{contractInfo.createRole}
+            </if>
+            <if test="contractInfo.createBy != null and contractInfo.createBy != '' ">
+                and contractInfo.create_by = #{contractInfo.createBy}
+            </if>
+            <if test="contractInfo.createDate != null and contractInfo.createDate != '' ">
+                and contractInfo.create_date = #{contractInfo.createDate}
+            </if>
+            <if test="contractInfo.updateBy != null and contractInfo.updateBy != '' ">
+                and contractInfo.update_by = #{contractInfo.updateBy}
+            </if>
+            <if test="contractInfo.updateDate != null and contractInfo.updateDate != '' ">
+                and contractInfo.update_date = #{contractInfo.updateDate}
+            </if>
+            <if test="contractInfo.activeFlag != null and contractInfo.activeFlag != '' ">
+                and contractInfo.active_flag = #{contractInfo.activeFlag}
+            </if>
+            <if test="contractInfo.loginId != null and contractInfo.loginId != '' ">
+                and (contractInfo.create_by=#{contractInfo.loginId} OR contractInfo.approve_by=#{contractInfo.loginId}
+                OR contractInfo.confirm_by=#{contractInfo.loginId})
+            </if>
+            
+            <!-- 根据主子帐号id查询  李伟龙增加 start-->
+            <if test="contractInfo.userList != null and contractInfo.userList.size() > 0 ">
+                 AND (contractInfo.create_by in
+                <foreach collection="contractInfo.userList" open="(" separator="," close=")" item="userId">
+                    #{userId}
+                </foreach>
+                OR contractInfo.approve_by in
+                <foreach collection="contractInfo.userList" open="(" separator="," close=")" item="userId">
+					#{userId}
+                </foreach>
+                 OR contractInfo.confirm_by in
+                <foreach collection="contractInfo.userList" open="(" separator="," close=")" item="userId">
+                    #{userId}
+                </foreach>
+                )
+            </if>
+            <!-- 根据主子帐号id查询  李伟龙增加 end-->
+            
+            <if test=" contractInfo.supplierIdList != null and contractInfo.supplierIdList.size() > 0 ">
+                AND contractInfo.supplier_id in
+                <foreach collection="contractInfo.supplierIdList" open="(" separator="," close=")" item="supplierId">
+                    #{supplierId}
+                </foreach>
+            </if>
+            <if test=" contractInfo.printerIdList != null and contractInfo.printerIdList.size() > 0 ">
+                AND contractInfo.printer_id in
+                <foreach collection="contractInfo.printerIdList" open="(" separator="," close=")" item="printerId">
+                    #{printerId}
+                </foreach>
+            </if>
+            <if test="contractInfo.updatedContractNo != null and contractInfo.updatedContractNo != '' ">
+                and contractInfo.updated_contract_no = #{contractInfo.updatedContractNo}
+            </if>
+            <if test="contractInfo.itemName != null and contractInfo.itemName != '' ">
+                <![CDATA[ and item.item_name like CONCAT('%',TRIM(#{contractInfo.itemName}),'%')]]>
+            </if>
+            
+
+        </where>
+    </sql>
+
+    <select id="queryPage" resultMap="contractInfoMapper">
+        SELECT
+        DISTINCT contractInfo.*
+        FROM
+        contract_info contractInfo
+        JOIN contract_mat contractMat
+        ON contractInfo.contract_no = contractMat.contract_no
+        LEFT JOIN item_sku itemSku
+        ON contractMat.mat_cd = itemSku.sku_id
+        LEFT JOIN item item
+        ON itemSku.item_id = item.item_id
+        LEFT JOIN item_category itemCategory
+        ON item.cid = itemCategory.cid
+        <include refid="where"/>
+        ORDER BY contractInfo.create_date DESC
+        limit #{pager.pageOffset},#{pager.rows}
+    </select>
+
+    <select id="queryPageCount" resultType="long">
+        select count(0) from (SELECT
+        DISTINCT contractInfo.*
+        FROM
+        contract_info contractInfo
+        JOIN contract_mat contractMat
+        ON contractInfo.contract_no = contractMat.contract_no
+        LEFT JOIN item_sku itemSku
+        ON contractMat.mat_cd = itemSku.sku_id
+        LEFT JOIN item item
+        ON itemSku.item_id = item.item_id
+        LEFT JOIN item_category itemCategory
+        ON item.cid = itemCategory.cid
+        <include refid="where"/>
+        ) A
+    </select>
+
+    <select id="findById" resultMap="contractInfoMapper">
+		select * from contract_info contractInfo
+		where id = #{id}
+	</select>
+    <select id="findBycontractInfoDTO" resultMap="contractInfoMapper">
+        select * from contract_info contractInfo
+        <include refid="where"/>
+    </select>
+
+    <select id="queryContractInfoPagerCount" resultType="long">
+        SELECT count(*)
+        FROM contract_info contractInfo
+        WHERE 1=1
+        <if test="contractInfo.contractNo != null and contractInfo.contractNo != '' ">
+            <![CDATA[ and contractInfo.contract_no like CONCAT('%',TRIM(#{contractInfo.contractNo}),'%')]]>
+        </if>
+        <if test="contractInfo.printerId != null and contractInfo.printerId != '' ">
+            and contractInfo.printer_id = #{contractInfo.printerId}
+        </if>
+        <if test=" contractInfo.supplierIdList != null and contractInfo.supplierIdList.size() > 0 ">
+            AND contractInfo.supplier_id in
+            <foreach collection="contractInfo.supplierIdList" open="(" separator="," close=")" item="supplierId">
+                #{supplierId}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="queryContractInfoPager" resultMap="contractInfoMapper">
+        SELECT *
+        FROM contract_info contractInfo
+        WHERE 1=1
+        <if test="contractInfo.contractNo != null and contractInfo.contractNo != '' ">
+            <![CDATA[ and contractInfo.contract_no like CONCAT('%',TRIM(#{contractInfo.contractNo}),'%')]]>
+        </if>
+        <if test="contractInfo.printerId != null and contractInfo.printerId != '' ">
+            and contractInfo.printer_id = #{contractInfo.printerId}
+        </if>
+        <if test=" contractInfo.supplierIdList != null and contractInfo.supplierIdList.size() > 0 ">
+            AND contractInfo.supplier_id in
+            <foreach collection="contractInfo.supplierIdList" open="(" separator="," close=")" item="supplierId">
+                #{supplierId}
+            </foreach>
+        </if>
+        limit #{pager.pageOffset},#{pager.rows}
+    </select>
+
+    <insert id="insert" parameterType="com.camelot.goodscenter.dto.ContractInfoDTO" useGeneratedKeys="true"
+            keyProperty="id">
+		insert into contract_info(
+				contract_no,
+				contract_order_no,
+				contract_name,
+				printer_id,
+				supplier_id,
+				begin_date,
+				end_date,
+				pay_type,
+				invoice_flag,
+				invoice_type,
+				invoice_name,
+				deliver_method,
+				remark,
+				confirm_by,
+				confirm_date,
+				approve_by,
+				approve_date,
+				status,
+				create_role,
+				create_by,
+				create_date,
+				update_by,
+				update_date,
+				active_flag,
+				annex,
+				refusal_reason,
+				contract_type
+		)values(
+				#{contractNo},
+				#{contractOrderNo},
+				#{contractName},
+				#{printerId},
+				#{supplierId},
+				#{beginDate},
+				#{endDate},
+				#{payType},
+				#{invoiceFlag},
+				#{invoiceType},
+				#{invoiceName},
+				#{deliverMethod},
+				#{remark},
+				#{confirmBy},
+				#{confirmDate},
+				#{approveBy},
+				#{approveDate},
+				#{status},
+				#{createRole},
+				#{createBy},
+				SYSDATE(),
+				#{updateBy},
+				#{updateDate},
+				#{activeFlag},
+				#{annex},
+				#{refusalReason},
+				#{protocolType}
+		)
+	</insert>
+
+    <update id="update">
+		update contract_info set
+				contract_no = #{contractNo},
+				contract_order_no=#{contractOrderNo},
+				contract_name = #{contractName},
+				printer_id = #{printerId},
+				supplier_id = #{supplierId},
+				begin_date = #{beginDate},
+				end_date = #{endDate},
+				pay_type = #{payType},
+				invoice_flag = #{invoiceFlag},
+				invoice_type = #{invoiceType},
+				invoice_name = #{invoiceName},
+				deliver_method = #{deliverMethod},
+				remark = #{remark},
+				confirm_by = #{confirmBy},
+				confirm_date = #{confirmDate},
+				approve_by = #{approveBy},
+				approve_date = #{approveDate},
+				status = #{status},
+				create_role = #{createRole},
+				create_by = #{createBy},
+				create_date = #{createDate},
+				update_by = #{updateBy},
+				update_date = #{updateDate},
+				active_flag = #{activeFlag},
+				annex=#{annex},
+				refusal_reason=#{refusalReason},
+				updated_contract_no=#{updatedContractNo}
+		where id = #{id}
+	</update>
+
+    <delete id="delete">
+        delete from contract_info
+        <if test=" codes != null and codes.size() > 0 ">
+            where id in
+            <foreach collection="codes" open="(" separator="," close=")" item="code">
+                #{code}
+            </foreach>
+        </if>
+        <if test=" codes == null or codes.size() == 0 ">
+            where 1 = 3
+        </if>
+    </delete>
+
+    <select id="findAll" resultType="map">
+        select * from contract_info contractInfo
+        <include refid="where"/>
+    </select>
+</mapper>

@@ -1,0 +1,58 @@
+#set($layout = "/none_layout.vm")
+<script type="text/javascript">
+	//跳转
+	function page_num(){
+		var deliveryPageNumVal = $("#deliveryPageNum").val();
+		if(deliveryPageNumVal == ''){
+			getDeliveryCompany(1);
+		}else if(parseInt(deliveryPageNumVal)>=parseInt($pager.totalPage)){
+			getDeliveryCompany($pager.totalPage);
+		}else{
+			getDeliveryCompany(deliveryPageNumVal);
+		}
+	}
+	//回车进行跳转
+	function enter_press_page(e){
+		if(e == 13|| e == 32){
+			page_num()
+		}
+	};
+</script>
+<table id="detailTable">
+    <tr>
+        <th style="width:200px;height:30px;text-align: left;">物流公司名称（英文）</th>
+        <th style="width:200px;height:30px;text-align: left;">物流公司名称（中文）</th>
+    </tr>
+    #foreach($dictionaryDTO in $pager.records)
+        <tr class="cursor" title="单击选取" onclick="getPartCompany(this)">
+            <td style="width:200px;height:22px">$!dictionaryDTO.code</td>
+            <td style="width:200px;height:22px">$!dictionaryDTO.name</td>
+        </tr>
+    #end
+</table>
+<!-- 分页 -->
+<div class="page ml14px">
+<ul>
+	<li class='lastPage'>
+	<a href="javascript:getDeliveryCompany(1)">首页</a>
+	</li>
+	<li class="lastPage"><a href="javascript:getDeliveryCompany($pager.previewPage)">上一页</a></li>
+	#foreach($pageNo in [$!pager.startPageIndex .. $!pager.endPageIndex])
+		<li>
+			<a #if($pageNo==$pager.page) class="curr" #end href="javascript:getDeliveryCompany($pageNo)">
+				$pageNo
+			</a>
+		</li>
+	#end
+	<li class="nextPage"><a href="javascript:getDeliveryCompany($pager.nextPage)">下一页</a></li>
+	<li  class="nextPage">
+    <a href="javascript:getDeliveryCompany($pager.totalPage)">末页</a>&nbsp;共$pager.totalPage页
+    </li>
+    <li class="nextPage">
+    	，第
+    	<input class="input_Style2 wid_20 hei_10" value="$pager.page" onkeyup="value=this.value.replace(/\\D+/g,'')" onkeydown="enter_press_page(event.keyCode||event.which);" id="deliveryPageNum"/>
+    	页 
+    	<span class="cursor font_fe" id="toPageNum" onclick="page_num()">[跳转]&nbsp;&nbsp;</span>
+    </li>
+</ul>
+</div>

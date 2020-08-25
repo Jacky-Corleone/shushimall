@@ -1,0 +1,348 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<link href="$staticPath/css/register.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+	$(function(){
+		//加载左侧菜单
+		if("$!shopDTO.status" == '5'){
+			$("#leftSeller").load("$request.contextPath/leftSeller");
+		}
+		//确定
+		$("#throughBtn").click(function(){
+			if(confirm("合同信息确认完成？")){
+				operationBtn("3","");
+			}
+		});
+		//驳回-弹出层
+		$("#rejectedBtn").click(function(){
+			$("#progressDiv").show();
+		});
+		//保存：驳回原因
+		$("#saveBtn").click(function(){
+			var auditRemark = $("#auditRemark").val();
+			if(auditRemark=="" || auditRemark==null || auditRemark==undefined){
+				alert("驳回原因不能为空值!");
+				return false;
+			}
+			operationBtn("0", auditRemark);
+		});
+		//取消-弹出层
+		$("#cancelBtn").click(function(){
+			$("#progressDiv").hide();
+		});
+		//关闭-弹出层
+		$(".close").click(function(){
+			$("#progressDiv").hide();
+		});
+		
+		/*更改编辑样式*/
+		if("$!shopDTO.runStatus" == "1"){
+			$(".shop_class_hide").show();
+			$(".shop_class_show").hide();
+			$(".shop_class").hide();
+		}
+		$("#shopShow").click(function(){
+			$(".shop_class_show").show();
+			$(".shop_class_hide").hide();
+			$(".shop_class").show();
+		});
+		$("#shopHide").click(function(){
+			$(".shop_class_hide").show();
+			$(".shop_class_show").hide();
+			$(".shop_class").hide();
+		});
+	});
+	function operationBtn(state, auditRemark){
+		$.ajax({
+			url:"$request.contextPath/information/progressSeller/updateUserContract",
+			type:"post",
+			dataType: "json",
+			data:{
+				"state": state,
+				"auditRemark": auditRemark
+			},
+			success:function(data){
+				if(state=="0"){
+					$(".po_fai").hide();
+				}
+				alert(data.message);
+				window.location.href="$request.contextPath/information/progressSeller/initProgress";
+			}
+		});
+	}
+</script>
+
+<div id="main">
+<!-- left start -->
+#if($!shopDTO.status == '5')
+<div id="leftSeller" class="border-4"></div>
+#else
+<div id="leftSeller" class="border-4">
+	<dl>
+		<dt><i class="demo-icons fa-unlock-alt font_16 mar_r10"></i>卖家中心</dt>
+		<dd>信息设置<i class="fa-sort-desc fr mar_r10"></i></dd>
+		<ul>
+			<li><a href="$request.contextPath/information/progressSeller/initProgress" >审核进度查看</a></li>
+		</ul>
+	</dl>
+</div>
+#end
+<!--left end -->
+
+<!--right start-->
+<div id="right" >
+	<h3>卖家审核状态管理>审核进度查看</h3>
+	<div class="register_content">
+		<dl>
+			<dt><span class="space">1</span></dt>
+			<dd>
+				<ul class="border-4 bg_06">
+					<li>
+						<ul class="buyer_Info">
+							<li class="font_18">卖家资质审核</li>
+								<div class="wid_500">
+								#if("$!userDTO.auditStatus" == "0")
+								
+									<p class="hei_30">您的资质审核未通过,请重新提交或联系管理员!</p>
+									<p class="hei_30">驳回原因</p>
+									<p class="user">
+										<textarea disabled="disabled" class="wid_300 hei_100">$!userInfoDTO.userDTO.auditRemark</textarea>
+									</p>
+									<p class="hei_50 mar_tb10">
+										<button class="button_2 hei_35"  onclick="javascript:window.location.href='$request.contextPath/information/progressSeller/userInfo?pageState=edit'" type="button">修改卖家资质</button>
+									</p>
+								#elseif("$!userDTO.userstatus" == "5")
+									<p>您的资质申请正在拼命审核中，审核通过后我们将会用以邮件形式通知您，请耐心等待管理员操作，谢谢您的支持和配合!</p>
+								
+								#end
+								</div>
+						</ul>
+						<ul class="buyer_button">
+							#if("$!userDTO.userstatus" == "6") 
+								<li class="font_14b font_7a">
+									<i class="fa-check-circle mar_r10"></i>审核通过
+								</li>
+							#end
+							<li class="font_14b cursor">
+								<a href="$request.contextPath/information/progressSeller/userInfo?pageState=view" >查看资料</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</dd>
+		</dl>
+		#if("$!userContractDTO.id"!="")
+		<dl class="po_re">
+			<dt class="po_ab pa_03"><span class="space">2</span></dt>
+			<dd>
+				<ul class="border-4 bg_06">
+					<li >
+						<ul class="buyer_Info">
+							<li class="font_18">合同确认</li>
+							#if("$!userContractDTO.contractStatus"=="1" || "$!userContractDTO.contractStatus"=="0") 
+								<div class="clear"></div>
+								<p class="hei_30">您的合同尚未被上传或正在修改，请稍等或联系平台招商人员!</p>
+							#elseif("$!userContractDTO.contractStatus"=="2")
+							<div class="clear"></div>
+							<ol>
+								<li>
+									<span class="font_wid">合同编号:</span>
+									<span class=wid_180  hei_30>$!userContractDTO.contractId</span>
+								</li>
+								<li>
+									<span class="font_wid">商家名称:</span>
+									<span class=wid_180  hei_30>$!userContractDTO.companyName</span>
+								</li>
+								<li>
+									<span class="font_wid">合同日期:</span>
+									<span class=wid_180  hei_30>
+										$!date.format('yyyy-MM-dd',$!userContractDTO.contractStarttime)
+										至
+										$!date.format('yyyy-MM-dd',$!userContractDTO.contractEndtime)
+									</span>
+								</li>
+								<li>
+									<span class="font_wid">商家类型:</span>
+									<span class=wid_180  hei_30>
+										#if("$!userContractDTO.contractType"=="1")
+											商家入驻
+										#elseif("$!userContractDTO.contractType"=="2")
+											续签
+										#elseif("$!userContractDTO.contractType"=="3")
+											调整类目
+										#end
+									</span>
+								</li>
+								</ol>
+								<div class="clear"></div>
+								<button onclick="javascript:window.open('$!imageServerAddr$!userContractDTO.contractJssAddr')" class="button_2 hei_35 font_16">预 览</button>
+								<button id="throughBtn" href="#" class="button_2 hei_35 font_16">确 认</button>
+								<button id="rejectedBtn" href="#" class="button_2 hei_35 font_16">驳 回</button>
+							#end
+						</ul>
+						<ul class="buyer_button">
+							#if("$!userContractDTO.contractStatus"=="3") 
+								<li class="font_14b font_7a">
+									<i class="fa-check-circle mar_r10"></i>审核通过
+								</li>
+								<li class="font_14b cursor"><a href="$!imageServerAddr$!userContractDTO.contractJssAddr" target="_Blank">查看资料</a></li>
+							#end
+						</ul>
+					</li>
+				</ul>
+			</dd>
+		</dl>
+		#end
+		#if("$!userContractDTO.contractStatus"=="3")
+		<dl class="po_re">
+			<dt class="po_ab pa_03"><span class="space">3</span></dt>
+			<dd>
+				<ul class="border-4 bg_06">
+					<li>
+						<ul class="buyer_Info">
+							<li class="font_18">店铺确认</li>
+							#if("$!shopDTO.status" == "1")
+								<div class="clear"></div>
+								<p class="hei_30">您的资质申请正在拼命审核中，审核通过后我们将会用以邮件形式通知您，请耐心等待管理员操作，谢谢你的支持和配合!</p>
+							#end
+							#if("$!shopDTO.status" == "3")
+							<div class="clear"></div>
+							<div class="wid_500">
+								<p class="hei_30">驳回原因</p>
+								<div class="user">
+									<textarea class="wid_300 hei_100" disabled="disabled">$!shopDTO.comment</textarea>
+								</div>
+								<p class="hei_50">
+									<button class="button_2 hei_35"  onclick="javascript:window.location.href='$request.contextPath/information/progressSeller/shopInfo?pageState=edit'" >修改店铺信息</button>
+								</p>
+							</div>	
+							#end
+						</ul>
+						<ul class="buyer_button">
+							#if("$!shopDTO.status"=="2" || "$!shopDTO.status"=="5")
+								<li class="font_14b font_7a" style="width:100%">
+									<i class="fa-check-circle mar_r10"></i>审核通过
+								</li>
+							#end
+							<li class="font_14b cursor"><a href="$request.contextPath/information/progressSeller/shopInfo?pageState=view" >查看资料</a></li>
+						</ul>
+					</li>
+				</ul>
+			</dd>
+		</dl>
+		#end
+		#if("$!userContractDTO.contractStatus"=="3" && ("$!shopDTO.status"=="2" || "$!shopDTO.status"=="5"))
+		<dl>
+			<dt><span class="space">4</span></dt>
+			<dd>
+				<ul class="border-4 bg_06" >
+					<li >
+						<ul class="buyer_Info">
+							<li class="font_18">付款确认</li>
+							<div class="shop_class">
+								<li class="hei_30">平台租赁确认:平台资费情况已更新,请确认并线下缴纳相关费用</li>
+								<li class="hei_30 font_14">平台质量保证金 : 你一共了选择<span> $!shopCategorySum </span>个项目，平台质量保证金共计 :<span> $!marginSummary </span>元</li>
+								<div class="clear"></div>
+									<ol class="list_top hei_35 font_14b bg_05 mar_tb20">
+											<li class="font_cen wid_150 hei_30">序 号</li>
+											<li class="font_cen wid_150 hei_30">一级类目</li>
+											<li class="font_cen wid_150 hei_30">二级类目</li>
+											<li class="font_cen wid_150 hei_30">三级类目</li>
+											<li class="font_cen wid_150 hei_30"> 金 额 </li>
+									</ol>
+										
+									#foreach($margin in $marginList)
+									<ol class="list_top hei_35">
+										<li class="wid_150 font_cen">$!{velocityCount}</li>
+											#foreach($marginVal in $margin)
+												<li class="font_cen wid_150">$!marginVal</li>
+											#end
+									</ol>
+									#end
+									<li class="hei_30">平台质量保证金采用平台代收托管的形式，是卖家为保障交易安全和售后质量对买家做出的一种服务承诺，请查看《平台质量保证金协议》</li>
+									<li class="hei_30 font_14">平台使用费 : 你一共了选择<span> $!shopCategorySum </span>个项目，平台使用费共计 :<span> $!royaltiesSummary </span>元</li>
+									<ol class="list_top hei_35 font_14b bg_05 mar_tb20">
+										<li class="font_cen wid_150 hei_30"> 序 号 </li>
+										<li class="font_cen wid_150 hei_30">一级类目</li>
+										<li class="font_cen wid_150 hei_30">二级类目</li>
+										<li class="font_cen wid_150 hei_30">三级类目</li>
+										<li class="font_cen wid_150 hei_30"> 金 额 </li>
+									</ol>
+									#foreach($royalties in $royaltiesList)
+										<ol class="list_top hei_35 font_14b">
+										<li class="font_cen wid_150 hei_30">$!{velocityCount}</li>
+											#foreach($royaltiesVal in $royalties)
+												<li  class="font_cen wid_150 hei_30">$!royaltiesVal</li>
+											#end
+									</ol>
+									#end
+									<li class="hei_30">平台使用费是卖家使用平台而支付的相关费用，以按年收费的形式，请查看《平台使用费协议》</li>
+								</div>
+						</ul>
+						<ul class="buyer_button">
+							#if("$!shopDTO.runStatus" == "1")
+								<li class="font_14b font_7a">
+									<i class="fa-check-circle mar_r10"></i>审核通过
+								</li>
+								<li class="font_14b cursor">
+									<a id="shopShow" href="#" class="shop_class_hide" >查看资料</a>
+									<a id="shopHide" href="#" class="shop_class_show" >关闭资料</a>
+								</li>
+							#end
+						</ul>
+					</li>
+				</ul>
+			</dd>
+		</dl>
+		#end
+		#if("$!shopDTO.runStatus" == "1")
+		<dl>
+			<dt><span class="space">5</span></dt>
+			<dd style="border:none;">
+				<ul class="border-4">
+					<li class="bg_06">
+						<ul class="buyer_Info">
+							<li class="font_18">店铺开通</li>
+							<li>恭喜您已经完成开店申请，您可以去店铺管理中查看店铺基本信息!</li>
+							<li>
+								<span class="font_wid">店铺名称:</span>
+								<span class=wid_180  hei_30>$!shopDTO.shopName</span>
+							</li>
+						</ul>
+						<ul class="buyer_button">
+							<li class="font_14b font_7a">
+								<i class="fa-check-circle mar_r10"></i>审核通过
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</dd>
+		</dl>
+		#end
+	</div>
+</div>
+<!--right end-->
+</div>
+<!-- 驳回：弹出层 -->
+<div id="progressDiv" class="po_fai" style="display:none">
+	<div class="po_fai_bg"></div>
+	<div class="po_main" style="width:400px; margin-left:-200px;">
+		<div class="tit pad_l10 hei_30 bg_05" >
+			<div class="fl font_14">驳回合同信息</div>
+			<i id="log_hidden_id" style="cursor: pointer;" class="fa close fa-times-circle fr font_14 mar_r10"></i>
+			<div class="clear"></div>
+		</div>
+		<div class="mar_l30 mar_r30 mar_t10">
+			<div class="clear"></div>
+			<p class="hei_30">驳回原因</p>
+			<div class="user">
+				<textarea id="auditRemark" name="auditRemark" style="width:300px; height:100px" class="input_Style2 hei_30 wid_220">$!userContractDTO.auditRemark</textarea>
+			</div>
+			<div class="clear"></div>
+			<div class="font_cen mar_t20 pad_t50" >
+				<a id="saveBtn" href="#" class="button_2 hei_40 font_16">保存</a>
+				<a id="cancelBtn" href="#" class="button_2 hei_40 font_16">取消</a>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,59 @@
+#set($layout = "common/order.vm")
+#if(${pager})
+	#foreach($detail in $pager.records)
+		#if(${detail})
+			<div class="pad_lr5 bg_01 mar_b10">
+				<!-- 订单号 -->
+				<div class="hei_32 border_2">
+					<p class="fl wid_57">
+						<span>订单号:$!{detail.orderId}</span>
+					</p>
+					<p class="fr wid_35 font_right">
+<!-- 						<a class="font_e5 mar_l5" id="$!order.orderId">$!{order.ordreStatus}</a> -->
+					</p>
+					<input type="hidden" id="total1" value="$!{total1}">
+				</div>
+				<!-- 订单号 -->
+				#if(${detail.list})
+					#foreach($de in $detail.list)
+						<!-- 商品信息 -->
+						<div class="border_2 shop_order pad_tb5">
+							<p class="fl shop_order_img">
+								<!-- <a href="$request.contextPath/product/toDetail?id=$!de.itemId&skuId=$!de.skuId"></a> -->
+								<img src="$!imageServerAddr$!de.skuUrl" width="75px" height="75px"/>
+							</p>
+							<div class="wid_50 fl shop_order_p">
+								<p>
+									$!{de.skuName}
+								</p>
+							</div>
+							<div class="fl lin_24">
+								<p>￥$!{de.payPrice}</p>
+								<p class="font_66">x$!{de.goodCount}</p>
+							</div>
+							
+							<div class="clear"></div>
+						</div>
+						<!-- 商品信息 -->
+						<p class="hei_34">投诉时间：$!{detail.created}&nbsp;&nbsp;&nbsp;&nbsp;<span class="fr">总价：￥$!{de.amount}</span></p>
+					#end
+				#else
+					没有商品
+				#end
+				<!-- 按钮 -->
+				<div class="pad_tb5">
+                    <button class="button_3 pad_mlr5" id="refundSubmitSucc" style="width: 125px" onclick="refundSubmitSucc('$!detail.thid','1')">查看退款/退货进度</button>
+					<button class="button_3 pad_mlr5" id="gocomplaindetail" style="width: 95px" onclick="gocomplainsellerdetail('$!detail.complainid')">查看投诉协议</button>
+                    #if(${detail.stace}=='0'&&${detail.sellerOrBuyer}=='1')
+						<button class="button_3 pad_mlr5" id="canclecomplain" style="width: 70px" onclick="canclecomplain('$!detail.complainid')">取消投诉</button>
+                    #end
+					<div class="clear"></div>
+				</div>
+			</div>
+		#else
+			没有订单
+		#end
+	#end
+#else
+	没有数据
+#end

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.accountinfo.dao.FinanceAccountDAO">
+
+	<!-- =========================================================== -->
+	<!-- 定义resultMap -->
+	<!-- =========================================================== -->
+
+	<resultMap id="dinanceAccountInfoDtoMap"
+		type="com.camelot.tradecenter.dto.FinanceAccountInfoDto">
+		<id property="account_id" column="accountId" />
+		<result property="financialCloudPaymentAccountId" column="financial_cloud_payment_account_id" />
+		<result property="fullName" column="full_name" />
+		<result property="ownedBank" column="owned_bank" />
+		<result property="bankLoginUsername" column="bank_login_username" />
+		<result property="citicFrontEndProcessor" column="citic_front_end_processor" />
+		<result property="masterAccountName" column="master_account_name" />
+		<result property="masterAccountNumber" column="master_account_number" />
+		<result property="clusterId" column="cluster_id" />
+		<result property="settlementAccountName" column="settlement_account_name" />
+		<result property="settlementAccountNumber" column="settlement_account_number" />
+		<result property="commissionAccountName" column="commission_account_name" />
+		<result property="commissionAccountNumber" column="commission_account_number" />
+		<result property="actingOutGoldAccountName" column="acting_outgold_account_name" />
+		<result property="actingOutGoldAccountNumber" column="acting_outgold_account_number" />
+		<result property="publicChargingFeesAccountName" column="public_chargingfees_account_name" />
+		<result property="publicChargingFeesAccountNumber" column="public_chargingfees_account_number" />
+		<result property="publicAccountName" column="public_account_name" />
+		<result property="publicAccountNumber" column="public_account_number" />
+		<result property="initializationFundsAccountName" column="initialization_funds_account_name" />
+		<result property="initializationFundsAccountNumber" column="initialization_funds_account_number" />
+		<result property="refundAccountName" column="refund_account_name" />
+		<result property="refundAccountNumber" column="refund_account_number" />
+		
+		<result property="settlementAlipayAccountName" column="settlement_alipay_account_name" />
+		<result property="settlementAlipayAccountNumber" column="settlement_alipay_account_number" />
+		<result property="refundAlipayAccountName" column="refund_alipay_account_name" />
+		<result property="refundAlipayAccountNumber" column="refund_alipay_account_number" />
+		<result property="settlementWXAccountName" column="settlement_wx_account_name" />
+		<result property="settlementWXAccountNumber" column="settlement_wx_account_number" />
+		<result property="refundWXAccountName" column="refund_wx_account_name" />
+		<result property="refundWXAccountNumber" column="refund_wx_account_number" />
+		<result property="poundageFillAccountName" column="poundage_fill_account_name" />
+		<result property="poundageFillAccountNumber" column="poundage_fill_account_number" />
+	</resultMap>
+
+	<!-- =========================================================== -->
+	<!-- DAO方法中的基本增改查方法 -->
+	<!-- =========================================================== -->
+
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="com.camelot.tradecenter.dto.FinanceAccountInfoDto">
+		<![CDATA[
+		insert into finance_account_info (
+				account_id
+		    	,financial_cloud_payment_account_id
+		    	,full_name
+		    	,owned_bank
+		    	,bank_login_username  
+		    	,citic_front_end_processor
+				,master_account_name  
+				,master_account_number  
+				,cluster_id  
+				,settlement_account_name  
+				,settlement_account_number  
+				,commission_account_name  
+				,commission_account_number  
+				,acting_outgold_account_name  
+				,acting_outgold_account_number  
+				,public_chargingfees_account_name  
+				,public_chargingfees_account_number  
+				,public_account_name  
+				,public_account_number  
+				,initialization_funds_account_name  
+				,initialization_funds_account_number 
+				,refund_account_name
+				,refund_account_number
+				,settlement_alipay_account_name
+				,settlement_alipay_account_number
+				,settlement_wx_account_name
+				,settlement_wx_account_number
+				,refund_alipay_account_name
+				,refund_alipay_account_number
+				,refund_wx_account_name
+				,refund_wx_account_number
+				,poundage_fill_account_name
+				,poundage_fill_account_number
+		   )values(
+		   		#{accountId}
+				,#{financialCloudPaymentAccountId}
+				,#{fullName}
+				,#{ownedBank}
+				,#{bankLoginUsername}
+				,#{citicFrontEndProcessor}
+				,#{masterAccountName}
+				,#{masterAccountNumber}
+				,#{clusterId}
+				,#{settlementAccountName}
+				,#{settlementAccountNumber}
+				,#{commissionAccountName}
+				,#{commissionAccountNumber}
+				,#{actingOutGoldAccountName}
+				,#{actingOutGoldAccountNumber}
+				,#{publicChargingFeesAccountName}
+				,#{publicChargingFeesAccountNumber}
+				,#{publicAccountName}
+				,#{publicAccountNumber}
+				,#{initializationFundsAccountName}
+				,#{initializationFundsAccountNumber}
+				,#{refundAccountName}
+				,#{refundAccountNumber}
+				,#{settlementAlipayAccountName}
+				,#{settlementAlipayAccountNumber}
+				,#{settlementWXAccountName}
+				,#{settlementWXAccountNumber}
+				,#{refundAlipayAccountName}
+				,#{refundAlipayAccountNumber}
+				,#{refundWXAccountName}
+				,#{refundWXAccountNumber}
+				,#{poundageFillAccountName}
+				,#{poundageFillAccountNumber}
+		   )
+	    ]]>
+	</insert>
+
+	<!-- 根据id，修改记录 -->
+	<update id="updateFinanceAccountInfoDto">
+		<![CDATA[
+		update finance_account_info set
+				account_id = #{financeAccountInfoDto.accountId}
+				,financial_cloud_payment_account_id = #{financeAccountInfoDto.financialCloudPaymentAccountId}
+				,full_name = #{financeAccountInfoDto.fullName}
+				,owned_bank = #{financeAccountInfoDto.ownedBank}
+				,bank_login_username  = #{financeAccountInfoDto.bankLoginUsername}
+				,citic_front_end_processor = #{financeAccountInfoDto.citicFrontEndProcessor}
+				,master_account_name = #{financeAccountInfoDto.masterAccountName}
+				,master_account_number = #{financeAccountInfoDto.masterAccountNumber}
+				,cluster_id = #{financeAccountInfoDto.clusterId}
+				,settlement_account_name = #{financeAccountInfoDto.settlementAccountName}
+				,settlement_account_number = #{financeAccountInfoDto.settlementAccountNumber}
+				,commission_account_name = #{financeAccountInfoDto.commissionAccountName}
+				,commission_account_number = #{financeAccountInfoDto.commissionAccountNumber}
+				,acting_outgold_account_name = #{financeAccountInfoDto.actingOutGoldAccountName}
+				,acting_outgold_account_number = #{financeAccountInfoDto.actingOutGoldAccountNumber}
+				,public_chargingfees_account_name = #{financeAccountInfoDto.publicChargingFeesAccountName}
+				,public_chargingfees_account_number = #{financeAccountInfoDto.publicChargingFeesAccountNumber}  
+				,public_account_name =#{financeAccountInfoDto.publicAccountName}
+				,public_account_number =#{financeAccountInfoDto.publicAccountNumber}
+				,initialization_funds_account_name = #{financeAccountInfoDto.initializationFundsAccountName} 
+				,initialization_funds_account_number = #{financeAccountInfoDto.initializationFundsAccountNumber}  	
+				,refund_account_name = #{financeAccountInfoDto.refundAccountName}
+				,refund_account_number = #{financeAccountInfoDto.refundAccountNumber}
+				,settlement_alipay_account_name = #{financeAccountInfoDto.settlementAlipayAccountName}
+				,settlement_alipay_account_number = #{financeAccountInfoDto.settlementAlipayAccountNumber}
+				,settlement_wx_account_name = #{financeAccountInfoDto.settlementWXAccountName}
+				,settlement_wx_account_number = #{financeAccountInfoDto.settlementWXAccountNumber}
+				,refund_alipay_account_name = #{financeAccountInfoDto.refundAlipayAccountName}
+				,refund_alipay_account_number = #{financeAccountInfoDto.refundAlipayAccountNumber}
+				,refund_wx_account_name = #{financeAccountInfoDto.refundWXAccountName}
+				,refund_wx_account_number = #{financeAccountInfoDto.refundWXAccountNumber}
+				,poundage_fill_account_name = #{financeAccountInfoDto.poundageFillAccountName}
+				,poundage_fill_account_number = #{financeAccountInfoDto.poundageFillAccountNumber}
+		 where account_id = #{financeAccountInfoDto.accountId}
+		 	
+		]]>
+	</update>
+	<!-- 根据id，查询记录 -->
+	<select id="queryById" resultMap="dinanceAccountInfoDtoMap">
+	<![CDATA[
+		select * 
+		from 
+		finance_account_info 
+		where account_id = #{account_id}
+		]]>
+	</select>
+
+</mapper>

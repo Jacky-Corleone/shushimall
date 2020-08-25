@@ -1,0 +1,58 @@
+#set($layout = "common/order.vm")
+<!-- 表格 -->
+#if($contracts.size()==0)
+<div class="font_cen hei_30">没有待审批的协议~~~~</div>
+#else
+    #foreach($contract in $contracts)
+    <!-- 发货商城 -->
+    <div class="bg_01 pad_mlr5 mar_b10">
+        <div class="hei_32 border_2">
+            <p class="fl "><span>协议名称：$!contract.contractName</span>
+            </p>
+
+            <p class="fr font_e5">$!statusMap.get($contract.status)</p>
+        </div>
+        <!-- 发货商城 -->
+        <!-- 发货信息 -->
+        <div class="border_2 shop_order pad_tb5">
+            #foreach($contractMat in $contract.contractMatDTOs)
+                <div class="wid_50 fl shop_order_p">
+                    <p class="fl over_ell">商品编号：
+                        <a href="$request.contextPath/product/toDetail?id=$!{contractMat.get('itemId')}&skuId=$!{contractMat.get('skuId')}">
+                            $!contractMat.get("skuId")
+                        </a>
+                    </p>
+					<div class="clear"></div>
+                    <p class="fl over_ell">商品名称:
+                        <a href="$request.contextPath/product/toDetail?id=$!{contractMat.get('itemId')}&skuId=$!{contractMat.get('skuId')}">
+                            $!contractMat.get("itemName")
+                        </a>
+                    </p>
+				<div class="clear"></div>
+                    <p class="fl over_ell">商品属性：$!{contractMat.get("salerAttr")}</p>
+                </div>
+
+                <div class="fr lin_24">
+                    <p>￥$!contractMat.get("matPrice")</p>
+                </div>
+            #end
+            <div class="clear"></div>
+        </div>
+        <!-- 发货信息 -->
+        <p class="hei_34">创建日期：$!date.format('yyyy-MM-dd',$contract.createDate)</p>
+        <!-- 按钮 -->
+        <div class="pad_tb5">
+            <button class="button_3 pad_mlr5"
+                    onclick="showConfirmDIV('$contract.id','$contract.contractName','审批','拒绝')">拒&nbsp;&nbsp;绝
+            </button>
+            <button class="button_3 pad_mlr5"
+                    onclick="showConfirmDIV('$contract.id','$contract.contractName','审批','同意')">同&nbsp;&nbsp;意
+            </button>
+            <button class="button_3 pad_mlr5" onclick="showContractDetail('$contract.id')">
+                查看详情
+            </button>
+            <div class="clear"></div>
+        </div>
+    </div>
+    #end
+#end

@@ -1,0 +1,12 @@
+{{#each result.rows}}
+<div class="shop_price fl po_re">
+<a href="product/toDetail?id={{itemId}}&skuId={{skuId}}">
+    <div class="shop_price_img">
+        <img src="{{../gix}}{{itemShopCartDTO.skuPicUrl}}">
+    </div>
+    <div class="shop_price_bg po_ab">
+        <span class="fl">已售:55{{itemShopCartDTO.itemName}}</span><span class="fr">已售</span>
+    </div>
+ </a>
+ </div>
+{{/each}}

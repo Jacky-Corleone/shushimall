@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.report.dao.ItemSkuSellReportDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="itemSkuSellReportMap" type="com.camelot.report.dto.ItemSkuSellReportOut">
+			<result property="sellPriceTotal" column="sellPriceTotal"/>
+			<result property="sellTotalNum" column="sellTotalNum"/>
+			<result property="dealDate" column="dealDate"/>
+	</resultMap>
+	
+	<!--  查询总数 -->
+	<select id="queryItemSkuSellReportCount" resultType="long">
+		SELECT COUNT(DISTINCT t.dealDate )
+		FROM 
+			(SELECT order_id,DATE_FORMAT(payment_time,'%Y%m%d') dealDate 
+			FROM trade_orders WHERE parent_order_id!='0' AND paid=2 
+			<include refid="pay_condition" />
+			 )t INNER JOIN ( 
+			 SELECT order_id,SUM(pay_price_total) sellPriceTotal,SUM(num) sellTotalNum 
+			 FROM trade_order_items
+			  <include refid="sku_condition" />
+			  GROUP BY order_id) p ON  t.order_id=p.order_id where t.dealDate>0
+	</select>
+	
+	
+	<!-- 分页查询  销售额、销售量-->
+	<select id="queryItemSkuSellReportList"  resultMap="itemSkuSellReportMap">
+		SELECT t.dealDate,IFNULL(SUM(p.sellPriceTotal),0) sellPriceTotal,IFNULL(SUM(p.sellTotalNum),0) sellTotalNum
+		FROM
+			(SELECT order_id,DATE_FORMAT(payment_time,'%Y%m%d') dealDate 
+			FROM trade_orders WHERE parent_order_id!='0' AND paid=2 
+			<include refid="pay_condition" />
+			)t INNER JOIN (
+			SELECT order_id,SUM(pay_price_total) sellPriceTotal,SUM(num) sellTotalNum 
+			FROM trade_order_items 
+			<include refid="sku_condition" />
+			 GROUP BY order_id) p 
+			 ON  t.order_id=p.order_id  where t.dealDate>0
+			GROUP BY t.dealDate ORDER BY t.dealDate DESC
+		 <if test="page != null ">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<sql id="sku_condition">
+		<if test="reportIn!=null">
+			 <if test="reportIn.skuId != null  and reportIn.skuId !=''">
+				<![CDATA[ where sku_id = #{reportIn.skuId} ]]>
+			</if>
+			 <if test="reportIn.skuId == null and reportIn.itemId !=null">
+				<![CDATA[ where item_id = #{reportIn.itemId} ]]>
+			</if>
+		</if>
+	</sql>
+	
+	<sql id="pay_condition">
+		<if test="reportIn!=null">
+			<if test="reportIn.shopId != null  and reportIn.shopId !=''">
+				<![CDATA[ AND shop_id = #{reportIn.shopId} ]]>
+			</if>
+			<if test="reportIn.startDate != null  and reportIn.startDate !=''">
+				<![CDATA[ AND payment_time>=#{reportIn.startDate} ]]>
+			</if>
+			<if test="reportIn.endDate != null  and reportIn.endDate !=''">
+				<![CDATA[ AND DATE_FORMAT(payment_time,'%Y%m%d') <=#{reportIn.endDate} ]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+</mapper>

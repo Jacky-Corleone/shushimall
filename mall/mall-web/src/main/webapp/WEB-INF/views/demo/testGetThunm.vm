@@ -1,0 +1,112 @@
+#set($staticPath="$request.contextPath/assets/js/jquery-1.9.1.js")
+<script type="text/javascript">
+	function getThunm(obj){
+		var image = $(obj);
+		var isHandle = false;
+		if(!isHandle){
+			$.post("$request.contextPath/thumbHandle/getThumb",{thumbUrlString:obj.src},function(result){
+			console.info(result);
+    		image.attr("src",result.thumbUrl);
+			isHandle = true;
+			//obj.src=result.thumbUrl;
+ 		 },"json");
+		}
+		
+		
+	};
+	
+	
+	
+	
+	
+	
+	$(document).ready(function() {
+		
+	   $("#fileupload-form").submit(function(e)
+{
+    var postData = $(this).serializeArray();
+	var fd = new FormData($(this)[0]);
+    $.ajax(
+    {
+        url : "$request.contextPath/fdfsfileupload/uploadoriginal",
+        type: "POST",
+        data : fd,
+		dataType: 'json',
+		processData : false,
+        contentType : false,
+        success:function(data, textStatus, jqXHR) 
+        {
+		     console.info("-------------->>>");
+            console.info(data);
+			console.info(textStatus);
+			console.info(jqXHR);
+		    $("#imagelist img").each(function(index,element){
+			console.info(index);
+			console.info(element);
+		         element.src=data.fileUrlList[0];
+		    });
+        },
+        error: function(jqXHR, textStatus, errorThrown) 
+        {
+            console.info("Status: " + XMLHttpRequest);
+            alert("Status: " + textStatus);
+            alert("Error: " + errorThrown);    
+        }
+    });
+    e.preventDefault(); //STOP default action
+	return false;
+	});
+ 
+	//$("#fileupload-form").submit(); //Submit  the FORM
+	
+	
+	
+	
+	   	$("img").one('error', function() {
+		 console.info("error1 ......... ");
+		 console.info(this);
+		 $.post("$request.contextPath/thumbHandle/getThumb",{thumbUrlString:this.src},function(result){
+			 console.info(result);
+    		this.src=result.thumbUrl;
+		 },'json');
+}).each(function() {
+  if(this.complete) $(this).load();
+});
+	 
+	  $('img').one( 'error', function() {
+        console.info("error2 ......... ");
+		 console.info(this);
+		 $.post("$request.contextPath/thumbHandle/getThumb",{thumbUrlString:this.src},function(result){
+			 console.info(result);
+    		this.src=result.thumbUrl;
+		 },'json');
+    });
+	 	
+
+
+
+	
+	});
+	
+</script>
+<!-- 中间内容 -->
+<div>
+		<img src="http://192.168.1.186:8000/group2/M00/00/00/wKgBvFcPYqqAasZTABU8o7_hC3w547_60x60.JPG" alt="图片加载中..." class="getThunm"  onerror="getThunm(this);"/>
+		
+		<img src="http://192.168.1.186:8000/group2/M00/00/00/wKgBvFcPYqqAasZTABU8o7_hC3w547_300x300.JPG" alt="图片加载中..." class="getThunm"  onerror="getThunm(this);"/>
+</div><!-- 中间内容 end -->
+
+
+<div>
+<form id="fileupload-form" enctype="multipart/form-data">    
+     <input id="fileupload" type="file" name="file" > 
+     <input type="submit" class="send" id="send" value="发布">  
+</form>
+
+</div>
+
+<div id="imagelist">
+	<img height="400" width="400" alt="图片加载中..."/>
+	<img height="400" width="400" alt="图片加载中..."/>
+	<img height="400" width="400" alt="图片加载中..."/>
+</div>

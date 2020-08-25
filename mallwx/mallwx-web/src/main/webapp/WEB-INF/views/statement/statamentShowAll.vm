@@ -1,0 +1,13 @@
+#set($layout = "common/order.vm")
+#if($rows.size() != $0)
+	#foreach($model in $rows)
+		<!-- 中间内容 -->
+			<p class="pad_lr5 hei_34 mar_t10 border_2">
+				<span class="fl font_5 font_1_2">对账单号:$!{model.id}</span>$!{model.orderCode}<span
+					class="fr font_5 font_1_2">$!date.format('yyyy-MM-dd HH:mm:ss', $!{model.createDate})</span>
+			</p>
+		<!--中间结束 -->
+	#end		
+#else
+对账单没有数据!
+#end

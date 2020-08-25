@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.storecenter.dao.ShopModifyDetailDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="shopModifyDetailMap" type="com.camelot.storecenter.dto.ShopModifyDetailDTO">
+				<result property="id" column="id"/>
+				<result property="modifyInfoId" column="modify_info_id"/>
+				<result property="propertiesColumn" column="properties_column"/>
+				<result property="beforeChange" column="before_change"/>
+				<result property="afterChange" column="after_change"/>
+				<result property="createTime" column="create_time"/>
+				<result property="reviewReason" column="review_reason"/>
+				<result property="reviewUserId" column="review_user_id"/>
+				<result property="reviewTime" column="review_time"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,modify_info_id
+ 			,properties_column
+ 			,before_change
+ 			,after_change
+ 			,create_time
+ 			,review_reason
+ 			,review_user_id
+ 			,review_time
+		FROM 
+		shop_modify_detail shop_modify_detail_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1 
+		<if test="entity!=null">
+			<if test="entity.id != null  and entity.id !=''">
+				<![CDATA[ and shop_modify_detail_.id  = #{entity.id} ]]>
+			</if>
+			<if test="entity.modifyInfoId != null  and entity.modifyInfoId !=''">
+				<![CDATA[ and shop_modify_detail_.modify_info_id  = #{entity.modifyInfoId} ]]>
+			</if>
+			<if test="entity.propertiesColumn != null  and entity.propertiesColumn !=''">
+				<![CDATA[ and shop_modify_detail_.properties_column  = #{entity.propertiesColumn} ]]>
+			</if>
+			<if test="entity.beforeChange != null  and entity.beforeChange !=''">
+				<![CDATA[ and shop_modify_detail_.before_change  = #{entity.beforeChange} ]]>
+			</if>
+			<if test="entity.afterChange != null  and entity.afterChange !=''">
+				<![CDATA[ and shop_modify_detail_.after_change  = #{entity.afterChange} ]]>
+			</if>
+			<if test="entity.createTime != null  and entity.createTime !=''">
+				<![CDATA[ and shop_modify_detail_.create_time  = #{entity.createTime} ]]>
+			</if>
+			<if test="entity.reviewReason != null  and entity.reviewReason !=''">
+				<![CDATA[ and shop_modify_detail_.review_reason  = #{entity.reviewReason} ]]>
+			</if>
+			<if test="entity.reviewUserId != null  and entity.reviewUserId !=''">
+				<![CDATA[ and shop_modify_detail_.review_user_id  = #{entity.reviewUserId} ]]>
+			</if>
+			<if test="entity.reviewTime != null  and entity.reviewTime !=''">
+				<![CDATA[ and shop_modify_detail_.review_time  = #{entity.reviewTime} ]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="selectListById" resultMap="shopModifyDetailMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where shop_modify_detail_.modify_info_id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="selectListByCondition" resultMap="shopModifyDetailMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectCountByCondition" resultType="long">
+		<include refid="count_Tail" />
+		shop_modify_detail shop_modify_detail_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="com.camelot.storecenter.dto.ShopModifyDetailDTO">
+		<![CDATA[
+		insert into shop_modify_detail (
+		    	 modify_info_id
+		    	 ,properties_column
+		    	 ,before_change
+		    	 ,after_change
+		    	 ,create_time
+	
+		   )values(
+		    	#{modifyInfoId}
+		    	,#{propertiesColumn}
+		    	,#{beforeChange}
+		    	,#{afterChange}
+		    	,now()
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.storecenter.dto.ShopModifyDetailDTO">
+		<![CDATA[
+		update shop_modify_detail set
+   			id = #{id}
+   			,modify_info_id = #{modifyInfoId}
+   			,properties_column = #{propertiesColumn}
+   			,before_change = #{beforeChange}
+   			,after_change = #{afterChange}
+   			,create_time = #{createTime}
+   			,review_reason = #{reviewReason}
+   			,review_user_id = #{reviewUserId}
+   			,review_time = #{reviewTime}
+		 where id = #{id}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from shop_modify_detail where modify_info_id = #{id}
+		]]>
+	</delete>
+</mapper>

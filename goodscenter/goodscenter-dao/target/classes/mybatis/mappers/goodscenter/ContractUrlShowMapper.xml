@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.goodscenter.dao.ContractUrlShowDAO">
+	<resultMap id="contractUrlShowMapper" type="com.camelot.goodscenter.dto.ContractUrlShowDTO">
+			<result property="id" column="id" />
+			<result property="contractInfoId" column="contract_info_id" />
+			<result property="imgUrl" column="imgUrl" />
+			<result property="isDelete" column="is_delete" />
+	</resultMap>
+	 <sql id="where">
+        <where>
+           1=1
+             <if test="contractInfoId != null and contractInfoId != '' ">
+                and contract_info_id = #{contractInfoId}
+            </if>
+        </where>
+    </sql>
+	
+	
+	<insert id="insert" parameterType="com.camelot.goodscenter.dto.ContractUrlShowDTO" useGeneratedKeys="true" keyProperty="id">
+		insert into contract_url_show(
+				contract_info_id,
+				imgUrl,
+				is_delete
+		)values(
+				#{contractInfoId},
+				#{imgUrl},
+				#{isDelete}
+		)
+	</insert>
+	  <select id="findByContractUrlShowDTO" resultMap="contractUrlShowMapper">
+        select * from contract_url_show 
+        <include refid="where"/>
+    </select>
+    
+    <delete id="delete">
+        delete from contract_url_show where contract_info_id=#{contractInfoId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,212 @@
+#set($layout = "/none_layout.vm")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>基本信息</title>
+<link href="$request.contextPath/assets/css/manage_style.css" rel="stylesheet" type="text/css" />
+<link href="$request.contextPath/assets/css/basic.css" rel="stylesheet" type="text/css" />
+
+<script language="javascript" type="text/javascript" src="$request.getContextPath()/assets/js/jquery.1.4.2-min.js"></script>
+<style type="text/css">
+
+</style>
+<script type="text/javascript">
+function editShopInfo(){
+	window.location.href="$request.contextPath/shop/toEdit";
+}
+//身份验证
+function verifyIndex(){
+	window.location.href="$request.contextPath/shop/step1";
+}
+</script>
+</head>
+
+<body>
+<!--头部开始-->
+<div class="header_top" style="border:none">
+	<div class="top_mid">
+       <div class="top_mid_l">
+        <i class="demo-icons fa-map-marker font_20 font_82"></i><b class="font_14 mar_r10">北京市</b>查看省份<i class="demo-icons fa-sort-desc font_14"></i>
+        <i class="demo-icons fa-weibo font_16 mar_lr10"></i>
+        <i class="demo-icons  fa-wechat font_16"></i>
+        </div><!--top_mid_l end-->
+        <div class="top_mid_r">
+        <a href="#">商城首页</a><i class="mar_lr10 font_ec">|</i>
+        <i class="demo-icons fa-star font_82"></i><a href="#">收藏夹</a><i class="demo-icons fa-sort-desc font_14 font_c7"></i>
+        <i class="mar_lr10 font_ec">|</i>
+        <i class="fa-cart"></i><a href="#">购物车</a><i class="demo-icons fa-sort-desc font_14 font_c7"></i>
+        </div><!--top_mid_r end-->
+    </div><!--top_mid end-->
+</div><!--header_top end-->
+<div class="clear"></div>
+ <!--导航菜单start-->
+ <div class="Center_head">
+   <div class="Center_head_min">
+     <div class="Center_head_Logo"><a href="#"><img src="$request.contextPath/assets/images/logo-manage.png" alt=""></a></div><!--Center_head_Logo end-->
+     <div class="Center_head_midtab">
+     	<ul>
+            <li>买家中心</li>
+        	<li class="focus_mid">卖家中心</li>
+        </ul>
+     </div><!--Center_head_midtab end -->
+     <div class="Center_head_Search">
+       <span class="Center_Search_list">
+         <ul>
+           <li><a href="#">店 铺</a></li>
+           <li><a href="#">全部</a></li>
+           <li><a href="#">知识库</a></li>
+           <li><a href="#">专家</a></li>
+           <li><a href="#">知识社区</a></li>
+           <li><a href="#">部门群落</a></li>
+         </ul>
+         <i class="Center_Search_chose fa-sort-desc"></i>
+       </span>
+       <span class="Center_Search_input_box"><input name="wwaq" type="text" class="Center_Search_input" onBlur="if(this.value=='') {this.value='搜索店铺/搜索产品';this.style.color='#999'}" onFocus="if(this.value=='搜索店铺/搜索产品') this.value='';this.style.color='#222'" onpaste="return false;" autocomplete="off" value="搜索店铺/搜索产品" style="color: rgb(153,153,153);"></span>
+       <span class="Center_Search_btn fa-search"></span><!--搜索按钮-->
+     </div><!--Center_head_Search end-->
+   </div><!--Center_head_min end-->
+ </div><!--Center_head end-->
+ <!--导航菜单end-->
+ 
+<div id="main">
+<!--中间部分开始-->
+
+<div id="leftSeller" class="border-4">
+    <div class="head-pic"><img src="$request.contextPath/assets/images/pic.png" /></div>	
+    <dl>
+    <dt><i class="demo-icons fa-unlock-alt font_16 mar_r10"></i>卖家中心</dt>
+    <dd>商品管理<i class="fa-sort-up fr mar_r10"></i><!--向上class="fa-sort-up" 向下class="fa-sort-desc"的箭头--></dd>
+        <ul>
+          <li>商品列表</li>
+          <li>添加商品</li>
+          <li>库存管理</li>
+          <li>代售商品管理</li>
+          <li>销售属性管理</li>
+          <li>商品评价管理</li>
+        </ul>
+    <dd>店铺管理<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>基本设置</li>
+          <li>店铺设置管理</li>
+          <li>权限管理</li>
+          <li>公告管理</li>
+          <li>类目管理</li>
+          <li>店铺信誉</li>
+          <li>店铺装修</li>
+          <li>消息中心</li>
+        </ul>
+    <dd>订单中心<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>全部订单</li>
+          <li>等待买家付款</li>
+          <li>等待我发货</li>
+          <li>等待买家收货</li>
+          <li>需要评价</li>
+          <li>交易完成</li>
+          <li>交易取消</li>
+          <li>我收到的转单</li>
+        </ul>
+     <dd>信息设置<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>基本信息设置</li>
+          <li>安全信息设置</li>
+          <li>审核进度查看</li>
+        </ul> 
+     <dd>售后管理<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>退款处理</li>
+          <li>售后服务处理</li>
+          <li>地址管理</li>
+        </ul> 
+     <dd>运营分析<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>经营状况</li>
+          <li>销售分析</li>
+        </ul>  
+     <dd>会员管理<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>会员管理</li>
+        </ul> 
+    <dd>服务认证<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>实地认证管理</li>
+          <li>服务保障管理</li>
+        </ul>
+    <dd>促销管理<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>促销管理</li>
+        </ul> 
+   <dd>财务管理<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>提现管理</li>
+        </ul> 
+   <dd>结算中心<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>结算单管理</li>
+          <li>账务核对</li>
+        </ul> 
+    <dd>价格管理<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>协议价管理</li>
+          <li>询价管理</li>
+        </ul>  
+    <dd>物流管理<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>运费模板设置</li>
+          </ul>
+     </dl>                                      
+</div><!--left end -->
+
+<!--右边部分开始-->
+<div id="right">
+    <h3>店铺信息</h3>
+     <div class="mess_setup border-4 bg_06">
+       <div class="mess_setup_con">
+       	  <div class="head_pic border-4"><img src="$request.contextPath/assets/images/no_head.png"/></div><!--放logo的位置-->
+             <ul>
+              <li class="font_14b">商家培训店</li>
+              <li>用户名：$!{shop.userName}</li>
+              <li>已认证：</li>
+              <li>联系手机：$!{name} <a onclick="verifyIndex();">手机绑定</a> <a>修改密保问题</a></li>
+              <li>认证邮箱：$!{email}<span style="color:red">未认证 </span><a onclick="verifyIndex();">绑定邮箱</a></li>
+              <li>上次登录：2014-03-27 17:15:02</li>
+            </ul>
+         </div><!--tmp-2 end-->
+        <div class="mess_setup_right">
+               <ul>
+                  <li>店铺动态评分：与同行业相比</li>
+                  <li>好平率：与同行业相比</li>
+                  <li>比行业平均值高：<i class="font_fe font_14b">0.42%</i></li>
+               </ul>
+        </div><!--tmp-3 end--> 
+        <div class="mess_setup_mid"><p class="button_2" onClick="editShopInfo();">店铺信息修改</p></div>  <!--down end-->
+    </div> 
+    <!--文字段落开始-->
+    <div class="text border-4 bg_06" id="content">
+            <ul>
+               <li>店铺名称：$!{shop.shopName}</li>
+               <li>店铺域名：$!{shop.shopUrl}</li>
+			   <li>店铺信息状态：店铺信息修改 <span style="color:red">审核通过</span></li>
+               <li>店铺LOGO：<img src="pic/s-2.png" width="100" height="100"/></li>
+               <li>店铺类目：$!{shop.shopCatgory}</li>
+               <li>关键字：数码相机，手机，潮流，2014年新款</li>
+               <li>店铺简介：广州市嘉通信息软件数码城，本公司长期以来从事通讯，数码及电脑网络产品直接境销商，货源充足，质量可靠。《全国通用》手机充值卡，游戏点卡。石化卡面值50元批￥19元面值100元批￥38元。卡截止日期：2011年12月31日！实物卡：全国通用；价格优惠，欢迎购买！这是一个小投资大赢利无风险的投资方式，为您无业及创业时同样拥有赚钱的好机会，竭诚为广大新老客户提供更优质的服务。</li>
+               <li>店铺主营：数码相机，手机，电脑网络产品</li>
+               <li>购买设置：混批 金额要求：订单总价大于1000元 数量要求：货品总数大于10件</li>
+               <li>档口地址：广东省</li>
+               <li>邮政编码：510045</li>
+               <li>街道地址：南山区月亮湾大道2080号兆龙大厦B</li>
+               <li>手机号码：13688992506</li>
+			   <li>座机号码：010 - 88275757</li>
+            </ul>
+    </div><!--text end-->
+    <!--文字段落结束-->         
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->
+</body>
+</html>        
+    
+
+

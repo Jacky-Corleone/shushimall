@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.cmscenter.dao.CmsArticleTagsListDAO">
+	<resultMap id="CmsArtTagListMapper" type="com.camelot.cmscenter.dto.CmsArticleTagsListDto">
+			<result property="id" column="id" />
+			<result property="aid" column="aid" />
+			<result property="imgid" column="imgid" />
+			<result property="tagid" column="tagid" />
+			<result property="catename" column="catename" />
+			<result property="addtime" column="addtime" />
+	</resultMap>
+	<resultMap id="CmsArtTagListJoinMapper" type="com.camelot.cmscenter.dto.CmsArticleTagsListJoinDto">
+		<result property="id" column="id" />
+		<result property="aid" column="aid" />
+		<result property="imgid" column="imgid" />
+		<result property="tagid" column="tagid" />
+		<result property="catename" column="catename" />
+		<result property="addtime" column="addtime" />
+		<result property="parentid" column="parentid" />
+		<result property="tagname" column="tagname" />
+		<result property="art_seo" column="art_seo" />
+		<result property="pro_seo" column="pro_seo" />
+		<result property="img_seo" column="img_seo" />
+		<result property="type" column="type" />
+		<result property="art_tag" column="art_tag" />
+		<result property="img_tag" column="img_tag" />
+		<result property="pro_nav" column="pro_nav" />
+		<result property="img_nav" column="img_nav" />
+	</resultMap>
+	<select id="queryByArtId" resultMap="CmsArtTagListMapper" >
+		select * from cms_article_tags_list where aid = #{id}
+	</select>
+	<select id="queryByImgId" resultMap="CmsArtTagListMapper" >
+		select * from cms_article_tags_list where imgid = #{id}
+	</select>
+	<select id="queryById" resultMap="CmsArtTagListMapper" >
+		select * from cms_article_tags_list where id = #{id}
+	</select>
+
+	<delete id="delete" parameterType="java.lang.String">
+		DELETE from cms_article_tags_list where aid=#{id}
+	</delete>
+	<delete id="deleteByImg" parameterType="java.lang.String">
+		DELETE from cms_article_tags_list where imgid=#{id}
+	</delete>
+	<select id="queryCount" resultType="long">
+		SELECT
+		count(1)
+		from cms_article_tags_list a LEFT JOIN cms_article_tags b ON b.tagid=a.tagid
+		<include refid="where_fragement" />
+	</select>
+	<!-- 关联查询 -->
+	<select id="queryArtTagjoinList" resultMap="CmsArtTagListJoinMapper">
+		select *
+		from cms_article_tags_list a LEFT JOIN cms_article_tags b ON b.tagid=a.tagid
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	<!-- 查询 -->
+	<select id="queryArtTagList" resultMap="CmsArtTagListMapper">
+		select *
+		from cms_article_tags_list
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	<sql id="where_fragement">
+		where 1 = 1
+		<if test="entity.id!=null and entity.id!=''">
+			and a.id = #{entity.id}
+		</if>
+		<if test="entity.aid!=null and entity.aid!=''">
+			and a.aid = #{entity.aid}
+		</if>
+		<if test="entity.imgid!=null and entity.imgid!=''">
+			and a.imgid = #{entity.imgid}
+		</if>
+		<if test="entity.tagid!=null and entity.tagid!=''">
+			and a.tagid = #{entity.tagid}
+		</if>
+		<if test="entity.catename!=null and entity.catename!=''">
+			and a.catename = #{entity.catename}
+		</if>
+		<if test="entity.addtime!=null and entity.addtime!=''">
+			and a.addtime = #{entity.addtime}
+		</if>
+	</sql>
+
+	<sql id="pagination_tail">
+		limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<insert id="insertTagList" parameterType="com.camelot.cmscenter.dto.CmsArticleTagsListDto">
+		INSERT INTO cms_article_tags_list (id,aid,imgid,tagid,catename,addtime)
+		VALUES(#{entity.id},#{entity.aid},#{entity.imgid},#{entity.tagid},#{entity.catename},#{entity.addtime})
+	</insert>
+</mapper>

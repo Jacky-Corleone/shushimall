@@ -1,0 +1,625 @@
+#set($staticPath="$request.contextPath/assets")
+<link href="$staticPath/css/Details.css" rel="stylesheet" type="text/css"/>
+<link href="$staticPath/css/loading.css" rel="stylesheet" type="text/css"/>
+<link href="$staticPath/css/manage_style.css" rel="stylesheet" type="text/css"/>
+<link href="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="$staticPath/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.js"></script>
+<script type="text/javascript" src="$staticPath/js/jquery-migrate-1.1.0.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/fancyzoom/jquery.shadow.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/fancyzoom/jquery.ifixpng.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/fancyzoom/jquery.fancyzoom.js"></script>
+<script type="text/javascript">
+// javascript:window.history.go(-1);
+javascript:window.history.forward(1);
+	// 解决IE8下不支持indexOf方法
+	if (!Array.prototype.indexOf){
+		Array.prototype.indexOf = function(elt){
+            var len = this.length >>> 0;
+            var from = Number(arguments[1]) || 0;
+            from = (from < 0)
+                 ? Math.ceil(from)
+                 : Math.floor(from);
+            if (from < 0)
+              from += len;
+            for (; from < len; from++){
+              if (from in this && this[from] === elt)
+                return from;
+            }
+            return -1;
+		};
+    }
+	$(document).ready(function(){
+		//图片查看
+		$('.po_re_img').fancyzoom({
+			Speed:400,
+			showoverlay:false,
+			imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+		});
+		checkTheme();
+		checkPackage();
+	});
+	
+	function checkPackage(){
+		$("#mallThemePackage").val('no');
+		$("[name='addSourceName']").each(function(){
+			if($(this).val() == 3){
+				var itemId = $(this).attr("class");
+				checkPackageS(itemId);
+			}
+		});
+	}
+	
+	function checkPackageS(itemId){
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "$request.contextPath/productController/checkServiceItemCity",
+			data: {
+				itemId : itemId,
+				cityCode : $("[name='cityId']").val()
+			},
+			success: function(data){
+				if(data.result){
+					if($("#mallThemePackage").val() == 'no'){
+						$("#mallThemePackage").val('ok');
+					}else{
+						$("#mallThemePackage").val($("#mallThemePackage").val() + '_' + 'ok');
+					}
+				}else{
+					if($("#mallThemePackage").val() == 'no'){
+						$("#mallThemePackage").val(data.resultMessage);
+					}else{
+						$("#mallThemePackage").val($("#mallThemePackage").val() + '_' + data.resultMessage);
+					}
+				}
+			}
+		});
+	}
+	
+	
+	
+	//根据收获地址判断子站是否存在
+	function checkTheme(){
+		//根据售货地址加载子站判断
+		var cityCode = $("[name='cityId']").val();
+  		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "$request.contextPath/shopCart/checkMallTheme",
+			data: {
+				cityCode : cityCode
+			},
+			success: function(data){
+				if(data.result){
+					$("#mallTheme").val('ok');
+				}else{
+					$("#mallTheme").val(data.resultMessage);
+				}
+			}
+		});
+	}
+	
+	// 重新加载订单核对页
+	function toOrderDetail(){
+		$(".Check_order").append("<div id='ke-loading' class='cart-loading' ></div>");
+		var orderType = $("#orderType").val();
+		var url = "";
+		if(orderType==2){
+			url = "$request.contextPath/shopCart/toOrderDetail";
+		}else if(orderType==0 || orderType==1){
+			url = "$request.contextPath/shopCart/toOrderDetail2";
+		}
+		$.ajax({
+			url: url,
+			data: $("#orderForm").serialize(),
+			type: "post",
+			dataType: "html",
+			success: function(data){
+				if(data && !data.success && data.indexOf("请不要频繁操作") != -1){
+					location.href = "$request.contextPath/reSubmit";
+				}else{
+					$(".Check_order").html(data);
+				}
+				checkTheme();
+				checkPackage();
+			}
+		});
+	}
+	
+	// 切换支付方式
+	function selectPayType(thiz){
+		var id = thiz.id;
+		var userType = "$userType";
+		$(thiz).attr('class','press_classes po_re border-8 js_attr');
+		if(id == 'personal'){
+			$('#paymentMethod').val('1');
+    		if(userType > 1){
+    			$('#enterprise').attr('class','press_classes po_re border-13 js_attr');
+    			if($("[name='shipmentType']").val()==2){
+    				alert("个人支付只能使用立即支付！");
+	    			$("[name='shipmentType']").val("1");
+					$("[name='payPeriod']").val("").parent().hide();
+				}
+    		}
+			
+		} else{
+			$('#paymentMethod').val('2');
+			$('#personal').attr('class','press_classes po_re border-13 js_attr');
+		}
+		toOrderDetail();
+	}
+	
+	// 优惠券使用
+	function coupon(o){
+		$("[name='couponId']").not($(o)).removeAttr("checked");
+    	toOrderDetail();
+	}
+	
+	// 使用积分
+	function submitIntegral(){
+		var numRegEx = /^[1-9]\d*$/;
+		var integral = $("#integral").val();
+		var maxIntegral = $("#maxIntegral").val();
+		if(integral){
+			if(numRegEx.test(integral)){
+				if(parseInt(integral) <= parseInt(maxIntegral)){
+					$('input[name="integral"]').val(integral);
+					toOrderDetail();
+				} else{
+					alert("您的可用积分为" + maxIntegral);
+					$("#integral").focus();
+				}
+			} else{
+				alert("积分只能输入正整数");
+				$("#integral").focus();
+			}
+		} else{
+			alert("请输入积分");
+			$("#integral").focus();
+		}
+	}
+	
+	// 解除使用积分
+	function cancelIntegral(){
+		$("#integral").val("");
+		$('input[name="integral"]').val("");
+		toOrderDetail();
+	}
+	
+	// 运送方式切换
+	function switchDeliveryType(){
+		toOrderDetail();
+	}
+	
+	/*工具方法：上传图片*/
+    function startUpload(fileElementId, showImg, urlInput){
+    	//判断图片格式
+    	var fileInput = $("#"+fileElementId).val();
+    	var extStart = fileInput.lastIndexOf(".");
+    	var ext = fileInput.substring(extStart,fileInput.length).toUpperCase();
+    	if(ext!=".JPG" && ext!=".jpg" && ext!=".JPEG" && ext!=".jpeg" && ext!=".PNG" && ext!=".png" && ext!=".BMP" && ext!=".bmp"){
+    		alert("图片限于jpg,jpeg,png,bmp格式");
+    		return false;
+    	}
+    	$.ajaxFileUpload({
+    		url: '$request.getContextPath()/fileUpload/fixedUpload?size=307200&date='+new Date(), //用于文件上传的服务器端请求地址
+    		secureuri: false, //是否需要安全协议，一般设置为false
+    		fileElementId: fileElementId, //文件上传域的ID
+    		dataType: 'json', //返回值类型 一般设置为json
+    		type:"post",
+    		success: function (data, status){  //服务器成功响应处理函数
+    			if(!data.success){
+    				alert(data.msg);
+    				return false;
+    			}
+    			$("#"+showImg).attr("src","$!imageServerAddr"+data.url);
+    			$("#"+urlInput).val(data.url);
+    			$("#"+fileElementId).val("");
+    			
+    			//图片查看
+    			$('.po_re_img').fancyzoom({
+    				Speed:400,
+    				showoverlay:false,
+    				imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+    			});
+    		},
+    		error: function (data, status, e){//服务器响应失败处理函数
+    		}
+    	});
+    };
+
+	function addAddress(){
+		$("#addressId").val("");
+		$("#contactName").val("");
+		$("#contactMobile").val("");
+		$("#address").val("");
+		$("#telephone").val("");
+		$("#province").val("");
+		$("#city").val("");
+		//$("#area").val("");
+		$("[name = fn]:checkbox").attr("checked", false);
+
+		var element = $(".cle_con1_add");
+		if (element.hasClass("current")) {
+			element.removeClass("current");
+			element.hide();
+		} else {
+			element.addClass("current");
+			getAddress(0, "province");
+
+
+			$("#province").change( function() {
+				$('#city option:first').siblings().remove();
+				//$('#area option:first').siblings().remove();
+				getAddress($("#province").val(), "city");
+			});
+			//获取区/县
+			/*
+			$("#city").change( function() {
+				$('#area option:first').siblings().remove();
+				getAddress($("#city").val(), "area");
+			});
+			*/
+			element.show();
+		}
+	}
+	function getAddress(addressId, domId){
+		$.ajax({
+		   type: "POST",
+		   dataType: "json",
+		   url: "$request.getContextPath()/address/query",
+		   data: {
+				id: addressId
+		   },
+		   success: function(data){
+			   $(data).each(function(i,obj){
+					$("#"+domId).append('<option value="'+obj.code+'">'+obj.name+'</option>');
+			   });
+		   }
+		});
+	}
+	
+	/**
+     * 省市区数据填充
+     * parentCode 父级编码
+     * opitonId 需要填充数据的下拉列表框的id
+     * selectVal 默认选中的值
+     * name 服务器返回的数据中，作为下拉框option的text的字段名，默认为"name"
+     * code 服务器返回的数据中，作为下拉框option的value的字段名，默认为"code"
+     */
+    function order_optionItems(parentCode, optionId, selectVal, name, code){
+    	$.ajax({
+    		url:"$request.getContextPath()/address/query",
+    		type:"post",
+    		data:{
+    			id:parentCode
+    		},
+    		dataType: "json",
+    		success:function(data){
+    			var optionItem = $("#"+optionId);
+    			optionItem.empty();
+    			optionItem.append($("<option>").text("请选择").val(""));
+    			$.each(data, function (n, address) {
+    				if(!name){
+    					name = "name"; 
+    				}
+    				if(!code){
+    					code = "code";
+    				}
+    				var option = $("<option>").text(address[name]).val(address[code]);
+    				if(address.code == selectVal){
+    					option.attr("selected",true);
+    				}
+    				optionItem.append(option);
+    			});
+    		}
+    	});
+    }
+
+	function saveAddress(){
+		var addressId = $("#addressId").val();
+		var contactperson = $.trim($('#contactName').val());//收货人
+		if(contactperson==null || contactperson==""){
+			$("#errorMsg").html("请填写收货人信息");
+			return;
+		}
+		var mobile = /^(1+\d{10})$/;
+		var contactphone = $('#contactMobile').val();//手机号码
+		if(!mobile.test(contactphone)){
+			$("#errorMsg").html("请正确填写您的手机号码");
+			return;
+		}
+		var provicecode = $('#province').val();
+		var citycode = $('#city').val();
+		//var countrycode = $('#area').val();
+		if(provicecode==null || citycode==null  /*||countrycode==null*/ || provicecode=="" || citycode=="" /*|| countrycode==""*/){
+			$("#errorMsg").html("请选择您的收货地址");
+			return;
+		}
+		var fulladdress = $.trim($('#address').val());//详细地址
+		if(fulladdress==null || fulladdress==""){
+			$("#errorMsg").html("请填写详细地址");
+			return;
+		}
+		if(fulladdress.length >200){
+			$("#errorMsg").html("详细地址最多输入200字符");
+			return;
+		}
+		var telephone = $('#telephone').val();
+		var regTel = /^(0[0-9]{2,3}\-)?([2-9][0-9]{6,7})+(\-[0-9]{1,4})?$/;
+		if( telephone != null && telephone != "" ){
+			if( !regTel.test(telephone) ){
+				$("#errorMsg").html("固定电话格式有误！");
+				return;
+			}
+		}
+
+		var isdefault = $('#fn').is(":checked") ? 1 : 2;//默认地址
+		$("#errorMsg").html("");
+		var orderType = $("#orderType").val();
+		var contractNo = $("#contractNo").val();
+		var buyType = $("#buyType").val();
+		if(orderType==2){
+			if(buyType && buyType == "NOW"){
+				url = "$request.contextPath/shopCart/toOrderViewPromptly?orderType=2";
+			} else{
+				url = "$request.contextPath/shopCart/toOrderView?orderType=2";
+			}
+		}else if(orderType==0 || orderType==1){
+    		if(buyType && buyType == "NOW"){
+    			url = "$request.contextPath/shopCart/toOrderViewPromptly?orderType="+orderType+"&contractNo="+contractNo;
+    		} else{
+    			url = "$request.contextPath/shopCart/toOrderView?orderType="+orderType+"&contractNo="+contractNo;
+    		}
+		}
+		$.ajax({
+		   type: "POST",
+		   dataType: "json",
+		   url: "$request.getContextPath()/address/addAddress",
+		   data: {
+				provicecode: provicecode,
+				citycode: citycode,
+				countrycode: 0,
+				fulladdress: fulladdress,
+				isdefault: isdefault,
+				contactperson: contactperson,
+				contactphone: contactphone,
+				contacttel: telephone,
+				addressId: addressId
+		   },
+		   success: function(data){
+			   if(isdefault){
+				   location.href = url;
+			   }
+		   }
+		});
+	}
+
+	function reCalculateFee(id){
+		$("[name='address']").val(id);
+		toOrderDetail();
+	}
+
+	function changeInvoice(obj){
+		var invoice = $(obj).val();
+		if( invoice == 1 ){
+			$("#invoiceTitle").hide();
+		}else{
+			$("#invoiceTitle").show();
+		}
+	}
+
+	function changePayType(obj){
+		var payType = $(obj).val();
+		if( payType == 1 ){
+			$("[name='payPeriod']").val("").parent().hide();
+		}else{
+			if($('#paymentMethod').val()==1){
+				alert("延期支付只能是企业支付！");
+				$('#paymentMethod').val('2');
+				$('#enterprise').attr('class','press_classes po_re border-8 js_attr');
+				$('#personal').attr('class','press_classes po_re border-13 js_attr');
+				toOrderDetail();
+			}
+			$("#payPeriod").show();
+		}
+	}
+	function changePayModel(obj){
+		var payType = $(obj).val();
+		if( payType == 1 ){
+			$("#zxyh").removeAttr("checked");
+//			$("#zxyh").attr("checked","false");
+			$("#wyzxDiv").attr('style','display:block');
+			$("#zxyhDiv").attr('style','display:none');
+			$("#wyzx").prop("checked","checked");
+			
+			
+		}else{
+			$("#wyzx").removeAttr("checked");
+//			$("#wyzx").attr("checked","false");
+			$("#wyzxDiv").attr('style','display:none');
+			$("#zxyhDiv").attr('style','display:block');
+			$("#zxyh").prop("checked","checked");
+		}
+	}
+
+	//提交订单
+	function orderSubmit() {
+		var needApprove = $("#needApproveId").val();
+		var auditId = $("#auditId").val();
+		var userId = $("#userId").val();
+		var payTotal = $("#payTotal").val();
+		if ($("[name='detailAddress']").val() == null
+				|| $("[name='name']").val() == null) {
+			alert("请填写选择收货地址！");
+			return;
+		}
+		
+		var isService = false;
+		$("[name='addSourceName']").each(function(){
+			if($(this).val() > 3){
+				isService  =true;
+				return;
+			}
+		});
+		
+		if(isService){
+			var mallTheme = $("#mallTheme").val();
+	  		if(mallTheme != 'ok'){
+	  			alert(mallTheme);
+	  			return;
+	  		}
+		}
+		
+		var mallThemePackage = $("#mallThemePackage").val().split('_');
+		for(var i = 0; i < mallThemePackage.length ; i ++){
+			if(mallThemePackage[i] != 'no' && mallThemePackage[i] != 'ok'){
+				alert(mallThemePackage[i]);
+				return ;
+			}
+		}
+		
+		if($("[name='cityId']").val() != $.cookie('regionCode')){
+			if(!confirm('收货地址与所在地不符是否提交订单')){
+				return;
+			}
+		}
+		
+		
+		if($("[name='invoice']").val() == "2" && $('[name="invoiceTitle"]').val() == "" ){
+			alert("请填写发票抬头！");
+			return;
+		}
+
+		if($('[name="shipmentType"]').val() != "1" && $('[name="payPeriod"]').val() == "" ){
+			alert("请选择支付周期！");
+			return;
+		}
+		if(needApprove=="0" && (auditId==""||auditId==null)){
+			alert("请选择审核人！");
+			return;
+		}
+		var payModel = $('[name="payModel"]').val();
+		if(payModel ==1){//个人用户
+			if($('#wyzx').is(":checked")!=true){
+				alert('请选择支付方式！');
+				return ;
+			}
+		}else if(payModel ==2){
+			if($('#zxyh').is(":checked")!=true){
+				alert('请选择支付方式！');
+				return;
+			}
+		}
+		if ($("#quantity").val() == "") {
+			alert("订单信息异常！");
+		}
+		if(!payTotal || payTotal<=0){
+			alert("支付金额不能为0！");
+			return;
+		}
+		promotionMng();
+		markdownMng();
+		$(".wid").append("<div class='submit-loading' ></div>");
+  		$.ajax({
+  			url: "$request.contextPath/shopCart/validate",
+			data: $("#orderForm").serialize(),
+  			dataType: "html",
+  			success: function(data){
+  				if( data != null && data != "" ){
+					$(".submit-loading").fadeOut().remove();
+  					$("#xxx").append(data);
+  				}else{
+      				if(needApprove=="0"&& userId!=auditId){//需要审核并且选择的审核人不是自己
+      					 $("#orderForm").attr("action","$request.contextPath/shopCart/orderApproveSubmit").submit();
+      				}else{
+  						if(needApprove=="0" && userId==auditId){
+      						if(window.confirm("您选择的审核人是本人，系统默认不走审核流程，执行正常订单流程，您确认提交该订单吗？")){
+      							$("#orderForm").attr("action","$request.contextPath/shopCart/orderSubmit").submit();
+      						} else{
+  								$(".submit-loading").fadeOut().remove();
+  							}
+  						} else{
+  							$("#orderForm").attr("action","$request.contextPath/shopCart/orderSubmit").submit();
+  						}
+					}
+  				}
+  			}
+  		});
+	}
+	function promotionMng(){
+		var $promotion_ = "";
+		$("[name='promid']").each(function(){
+			if($(this).val()){
+				$promotion_ += $(this).val()+",";
+			}
+		});
+		$("#promotion").val($promotion_);
+	}
+	function markdownMng(){
+		var $markdownPromId_ = "";
+		$("[name='markdownPromId']").each(function(){
+			if($(this).val()){
+				$markdownPromId_ += $(this).val()+",";
+			}
+		});
+		$("#markdown").val($markdownPromId_);
+	}
+</script>
+<input type="hidden" id="userId" value="$!userId"/>
+<input type="hidden" id="mallTheme">
+<input type="hidden" id="mallThemePackage" value= "no">
+#parse("/common/search.vm")
+#parse("/common/index_head.vm")
+
+<!--主体-->
+<div class="wid">
+
+	<!--以下为：标题-->
+	<div class="mar_tb20">
+	<div class="cle_top">
+		<h1 class="fl">
+			<i class="demo-icons fa-pencil-square-o font_20 font_fe"></i>填写核对订单信息
+		</h1>
+	</div>
+	<div class="tree tree_2"></div>
+	</div>
+	<!-- cle_top end-->
+	<div class="clear"></div>
+
+	<!--以下为：订单信息-->
+	<div class="Check_order">
+		#parse("/shopcart/order_detail.vm")
+	</div>
+
+	#set($layout = "/mini_layout.vm")
+</div>
+<!--wid end -->
+
+<div id="xxx"></div>
+
+<!--
+<div id="submitResult" class="po_fai" style="display: none;">
+    <div class="po_fai_bg"></div>
+    <div class="po_main">
+		<ul>
+	    	<li class="font_18">
+	    		<i class="fa-info-circle demo-icons font_24 mar_r10"></i>
+	    		<span class="title"></span>
+	    	</li>
+	        <li class="message" style="color: red;"></li>
+	        <li class="successBar" style="text-align: right; display: none;">
+				<a href="$request.contextPath/order/queryBuyer" class="font_1c">我的订单</a>
+				<span style="margin: auto 2px auto 2px;">|</span>
+				<a href="$request.contextPath/" class="font_1c">继续购物</a>
+	        </li>
+	        <li class="errorBar" style="text-align: right; display: none;">
+				<a href="$request.contextPath/shopCart/toCart" class="font_1c">返回购物车</a>
+				<span style="margin: auto 2px auto 2px;">|</span>
+				<a href="$request.contextPath/" class="font_1c">继续购物</a>
+	        </li>
+    	</ul>
+	</div>
+</div>
+-->

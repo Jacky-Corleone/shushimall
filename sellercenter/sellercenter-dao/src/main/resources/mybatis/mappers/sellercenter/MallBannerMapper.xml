@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.sellercenter.dao.MallBannerDAO">
+	<resultMap id="mallBannerMapper" type="com.camelot.sellercenter.domain.MallBanner">
+			<result property="id" column="id" />
+			<result property="bannerUrl" column="banner_url" />
+			<result property="platformId" column="platform_id" />
+			<result property="sortNumber" column="sort_number" />
+			<result property="created" column="created" />
+			<result property="modified" column="modified" />
+			<result property="status" column="status" />
+			<result property="startTime" column="start_time" />
+			<result property="endTime" column="end_time" />
+			<result property="bannerLink" column="banner_link" />
+			<result property="title" column="title" />
+			<result property="bannerType" column="banner_type" />
+			<result property="integral" column="integral" />
+			<result property="skuId" column="sku_id" />
+			<result property="themeId" column="theme_id"/>
+	</resultMap>
+	<resultMap id="mallBannerDTO" type="com.camelot.sellercenter.mallBanner.dto.MallBannerDTO">
+			<result property="id" column="id" />
+			<result property="bannerUrl" column="banner_url" />
+			<result property="bannerLink" column="banner_link" />
+			<result property="title" column="title" />
+			<result property="sortNumber" column="sort_number" />
+			<result property="created" column="created" />
+			<result property="modified" column="modified" />
+			<result property="status" column="status" />
+			<result property="startTime" column="start_time" />
+			<result property="endTime" column="end_time" />
+			<result property="bannerType" column="banner_type" />
+			<result property="integral" column="integral" />
+			<result property="skuId" column="sku_id" />
+			<result property="themeId" column="theme_id"/>
+	</resultMap>
+	
+	<sql id="selectBannerReportColumns">
+		<![CDATA[
+		select
+ 			 mall_ad_count_.id
+ 			,mall_ad_count_.mall_ad_id
+ 			,mall_ad_count_.ad_count
+ 			,mall_ad_count_.click_date
+ 			,mall_banner.title
+		FROM 
+		mall_banner mall_banner LEFT JOIN  mall_ad_count mall_ad_count_ ON mall_ad_count_.mall_ad_id=mall_banner.id
+		]]>
+	</sql>
+	<select id="queryById" resultMap="mallBannerMapper" >
+		select * from mall_banner
+		where id = #{id}
+	</select>
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	<insert id="add">
+		insert into mall_banner(
+				banner_url,
+				platform_id,
+				sort_number,
+				created,
+				modified,
+				status,
+				start_time,
+				end_time,
+				banner_link,
+				title,
+				banner_type,
+				integral,
+				sku_id,
+				theme_id
+		)values(
+				#{bannerUrl},
+				#{platformId},
+				#{sortNumber},
+				NOW(),
+				NOW(),
+				#{status},
+				#{startTime},
+				#{endTime},
+				#{bannerLink},
+				#{title},
+				#{bannerType},
+				#{integral},
+				#{skuId},
+				#{themeId}
+		)
+		<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+			select @@IDENTITY
+		</selectKey>
+	</insert>
+	
+	<update id="update">
+		update mall_banner set
+				<if test="bannerUrl != null and bannerUrl !='' ">
+					banner_url = #{bannerUrl},
+				</if>
+				<if test="platformId != null">
+					platform_id = #{platformId},
+				</if>
+				<if test="sortNumber != null">
+					sort_number = #{sortNumber},
+				</if>
+				modified = NOW(),
+				<if test="startTime != null">
+					start_time = #{startTime},
+				</if>
+				<if test="endTime != null">
+					end_time = #{endTime},
+				</if>
+				<if test="bannerLink != null and bannerLink != ''">
+					banner_link = #{bannerLink},
+				</if>
+				<if test="title != null and title != ''">
+					title = #{title},
+				</if>
+				<if test="bannerType != null">
+					banner_type = #{bannerType},
+				</if>
+				<if test="themeId != null">
+					theme_id = #{themeId},
+				</if>
+				<if test="status != null">
+					status = #{status},
+				</if>
+				id = #{id}
+		where id = #{id}
+	</update>
+	<update id="updateStatusById">
+		update mall_banner set
+			status = #{publishFlag}
+		<if test=" publishFlag == 0 ">
+			,  start_time = NULL  , end_time = NULL 
+		</if>	
+		where id = #{id}
+	</update>
+	
+	<update id="updateBatchStatusById">
+		update mall_banner set
+			status = #{publishFlag}
+		<if test=" publishFlag == 0 ">
+			,  start_time = NULL  , end_time = NULL 
+		</if>	
+		where id in
+		<foreach collection="ids" open="(" separator="," close=")" item="ids">
+			#{ids}
+		</foreach>
+		<if test="">
+			<![CDATA[
+				AND start_time < now() 
+			]]>
+		</if>
+	</update>
+	<update id="autoBatchOffShelves">
+		<![CDATA[
+			UPDATE mall_banner t SET t.status = 1 WHERE t.start_time <= NOW() AND t.status = 0
+		]]>
+	</update>
+	<update id="autoBatchRelease">
+		<![CDATA[
+			UPDATE mall_banner t SET t.status = 0 ,t.start_time = NULL , t.end_time = NULL WHERE t.end_time <= NOW() AND t.status = 1
+		]]>
+	</update>
+	<update id="updateSortNumberById">
+		update mall_banner set
+			sort_number = #{sortNum}
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from mall_banner
+		<if test=" codes != null and codes.size() > 0 ">
+			where id in
+			<foreach collection="codes" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test=" codes == null or codes.size() == 0 ">
+			where 1 = 3
+		</if>
+	</delete>
+
+	<select id="queryCountDTO" resultType="long">
+		select count(0) from mall_banner where 1=1
+		<if test="publishFlag!= null ">
+				and status = #{publishFlag}
+		</if>
+		<if test="bannerType!= null ">
+				and banner_type = #{bannerType}
+		</if>
+		<if test=" publishFlag != null and publishFlag==1 ">
+			<![CDATA[
+			and ((date_format(start_time,'%Y-%m-%d')  <= date_format(#{nowTime},'%Y-%m-%d')
+			]]>
+			and date_format(end_time,'%Y-%m-%d') >= date_format(#{nowTime},'%Y-%m-%d'))
+			or(start_time is null and end_time is null)
+            )
+		</if>
+	</select>
+	<select id="queryListDTO" resultMap="mallBannerDTO">
+		select * from mall_banner where 1=1
+		<if test="publishFlag!= null ">
+				and status = #{publishFlag}
+		</if>
+		<if test="bannerType!= null ">
+				and banner_type = #{bannerType}
+		</if>
+		<if test=" publishFlag != null and publishFlag==1 ">
+			<![CDATA[
+			and ((date_format(start_time,'%Y-%m-%d')  <=  date_format(#{nowTime},'%Y-%m-%d')
+			]]>
+            and date_format(end_time,'%Y-%m-%d') >= date_format(#{nowTime},'%Y-%m-%d'))
+            or(start_time is null and end_time is null)
+            )
+
+		</if>
+		order by sort_number asc, modified desc
+	  	limit #{page.pageOffset} , #{page.rows}
+	</select>
+	
+	
+	<select id="queryCountDTOToAdmin" resultType="long">
+		select count(0) from 
+		mall_banner mb LEFT JOIN mall_theme mt ON mb.theme_id=mt.id
+		<include refid="queryList_where"/>
+	</select>
+	<select id="queryListDTOToAdmin" resultMap="mallBannerDTO">
+		select 
+		mb.id,
+		mb.banner_url bannerUrl,
+		mb.banner_link bannerLink,
+		mb.sort_number sortNumber,
+		mb.title,
+		mb.created,
+		mb.modified,
+		mb.status,
+		mb.start_time startTime,
+		mb.end_time endTime,
+		mb.theme_id themeId,
+		mb.banner_type bannerType,
+		mb.sku_id,
+		mb.integral
+		from 
+		mall_banner mb LEFT JOIN mall_theme mt ON mb.theme_id=mt.id
+		<include refid="queryList_where"/>
+		order by sort_number asc, modified desc
+	  	limit #{page.pageOffset} , #{page.rows}
+	</select>
+	<sql id="queryList_where">
+			where 1=1
+			and mb.status != '2'
+			
+			<if test="entity!=null">
+				<if test=" entity.id != null and entity.id != '' ">
+					and mb.id = #{entity.id}
+				</if>
+				<if test="entity.themeId != null and entity.themeId != -1">
+					and mb.theme_id = #{entity.themeId}
+				</if>
+				<!-- TODO 子站暂时是不取全国的轮播图 -->
+				<if test="entity.themeId != null and entity.themeId == -1">
+					and mb.theme_id != 0
+				</if>
+				<if test=" entity.bannerType != null">
+					and mb.banner_type = #{entity.bannerType}
+				</if>
+				<if test=" entity.status != null and entity.status != '' ">
+					and mb.status = #{entity.status}
+				</if>
+				<if test=" entity.title != null ">
+					and title like concat('%',#{entity.title},'%')
+				</if>
+				<!-- timeFlag  ==== 0：创建时间  1：发布时间 -->
+				<if test=" entity.timeFlag != null and entity.timeFlag == 0 ">
+					<if test=" entity.startTime != null ">
+						and date_format(created,'%Y-%m-%d') >= date_format(#{entity.startTime},'%Y-%m-%d')
+					</if>
+					<if test=" entity.endTime != null ">
+						<![CDATA[
+						and date_format(created,'%Y-%m-%d') <= date_format(#{entity.endTime},'%Y-%m-%d')
+						]]>
+					</if>
+				</if>
+				<if test=" entity.timeFlag != null and entity.timeFlag == 1 ">
+					<if test=" entity.startTime != null ">
+						and date_format(start_time,'%Y-%m-%d') >= date_format(#{entity.startTime},'%Y-%m-%d')
+					</if>
+					<if test=" entity.endTime != null ">
+						<![CDATA[
+						and date_format(start_time,'%Y-%m-%d') <= date_format(#{entity.endTime},'%Y-%m-%d')
+						]]>
+					</if>
+				</if>
+				<if test=" entity.skuId != null and entity.skuId != '' ">
+					and sku_id = #{entity.skuId}
+				</if>
+			</if>
+		
+	</sql>
+	
+	<sql id="queryPage_where">
+		where 1=1 
+		<if test="entity!=null">
+			<if test="entity.ids != null">
+				<![CDATA[ and mall_ad_count_.id  in ]]>
+				<foreach collection="entity.ids" item="id" index="index"  open="(" close=")">  
+					#{id}
+				</foreach>
+			</if>
+			<if test="entity.mallAdId != null">
+				<![CDATA[ and mall_ad_count_.mall_ad_id =#{entity.mallAdId} ]]>
+			</if>
+			<if test="entity.mallAdName != null">
+				<![CDATA[ and mall_banner.title like concat('%',#{entity.mallAdName},'%') ]]>
+			</if>
+			<if test="entity.tableType != null">
+				<![CDATA[ and mall_ad_count_.table_type =#{entity.tableType} ]]>
+			</if>
+			<if test="entity.adCountMin != null">
+				<![CDATA[ and mall_ad_count_.ad_count >=#{entity.adCountMin} ]]>
+			</if>
+			<if test="entity.adCountMax != null">
+				<![CDATA[ and mall_ad_count_.ad_count<=#{entity.adCountMax} ]]>
+			</if>
+			<if test="entity.clickDateBegin != null  and entity.clickDateBegin !=''">
+				<![CDATA[ and mall_ad_count_.click_date >DATE_FORMAT(#{entity.clickDateBegin},'%Y-%m-%d') ]]>
+			</if>
+			<if test="entity.clickDateEnd != null  and entity.clickDateEnd !=''">
+				<![CDATA[ and mall_ad_count_.click_date <DATE_FORMAT(#{entity.clickDateEnd},'%Y-%m-%d')]]>
+			</if>
+		</if>
+	</sql>
+</mapper>

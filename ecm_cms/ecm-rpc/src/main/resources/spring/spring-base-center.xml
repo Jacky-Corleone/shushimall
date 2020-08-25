@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+
+	<!--商城信息调用 -->
+	   <dubbo:reference id="addressBaseService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.basecenter.service.AddressBaseService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    <!--服务规则 -->
+    <dubbo:reference id="platformServiceRuleExportService" registry="qingdaoRegistry"
+                     owner="zhangfan" interface="com.camelot.basecenter.service.PlatformServiceRuleExportService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    <!--TDK -->
+    <dubbo:reference id="baseTDKConfigService" registry="qingdaoRegistry"
+                     owner="zhangfan" interface="com.camelot.basecenter.service.BaseTDKConfigService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+                     
+     <dubbo:reference id="baseSendMessageService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.basecenter.service.BaseSendMessageService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+	 <dubbo:reference id="growthService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.basecenter.service.GrowthService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+	<dubbo:reference id="dictionaryService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.basecenter.service.DictionaryService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+</beans>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.tradecenter.dao.TradeOrderItemsPackageDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="tradeOrderItemsPackageDTOMap" type="com.camelot.tradecenter.dto.TradeOrderItemsPackageDTO">
+		<result property="id" column="id"/>
+		<result property="orderId" column="order_id"/>
+		<result property="orderItemsId" column="order_items_id"/>
+		<result property="itemId" column="item_id"/>
+		<result property="skuId" column="sku_id"/>
+		<result property="subItemId" column="sub_item_id"/>
+		<result property="subSkuId" column="sub_sku_id"/>
+		<result property="addSource" column="add_source"/>
+		<result property="subSkuPrice" column="sub_sku_price"/>
+		<result property="subNum" column="sub_num"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			*
+		FROM 
+		trade_order_items_package trade_order_items_package_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.id != null and entity.id !=''">
+				<![CDATA[ and trade_order_items_package_.id = #{entity.id} ]]>
+			</if>
+			<if test="entity.orderId != null and entity.orderId != ''">
+				<![CDATA[ and trade_order_items_package_.order_id = #{entity.orderId} ]]>
+			</if>
+			<if test="entity.orderItemsId != null and entity.orderItemsId != ''">
+				<![CDATA[ and trade_order_items_package_.order_items_id = #{entity.orderItemsId} ]]>
+			</if>
+			<if test="entity.itemId != null and entity.itemId != ''">
+				<![CDATA[ and trade_order_items_package_.item_id = #{entity.itemId} ]]>
+			</if>
+			<if test="entity.skuId != null and entity.skuId != ''">
+				<![CDATA[ and trade_order_items_package_.sku_id = #{entity.skuId} ]]>
+			</if>
+			<if test="entity.subItemId != null and entity.subItemId != ''">
+				<![CDATA[ and trade_order_items_package_.sub_item_id = #{entity.subItemId} ]]>
+			</if>
+			<if test="entity.subSkuId != null and entity.subSkuId != ''">
+				<![CDATA[ and trade_order_items_package_.sub_sku_id = #{entity.subSkuId} ]]>
+			</if>
+			<if test="entity.addSource != null and entity.addSource != ''">
+				<![CDATA[ and trade_order_items_package_.add_source = #{entity.addSource} ]]>
+			</if>
+			<if test="entity.subNums != null">
+				and trade_order_items_package_.sub_num  in
+				<foreach collection="entity.subNums" item="subNum" index="index" open="(" separator="," close=")">
+	                #{subNum}
+	  	        </foreach>
+		   </if>
+		   <if test="entity.addSources != null">
+				and trade_order_items_package_.add_source  in
+				<foreach collection="entity.addSources" item="addSource" index="index" open="(" separator="," close=")">
+	                #{addSource}
+	  	        </foreach>
+		   </if>
+		</if>
+		order by trade_order_items_package_.create_time desc
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="tradeOrderItemsPackageDTOMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where trade_order_items_package_.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="tradeOrderItemsPackageDTOMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		trade_order_items_package trade_order_items_package_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="com.camelot.tradecenter.dto.TradeOrderItemsPackageDTO">
+		<![CDATA[
+		insert into trade_order_items_package (
+		    	 order_id
+		    	 ,order_items_id
+		    	 ,item_id
+		    	 ,sku_id
+		    	 ,sub_item_id
+		    	 ,sub_sku_id
+		    	 ,add_source
+		    	 ,sub_sku_price
+		    	 ,sub_num
+		    	 ,create_time
+		    	 ,update_time
+		   )values(
+		    	#{orderId}
+		    	,#{orderItemsId}
+		    	,#{itemId}
+		    	,#{skuId}
+		    	,#{subItemId}
+		    	,#{subSkuId}
+		    	,#{addSource}
+		    	,#{subSkuPrice}
+		    	,#{subNum}
+		    	,now()
+		    	,now()
+		   )
+	    ]]>	
+	</insert>
+	
+</mapper>

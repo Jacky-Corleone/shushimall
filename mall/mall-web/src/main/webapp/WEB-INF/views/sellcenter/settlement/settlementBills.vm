@@ -1,0 +1,219 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script src="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.js" type="text/javascript"></script>
+
+
+<script type="text/javascript">
+//到指定的分页页面
+	function topage(page){
+		$("input[name='page']").val(page);
+		$("#queryForm").submit();
+	}
+$(function(){
+//加载左侧导航
+	$("#leftSeller").load("$request.contextPath/leftSeller");
+	/*表单清空*/
+	$("#clean").bind('click',function(){
+		//无法清空提交后的form
+		$("#queryForm")[0].reset();
+		//提交之后form清空
+		$("#billDatestr").val('');
+		$("#billDateend").val('');
+		$("#havePaidDatestr").val('');
+		$("#havePaidDateend").val('');
+		$("#orderId").val('');
+		$("#status").val('');
+	});
+	/*点击回车查询*/
+	$("#queryForm").keydown(function() {
+       if (event.keyCode == "13") {//keyCode=13是回车键
+            $('#queryBtn').click();
+        }
+  	  });
+	//form to submit
+	$("#sub_btn").bind('click',function(){
+		if(($("#billDatestr").val() !='')&&($("#billDateend").val()=='')){
+			alert("请输入出账截止日期");
+		}else if(($("#billDatestr").val() =='')&&($("#billDateend").val()!='')){
+			alert("请输入出账起始日期");
+		}else if(($("#havePaidDatestr").val() !='')&&($("#havePaidDateend").val()=='')){
+			alert("请输入结算截止日期");
+		}else if(($("#havePaidDatestr").val() =='')&&($("#havePaidDateend").val() !='')){
+			alert("请输入结算起始日期");
+		}else if($("#billDatestr").val() > $("#billDateend").val()){
+			alert("出账日期输入错误");
+		}else if($("#havePaidDatestr").val() > $("#havePaidDateend").val()){
+			alert("结算日期输入错误");
+		}else{
+			//初始化页码
+			$("input[name='page']").val("1");
+    		$("#queryForm").submit();
+		}
+	});
+});
+function settlementDetail(id,passKey){
+	window.location.href = "$request.getContextPath()/order/queryOrderInfoSeller?orderId="+id+"&passKey="+passKey;
+}
+	//结算单确认
+	function confirmSettlement(id){
+	$("#payLoadMessage").show();	//正在加载弹出层
+    	$.ajax({
+    		url:'$request.getContextPath()/sellcenter/settlement/proceedSettlement',
+    		type:'post',
+    		dataType:'json',
+    		data:'settlementId='+id,
+    		success:function(data){
+				if(data.flag == "success"){
+				  $("#payLoadMessage").hide();
+   			        alert(data.messager);
+					window.location.reload(true);
+//					window.location.href="$request.getContextPath()/sellcenter/settlement/financialCheck";
+				}else{
+				    $("#payLoadMessage").hide();
+					alert(data.messager);
+					
+				}
+    		}
+    	});
+	}
+</script>
+<!--头部开始-->
+ <!--导航菜单end-->
+
+<!--中间部分开始-->
+<div id="main">
+<!--左边部分开始-->
+<div id="leftSeller" class="border-4"></div>
+<!--右边部分开始-->
+<div id="right">
+<div id="right_top" class="right_top border-4 bg_06">
+  <form action="$request.getContextPath()/sellcenter/settlement/initBills" method="post" id="queryForm">
+  <input type="hidden" name="page" value="$!pager.page" />
+   <div class="right_top_l">
+      <ul class="list">
+        <li class="wid_300">
+
+          <span class="font_wid">订单编号：</span><input class="input_Style2 wid_120 hei_30" value="$!orderId" type="text" id="orderId" name="orderId"/>
+        </li>
+        <li class="wid_400">
+          <span class="font_wid">出账日期：</span><input id="billDatestr" name="billDatestr" value="$!date.format('yyyy-MM-dd',$!{settlementInDTO.billDatestr})" type="text" readonly="readonly" maxlength="20" class="input_Style2 wid_120 hei_30"
+				onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/><i class="demo-icons">至</i><input id="billDateend" name="billDateend" value="$!date.format('yyyy-MM-dd',$!{settlementInDTO.billDateend})" type="text" readonly="readonly" maxlength="20" class="input_Style2 wid_120 hei_30"
+				onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/>        
+        </li>
+        <li class="wid_300">
+			<span class="font_wid">结算单状态：</span>
+			<select class="wid_130 hei_35 input_Style2 border-4 " name="status" id="status">
+				<option value="">--全部--</option>
+				<option value="0" #if($!{settlementInDTO.status} ==0) selected="true" #end>待结算</option>
+				<option value="1" #if($!{settlementInDTO.status} ==1) selected="true" #end>已结算</option>
+				<!-- <option value="0" #if($!{settlementInDTO.status} ==0) selected="true" #end>待出账</option>
+				<option value="1" #if($!{settlementInDTO.status} ==1) selected="true" #end>待结算</option>
+				<option value="2" #if($!{settlementInDTO.status} ==2) selected="true" #end>已结算待确认</option>
+				<option value="3" #if($!{settlementInDTO.status} ==3) selected="true" #end>已结算已确认</option> -->
+			</select>
+		</li>
+        <li class="wid_400">
+          <span class="font_wid">结算日期：</span><input id="havePaidDatestr" name="havePaidDatestr" value="$!date.format('yyyy-MM-dd',$!{settlementInDTO.havePaidDatestr})" type="text" readonly="readonly" maxlength="20" class="input_Style2 wid_120 hei_30"
+				onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/>
+				<i class="demo-icons">至</i><input id="havePaidDateend" name="havePaidDateend"
+				 value="$!date.format('yyyy-MM-dd',$!{settlementInDTO.havePaidDateend})" type="text" 
+				 readonly="readonly" maxlength="20" class="input_Style2 wid_120 hei_30"
+				onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/>        
+        </li>
+        
+      </ul>
+    </div>
+ </form>
+    <div class="right_top_r ">
+        <button type="button" class="button_4 but_cx3"  id="sub_btn">
+          <a class="font_1c hei_24">查 询</a>
+        </button>
+		<button type="reset" class="button_4 but_cx3">
+         <a class="font_1c" id="clean">清 除</a>
+        </button>
+    </div>
+  </div>
+   <!-- right结束 -->
+<style>
+  
+  .add_h_b{ height: 40px; background: #fafafa;}
+</style>
+  <div id="right_bot" class="right_bot border-4 mar_t10 bg_06">
+    <!-- 商品列表开头 -->
+	#if($pager.records.size() == 0)
+    <p class="hei_30 bg_08 mar_l14 mar_b10 tit" style="width:950px;"><span text-align="center">目前还没有结算单</span></p>
+	#else
+	#foreach($settlementDTO in $pager.records)
+		<style>
+		.xx_font i{ display:block; float:left;}
+		</style>
+	 <p class="hei_30 bg_08 mar_l14 mar_b10 tit xx_font" style="width:950px;">
+           <i class="wid_150"> 结算单号:$!{settlementDTO.settlement.id}</i>
+           <i class="wid_170 over_ell">状态：
+			#if(${settlementDTO.settlement.status}==0)    待结算
+			#elseif(${settlementDTO.settlement.status}==1)已结算
+			#* #elseif(${settlementDTO.settlement.status}==2)已结算待确认
+			#elseif(${settlementDTO.settlement.status}==3)已结算已确认 *#
+			#end
+			</i>
+           <i class="wid_200 over_ell" title="$!{shopDTO.shopName}">店铺：$!{shopDTO.shopName}</i>
+           <i class="wid_170">出账日：$!date.format('yyyy-MM-dd',$!{settlementDTO.settlement.billDate})</i>
+           <i class="wid_180">应结算日：$!date.format('yyyy-MM-dd',$!{settlementDTO.settlement.settlementDate})</i>
+           #if(${settlementDTO.settlement.status}==2)
+		   <i class="wid_120;"><a href="javascript:void(0)" onclick="confirmSettlement('${settlementDTO.settlement.id}');" class="font_1c hei_24"  style="float:right">确&nbsp;定&nbsp;&nbsp;</a></i>
+		   #end 
+	 </p>
+    <div class="right_xinxi mar_l14 zd_xinxi hide">
+     <ul class="list_top bg_05 jiesuan font_cen">
+        <li class="wid_120">订单号</li>
+        <!-- <li class="wid_120">结算状态</li> -->
+        <li class="wid_80">订单金额</li>
+        <li class="wid_80">扣点金额</li>
+        <!-- <li class="wid_80">手续费</li> -->
+        <li class="wid_80">退款金额</li>
+        <li class="wid_80">结算金额</li>
+        <li class="wid_100">备注</li>
+        <li class="wid_210" style="width:100px;">操作</li>
+      </ul>
+		#foreach($detail in ${settlementDTO.settlementDetailList})
+          <ul class="jiesuan   hei_30  font_cen">
+            <li class="wid_120 ">$!{detail.orderId}</li>
+            <!-- <li class="wid_120">$!{detail.statusLabel}</li> -->
+            <li class="wid_80">￥$!{detail.orderPrice}</li>
+            <li class="wid_80">￥$!{detail.commission}</li>
+            <!-- <li class="wid_80">￥$!{detail.factorage}</li> -->
+            <li class="wid_80">￥$!{detail.refundMoney}</li>
+            <li class="wid_80">￥$!{detail.sellerCashAccountIncome}</li>
+			#if(${detail.remark})
+              <li class="wid_100 over_ell"title="$!{detail.remark}">$!{detail.remark}</li>
+			#else
+			   <li class="wid_100 over_ell">---</li>
+			#end
+            <li class="wid_210 font_1c" > <a href="javascript:settlementDetail('$!{detail.orderId}','$!{detail.passKey}')">查看详情</a><br/>
+            <!-- <a href="javascript:showCiticTrade('$!date.format('yyyyMMdd',$!settlementDTO.settlement.settlementDate )','seller')"
+             class="font_65">银行交易回单打印 </a> -->
+             </li>
+    	  </ul>
+	  #end
+    </div>
+	#end
+	#end
+  </div>
+ #pageVelocity($pager)
+<!--又底边图标开始-->
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->
+	<!-- 阶梯价加载弹出曾 -->
+	<div class="po_fai" id="payLoadMessage" style="display:none;z-index:10000">
+	    <div class="po_fai_bg"></div>
+	    <div class="po_main1">
+	      <div class="tit bg_05 hei_30 pad_l10">提示</div>
+	    <ul>
+	        <li><img src="$request.contextPath/assets/images/loading.gif" alt="" />&nbsp;&nbsp;正在确认结算单,请稍候...</li>
+	    </ul>
+	  </div>
+	</div>
+	<!-- 弹出层  交易信息列表DIV -->
+#parse("/bank/citic_trade_index.vm")

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.camelot.payment.dao.RefundTransationsDAO">
+	
+	<resultMap id="refundTransationsResultMap" type="RefundTransations">
+		<result column="ID" property="id"/>
+		<result column="OUT_TRADE_NO" property="outTradeNo"/>
+		<result column="OUT_REFUND_NO" property="outRefundNo"/>
+		<result column="CODE_NO" property="codeNo"/>
+		<result column="ORDER_NO" property="orderNo"/>
+		<result column="TOTAL_AMOUNT" property="totalAmount"/>
+		<result column="REFUND_AMOUNT" property="refundAmount"/>
+		<result column="PAY_BANK" property="payBank"/>
+		<result column="STATE" property="state"/>
+		<result column="RESULT_CODE" property="resultCode"/>
+		<result column="RESULT_MESSAGE" property="resultMessage"/>
+		<result column="INSERT_BY" property="insertBy"/>
+		<result column="INSERT_TIME" property="insertTime"/>
+	</resultMap>
+	<sql id="count_Tail">
+		select count(1) from REFUND_TRANSATIONS refundTransations_
+	</sql>
+	 <!-- mysql 分页 -->
+    <sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			ID,			OUT_TRADE_NO,			OUT_REFUND_NO,			CODE_NO,			ORDER_NO,			TOTAL_AMOUNT,			REFUND_AMOUNT,			PAY_BANK,			STATE,			RESULT_CODE,			RESULT_MESSAGE,			INSERT_BY,			INSERT_TIME
+		FROM 
+		refund_transations refundTransations_
+		]]>
+	</sql>
+	<sql id="where_fragement">
+		where 1 = 1
+		<if test="entity!=null">
+			<if test="entity.outTradeNo != null and entity.outTradeNo !=''">
+				<![CDATA[ and refundTransations_.OUT_TRADE_NO =#{entity.outTradeNo} ]]>
+			</if>
+			<if test="entity.outRefundNo != null and entity.outRefundNo !=''">
+				<![CDATA[ and refundTransations_.OUT_REFUND_NO =#{entity.outRefundNo} ]]>
+			</if>
+			<if test="entity.codeNo != null and entity.codeNo !=''">
+				<![CDATA[ and refundTransations_.CODE_NO =#{entity.codeNo} ]]>
+			</if>
+			<if test="entity.orderNo != null and entity.orderNo !=''">
+				<![CDATA[ and refundTransations_.ORDER_NO =#{entity.orderNo} ]]>
+			</if>
+			<if test="entity.totalAmount != null">
+				<![CDATA[ and refundTransations_.TOTAL_AMOUNT =#{entity.totalAMOUNT} ]]>
+			</if>
+			<if test="entity.refundAmount != null and entity.refundAmount !=''">
+				<![CDATA[ and refundTransations_.REFUND_AMOUNT =#{entity.refundAmount} ]]>
+			</if>
+			<if test="entity.payBank != null and entity.payBank !=''">
+				<![CDATA[ and refundTransations_.PAY_BANK =#{entity.payBank} ]]>
+			</if>
+			<if test="entity.state != null">
+				<![CDATA[ and refundTransations_.STATE =#{entity.state} ]]>
+			</if>
+			<if test="entity.resultCode != null and entity.resultCode !=''">
+				<![CDATA[ and refundTransations_.RESULT_CODE =#{entity.resultCode} ]]>
+			</if>
+			<if test="entity.resultMessage != null and entity.resultMessage !=''">
+				<![CDATA[ and refundTransations_.RESULT_MESSAGE =#{entity.resultMessage} ]]>
+			</if>
+		</if>
+	</sql>
+	<insert id="add" parameterType="RefundTransations"  useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO REFUND_TRANSATIONS
+		  (
+		   ID,
+			OUT_TRADE_NO,
+			OUT_REFUND_NO,
+			CODE_NO,
+			ORDER_NO,
+			TOTAL_AMOUNT,
+			REFUND_AMOUNT,
+			PAY_BANK,
+			STATE,
+			RESULT_CODE,
+			RESULT_MESSAGE,
+			INSERT_BY,
+			INSERT_TIME
+		   )
+		VALUES  (
+		  	#{id},
+			#{outTradeNo},
+			#{outRefundNo},
+			#{codeNo},
+			#{orderNo},
+			#{totalAmount},
+			#{refundAmount},
+			#{payBank},
+			#{state},
+			#{resultCode},
+			#{resultMessage},
+			#{insertBy},
+			now()
+		   )
+	</insert>
+	<update id="updateByOutRefundNo" parameterType="RefundTransations">
+		UPDATE REFUND_TRANSATIONS t
+			SET
+			<if test="entity.resultCode != null and entity.resultCode !=''">
+				RESULT_CODE = #{entity.resultCode},
+			</if>
+			<if test="entity.resultMessage != null and entity.resultMessage !=''">
+				RESULT_MESSAGE = #{entity.resultMessage},
+			</if>
+				STATE = #{entity.state}
+			where 1=3
+			<if test="entity.outRefundNo != null and entity.outRefundNo !=''">
+				<![CDATA[ or refundTransations_.OUT_REFUND_NO =#{entity.outRefundNo} ]]>
+			</if>
+	</update>
+	<update id="update" parameterType="RefundTransations">
+	update REFUND_TRANSATIONS 
+	 <set>
+        <trim suffix="" suffixOverrides=",">
+	    <if test="outTradeNo!=null and outTradeNo!=''">
+	     OUT_TRADE_NO=#{outTradeNo},
+	     </if>
+		 <if test="codeNo!=null and codeNo!=''">
+		 CODE_NO=#{codeNo},
+		 </if>
+		 <if test="orderNo!=null and orderNo!=''">
+		 ORDER_NO=#{orderNo},
+		 </if>
+		 <if test="totalAmount!=null and totalAmount!=''">
+		 TOTAL_AMOUNT=#{totalAmount},
+		 </if>
+		 <if test="refundAmount!=null and refundAmount!=''">
+		 REFUND_AMOUNT=#{refundAmount},
+		 </if>
+		 <if test="payBank!=null and payBank!=''">
+		 PAY_BANK=#{payBank},
+		 </if>
+		 <if test="state!=null">
+		 STATE=#{state},
+		 </if>
+		 <if test="resultCode!=null and resultCode!=''">
+		 RESULT_CODE=#{resultCode},
+		 </if>
+		 <if test="resultMessage!=null and resultMessage!=''">
+		 RESULT_MESSAGE=#{resultMessage},
+		 </if>
+		 <if test="insertBy!=null">
+		 INSERT_BY=#{insertBy},
+		 </if>
+		 INSERT_TIME=now(),
+		 </trim>
+        </set>
+	where OUT_REFUND_NO=#{outRefundNo}
+	</update>
+	<select id="queryList"  resultMap="refundTransationsResultMap">
+	<include refid="selectAllColumns"/>
+	<include refid="where_fragement"/>
+	<if test="page!=null">
+            <include refid="pagination_tail"/>
+        </if>
+	order by refundTransations_.INSERT_TIME desc
+	</select>
+	<select id="queryRefundTransationByRefundNo" resultMap="refundTransationsResultMap" parameterType="RefundTransations">
+	
+	<include refid="selectAllColumns"/>
+	where refundTransations_.OUT_REFUND_NO=#{outRefundNo}
+	</select>
+	<select id="queryCount" resultType="long" >
+		<include refid="count_Tail"/>
+		<include refid="where_fragement"/>
+	</select>
+</mapper>

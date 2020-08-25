@@ -1,0 +1,33 @@
+#set($layout = "/none_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+#parse("/common/tdk.vm")
+<link rel="stylesheet" style="text/css" href="$staticPath/bank/citic/css/login.css">
+<link href="$staticPath/css/basic.css" rel="stylesheet" type="text/css"/>
+</head>
+<body class="login_bg">
+	<div id="container">
+    	<img src="$staticPath/bank/citic/images/top_logo.jpg" alt="中信银行LOGO" align="absmiddle">
+        <div id="centerBox">
+        	<div id="mainBox">
+				<div id="content" style="height:300px">
+                <div class="error_404">
+                    <span class="fl">查询账户余额异常，请稍后再试，</br>
+						如有疑问，请联系舒适100平台客服：400 9987 466 按3
+                    </span>
+               </div>
+            </div>
+          	</div>
+        </div>
+        
+        <div class="bottom"></div>
+        <div class="copyRight">
+            	Copyright &copy; 舒适100 版权所有，并保留所有权利 | 京ICP备15027467号<br/>
+                                                       舒适100字体由汉仪字库提供 | Tel：400-9987-466 | E-mail：service@shushi100.com
+        </div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,114 @@
+#set($layout = "common/order.vm")
+#if(${pager})
+	#foreach($entity in $pager.records)
+		#if(${entity})
+			<div class="pad_lr5 bg_01 mar_b10">
+				<!-- 订单号 -->
+				<div class="hei_32 border_2">
+					<p class="fl wid_57">
+						<span>订单号:$!{entity.orderId}</span>
+					</p>
+					<p class="fr wid_35 font_right">
+						<a class="font_e5 mar_l5" id="$!order.orderId">
+							#if($entity.state == '1' )  待付款
+							#elseif ($entity.state == '2' )待配送
+							#elseif ($entity.state == '3' )待收货
+							#elseif ($entity.state == '4' )待评价
+							#elseif ($entity.state == '5' )已完成
+							#elseif ($entity.state == '6' )已取消
+							#else &nbsp;
+							#end
+						</a>
+					</p>
+					<input type="hidden" id="totalItem" value="$!{totalItem}">
+					<input type="hidden" id="back" value="$!{back}">
+				</div>
+				<!-- 订单号 -->
+				#foreach($entityItem in $!entity.items)
+					#foreach($json in $!jsonArray)
+						#if($!entity.orderId == $!json.orderId)
+							#foreach($jsonItem in $!json.items)
+								#if($!entityItem.skuId == $!jsonItem.skuId)
+									<!-- 商品信息 -->
+									<div class="border_2 shop_order pad_tb5">
+										<p class="fl shop_order_img">
+											<a href="$request.contextPath/product/toDetail?id=$!entityItem.itemId&skuId=$!entityItem.skuId">
+												<img src="$!imageServerAddr$!jsonItem.skuPicUrl" width="75px" height="75px"/>
+											</a>
+										</p>
+										<div class="wid_50 fl shop_order_p">
+											<p>
+												<a href="$request.contextPath/product/toDetail?id=$!entityItem.itemId&skuId=$!entityItem.skuId">
+													$!jsonItem.itemName
+												</a>
+											</p>
+<!-- 											<p>商品属性：$!{jsonItem.skuName}</p> -->
+										</div>
+										<div class="fl lin_24">
+											<p>￥$!{jsonItem.payPrice}</p>
+											<p class="font_66">x$!{jsonItem.num}</p>
+												#if(!$!jsonItem.refundFlag)
+													#if($entity.state == 2 || $entity.state == 3)
+														#if($entity.state == 3)
+															<p class="font_66">
+																<a href="$request.getContextPath()/orderWx/refundAgreementWx?orderId=$!entity.orderId&skuId=$!jsonItem.skuId">退款/退货</a>
+			        										</p>
+			   											#else
+			   												<p class="font_66">
+			   													#if($entity.shipmentType == 2 && $entity.paid == 1)
+			   												  		
+			   												  	#else
+			   												  		<a href="$request.getContextPath()/orderWx/refundAgreementWx?orderId=$!entity.orderId&skuId=$!jsonItem.skuId">退款/退货</a>
+			   													#end
+			   												</p>
+			   												
+			   											#end
+													#elseif($entity.state > 3 && $entity.state < 6 )
+														<p class="font_66">
+															<a href="$request.getContextPath()/orderWx/refundAgreementWx?orderId=$!entity.orderId&skuId=$!jsonItem.skuId">申请售后</a>
+														</p>
+													#end
+												#else
+													#if($entity.state >=3 && $entity.state < 6)
+														<p class="font_66">
+															<a href="$request.getContextPath()/orderWx/refundSubmitSucc?returnId=$!jsonItem.refundId&skuId=$!jsonItem.skuId">售后进度</a>
+		   												</p>
+		   											#else
+		   											#if($entity.state >=6)
+		   												<p class="font_66">
+		   													<a href="$request.getContextPath()/orderWx/refundSubmitSucc?returnId=$!jsonItem.refundId&skuId=$!jsonItem.skuId">售后进度</a>
+		   												</p>
+													#else
+													<p class="font_66">
+														<a href="$request.getContextPath()/orderWx/refundSubmitSucc?returnId=$!jsonItem.refundId&skuId=$!jsonItem.skuId">退款进度</a>
+													</p>
+													#end
+												#end
+											#end
+										</div>
+										<div class="clear"></div>
+									</div>
+									<!-- 商品信息 -->
+								#end
+							#end
+						#end
+					#end
+				#end
+				<p class="hei_34">下单时间：$!date.format('yyyy-MM-dd HH:mm:ss ',$!entity.createTime )&nbsp;&nbsp;&nbsp;&nbsp;<span class="fr">总价：￥$!{entity.paymentPrice}</span></p>
+				<!-- 按钮 -->
+				<div class="pad_tb5">
+					#if($!entity.locked == 1)
+						<button class="button_3 pad_mlr5" id="orderDetail" onclick="orderDetail('$!entity.orderId')">订单详情</button>
+					#else
+						<span>订单已被冻结</span><br/>
+					#end
+					<div class="clear"></div>
+				</div>
+			</div>
+		#else
+			没有订单
+		#end
+	#end
+#else
+	没有数据
+#end

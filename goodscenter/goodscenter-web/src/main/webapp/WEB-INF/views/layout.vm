@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>goodscenter</title>
+</head>
+<body>
+
+<!-- content -->
+<section class="w">
+    $screen_content
+</section>
+</body>
+</html>

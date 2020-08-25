@@ -1,0 +1,129 @@
+<script type="text/javascript">
+	$(function(){
+		var couponId=$("#couponId").val();
+		if(couponId!=null&&couponId!=""){
+			var lis = $(".xzys");
+			$.each(lis,function(idx,ele){
+				if(couponId==$(ele).attr("cid")){
+					$(ele).attr("class","active_li");
+					$("#dh_"+couponId).attr("class","oupon_li_sp01 coupon_li_sp02");
+				}else{
+					$(ele).attr("class","xzys");
+				}
+			});
+		}
+		$(".xzys").click(function(){
+			var cid = $(this).attr("cid");
+			$(".active_li").attr("class","xzys");
+			$(".oupon_li_sp01").attr("class","oupon_li_sp01");
+			$("#dh_"+cid).attr("class","oupon_li_sp01 coupon_li_sp02");
+			$(this).attr("class","active_li");
+			$(".xzys").unbind("click");
+		});
+	})
+
+</script>
+
+
+#set($layout = "common/order.vm")
+
+	<input type="hidden" name="couponId" value="$!{couponId}" id="couponId"/>
+	#foreach($entity in $!couponsDTOs)
+		<div class="coupon_div">
+		
+	
+        <span class="coupon_li_sp01" id="dh_${entity.couponId}"></span>
+		<li id="$!entity.couponUserId"  class ="xzys" cid="${entity.couponId}" onclick="selectedCoupons('${entity.couponId}');">
+			
+		   	<dl class="clear">
+		       	<dt class="fl">
+		           	<span>
+		           	 #if($!entity.couponType == '2')
+		           	    #set($str=$!entity.descr)
+						#set($str = $str.substring(0,$str.lastIndexOf("折")))  
+		           	    $str折
+		           	 #else
+		           	 	  $!entity.couponAmount 
+		           	 #end
+		           	</span>
+		            <p>
+		            	#if($!entity.couponType == '1')满￥$!entity.meetPrice #end
+					    #if($!entity.couponType == '2')限额￥$!entity.couponMax #end
+					    #if($!entity.couponType == '3')&nbsp; #end
+		            </p>
+		        </dt>
+	             <dd class="fl">
+	           		<p class="p01">
+	              		#if($!entity.couponUsingRange==1) 平台通用类
+						#elseif($!entity.couponUsingRange==2) 店铺通用类
+						#elseif($!entity.couponUsingRange==3) 品类通用类
+						#elseif($!entity.couponUsingRange==4) SKU使用类
+						#end 
+	              	</p>
+	                <p>
+	                  	#if($!entity.costAllocation==1) 平台优惠券
+							#if($!entity.couponUsingRange==2) 
+							（部分店铺）
+							#elseif($!entity.couponUsingRange==3) 
+							（部分品类）
+							#elseif($!entity.couponUsingRange==4) 
+							（部分商品） 
+							#end
+						#elseif($!entity.costAllocation==2) 
+							店铺优惠券
+						#end
+	                </p>
+	                 <p>
+	                 #if($!entity.costAllocation==2)
+						$!entity.promulgator 
+					 #end
+	                </p> 
+	           </dd>
+		    </dl>
+	        <div class="li_bottom clear">
+	        	 <span style="color:#fe776b; padding-left:10px;">
+	        	 	#if($!entity.deleted == '0')
+						#if($!entity.state == '0')
+			     			#if($!entity.userCouponType== 1)
+								已使用
+							#else
+								未使用
+							#end
+						#elseif($!entity.state == '1')
+				 			#if($!entity.userCouponType== 1)
+								已使用
+							#else
+								未使用
+							#end
+						#elseif($!entity.state == '2')
+							已过期 
+							<span style="color:#fe776b; padding-left:10px;" onclick="deleteUserCoupons('$!entity.couponUserId')">删除</span>
+						#elseif($!entity.state == '3')
+						    #if($!entity.userCouponType== 1)
+								已使用
+							#else
+								未使用
+							#end
+						#elseif($!entity.state == '7')
+						    #if($!entity.userCouponType== 1)
+								已使用
+							#else
+								未使用
+							#end
+						#end
+					#elseif($!entity.deleted == '1')
+						已过期
+						<span style="color:#fe776b; padding-left:10px;" onclick="deleteUserCoupons('$!entity.couponUserId')">删除</span>
+					#end
+	        	 </span>
+	             <span style="color:#666; padding-right:10px;" class="fr">
+	             	有效期：<span class="font_12">$!date.format('yyyy-MM-dd',$!entity.couponStartTime)至 $!date.format('yyyy-MM-dd',$!entity.couponEndTime)</span>
+	             </span>
+	        </div>
+	        
+	   </li>
+	  </div>
+
+	
+#end
+<button class="button_1 pad_tb3 hei_34 fr" style="margin:3px 3%;" onclick="selectedCoupons('');">取消使用</button>

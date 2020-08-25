@@ -1,0 +1,37 @@
+#set($layout = "/none_layout.vm")
+<ul id="detailTable" class="list_top font_cen font_14b">
+	<li class="wid_50">全选 <input type="checkbox" id="selectAllUser" onclick="checkAlluser(this)"></li>
+    <li class="wid_180">用户名</li>
+    <li class="wid_300">用戶昵称</li>
+    <!-- <li class="wid_160">会员等级</li> -->
+</ul>
+#foreach($userInfo in $pager.records)
+<ul class="list_top">
+    <li class="wid_50 over_ell font_cen" ><input type="checkbox" name="userCheck" value="$userInfo.uid" onchange="checkIsChosenUser(this)"></li>
+    <li class="wid_180 over_ell font_cen" title="$!userInfo.uname">$!userInfo.uname&nbsp;</li>
+    <li class="wid_300 over_ell font_cen" title="$!userInfo.companyName">$!userInfo.nickname&nbsp;</li>
+    <!-- <li class="wid_160 over_ell font_cen" >
+    	#if($!userInfo.vipLevel == '1')红象会员
+    	#elseif($!userInfo.vipLevel == '2')铜象会员
+    	#elseif($!userInfo.vipLevel == '3')银象会员
+    	#elseif($!userInfo.vipLevel == '4')金象会员
+    	#elseif($!userInfo.vipLevel == '5')钻石象会员
+    	#else红象会员
+        #end
+    </li> -->
+    <input type="hidden" name="uid" value="$userInfo.uid">
+    <input type="hidden" name="uname" value="$userInfo.uname">
+    <input type="hidden" name="umobile" value="$!userInfo.umobile">
+    <!-- <input type="hidden" name="level" 	#if($!userInfo.vipLevel == '1') value="红象会员"
+								    	#elseif($!userInfo.vipLevel == '2') value="铜象会员"
+								    	#elseif($!userInfo.vipLevel == '3') value="银象会员"
+								    	#elseif($!userInfo.vipLevel == '4') value="金象会员"
+								    	#elseif($!userInfo.vipLevel == '5') value="钻石象会员"
+								    	#else value="红象会员"
+								        #end > -->
+    <input type="hidden" name="companyName" value="$!userInfo.companyName">
+    <input type="hidden" name="nickName" value="$!userInfo.nickname">
+</ul>
+#end
+<!-- 分页 -->
+#pageVelocity($pager)

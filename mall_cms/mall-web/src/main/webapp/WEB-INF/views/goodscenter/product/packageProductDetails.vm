@@ -1,0 +1,1249 @@
+#set($assetsPath="$request.contextPath/assets")
+<link href="$assetsPath/css/basic.css" rel="stylesheet" type="text/css"/>
+<link href="$assetsPath/css/Details.css" rel="stylesheet" type="text/css"/>
+<link href="$assetsPath/plugin/jquery-validation/1.11.1/jquery.validate.css" type="text/css" rel="stylesheet" />
+<script language="javascript" type="text/javascript" src="$assetsPath/js/tab.js"></script>
+<script language="javascript" type="text/javascript" src="$assetsPath/js/js.js"></script>
+<script type="text/javascript" src="$assetsPath/plugin/jquery-validation/1.11.1/jquery.validate.js"></script>
+<script type="text/javascript" src="$assetsPath/plugin/jquery-validation/1.11.1/messages_zh.js"></script>
+<script type="text/javascript" src="$assetsPath/js/jquery.blockUI.js"></script>
+<script type="text/javascript" src="$assetsPath/js/jquery-migrate-1.1.0.js"></script>
+<script type="text/javascript" src="$assetsPath/plugin/fancyzoom/jquery.shadow.js"></script>
+<script type="text/javascript" src="$assetsPath/plugin/fancyzoom/jquery.ifixpng.js"></script>
+<script type="text/javascript" src="$assetsPath/plugin/fancyzoom/jquery.fancyzoom.js"></script>
+<script type="text/javascript" src="$assetsPath/plugin/common/loadMsg.js"></script>
+<script type="text/javascript">
+	function loadEvaluation(page){
+		$("#myTab0_Content2").html("<div style='height: 42px; line-height: 42px; text-align: center;'><img src='$assetsPath/images/loading-1j.gif'></div>");
+		var skuId = $("#skuId").val();
+		var itemId = $("#itemId").val();
+		$.ajax({
+			url: '$request.contextPath/productController/getItemEvaluation',
+			data: { "page": page,"skuId":skuId,"itemId":itemId },
+			type: 'post',
+			dataType: "html",
+			success: function(data){
+				$("#myTab0_Content2").html(data);
+				$("img[fancy_zoom='view_img']").fancyzoom({
+            		Speed:400,
+            		showoverlay:false,
+            		imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+            	});
+			}
+		});
+	};
+    $(document).ready(function(){
+        //loadEvaluation(0);
+    });
+
+    function openCustomerWin(){
+        var retUrl = window.location.href;
+        retUrl = retUrl.replace(window.location.host,'').replace('http://','').replace('/mall-web','');
+        this.location.href="$request.contextPath/user/login?retUrl="+retUrl;
+        return false;
+    }
+</script>
+
+<!-- js 扩展的 map 对象 -->
+<script type="text/javascript" src="$assetsPath/plugin/common/newtimer.js"></script>
+<script src="$assetsPath/js/goodscenter/map.js"></script>
+<script src="$assetsPath/js/goodscenter/details.js"></script>
+<script src="$assetsPath/js/goodscenter/packageProductDetails.js"></script>
+<input type="hidden" id="contextPath" value="$request.getContextPath()"/>
+<input type="hidden" id="shopId" value="$!item.shopId"/>
+<input type="hidden" id="itemId" value="$!item.itemId"/>
+<input type="hidden" id="sellerId" value="$!item.sellerId"/>
+<input type="hidden" id="itemName" value="$!item.itemName"/>
+<input type="hidden" id="itemStatus" value="$!item.itemStatus"/>
+<input type="hidden" id="marketPrice" value="$!item.marketPrice"/>
+<input type="hidden" id="hasPrice" value="$!item.hasPrice"/>
+<input type="hidden" id="skuId" value="$!skuId"/>
+<input type="hidden" id="areaCode" value=""/>
+<input type="hidden" id="logging_status" value="$!logging_status"/>
+<input type="hidden" id="imageServerAddr" value="$!imageServerAddr"/>
+<style type="text/css">
+	.right_box {
+		right: 0;
+		width:220px;
+	}
+	.right_box h3{
+		width:210px;
+	}
+	.mid_font1 {
+		width:490px;
+	}
+	.mid_font1 li .mid_f_left {
+		width:90px;
+	}
+	.mid_font1 li .mid_f_right {
+		width:400px;
+	}
+	.tb_btn-sku a:hover{
+		background:#F9DEDE;
+	}
+	.tb_btn-sku a{
+		margin-right:0px;float:left;overflow:hidden;position:relative;
+		width:150px;height:36px;line-height:38px;background-color:#ffeded;
+		border:1px solid #c40000;color:#c40000;font-family:"Microsoft Yahei";
+		font-size:16px;border-radius:2px;text-align:center;margin-left:20px
+	}
+</style>
+</style>
+
+
+
+<div id="skuInfos" style="display:none;">
+	#foreach( $skuInfos in $!item.skuInfos)
+	<ul>
+		<li class="attributes">$skuInfos.attributes</li>
+		<li class="skuId">$skuInfos.skuId</li>
+		<li class="skuInventory">$skuInfos.skuInventory</li>
+		<li class="skuPicUrl">$skuInfos.skuPicUrl</li>
+		<li class="skuType">$skuInfos.skuType</li>
+	</ul>
+	#end
+</div>
+
+<!--内容开始-->
+<div id="content">
+	<input type="hidden" id="addSource" value="$!item.addSource"/>
+	<div class="wid_auto mar_tb20 bg_05 pad_tb20 box-shadow1">
+		<div class="wid_1160 bg_06 border-4">
+			<!--面包屑开始-->
+			<div class="mic">
+				#foreach( $cadeOne in $catCascade)
+					<span><a href="$request.getContextPath()/searchController/searchItemByCategory?cid=$!cadeOne.cid">$!cadeOne.cname</a></span> >
+					#foreach( $cadeTwo in $cadeOne.childCats)
+						<a href="$request.getContextPath()/searchController/searchItemByCategory?cid=$!cadeTwo.cid">$!cadeTwo.cname ></a>
+						#foreach( $cadeThree in $cadeTwo.childCats)
+							<a href="$request.getContextPath()/searchController/searchItemByCategory?cid=$!cadeThree.cid">$!cadeThree.cname</a> >
+						#end
+					#end
+				#end
+				<a href="#">$!item.itemName</a>
+			</div>
+			<!--面包屑结束-->
+			<!--左侧图片开始-->
+			<div class="left_pic">
+				<div id="vertical" class="bigImg">
+						<img src="$!imageServerAddr#foreach( $picUrl in $!item.picUrls)#if($velocityCount == 1)$picUrl#end#end" width="398" height="398" id="midimg"/>
+					<div style="display:none;" id="winSelector"></div>
+				</div><!--bigImg end-->
+
+				<div class="smallImg">
+					<div class="scrollbutton smallImgUp disabled"><i class="fa-angle-left font_20"></i></div>
+					<div id="imageMenu">
+						<!-- $!item.picUrls -->
+						#if($!item.picUrls)
+							<ul>
+							#foreach( $picUrl in $!item.picUrls)
+								<li><img src="$!imageServerAddr$picUrl"/></li>
+							#end
+							</ul>
+						#end
+					</div>
+					<div class="scrollbutton smallImgDown"><i class="fa-angle-right font_20"></i></div>
+				</div><!--smallImg end-->
+				<div id="bigView" style="display:none;"><img width="800" height="800" alt="" src="" /></div>
+				
+				<div class="mar_t10">
+					<!--下图片下面的分享信息 商品信息 开始 -->
+				<!-- JiaThis Button BEGIN -->
+				<div class="jiathis_style">
+					<a class="jiathis_button_weixin"></a>
+					<a class="jiathis_button_tsina"></a>
+					<a class="jiathis_button_qzone"></a>
+				</div>
+				<script type="text/javascript">
+				var jiathis_config = {data_track_clickback:'true'};
+				</script>
+				<script type="text/javascript" src="http://v3.jiathis.com/code_mini/jia.js?uid=2081714" charset="utf-8"></script>
+						
+					<span class="mar_l10 fr cursor js_favourite">
+						<i class="demo-icons fa-star font_ffd font_14"></i>
+						
+						<span id="shoucangshangpin">
+						
+						#if($!favouriteItem == "true")
+							已收藏
+						#else
+							收藏商品
+						#end
+						</span>
+					</span>
+				</div>
+				<!--下图片下面的分享信息 商品信息 开始 -->
+			</div><!--left_pic end -->
+		<!--左侧图片结束-->
+		<!--中间文字购买信息开始-->
+		<div class="mid po_re">
+			<div class="mid_tit">
+				#if($!item.itemStatus != 4)
+    				<h1 class="fl over_ell cursor" title="$!item.itemName" style="font-size:18px;width:180px">$!item.itemName</h1>
+    				<span class="font_fe" style="display: block;">商品不是在售状态，无法购买！</span>
+				#end
+				#if($!item.itemStatus == 4)
+					<h1 class="fl over_ell cursor" title="$!item.itemName" style="font-size:18px;width:650px">$!item.itemName</h1>
+				#end
+			</div>
+			<div class="mid_font1">
+				<ul>
+					<li>
+						<div class="mid_f_left">市场价：</div>
+						<!-- 如果是询价的商品，市场价就展示为空 -->
+						<div class="mid_f_right"><del id="marketPrice_del">#if($!item.hasPrice == 1) ￥$!item.marketPrice #end</del></div>
+					</li>
+					<!-- 集采的商品 -->
+					<li>
+						<div class="mid_f_left">
+							售价：
+						</div>
+						<div class="mid_f_right" id="shoujia">
+							#if($!item.hasPrice == 1)
+								<strong class="font_fe font_16" ><span id="itemPrice_js">#if($!item.guidePrice > 0) ￥$!item.guidePrice #end</span></strong>
+							#else
+								<span class="font_fe">暂无报价</span>
+							#end
+						</div>
+					</li>
+					<li style="display: none;" id="cuxiaojia">
+    					<div class="mid_f_left">促销价：</div>
+    					<div class="mid_f_right">
+    						<strong class="font_fe font_16" >
+    							<span id="itemCXPrice_js"></span>
+    						</strong>
+    					</div>
+				    </li>
+				    <div style="display:none;" id="promotion_manjian">
+    					<li class="po_re">
+        					<div class="mid_f_left">促销信息：</div>
+        					<div class="mid_f_right">
+        						<!-- 满减 -->
+        						
+        							<em class="manjian" id="promotionType_manjian">满减</em>
+        							<span class="font_fe" id="promotionMsg_manjian"></span>
+        							<a class="js_qing_manjian cursor" id="promotionInfo_manjian">&nbsp;&nbsp;详情 <s class="s-arrow">&gt;&gt;</s></a>
+        						
+        					</div>
+        					<div class="wid_440 js_xiang_manjian min-hei bg_06 box-shadow1 po_ab none" style="z-index: 1; left: 5px; top: 5px;">
+        						<div class="tit mar_lr10 mar_r10 border-6">
+        							<a><span class="mar_r20 font_14b">满减</span><span id="promotionTime"></span></a>
+        						</div>
+        						<div class="mar_l10" id="promotionList_manjian">								 							
+        						</div>
+        					</div>
+        				</li>
+    				</div>
+					<li>
+						<div class="mid_f_left">商品评分：</div>
+						<div class="mid_f_right" id="scoreId">
+							#if($skuItem)
+    							#set($Double=0.0)
+        						#if($Double.parseDouble($!skuItem.skuScope)>4.4)
+            						<span class="star sa5"></span>
+            					#elseif($Double.parseDouble($!skuItem.skuScope)>4.2)
+            						<span class="star-on"></span>
+            						<span class="star-on"></span>
+            						<span class="star-on"></span>
+            						<span class="star-on"></span>
+            						<span class="star-half"></span>
+            					#elseif($Double.parseDouble($!skuItem.skuScope)>3.4)
+            						<span class="star sa4"></span>
+            					#elseif($Double.parseDouble($!skuItem.skuScope)>3.2)
+            						<span class="star-on"></span>
+            						<span class="star-on"></span>
+            						<span class="star-on"></span>
+            						<span class="star-half"></span>
+            						<span class="star-off"></span>
+            					#elseif($Double.parseDouble($!skuItem.skuScope)>2.4)
+            						<span class="star sa3"></span>
+            					#elseif($Double.parseDouble($!skuItem.skuScope)>2.2)
+            						<span class="star-on"></span>
+            						<span class="star-on"></span>
+            						<span class="star-half"></span>
+            						<span class="star-off"></span>
+            						<span class="star-off"></span>
+            					#elseif($Double.parseDouble($!skuItem.skuScope)>1.4)
+            						<span class="star sa2"></span>
+            					#elseif($Double.parseDouble($!skuItem.skuScope)>1.2)
+            						<span class="star-on"></span>
+            						<span class="star-half"></span>
+            						<span class="star-off"></span>
+            						<span class="star-off"></span>
+            						<span class="star-off"></span>
+            					#elseif($Double.parseDouble($!skuItem.skuScope)>0.4)
+            						<span class="star sa1"></span>
+            					#elseif($Double.parseDouble($!skuItem.skuScope)>0.2)
+            						<span class="star-half"></span>
+            						<span class="star-off"></span>
+            						<span class="star-off"></span>
+            						<span class="star-off"></span>
+            						<span class="star-off"></span>
+            					#else
+            						<span class="star sa0"></span>
+        						#end
+							#else
+							<span class="star sa0"></span>
+							#end
+						</div>
+					</li>
+					<li id="distrib" class="po_re">
+						<div class="mid_f_left">配送：</div>
+                        <div class="mid_f_right">
+							#if($from)
+								<i class="fl mar_r10" title="$!from">#if($from.length() < 8)$!from#else$from.substring(0,8)#end 至</i>
+							#end
+							<div class="text border-4 js_guanqu cursoe">
+								<span class="js_address"></span>
+								<b class="fa-angle-down"></b>
+							</div><!--text border-4 end-->
+                            <div class="store-prompt" id="store-prompt-ESM" >
+								#if($deliveryTypes)
+									#if($deliveryTypes.size() == 0)包邮
+									#else
+										<span id="defaultDeliveryType">
+											#if($deliveryTypes.get(0).deliveryType==1)
+												快递
+    										#elseif($deliveryTypes.get(0).deliveryType==2)
+    											EMS
+    										#elseif($deliveryTypes.get(0).deliveryType==3)
+    											平邮
+    										#end
+    										#if($deliveryTypes.get(0).groupFreight == 0)
+    											包邮
+    										#else
+    											￥$!{deliveryTypes.get(0).groupFreight}
+											#end
+										</span>
+										<i class="demo-icons fa-caret-down"></i>
+										<ul id="store-prompt-ESM-ul" style="display: none;">
+    										#foreach( $shopDeliveryTypeDTO in $deliveryTypes)
+    											<li #if($velocityCount==1)style="background:#fff7f1"#end>
+													<span>
+        												#if($shopDeliveryTypeDTO.deliveryType==1)
+        													快递
+                										#elseif($shopDeliveryTypeDTO.deliveryType==2)
+                											EMS
+                										#elseif($shopDeliveryTypeDTO.deliveryType==3)
+                											平邮
+        												#end
+    												</span>
+    												<span style="margin-left:5px">
+    													#if($!shopDeliveryTypeDTO.groupFreight == 0)
+            											包邮
+                										#else
+                											￥$!shopDeliveryTypeDTO.groupFreight
+        												#end
+                                                    </span>
+    												<b class="po_ab pa_04" #if($velocityCount!=1)style="display: none"#end ></b>
+												</li>
+    										#end
+										</ul>
+									#end
+								#end
+                            </div><!--store-prompt end-->
+							#if($preferentialWay)
+    						<div style="height:24px;float:left;margin-left:5px;">
+    							<em class="manjian js_qing_youhui" style="cursor:pointer">优惠</em>
+    							<div class="wid_440 js_xiang_youhui min-hei bg_06 box-shadow1 po_ab none" style="z-index: 1; left: 5px; top: 5px;">
+        							<div class="tit mar_lr10 mar_r10 border-6">
+        								<a><span class="mar_r20 font_14b">优惠</span></a><a class="fr js_down_youhui cursor">收起</a>
+        							</div>
+        							<div class="mar_l10">
+    									#if($preferentialWay.deliveryType == 1)
+        									满$!{preferentialWay.full}件
+        									#elseif($preferentialWay.deliveryType == 2)
+        										满$!{preferentialWay.full}kg
+        										#elseif($preferentialWay.deliveryType == 3)
+        											满$!{preferentialWay.full}m³
+        											#elseif($preferentialWay.deliveryType == 4)
+        												满$!{preferentialWay.full}元
+        								#end
+        								#if($preferentialWay.strategy == 1)
+        									减$!{preferentialWay.reduce}元
+        									#elseif($preferentialWay.strategy == 2)
+        										包邮
+        								#end
+        							</div>
+        						</div>
+                			</div>
+    						#end
+                        </div><!--mid_f_right end-->
+					</li>
+					<li>
+						<div class="mid_f_left">购买限制：</div>
+						<div class="mid_f_right">
+							<div>
+								<span style=" background: none repeat scroll #7fbda9;color: #fff;padding: 0 5px;">起批</span>
+								<span style="margin-left: 5px;">
+									<span>金额要求：订单总价大于<font style="color: #be0a00;">$!shopInfo.initialPrice</font>元</span>
+									#if($!shopInfo.initialCondition == 1)
+									<span>或</span>
+									#end
+									#if($!shopInfo.initialCondition == 2)
+									<span>且</span>
+									#end
+									<span>数量要求：货品总数大于<font style="color: #be0a00;">$!shopInfo.initialMount</font>件</span>
+								</span>
+							</div>
+							<div>
+								<span style=" background: none repeat scroll 0 0 #a3b4cc;color: #fff;padding: 0 5px;">混批</span>
+								<span style="margin-left: 5px;">
+									#if($!shopInfo.mutilPrice == 1)
+										<span>金额要求：订单总价大于<font style="color: #be0a00;">$!shopInfo.priceMin</font>元</span>
+										#if($!shopInfo.mutilCondition == 1)
+										<span>或</span>
+										#end
+										#if($!shopInfo.mutilCondition == 2)
+										<span>且</span>
+										#end
+										<span>数量要求：货品总数大于<font style="color: #be0a00;">$!shopInfo.mountMin</font>件</span>
+									#else
+										无
+									#end
+								</span>
+							</div>
+						</div>
+					</li>
+					<li>
+						<div class="mid_f_left">辅料类型：</div>
+						<div class="mid_f_right">
+							#if($auxiliaryItems && $!auxiliaryItems.size() > 0)
+								#foreach($auxiliaryItem in $auxiliaryItems)
+    								<span class="press_classes po_re border-8">
+        								$auxiliaryItem.itemName
+        								<b class="po_ab pa_04"></b>
+        							</span>
+								#end
+							#else
+								<span style=" background: none repeat scroll 0 0 #a3b4cc;color: #fff;padding: 0 5px;">无</span>
+							#end
+						</div>
+					</li>
+					<li>
+						<div class="mid_f_left">安装服务：</div>
+						<div class="mid_f_right">
+							#if($basicItems && $!basicItems.size() > 0)
+								#foreach($basicItem in $basicItems)
+    								<span class="press_classes po_re border-8">
+        								$basicItem.itemName
+        								<b class="po_ab pa_04"></b>
+        							</span>
+								#end
+							#else
+								<span style=" background: none repeat scroll 0 0 #a3b4cc;color: #fff;padding: 0 5px;">无</span>
+							#end
+						</div>
+					</li>
+					<li>
+						<div class="mid_f_left">增值服务：</div>
+						<div class="mid_f_right">
+							#if($valueAddedItems && $!valueAddedItems.size() > 0)
+								#foreach($valueAddedItem in $valueAddedItems)
+    								<span class="press_classes po_re border-13 js_value_added_item" value="$valueAddedItem.itemId">
+        								$valueAddedItem.itemName
+        							</span>
+									<select class="js_value_added_item_value" style="display:none">
+										#foreach($itemShopCartDTO in $valueAddedItem.itemShopCartDTOs)
+											#set( $skuName = "" )
+											#foreach($attrSale in $itemShopCartDTO.attrSales)
+												#foreach($value in $attrSale.values)
+													#set( $skuName = "$skuName$value.name" )
+												#end
+											#end
+											<option value="${valueAddedItem.itemId}-${itemShopCartDTO.skuId}">$skuName</option>
+										#end
+                                    </select>
+								#end
+							#else
+								<span style=" background: none repeat scroll 0 0 #a3b4cc;color: #fff;padding: 0 5px;">无</span>
+							#end
+						</div>
+					</li>
+					<li>
+						<div class="mid_f_left">服务承诺：</div>
+						<div class="mid_f_right">
+						#if($!shopFreightTemplateDTO.deliveryTime)
+							<strong class="font_fe" >
+							卖家承诺$!shopFreightTemplateDTO.deliveryTime
+							</strong>
+					    #end
+					    </div>
+					</li>
+					#if($item && $!item.addSource==3)
+						#foreach( $attrSale in $!item.attrSale)
+    					<li>
+    						<div class="mid_f_left attrName_js over_ell" title="$attrSale.name" name="" style="height:auto;">$attrSale.name：</div>
+    						<div class="mid_f_right">
+    							<!--选中用border-8 的样式 然后加上<b class="po_ab pa_04"></b>标签-->
+    							#foreach( $values in $!attrSale.values)
+    								#if($skuItem)
+    									#foreach($!skuItemSales in $!skuItem.attrSales )
+    										#if($!skuItemSales.id == $attrSale.id)
+    											#foreach($!skuValues in $!skuItemSales.values )
+    												#if($!skuValues.itemSkuAttr == $!values.itemSkuAttr)
+                            							<span class="press_classes po_re border-8 js_attr" name="$values.itemSkuAttr">
+                            								$values.itemSkuName
+                            								<b class="po_ab pa_04"></b>
+                            							</span>
+    												#end
+    											#end
+    										#end
+    									#end
+    								#else
+										<span class="press_classes po_re border-13 js_attr" name="$values.itemSkuAttr">$values.itemSkuName</span>
+    								#end
+    							#end
+    						</div>
+    						<div class="clear"></div>
+    					</li>
+    					#end
+					#else
+						#foreach( $attrSale in $!item.attrSale)
+    					<li>
+    						<div class="mid_f_left attrName_js over_ell" title="$attrSale.name" name="$attrSale.id:$attrSale.name" style="height:auto;">$attrSale.name：</div>
+    						<div class="mid_f_right">
+    							<!--选中用border-8 的样式 然后加上<b class="po_ab pa_04"></b>标签-->
+    							#foreach( $values in $!attrSale.values)
+    								#if($skuItem)
+    									#foreach($!skuItemSales in $!skuItem.attrSales )
+    										#if($!skuItemSales.id == $attrSale.id)
+    											#foreach($!skuValues in $!skuItemSales.values )
+    												#if($!skuValues.id == $!values.id)
+                            							<span class="press_classes po_re border-8 js_attr" name="$values.id:$values.name">
+                            								$values.name
+                            								<b class="po_ab pa_04"></b>
+                            							</span>
+    												#end
+    											#end
+    										#end
+    									#end
+    								#else
+    							<span class="press_classes po_re border-13 js_attr" name="$values.id:$values.name">$values.name</span>
+    								#end
+    							#end
+    						</div>
+    						<div class="clear"></div>
+    					</li>
+    					#end
+					#end
+					<li>
+						<div class="mid_f_left">数量：</div>
+						<div class="mid_f_right" style="width: 80px;">
+							<div class="wrap-input">
+								<a class="btn-reduce border-4" href="javascript:void(0);" onclick="minus(this)">-</a>
+								<input value="1" class="text border-4 number_js" onkeyup="handEntry(this);">
+								<a class="btn-add border-4" href="javascript:void(0);" onclick="plus(this)">+</a>
+							</div>
+						</div>
+						<div class="store-prompt" style="height: 26px;line-height: 26px;">
+							#if($!item.inventory>0)
+								<strong>有货#if($!item.hasPrice == 1)（库存$!item.inventory件）#end</strong>
+							#else
+								<strong class="font_fe font_14">缺货</strong>
+								<span></span>
+							#end
+							<input type="hidden" id="qty_js" value="$!item.inventory">
+						</div>
+					</li>
+				</ul>
+
+			</div>
+			<!-- mid_font1 end-->
+			<div class="mid_font2 border-4 js_buyList" style="display:none;">
+				<!--标题 开始 -->
+				<!-- <ul class="font_14b bg_05 border-3">
+					<li>品牌</li>
+					<li>单价</li>
+					<li>活动价</li>
+					<li>库存量</li>
+					<li>采购量</li>
+				</ul> -->
+				<!--标题结束 -->
+				<!--内容一行循环一个ul 开始 -->
+				<!-- <ul>
+					<li>北京印刷出版社</li>
+					<li>100.00￥</li>
+					<li>80.00￥</li>
+					<li>100件</li>
+					<li>
+					<div class="wrap-input">
+						<a class="btn-reduce border-4" href="#" onclick="minus(obj)">-</a>
+						<input value="1" class="text border-4" onkeyup="handEntry(obj)">
+						<a class="btn-add border-4" href="#" onclick="plus(obj)">+</a>
+					</div>
+					</li>
+				</ul> -->
+				<!--内容一行循环一个ul end -->
+
+			</div>
+			<!--mid_font2 end-->
+			<!-- <div class="mid_font3 js_buyAll" style="display:none;">
+				<ul>
+					<li>共计<i class="mar_lr10 collectNum_js"></i>件商品</li>
+					<li>总金额：<i class="font_fe font_14b">￥<span class="collectMoney_js"></span></i></li>
+				</ul>
+			</div> -->
+			#if($!item.hasPrice == 1)
+				<div class="tb-btn-buy tb_btn-sku" onclick="toProOrderView();">
+                 	<a id="J_LinkBuy" class="cursor" rel="nofollow" data-addfastbuy="true" title="点击此按钮，到下一步确认购买信息。" data-spm-anchor-id="a220o.1000855.0.0">立即购买</a>
+            	</div>
+        	#end
+			#if($!item.hasPrice == 1)
+				<div onclick="addCart();" style="float:left" class="mall_button js_addCart">
+			#else
+				<div class="mall_button_disabled">	
+			#end
+				<span class="icon"></span>加入购物车
+			</div>
+			<!--中间文字购买信息结束-->
+
+
+
+			<!-- 最右侧的小盒子-->
+			<div class="right_box border-4 box-shadow2">
+				<h3 class="bg_05">商家信息</h3>
+				<ul>
+				<li class="left">服务评价：</li>
+				<li class="right1">
+					<!--服务星级也是 图标heart_icon5，heart_icon4，heart_icon3到0为止 -->
+					
+					#if($!shopEvaluationResult.shopReputation>4.4)
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+					#elseif($!shopEvaluationResult.shopReputation>4.2)
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-half" style="width: 16px;float: none;"></span>
+					#elseif($!shopEvaluationResult.shopReputation>3.4)
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+					#elseif($!shopEvaluationResult.shopReputation>3.2)
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-half" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+					#elseif($!shopEvaluationResult.shopReputation>2.4)
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+					#elseif($!shopEvaluationResult.shopReputation>2.2)
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-half" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+					#elseif($!shopEvaluationResult.shopReputation>1.4)
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+					#elseif($!shopEvaluationResult.shopReputation>1.2)
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-half" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+					#elseif($!shopEvaluationResult.shopReputation>0.4)
+						<span class="heart-on" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+					#elseif($!shopEvaluationResult.shopReputation>0.2)
+						<span class="heart-half" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+					#else
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+						<span class="heart-off" style="width: 16px;float: none;"></span>
+					#end
+					
+					<i class="evaluate-grade">
+					<strong>
+					#if("$!shopEvaluationResult.shopReputation" != "")
+						$!shopEvaluationResult.shopReputation分
+					#else
+						0分
+					#end
+					</strong></i><s></s>
+				</li>
+				<li class="right3" style="height: 90px;">
+					<div class="list">
+						<ul>
+							<li style="width: 200px;">描述相符：
+								#if($!shopEvaluationResult.shopDescription>4.4)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopDescription>4.2)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-half" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopDescription>3.4)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopDescription>3.2)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-half" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopDescription>2.4)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopDescription>2.2)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-half" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopDescription>1.4)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopDescription>1.2)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-half" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopDescription>0.4)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopDescription>0.2)
+            						<span class="star-half" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#else
+            						<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#end
+								
+								
+								
+							
+							$!shopEvaluationResult.shopDescription分
+							</li>
+							<li style="width: 200px;">送货速度：
+								#if($!shopEvaluationResult.shopService>4.4)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopService>4.2)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-half" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopService>3.4)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopService>3.2)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-half" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopService>2.4)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopService>2.2)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-half" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopService>1.4)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopService>1.2)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-half" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopService>0.4)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopService>0.2)
+            						<span class="star-half" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#else
+            						<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#end
+								
+							$!shopEvaluationResult.shopArrival分
+							</li>
+							<li style="width: 200px;">态度服务：
+								#if($!shopEvaluationResult.shopService>4.4)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopService>4.2)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-half" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopService>3.4)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopService>3.2)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+            						<span class="star-half" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopService>2.4)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopService>2.2)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-half" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopService>1.4)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopService>1.2)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+            						<span class="star-half" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopService>0.4)
+            						<span class="star-on" style="width: 15px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#elseif($!shopEvaluationResult.shopService>0.2)
+            						<span class="star-half" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#else
+            						<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+									<span class="star-off" style="width: 16px;float: none;"></span>
+            					#end
+								
+							$!shopEvaluationResult.shopService分
+							</li>
+						</ul>
+					</div>
+				</li>
+				<li class="left">店铺名称：</li>
+				<li class="right1"><a href="$request.getContextPath()/shopItemListIndexController/toIndex?shopId=$!shopInfo.shopId">$!shopInfo.shopName</a></li>
+				#if($!userDTO.companyName)
+					<li class="left">公司名称：</li>
+					<li class="right1">$!userDTO.companyName</li>
+				#end
+				<li class="left">所&nbsp;在&nbsp;地&nbsp;：</li>
+				#set($address=$!shopInfo.provinceName+ $!shopInfo.cityName +$!shopInfo.districtName+ $!shopInfo.streetName)
+				<li class="right1 cursor" title="$address" style="word-wrap:break-word">
+					#if($address.length()>45)
+						#set($address=$address.substring(0,45))
+						$address ...
+					#else
+						$!address
+					#end
+				</li>
+				<li class="right2">
+					<style type="text/css">
+						.btn-shop{
+							display: inline-block;
+							line-height: 20px;
+							padding: 2px 5px;
+							background: #f2f2f2 repeat scroll;
+							border: 1px solid #ddd;
+							border-radius: 2px;
+							color: #333;
+							display: inline-block;
+							text-align: center;
+							text-decoration: none;
+						}
+					</style>
+					#if($!shopInfo.platformId==2)
+						<a href="$request.getContextPath()/shopItemListIndexController/toIndex?shopId=$!shopInfo.shopId" class="font_65">进入卖家店铺</a>
+					#else
+						<a href="http://$!{shopInfo.shopUrl}.printhome.com" class="font_65">进入卖家店铺</a>
+					#end
+					
+					#if($!favouriteShop == "true")
+					<button type="button" href="javascript: void(0);" class="button_3 hei_35 mar_l10"> 已收藏 </button>
+					#else
+					<a href="javascript: void(0);" class="js_favourite_shop  font_65 mar_l10"><i class="demo-icons font_14 fa-star"></i>收藏店铺</a>
+					#end
+					</br>
+					#if($!qqId !='')
+                        <a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=$!qqId&site=qq&menu=yes"><img border="0" src="http://wpa.qq.com/pa?p=2:$!qqId:51" alt="点击这里给我发送消息" title="点击这里给我发送消息"/></a>
+                    #else
+                        <img border="0" src="http://wpa.qq.com/pa?p=2:2323322:52" alt="暂无客服" title="暂无客服"/>暂无客服
+                    #end
+					
+				</li>
+				</ul>
+			</div>
+			<!-- 最右侧的小盒子-->
+
+		   </div><!-- 右侧div结束-->
+		</div><!--1160 -->
+    </div><!--1200的外围盒子 -->
+<!--推荐套装开始-->
+<div class="clear"></div>
+<div class="wid">
+	<div id="packageSku">
+		#parse("/goodscenter/product/packageSku.vm")
+    </div>
+<div>
+<!--推荐套装结束-->
+<!--下面内容开始-->
+<div class="clear"></div>
+<div class="wid">
+ <!--左侧开始-->
+ <div id="shop_left">
+    <dl class="border-1">
+        <dt class="pad_l10">产品分类</dt>
+		<!--向上class="fa-angle-double-up" 向下class="fa-angle-double-down"的箭头-->
+        #foreach($entity in $categorylist)
+			<dd class="over_ell fl cursor" style="width:200px" title="$entity.cname">
+                <i class="fa-angle-double-down fr mar_r10"></i>
+				$entity.cname
+			</dd>
+			#if($!entity.childShopCategory.size()>0)
+				<ul>
+					#foreach($entityChild in $!entity.childShopCategory)
+					<li onclick="toShopListIndex($entityChild.cid);" class="over_ell wid_250 fl cursor" title="$entityChild.cname"><i class="demo-icons fa-angle-right"></i>$entityChild.cname</li>
+					#end
+				</ul>
+			#end
+		#end
+    </dl>
+	
+	<form method="get" action="$request.getContextPath()/shopItemListIndexController/toListIndex" id="contentForm">
+		<input type="hidden" value="" id="shopCid" name="shopCid">
+		<input type="hidden" value="1" name="page">
+		<input type="hidden" value="$!item.shopId" id="shopId" name="shopId">
+	</form>
+  </div>
+ <!--左侧结束-->
+
+ <!-- 右侧开始-->
+ <div id="right">
+ <!--tabs开始-->
+          <div class="nTab">
+            <!-- 标题开始 -->
+            <div class="TabTitle">
+              <ul id="myTab0">
+                <li class="active" onclick="nTabs(this,0);">商品介绍</li>
+                <li class="normal" onclick="nTabs(this,1);">包装清单</li>
+                <li class="normal" onclick="nTabs(this,2);">商品评价</li>
+                <li class="normal" onclick="nTabs(this,3);">售后保障</li>
+                #if($!item.platformId)
+                <li class="normal" onclick="nTabs(this,4);">认证信息</li>
+                #end
+	            #if($!item.specification && ""!=$item.specification)
+                	#if($!item.platformId)
+	                	<li class="normal" onclick="nTabs(this,5);">规格参数</li>
+                	#else
+                		<li class="normal" onclick="nTabs(this,4);">规格参数</li>
+	                #end
+                #end
+              </ul>
+            </div>
+            <!-- 内容开始 -->
+            <div class="TabContent">
+                        <!-- 商品介绍下的内容开始 -->
+				<div id="myTab0_Content0">
+				<ul>
+					<li class="nTab_list wid_300 cursor" title="$!item.itemName">商品名称：$!item.itemName</li>
+					<li class="nTab_list wid_300 cursor" title="$!item.itemId">商品编号：$!item.itemId</li>
+					<li class="nTab_list wid_300 cursor" title="$!date.format('yyyy-MM-dd HH:mm:ss ',$!item.listtingTime)">上架时间：$!date.format('yyyy-MM-dd HH:mm:ss ',$!item.listtingTime)</li>
+					<li class="nTab_list wid_300 cursor" title="$!shopInfo.shopName">店铺名称：$!shopInfo.shopName</li>
+					<li class="nTab_list wid_300 cursor" title="$!item.origin">商品产地：$!item.origin</li>
+					<li class="nTab_list wid_300 cursor" title="$!item.weight">商品毛重：#if($item.weight)$!{item.weight}$!{item.weightUnit}#end</li>
+					<li class="nTab_list wid_300 cursor" title="$!item.volume">商品体积：#if($item.volume)$!{item.volume}m³#end</li>
+				</ul>
+              </div>
+              <!-- 包装清单下的内容开始 -->
+              <div id="myTab0_Content1" class="none">
+               $!item.packingList
+              </div>
+
+              <!-- 商品评价下的内容开始 -->
+              <div id="myTab0_Content2" class="none">
+
+              </div>
+
+              <!-- 售后保障下的内容开始 -->
+              <div id="myTab0_Content3" class="none">
+				服务承诺：$!item.afterService 
+              </div>
+			 <!-- 认证信息下的内容开始 -->
+			 #if($!item.platformId)
+              <div id="myTab0_Content4" class="none right_pic" style="width:975px">
+              #if($!item.authentication)
+    		  #set($addr = 'src="' + $!imageServerAddr )
+      		  #set($authentication = $!item.authentication.replaceAll('src="', $addr))
+      			$authentication  
+      		  #else
+			  #end
+              </div>
+              #end  
+              #if($!item.specification && $item.specification!="")
+              	  #if($!item.platformId)
+		              <div id="myTab0_Content5" class="none right_pic" style="width:975px">
+		                $!item.specification
+		              </div>
+	              #else
+	              	<div id="myTab0_Content4" class="none right_pic" style="width:975px">
+		                $!item.specification
+		              </div>
+	              #end
+              #end
+            </div>
+          </div>
+    <!--tabs结束-->
+    <div class="clear"></div>
+    <!--下面图片内容开始-->
+    <div  class="right_pic">
+		#set($addr = 'src="' + $!imageServerAddr +"/")
+		#set($describeUrl = $!item.describeUrl.replaceAll('src="/', $addr))
+		$describeUrl
+		<!--图片的宽度不能超过990px -->
+       <!-- <img src="$assetsPath/pic/pic18.jpg"  class="img_l" />
+       <img src="$assetsPath/pic/pic19.jpg"  class="img_r"/>
+       <img src="$assetsPath/pic/pic20.jpg" class="img_l"/> -->
+    </div>
+	<!--下面图片内容结束-->
+
+    <!--购买咨询   开始-->
+    <div id="consultContent">
+
+	</div>
+	<!--购买咨询   结束-->
+</div><!--id="right" -->
+</div>
+ <!-- 右侧结束-->
+</div>
+<!--下面内容结束-->
+</div>
+<!--#content end内容结束-->
+<!-- 咨询价格  start-->
+<div id="xunjia" class="po_fai price none " >
+    <div class="po_fai_bg"></div>
+    <div class="po_main pad_t10" >
+    <div class=" hei_32 bg_05 pad_l10 font_14b">
+		<i class="demo-icons fa-times-circle font_16 fr mar_r10 no" style="cursor:pointer;"></i>
+		咨询价格
+	</div>
+    <div class="clear"></div>
+    <div class="register_content">
+         <p class="hei_30 font_cen font_fe">请填入询价信息，以便店家回复!</p>
+          <div class="register_box_mid">
+				<div class="hei_35 mar_tb10">
+                    <div class="fl wid_110 font_right font_14b hei_35"><span style="color:red;padding-right:5px;" class="font_fs">*</span>我的邮箱：</div>
+                    <div class="fl">
+						<input type="text" name="email" id="email_xunjia" value="$!userEmail" class="input_Style2 hei_30 wid_180">
+                    </div>
+                </div>
+				<div class="hei_35 mar_tb10">
+                    <div class="fl wid_110 font_right font_14b hei_35"><span class="demo-icons font_fs">*</span>手机：</div>
+                    <div class="fl">
+						<input name="mobile" id="mobile_xunjia" maxlength="11" type="text" class="input_Style2 hei_30 wid_180" value="$!userMobile" />
+                    </div>
+                </div>
+				<div class="hei_35 mar_tb10">
+                    <div class="fl wid_110 font_right font_14b hei_35"><span class="demo-icons font_fs">*</span>采购数量：</div>
+                    <div class="fl">
+						<input name="inquiryQty" id="inquiryQty" onkeyup="this.value=this.value.replace(/\D/g,'')" type="text" class="input_Style2 hei_30 wid_180"/>
+                    </div>
+                </div>
+				<div class="hei_150 mar_tb10">
+                    <div class="fl wid_110 font_right font_14b hei_35">采购说明：</div>
+                    <div class="fl">
+						<textarea name="comment" id="comment" maxlength="300" class="input_Style2 wid_300 hei_100" placeholder="不能超过300字" ></textarea><br>
+                    </div>
+                </div>
+
+                <!--如需增加可循环dl结束-->
+                <div class="font_cen wid_260 mar_cen">
+                    <button class="button_2 hei_40 font_16 js_xunjia">提交</button>
+                    <button class="button_5 hei_40 font_16 cancel mar_l10">取消</button>
+                </div>
+				<div class="font_cen" style="margin-top:10px;">
+					<span style="color:red;" class="errorMsg"></span>
+				</div>
+            </div><!--register_box-->
+    </div>
+    </div>
+</div>
+<!-- 咨询价格  end-->
+<!--选择收货地址开始 -->
+<!--tabs开始-->
+<div class="nTab_address box-shadow1 hide cursor bg_06">
+	<!-- 标题开始 -->
+	<div class="TabTitle_address">
+		<i class="demo-icons fa-times-circle font_16 fr mar_r10 no" onclick="closenTabAddress()"></i>
+		<ul id="Tabaddress">
+			<li class="active">
+				<span class="js_tabAddress_one">请选择</span>
+				<i class="demo-icons fa-angle-down font_14b"></i>
+			</li>
+			<li class="normal none">
+				<span class="js_tabAddress_two">请选择</span>
+				<i class="demo-icons fa-angle-down"></i>
+			</li>
+			<!-- <li class="normal none">
+				<span class="js_tabAddress_three">请选择</span>
+				<i class="demo-icons fa-angle-down"></i>
+			</li> -->
+		</ul>
+	</div>
+	<!-- 内容开始 -->
+	<div class="TabContent_address">
+		  <!-- 全部购买咨询 的内容开始 -->
+		  <div>
+			<ul id="Tabaddress_Content0">
+
+			</ul>
+		  </div>
+		  <div class="none" >
+			<ul id="Tabaddress_Content1">
+
+			</ul>
+		  </div>
+		  <div class="none" >
+			<ul id="Tabaddress_Content2">
+
+			</ul>
+		  </div>
+	</div>
+</div>
+<!--tabs end-->
+<!--加入购物车弹出层   开始-->
+<div id="addCartBomb" class="po_fai" style="display: none;">
+    <div class="po_fai_bg"></div>
+    <div class="po_main">
+		<ul>
+	    	<li class="font_18">
+	    		<i class="fa-info-circle demo-icons font_24 mar_r10"></i>
+	    		<span class="title">加入购物车成功！</span>
+	    	</li>
+	        <li class="msg font_14"></li>
+	        <li>
+        		<button type="button" class="button_3 hei_40" onclick="closeAddCartBomb();" style="margin-right: 10px;">
+        			继续浏览
+        		</button>
+        		<button type="button" class="button_1 hei_40" onclick="location.href='$request.contextPath/shopCart/toCart'">
+					去购物车结算
+        		</button>
+	        </li>
+    	</ul>
+	</div>
+</div>
+<!--加入购物车弹出层   结束-->
+<!-- <div class="dowebok"><a href="#top"> 返回顶部</a></div> -->
+
+<script language="javascript">
+    var LR_username='$!userId';
+    var LR_userdata="店铺名称：'$!shopInfo.shopName'<br/>商品名称：'$!item.itemName'";
+    function openZoosUrl_UserDefine(){
+        //你们的判断登录跳转功能，也可以在这里进行判断
+        if( '$!userId' == ''){
+            alert("你目前处于非登陆状态，请先登录再联系客服！");
+            var retUrl = "$request.contextPath/productController/details?id="+$!item.itemId;
+            window.location.href="$request.contextPath/user/login?retUrl=" + encodeURI(retUrl);
+            return true;
+        }
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            url:"$request.contextPath/shopCart/ifLogin_shopCustomer",
+            success: function(data){
+                if(data.ifLogin_shopCustomer == false){
+                    alert("你目前处于非登陆状态，请先登录再联系客服！");
+                    this.location.href="$request.contextPath/user/login";
+                    return true;
+                }
+            }
+        });
+        
+    }
+</script>
+#set($layout = "/product_layout.vm")

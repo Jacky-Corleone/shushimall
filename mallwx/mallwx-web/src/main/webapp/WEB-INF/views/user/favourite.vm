@@ -1,0 +1,202 @@
+##加载我的收藏
+#set($layout = "common/blanklayout.vm")
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <base href="${request.getContextPath()}/"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>我的收藏</title>
+    <link href="assets/css/detail.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" src="assets/css/detail.js" />
+    <script type="text/javascript" src="assets/js/iscroll.js"></script>
+##<script type="text/javascript" src="assets/js/iscroll-probe.js"></script>
+    <script src="assets/js/jquery-2.1.4.min.js" type="text/javascript"></script>
+##<script src="assets/js/modernizr-custom-v2.7.1.min.js" type="text/javascript"></script>
+##<script src="assets/js/jquery-finger-v0.1.0.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="assets/js/handlebars-v3.0.3.js"></script>
+    <script type="text/javascript" src="assets/handlebars/hbs_helpers.js"></script>
+    <style >
+        .wrapper {
+            position: absolute;
+            z-index: 1;
+            top: 0px;
+            bottom: 50px;
+            left: 0;
+            width: 100%;
+            background: #f6f6f6;
+            overflow: hidden;
+        }
+        .scroller {
+            position: absolute;
+            z-index: 1;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+            width: 100%;
+            -webkit-transform: translateZ(0);
+            -moz-transform: translateZ(0);
+            -ms-transform: translateZ(0);
+            -o-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-text-size-adjust: none;
+            -moz-text-size-adjust: none;
+            -ms-text-size-adjust: none;
+            -o-text-size-adjust: none;
+            text-size-adjust: none;
+        }
+
+
+    </style>
+    
+    <script type="text/javascript">
+
+    
+	//删除地址
+	function delShopFavourite(id){
+			kltconfirm("是否确认删除收藏商品？",function(){
+		   	    //跑后台删除询价信息
+		   	    	var ids = [id];
+		   	    $.ajax({
+		   	        type: "POST",
+		   	        dataType: "html",
+		   	        url: "$request.contextPath/product/deladdr",
+		   	         data:{ "ids[]": ids },
+		   	        success: function (data) {
+		   	            toast(data);
+		   	            window.location = "$request.contextPath/user/toFav";
+		   	        }
+		   	    });
+			});
+			
+			
+		}
+    
+	function delShopFavourite(id){
+		kltconfirm("是否确认删除收藏商品？",function(){
+	   	    //跑后台删除询价信息
+	   	    	var ids = [id];
+	   	    $.ajax({
+	   	        type: "POST",
+	   	        dataType: "html",
+	   	        url: "$request.contextPath/product/deladdr",
+	   	         data:{ "ids[]": ids },
+	   	        success: function (data) {
+	   	            toast(data);
+	   	            window.location = "$request.contextPath/user/toFav";
+	   	        }
+	   	    });
+		});
+		
+		
+	}
+
+	function delShopFavouritedp(id){
+		kltconfirm("是否确认删除收藏商品？",function(){
+	   	    //跑后台删除询价信息
+	   	    	var ids = [id];
+	   	    $.ajax({
+	   	        type: "POST",
+	   	        dataType: "html",
+	   	        url: "$request.contextPath/product/deldp",
+	   	         data:{ "ids[]": ids },
+	   	        success: function (data) {
+	   	            toast(data);
+	   	            window.location = "$request.contextPath/user/toFav";
+	   	        }
+	   	    });
+		});
+		
+		
+	}
+    
+    
+    
+  </script>  
+    
+    <script type="text/x-handlebars-template" id="searchResultTplt">
+        #include("user/searchResult.hbs")
+    </script>
+    <script type="text/x-handlebars-template" id="searchShopResultTplt">
+        #include("user/searchShopResult.hbs")
+    </script>
+    <script src="assets/js/user/favourite.js" type="text/javascript"></script>
+    <script>
+        var _searchItemId='$!{searchItemId}';
+        var searchType='$!{searchType}';
+        var _imgGix='$!{gix}';
+    </script>
+</head>
+<body class="bg_02">
+<div id="main" class="po_ab">
+
+    <!-- 中间内容 -->
+#*<div class="content" id="" style="bottom:0px;">
+    <!-- 头部 -->
+    <div class="purchase hei_50 bg_02" style="top:0px;">
+    <p class="fl mar_lr4 font_cen">
+        <i class="fa fa-list-ul font_1_5" onclick="toggleMenu();return false;"></i>
+    </p>
+    <p class="fl po_re mar_t10 wid_75">
+        <input id="keyWord" style="" onchange="changeKeyWord();" value="$!content" type="text" class="form-contro2 wid_95" />
+        <i onclick="changeKeyWord();" class="fa-search fr font_1_2 fa-user2 po_ab"></i>
+    </p>
+</div><!-- 头部 -->*#
+
+
+
+    <div class="nTab">
+        <!-- 标题开始 -->
+        <div class="TabTitle bg_01 po_ab" style="top:0;left:0;right:0;">
+            <ul id="_myTab0" class="myTab0">
+                <li class="active" style="width: 49%;" onclick="queryRquestPriceInfo(this,0);">商品</li>
+                <li class="normal" style="width: 49%;" onclick="queryRquestPriceInfo(this,1);">店铺</li>
+            </ul>
+        </div>
+        <!-- 标题开始 end-->
+        <!-- 内容开始 -->
+
+        <div class="TabContent po_ab" style="top:40px;left:0px;right:0px;bottom:0px;">
+            <div id="myTab0_Content0" istabcontent class="bg_01 po_ab" style="top:0;left:0;right:0;bottom:0px;">
+                <div id="wrapper0" class="wrapper">
+                    <div id="scroller0" class="scroller">
+                        <div id="pullDown" class="font_cen">
+                            <span id="pullDownLabel0" class="pullDownLabel">下拉刷新...</span>
+                        </div>
+                        <div class="pad_lr5 shop_present" id="searchGoodsList" style="padding-bottom: 0px;">
+
+                        </div>
+                        <div id="pullUp" class="font_cen">
+                            <span class="pullUpLabel" id="pullUpLabel0">上拉加载更多...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="myTab0_Content1" istabcontent class="bg_01 po_ab none" style="top:0;left:0;right:0;bottom:0px;">
+                <div id="wrapper1" class="wrapper">
+                    <div id="scroller1" class="scroller">
+                        <div id="pullDown" class="font_cen">
+                            <span id="pullDownLabel1" class="pullDownLabel">下拉刷新...</span>
+                        </div>
+                        <div class="pad_lr5 shop_present" id="searchShopList" style="padding-bottom: 0px;">
+
+                        </div>
+                        <div id="pullUp" class="font_cen">
+                            <span class="pullUpLabel" id="pullUpLabel1">上拉加载更多...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- 中间内容 end-->
+</div>
+
+    #parse("common/footer.vm")
+</body>
+</html>

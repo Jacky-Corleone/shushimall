@@ -1,0 +1,294 @@
+#set($layout = "common/blanklayout.vm")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>求购信息</title>
+<link href="$request.contextPath/assets/css/detail.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="$request.contextPath/assets/js/iscroll.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/tab.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/ajaxfileupload.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        changeIconToRed(2);
+    });
+function queryTranslationInfo(thisObj, Num) {
+	if (thisObj.className == "active"){
+		return;
+	}
+	addLoadMask();
+	var tabObj = thisObj.parentNode.id;
+	var tabList = document.getElementById(tabObj).getElementsByTagName("li");
+
+	for (i = 0; i < tabList.length; i++) {
+		if (i == Num) {
+		//显示相关的页面信息
+			$.ajax({
+			   type: "POST",
+			   url: "$request.contextPath/askItemInfoController/queryTranslation?flag=request&num="+Num,
+			   dataType: "html",
+			   success: function(data){
+				   $("#"+tabObj + "_Content" + Num).empty().append(data);
+				   removeLoadMask();
+			   }
+			});
+		
+			thisObj.className = "active";
+			document.getElementById(tabObj + "_Content" + i).style.display = "block";
+		} else {
+			tabList[i].className = "normal";
+			document.getElementById(tabObj + "_Content" + i).style.display = "none";
+			 $("#"+tabObj + "_Content" + Num).empty();
+		}
+	}
+}
+
+
+//附件上传
+var sccount=0;
+//文件上传
+	function startUpload(){
+        //判断图片格式
+        var fileInput = $("#fileInput")[0].files[0].name;
+        var maxSize = 10240000;
+        if ($("#fileInput")[0].files[0].size > maxSize) {
+            $("#fileInput").replaceWith('<input type="file" id="fileInput" class="wid_50 form-control hei_20" name="file" onchange="startUpload();" />');
+            alert("上传文件过大！");
+            return false;
+        }
+        $.ajaxFileUpload({
+            url: '$request.getContextPath()/orderWx/upload?size=10240000', //用于文件上传的服务器端请求地址
+            secureuri: false, //是否需要安全协议，一般设置为false
+            fileElementId: 'fileInput', //文件上传域的ID
+            dataType: 'text', //返回值类型 一般设置为json
+            type:"post",
+            success: function (data, status){  //服务器成功响应处理函数
+    			data = JSON.parse(data.substring(data.indexOf("{"),data.indexOf("}")+1));
+                if(data.success){
+                    sccount=sccount+1;
+                    var trid="trid"+sccount;
+                    appendtable(data.url,trid, fileInput);
+                }else{
+                    alert(data.msg);
+                    $("#fileInput").replaceWith('<input type="file" id="fileInput" class="wid_50 form-control hei_20" name="file" onchange="startUpload();" />');
+                }
+            },
+            error: function (data, status, e){//服务器响应失败处理函数
+			    alert(JSON.stringify(data));
+				alert(e);
+                alert("亲系统繁忙，请稍后再试");
+                $("#fileInput").replaceWith('<input type="file" id="fileInput" class="wid_50 form-control hei_20" name="file" onchange="startUpload();" />');
+            }
+        });
+    }
+    function appendtable(url,id, fileName){
+	    var imageUrl = '$!imageServerAddr'+url;
+		$("#annex").val(url);
+        $("#uploadLi").html("<p class='wid_30 fl font_right pad_r5'><span class='font_e5 mar_lr2'></span>附件</p><p class='fl wid_30 one' ><a href='" + imageUrl + "'>" + fileName + "</a></p><p class='fl one'><a href=javascript:cancleimg() >删除</a></p>");
+       
+    }
+	
+	//清除指定tr
+    function cancleimg(){
+        $("#uploadLi").html("<p class='wid_30 fl font_right pad_r5'><span class='font_e5 mar_lr2'></span>附件</p><input type='file' class='wid_50 mar_t10' id='fileInput' name='file' onchange='startUpload();'/>");
+		$("#annex").val('');
+    }
+    
+	
+</script>
+<!--求购相关js方法-->
+<script type="text/javascript" src="$request.contextPath/assets/js/askItemInfo/askItemInfo.js"></script>
+</head>
+<input type="hidden" id="contextPath" value="$request.getContextPath()"/>
+<body class="bg_02">
+<div id="main" class="po_re">
+    <!-- 中间内容 -->
+    <div class="content" id="wrapper">
+        <div class="nTab">
+            <!-- 标题开始 -->
+            <div class="TabTitle bg_01 ">
+              <ul id="myTab0" class="myTab0">
+                <li class="active" onclick="queryTranslationInfo(this,0);">全部求购</li>
+                <li class="normal" onclick="queryTranslationInfo(this,1);">求购创建</li>
+                <li class="normal" onclick="queryTranslationInfo(this,2);">待提交</li>
+                <li class="normal" onclick="queryTranslationInfo(this,3);">待接收</li>
+              </ul>
+            </div><!-- 标题开始 end-->
+            <!-- 内容开始 -->
+            <div class="TabContent" >
+               
+				
+				  <!-- 切换内容    1   -->     
+                <div id="myTab0_Content0">
+                <div  onclick="showItemDiv('queryInfo_0');"></div>
+                    <div  id="queryInfo_0" class="bg_01">
+                        <ul class="font_t pad_lr5">
+                        <li class="hei_32">
+                         <p class="wid_25 fl font_right pad_r5">供应商</P>
+							<input name="supplierName" id="supplierName" class="form-control wid_50 hei_20" />
+						</li>
+                        <li class="hei_32">
+                         <p class="wid_25 fl font_right pad_r5">物品名称</P>
+							<input class="form-control wid_50 hei_20" id="itemName" name="itemName"/></li>
+                        <li class="hei_32">
+                         <p class="wid_25 fl font_right pad_r5">求购名称</P><input class="form-control wid_50 hei_20" id="translationName"/></li>
+                    </ul>
+                        <div><button class="button_1 pad_lr5 hei_32 fr"  onclick="queryTranslation(0,'request');">求购查询</button></div>
+                        <div class="clear"></div>
+                    </div>
+                    <div  id="queryDiv0">
+						#foreach($translation in $!pager.records)
+						<div class="mar_b10 bg_01 pad_lr5">
+                        <!-- 发货商城 -->
+                        <div class="hei_32 border_2">
+                            <p class="fl" style="font-weight:bold;"><span>求购名称：$!translation.translationName</span></p>
+							 #if($!translation.status == "0")
+                				<p class="fr font_e5">待提交</p>
+                			#elseif($!translation.status == "1")
+                				<p class="fr font_e5">待审核</p>
+                		    #elseif($!translation.status == "2")
+                				<p class="fr font_e5">待报价</p>
+                			#elseif($!translation.status == "3")
+                				<p class="fr font_e5">已确认</p>
+                             #elseif($!translation.status == "4")
+                                 <p class="fr font_e5">已驳回</p>
+                			#else
+                				<p class="fr font_e5"></p>
+                			#end
+							
+                        </div><!-- 发货商城 -->
+						<!--物品信息展示-->
+						<div id="$!translation.translationNo"><p class="hei_32" >商品信息：</p>
+						#if($!translation.status == "2")
+							<input type="checkbox"  onclick="checkAll('$!translation.translationNo',this);"/>全选
+						#end
+						#foreach($listDetail in $translation.translationMatDTOs )
+                            <!-- 发货信息 -->
+                            <div class="border_2 shop_order pad_tb3" >
+                                <p class="wid_87 shop_order_p">
+									#if($!listDetail.alternate1 != "")
+									<input type="checkbox" class="mar_l2" name="$!translation.translationNo" value="$listDetail.id" />
+									#end 
+									商品名称：$listDetail.matDesc</p>
+                                <p class="wid_87 shop_order_p">类目名称：$!listDetail.alternate2</p>
+								<p class="wid_87 shop_order_p">商品属性：$!listDetail.matAttribute</p>
+                                <p class="wid_87 shop_order_p">数   　量：$!listDetail.quantity</p>
+								 #if($!listDetail.alternate1 != "")
+								 <div id="$!listDetail.id" >
+									<p class="wid_87 shop_order_p">供应商：$!listDetail.alternate1</p>
+                                     #if($!listDetail.status == "1")
+                                         <p class="wid_87 shop_order_p">状   态：已接收</p>
+                                     #else
+                                         <p class="wid_87 shop_order_p">状   态：未接收</p>
+                                     #end
+									<p class="wid_87 shop_order_p">价   格：$!listDetail.matPrice</p>
+								</div>
+								#end
+                                <div class="clear"></div>
+                            </div>
+                            <!-- 发货信息 -->
+						#end
+                        </div>
+					    <!--物品信息展示end-->
+                            <!-- 按钮 -->
+                            <p>&nbsp;</p>
+                             <p>截止报价时间：$!date.format('yyyy-MM-dd', $!translation.endDate)</p>
+                            <div class="pad_tb5">
+								#if($!translation.status == "0" || $!translation.status == "4")
+								<button class="button_3 pad_mlr5" onclick="updateTranslation('$!translation.translationNo','$!translation.status');">编辑</button>
+								<button class="button_3 pad_mlr5" onclick="commitTranslation('$!translation.translationNo','$!translation.status');">提交</button>
+								<button class="button_3 pad_mlr5" onclick="deleteTranslation('$!translation.translationNo','$!translation.status');">删除</button>
+								#end
+								#if($!translation.status == "2")
+									<button class="button_3 pad_mlr5" onclick="commitRequestTranslation('$!translation.translationNo','$!translation.status','$!translation.translationNo');">接收价格</button>
+								#end
+                                #if($!translation.status == "2" || $!translation.status == "3" )
+                                    <button class="button_3 pad_mlr5" onclick="committranslationRe('$!translation.translationNo','$!translation.status');">重新求购</button>
+                                #end
+								<button class="button_3 pad_mlr5" onclick="lookTranslationInfo('$!translation.translationNo','request');">查看</button>
+								<div class="clear"></div>
+								</div>
+								</div>
+					#end
+					</div>
+                </div><!-- 切换内容    1   -->  
+				<form action="$request.contextPath/orderWx/getShopCart" id="requestPriceForm" method="post">
+                	<input type="hidden" name="jsonProducts" id="jsonProducts"/>
+                	
+                	<input type="hidden" name="orderType" id="contract" value="0"/>
+                	<input type="hidden" name="contractNo" id="$!translation.translationNo"/>
+                </form>
+				
+				
+
+                <!-- 切换内容    2   -->  
+                <div id="myTab0_Content1" class="none bg_01">
+					
+                </div>
+                <!-- 切换内容    2   -->
+                <!-- 切换内容    3   -->    
+                <div id="myTab0_Content2" class="none">
+                   
+                </div><!-- 切换内容    3   -->  
+                <!-- 切换内容    4   -->  
+                <div id="myTab0_Content3" class="none">
+                </div><!-- 切换内容    4   -->  
+            </div>
+        </div>
+         
+    </div><!-- 中间内容 end-->
+
+
+    <!--物品弹出层-->
+    <div id="itemSearchDIV" class="bombbox"  style="z-index:120">
+        <div class="bombbox_bg" style="overflow: auto;z-index:80" >
+            <!-- 头部 -->
+            <div id="navigation"
+                 style="z-index:85;position:fixed;top:10px;">
+                <ul id="list">
+                    #foreach($item1 in $itemList)
+                        <li><a href="#" onclick="showItem(this,2);return false;" categoryCid="$item1.categoryCid"><span
+                                class="font_e5 mar_r2">|</span>$item1.categoryCName</a>
+                            <ul class="myHide" isItem2 parentId="$item1.categoryCid">
+                                #foreach($item2 in $item1.children)
+                                    <li><a href="#" onclick="return false;"
+                                           class="font_e5 font_8_5">$item2.categoryCName</a></li>
+                                    <li class="border_2" isItem3 parentId="$item2.categoryCid">
+                                        <a>
+                                            #foreach($item3 in $item2.children)
+                                                <span style=""
+                                                      onclick="createItemTR('$item3.categoryCid','$item3.categoryCName')">$item3.categoryCName</span>
+                                            #end
+                                        </a>
+                                    </li>
+                                #end
+                            </ul>
+                        </li>
+                    #end
+                </ul>
+            </div>
+            <input name="cid" id="cid" value="" />
+            <div class="clear"></div>
+            <!--   <div id="itemSearchResult" style="overflow: auto;padding:15% 0 15% 0;">
+               </div>  -->
+            <div style="width:100%;position: fixed;z-index: 99;bottom: 0;left:0;background:white;margin:auto">
+                <div style="padding-left:25%">
+                    <button class="hei_32 pad_lr10 button_2" onclick="closeItemSearchDIV()">
+                        <span style="font-weight:bold;font-size:16px;">取消</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 物品搜索弹出层 End -->
+
+</div>
+    #parse("common/footer.vm")
+</body>
+
+</html>
+

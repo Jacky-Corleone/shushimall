@@ -1,0 +1,245 @@
+#set($layout = "/none_layout.vm")
+<script type="text/javascript">
+	var SHOPMANAGEBRAND = {
+		initEvent:{
+			initPage:function(){
+				//加载平台一级类目
+				optionItems("$request.getContextPath()/shopManageCategoryController/getCategoryByParentId",0,"categoryLev1","","categoryCName","categoryCid");
+				//加载查看大图组件
+				this.initFancyZoom();
+				//初始化类目点击事件
+				this.initCategoryClick();
+				//初始化品牌图片点击事件
+				this.initBrandPicClick();
+				//初始化确认申请
+				this.initSaveBtn();
+			},
+			initFancyZoom:function(){
+				$("img[showImg='findImg']").fancyzoom({
+					Speed:400,
+					showoverlay:false,
+					imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+				});
+			},
+			initSaveBtn:function(){
+				$("#brandSaveBtn").bind("click",function(){
+					SHOPMANAGEBRAND.saveBrand();
+				});
+			},
+			initCategoryClick:function(){
+				$("td").delegate("span.press_classes","click",function(){
+					var catContainer = $(this).parent().attr("id");
+					if(!catContainer){
+						return;
+					}
+					var parentCid = $(this).attr("categoryId");
+					//高亮显示标签：在右下角添加一个小红勾
+					SHOPMANAGEBRAND.highLight(this);
+					//为类目的点击绑定事件
+					switch(catContainer){
+						case "tdlev3"://三级类目点击事件
+							SHOPMANAGEBRAND.loadBrandByCid(parentCid);
+							break;
+						default:
+							break;
+					}
+				});
+			},
+			initBrandPicClick:function(){
+				$("#brands").delegate("span.press_pic","click",function(){
+					var bEle = $(this).find("b");
+					if(bEle && bEle.length>0){//已经选择过该品牌
+						SHOPMANAGEBRAND.deleteBrand(this);
+					}else{//未选择过
+						SHOPMANAGEBRAND.addBrand(this);	
+					}
+				});
+			}
+		},
+		addBrand: function(ele){
+			var cid_brandid = $(ele).attr("cid") + ":" + $(ele).attr("brandId");
+			$(ele).append("<b class=\"pa_04 po_ab\"></b>"); //1、图片右下角挂一个绿色的勾
+  		    $("#selectedBrand").append($(ele).clone());		//2、将图片放到已选中区域中
+			$("#addBrandIds").val(this.addBrandIds(ele));
+		},
+		addBrandIds: function(ele){
+			var cid_brandid = $(ele).attr("cid") + ":" + $(ele).attr("brandId");
+			var selectedBrandIds = $("#addBrandIds").val(); //3、将图片对应的品牌id放到已选中id集合中
+			var brandIds = selectedBrandIds?(selectedBrandIds + "," + cid_brandid):cid_brandid;
+			return brandIds;
+		},
+		deleteBrand: function(ele){
+			var cid = $(ele).attr("cid");
+			var brandid = $(ele).attr("brandId");
+			var cid_brandid = cid + ":" + brandid;
+			$(ele).find("b").remove();	//1、移除图片右下角绿色的勾
+			$("#selectedBrand").find("span[brandId='"+brandid+"']").remove();//2、从已选中图片中移除掉
+			var afterRemoveIds = removeEle($("#addBrandIds").val(),cid_brandid).join(",");
+			$("#addBrandIds").val(afterRemoveIds);//3、从已选中图片的id中移除该id
+		},
+		highLight: function(ele){
+			$(ele).parent().children().find("b").remove();
+			$(ele).append("<b class=\"pa_04 po_ab\"></b>");
+		},
+		saveBrand: function(){
+			var addbrands = $("#addBrandIds").val();
+			if(addbrands=="" || addbrands==null){
+				alert("请选择品牌");
+				return;
+			}
+			$("#brandSaveBtn").loadingMsg();
+			//保存
+			$.post("$request.getContextPath()/shopManageBrandController/saveBrand",{"addBrandIds":addbrands},function(response){
+				if(response.result=="success"){
+					alert("申请成功");
+					nTabs(2);//刷新品牌信息页签
+				}else{
+					alert("申请失败");
+				}
+				$("#brandSaveBtn").hideMsg();
+			},"json");
+		},
+		/**
+		 * 加载品牌信息
+		 * @param cid 类目id
+		 */
+		loadBrandByCid: function(cid){
+			$.ajax({
+				url:"$request.getContextPath()/shopManageBrandController/queryBrandByCid",
+				type:"get",
+				data:{cid:cid},
+				dataType: "json",
+				success:function(data){
+					var brandList = $("#brands").empty();
+					$.each(data, function (n, brand) {
+						//品牌图片
+						var imgEle = $("<img>").attr("src","$!imageServerAddr"+brand.brandLogoUrl)
+						.attr({"alt":brand.brandName,"title":brand.brandName})
+						.css({width:"120",height:"40"});
+						var spanEle = $("<span>")
+						.attr({"brandId":brand.brandId,"cid":cid})
+						.addClass("press_pic border-4 mar_r10 mar_b10");
+						spanEle.append(imgEle);
+						$("span.press_pic").each(function(index, o) {
+    						if($(o).attr("cid")==cid && $(o).attr("brandId")==brand.brandId){
+    							spanEle.append("<b class=\"pa_04 po_ab\"></b>");
+    						}
+						});
+						brandList.append(spanEle);
+					});
+				}
+			});
+		},
+		/**
+		 * 删除品牌
+		 * @param brandId 品牌id
+		 */
+		 pseudoDeleteBrand : function(brandId){
+    		 if(confirm("确定要删除该品牌吗？")){
+    			$.ajax({
+                    url: "$request.getContextPath()/shopManageBrandController/deleteBrand",
+                    dataType:"json",
+                    data:{brandId:brandId},
+                    success: function(data){
+                        if(data.result=='success'){
+                            alert("删除成功");
+    						nTabs(2);
+                        }else{
+                        	alert(data.msg);
+                        }
+                    },error:function(data){
+                        alert("系统繁忙，请稍后再试");
+                    }
+                }); 
+    		}
+		 }
+	};
+	
+	$(function(){
+		//初始化页面元素
+		SHOPMANAGEBRAND.initEvent.initPage();
+	});
+</script>
+<style>
+.pad_t10{padding-top:10px;}
+
+</style>
+<!-- 店铺最新加的经营品牌的品牌id -->
+<input type="hidden" id="addBrandIds" name="addBrandIds" value="" />
+
+<!--右边部分开始-->
+<div id="right" >
+			#if($!rejectedBrandList && $!rejectedBrandList.size()>0)
+				<dl>
+	               <dt><h3 class="tit mar_l10 mar_t10">被驳回的的品牌</h3></dt>
+	               <dd> 
+	                   	<ol class="pad_l20">
+	                   		<table>
+	                   		#foreach($entity in $!rejectedBrandList.entrySet())
+	                   			<tr>
+	                   				<td style="width:100px;text-align:right;">$!entity.key：</td>
+	                   				<td style="text-align:left;"><i class="demo-icons font_fe">【驳回原因：$!entity.value】</i></td>
+	                   			</tr>
+	                   		#end
+	                   		</table>
+	                   	</ol>
+	               </dd>
+	            </dl>			
+			#end
+            <dl>
+               <dt><h3 class="tit mar_l10 mar_t10">经营的品牌</h3></dt>
+               <dd> 
+                   <p class="pad_l20">
+                   		#foreach($entity in $!shopBrandList)
+                   			<img src="$!imageServerAddr$entity.brandLogoUrl" width="90" height="40" name="" style="cursor:pointer;" showImg="findImg" alt="$entity.brandName" title="$entity.brandName">
+							&nbsp;<i class="my_icon-del" title="删除" onclick="SHOPMANAGEBRAND.pseudoDeleteBrand($entity.brandId)">&nbsp;&nbsp;&nbsp;&nbsp;</i>
+                   		#end
+                   </p>
+               </dd>
+            </dl>
+            <dl>
+              <dt><h3 class="tit mar_l10 mar_t10">申请新经营品牌</h3></dt>
+              <dd> 
+              <style>
+              	.pinpai tr{border:1px solid #eee;}
+              
+              </style>
+                <table width="80%" border="0" class="mar_l10 border-1" cellspacing="0" cellpading="0">
+                     <tbody>
+                     <!--每级分类为每行tr循环 -->
+                       <tr>
+                         <td class="wid_80 font_cen border-4" height="30">三级类目：</td>
+                         <td id="tdlev3" class=" border-9 border-6 pad_t10">
+                             #foreach($firstLevCat in $levOneCategoryList)
+                                 #foreach($secondLevCat in $firstLevCat.childCats)
+                                     #foreach($thridLevCat in $secondLevCat.childCats)
+                                         <span class="press_classes border-4 bg_05" categoryId="$thridLevCat.cid">$thridLevCat.cname</span>
+                                     #end
+                                 #end
+                             #end
+                         </td>
+                       </tr>
+                     </tbody>
+                   </table>
+              </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+    		<dl>
+    			<li>
+	    			<div class="font_span"></div>
+	    			<div class="font_content mar_t10 mar_20" id="brands"></div>
+    			</li>
+    		</dl>
+    		<dl>
+	    		<li>
+	    			<div><h3 class="tit mar_l10 mar_t10">申请新经营品牌</h3></div>
+	    			<div class="buyer_content mar_20" id="selectedBrand"></div>
+	    		</li>
+    		</dl>
+            <div class="wid_460" style="margin:20px auto">
+                <input class="button_2 hei_35 font_14b" type="button" id="brandSaveBtn" loadMsg="正在申请..." value="确认申请" />
+                <input class="button_2 hei_35 font_14b" type="button" value="返回" onclick="forwardToShopIndex()" />
+            </div>
+         </div><!--Notice end-->
+    <!--文字段落结束-->         
+</div>

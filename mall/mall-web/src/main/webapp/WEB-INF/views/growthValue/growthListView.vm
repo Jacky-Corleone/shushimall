@@ -1,0 +1,114 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+
+<script type="text/javascript">
+$(function(){
+	//加载左侧菜单
+	$("#leftBuyer").load("$request.contextPath/leftBuyer");
+});
+
+//Form表单提交
+function topage(page){
+	searchContractInfo('top',page);
+}
+
+  function searchContractInfo(e, page) {
+        $.ajax({
+            url:  "$request.contextPath/growth/growthList",
+            data: {
+                "toPage":e,
+                "page": page
+            },
+            type: 'post',
+            dataType: 'html',
+            success: function (data) {
+                $("#right").html(data);
+            },
+        });
+    } 
+  
+
+
+
+
+</script>
+
+<div id="main">
+<!--left start-->
+<div id="leftBuyer"></div>
+<!--left end-->
+
+<!--right start-->
+<div id="right">
+	<div class="right_top bg_06 mar_b10">
+		<div class="wid_820 fl mar_20">
+			<p class="hei_30">总成长值：<span>$user.growthValue</span>
+			</p>
+			<p class="hei_30">
+				会员等级：<span class="font_14b font_fe">
+					<span>$user.vipLevel</span>		
+				</span>
+			</p>
+			<div class="clear"></div>
+		</div>
+	</div>
+
+		<div class="TabContent">
+			<div id="right_bot" class="right_bot ">
+				<div id="right_bot" class="right_bot">
+					<ul class="list_top bg_08 font_14b wid_950 mar">
+						<li class="wid_80 font_cen hei_35">序 号</li>
+						<li class="wid_300 font_cen hei_35">获取方式</li>
+						<li class="wid_300 font_cen hei_35">获取成长值</li>
+						<li class="wid_250 font_cen hei_35">获取时间</li>
+					</ul>
+					<!--每一笔订单可以循环一下内容 开始-->
+					<div class="wid_950 mar_cen border-4" >
+						#foreach($evaluation in $pager.records)
+						<!-- 每一条评论订单 -->
+						<ul class="list_top hei_80 border-5">
+							<li class="wid_80 font_cen">$velocityCount</li>
+							<li class="wid_300 font_cen">
+								#if($!evaluation.type=="1")
+									<span>登录获取</span>
+								#elseif($!evaluation.type=="2")
+									<span>购物获取</span>
+								#elseif($!evaluation.type=="3")
+									<span>评价获取</span>
+								#elseif($!evaluation.type=="4")
+									<span>评价+晒单获取</span>
+								#end
+							</li>
+							<li class="wid_300 font_cen">
+								&nbsp;$!evaluation.growthValue
+							</li>
+							<li class="wid_250 font_cen ">
+								$!date.format('yyyy-MM-dd HH:mm:ss',$!evaluation.createTime)
+							</li>
+						</ul>
+						#end
+						<!--分页数据-->
+            		#pageVelocity($pager)<!--分頁結束 -->
+					</div>
+					
+				</div>
+			</div>
+		</div>
+</div>
+<!-- right end-->
+</div>
+
+<!-- 弹出层  -->
+<div class="po_fai" style="display:none;" id="shopNewsDiv">
+    <div class="po_fai_bg"></div>
+    <div class="po_main0 pad_t10" >
+        <div class=" hei_40 bg_05 pad_l10 font_14b"><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor" onclick="hideDiv('shopNewsDiv')"></i>详细信息</div>
+        <div class="add_qynm">
+            <span class="list_top font_14b f1" id="contentId"></span>
+        </div>
+        <div class="wid_130 mar_cen">
+            <button type="button" class="button_3 but_cx hei_30 " onclick="hideDiv('shopNewsDiv')"><a class="font_82">关闭</a>  </button>
+        </div>
+    </div>
+</div>
+

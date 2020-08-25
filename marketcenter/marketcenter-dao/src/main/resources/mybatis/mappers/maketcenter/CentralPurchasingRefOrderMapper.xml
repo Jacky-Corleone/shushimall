@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.maketcenter.dao.CentralPurchasingRefOrderDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="centralPurchasingRefOrder" type="com.camelot.maketcenter.dto.CentralPurchasingRefOrderDTO">
+		<result property="orderActivitiesDetailId" column="order_activities_detail_id"/>
+		<result property="activitesDetailsId" column="activites_details_id"/>
+		<result property="orderId" column="order_id"/>
+		<result property="itemId" column="item_id"/>
+		<result property="skuId" column="sku_id"/>
+		<result property="purchaseNum" column="purchase_num"/>
+		<result property="purchasePrice" column="purchase_price"/>
+		<result property="insertTime" column="insert_time"/>
+		<result property="insertBy" column="insert_by"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateBy" column="update_by"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			order_activities_detail_id,
+			activites_details_id,
+			order_id,
+			item_id,
+			sku_id,
+			purchase_num,
+			purchase_price,
+			insert_time,
+			insert_by,
+			update_time,
+			update_by
+		FROM 
+		CENTRAL_PURCHASING_REF_ORDER ref_order_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.orderActivitiesDetailId != null and entity.orderActivitiesDetailId !=''">
+				<![CDATA[ and ref_order_.order_activities_detail_id = #{entity.orderActivitiesDetailId} ]]>
+			</if>
+			<if test="entity.activitesDetailsId != null and entity.activitesDetailsId !=''">
+				<![CDATA[ and ref_order_.activites_details_id = #{entity.activitesDetailsId} ]]>
+			</if>
+			<if test="entity.orderId != null and entity.orderId !=''">
+				<![CDATA[ and ref_order_.order_id = #{entity.orderId} ]]>
+			</if>
+			<if test="entity.itemId != null and entity.itemId !=''">
+				<![CDATA[ and ref_order_.item_id = #{entity.itemId} ]]>
+			</if>
+			<if test="entity.skuId != null and entity.skuId !=''">
+				<![CDATA[ and ref_order_.sku_id = #{entity.skuId} ]]>
+			</if>
+			<if test="entity.purchaseNum != null and entity.purchaseNum !=''">
+				<![CDATA[ and ref_order_.purchase_num = #{entity.purchaseNum} ]]>
+			</if>
+			<if test="entity.purchasePrice != null and entity.purchasePrice !=''">
+				<![CDATA[ and ref_order_.purchase_price = #{entity.purchasePrice} ]]>
+			</if>
+			<if test="entity.insertTime != null and entity.insertTime !=''">
+				<![CDATA[ 
+				and DATE_FORMAT(ref_order_.insert_time, '%Y-%m-%d') = DATE_FORMAT(#{entity.insertTime}, '%Y-%m-%d')
+				]]>
+			</if>
+			<if test="entity.insertBy != null and entity.insertBy !=''">
+				<![CDATA[ and ref_order_.insert_by = #{entity.insertBy} ]]>
+			</if>
+			<if test="entity.updateTime != null and entity.updateTime !=''">
+				<![CDATA[ 
+				and DATE_FORMAT(ref_order_.update_time, '%Y-%m-%d') = DATE_FORMAT(#{entity.updateTime}, '%Y-%m-%d')
+				]]>
+			</if>
+			<if test="entity.updateBy != null and entity.updateBy !=''">
+				<![CDATA[ and ref_order_.update_by = #{entity.updateBy} ]]>
+			</if>
+
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="centralPurchasingRefOrder" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where ref_order_.order_activities_detail_id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="centralPurchasingRefOrder" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		CENTRAL_PURCHASING_REF_ORDER ref_order_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="com.camelot.maketcenter.dto.CentralPurchasingRefOrderDTO">
+		<![CDATA[
+		insert into CENTRAL_PURCHASING_REF_ORDER (
+				activites_details_id,
+				order_id,
+				item_id,
+				sku_id,
+				purchase_num,
+				purchase_price,
+				insert_time,
+				insert_by,
+				update_time,
+				update_by
+		   )values(
+				#{activitesDetailsId},
+				#{orderId},
+				#{itemId},
+				#{skuId},
+				#{purchaseNum},
+				#{purchasePrice},
+				now(),
+				#{insertBy},
+				now(),
+				#{updateBy}
+		   )
+	    ]]>	
+	</insert>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from CENTRAL_PURCHASING_REF_ORDER where order_activities_detail_id = #{id}
+		]]>
+	</delete>
+</mapper>

@@ -1,0 +1,76 @@
+#set($layout = "/none_layout.vm")
+	<!-- 全部评价的内容开始 -->
+	<div id="Tab0_Content0" class="border-1">
+		<!--标题 开始-->
+		<ul class="font_cen bg_05 hei_30 font_14b">
+			<li class="nTab_list wid_500">评价心得</li>
+			<li class="nTab_list wid_150">顾客满意度</li>
+			<li class="nTab_list wid_180">购买信息</li>
+			<li class="nTab_list wid_180">评论者</li>
+		</ul><!--标题结束-->
+		<!--内容 开始-->
+		#foreach($evaluation in $pager.records)
+		<ul class="content_01 border-6">
+			<li class="nTab_list2 wid_500">
+			$evaluation.content
+			<span class="font_c7">$!date.format('yyyy-MM-dd HH:mm:ss ',$!evaluation.createTime)</span>
+			<p>
+			#foreach($tag in $evaluation.evalTags)
+			<span class="bg_13 tag">$tag.tagName</span>
+			#end
+			</p>
+			<div class="clear"></div>
+			<!--小图片图片展示 div -->
+			#if($!evaluation.isHavePic)
+			<div class="mar_tb10">
+				#foreach($pic in $evaluation.picList)
+					<img src="$urlFtp$!pic.imgUrl" class="mar_r10"
+						width="50" height="50" style="cursor: pointer; opacity: 1;" fancy_zoom="view_img" title="点击查看大图"/>
+				#end
+			</div>
+			#end
+			<!--小图片图片展示 div -->
+			<div class="clear"></div>
+			#if($evaluation.itemEvaluationReplyList)
+			<!-- 回复 -->
+			<div class="font_c7 return"><i class="mar_r30 return_i">回复（$evaluation.itemEvaluationReplyList.size()）</i></div><!-- 回复 end -->
+			<div class="clear"></div>
+			<!-- 回复内容 -->
+			<div class="font_c7 mar_b10 return_cont">
+				<h3 class="hei_30 border-5">商家回复：</h3>
+				<div>
+					#foreach($replay in $evaluation.itemEvaluationReplyList)
+					<p>$!replay.content<span class="fr">$!date.format('yyyy-MM-dd HH:mm ',$!replay.createTime)</span></p>
+					#end
+				</div>
+			</div><!-- 回复内容 end -->
+			</li>
+			#end
+			<li class="nTab_list2 wid_100 pad_t20 mar_l10">
+				<span class="star sa$!evaluation.skuScope"></span>
+			</li>
+			<li class="nTab_list2 wid_180 pad_t20">
+			#foreach($itemAttr in $!evalMapToItemAttrs.get($evaluation.id.toString()))
+				<p class="font_cen">$itemAttr.name：$itemAttr.values[0].name</p>
+			#end
+			</li>
+			<li class="nTab_list2 wid_200 pad_l40">
+			<p>$!evaluation.userName</p>
+			<p class="font_c7">$!date.format('yyyy-MM-dd HH:mm',$!evalMapToOrderTime.get($evaluation.id.toString()))购买</p>
+			</li>
+		</ul><!--内容 结束-->
+		#end
+	</div>
+	#pageVelocity($pager)
+	<!-- 有图片的评论 内容开始 -->
+	<script>
+		// 分页搜索方法
+		function topage(page) {
+			evaluationContentSearch(page);
+		}
+		
+		// 显示/隐藏卖家对评论的回复
+		$(".return_i").click(function() {
+			$(this).parent().next().next().toggle();
+		});
+    </script>

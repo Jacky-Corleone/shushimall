@@ -1,0 +1,112 @@
+#set($layout = "common/blanklayout.vm")
+#if($myCart.shops.size() != $0)
+    #foreach( $shop in $myCart.shops )
+    
+        <!-- 店铺信息 -->
+    <div class="pad_5 bg_01 ">
+        <p class="fl hei_32 font_1_2"><i onclick="checkShop(this);" shopId="$!shop.shopId" class="fa #if($!shop.checked)fa-check-circle #else fa-circle-thin #end font_3"></i><a href="shopBaseInfoController/toView?shopId=$!shop.shopId">$shop.shopTitle</a></p>#*<button class="button_2 hei_32 fr">领取优惠券</button>*#
+        <p class="fl" style="margin-left:2.5em;">$shop.shopRule</P>
+        <div class="clear"></div>
+    </div><!-- 店铺信息 end-->
+    <!-- 商品优惠 -->
+        <div  class="pad_5">
+    		#foreach($product in $shop.products)
+			<div id="$product.skuId" isproductframe oncontextmenu="return false;" style="-webkit-user-select:none;-webkit-touch-callout:none;">
+				#if( $product.promotions && $product.promotions.size() != 0 )
+				<p class="favour hei_34">
+					<b class="fl"  style="color:#fff">惠</b>
+					<input type="hidden" name="chang_skuId" value ="$product.skuId"/>
+					<input type="hidden" name="chang_qty" value ="$!product.qty"/>
+					<input type="hidden" name="chang_shopId" value ="$shop.shopId"/>
+					<select onchange=changePriceByfavour(this) style="width: 60%">
+							<option value = ''>不参与活动</option>
+							#foreach($promotion in $product.promotions)##活动只有2中类型，直降和满减
+							<option value="$promotion.id" #if( $product.promId == $promotion.id )selected#end>$promotion.name</option>
+			    			#end
+					</select>
+				</p>
+				#end
+				<div class="clear"></div>
+                <!-- 商品介绍 -->
+                <dl class="shop_car mar_t10">
+					 <p class="fl mar_r2 pad_t50"><i onclick="proPick(this);"  name="danxk" checkIcon="1" skuId="$product.skuId" class="fa #if($product.checked)fa-check-circle #else fa-circle-thin #end font_3"></i></p>
+                    <!-- 商品图片 -->
+                    <dt class="fl">
+						<a href="product/toDetail?id=${product.itemId}&skuId=${product.skuId}">
+							<img width="100%" height="100%" src="$imgUrlPre/${product.src}" />
+						</a>
+                    </dt> <!-- 商品图片 -->
+                     <!-- 商品文字 -->
+                    <dd class="fr wid_48">
+                        <p class="lin_24">$product.title &nbsp;
+        					#foreach( $attr in $product.attrs)
+        		            	$attr.name:$attr.value &nbsp;
+        		            #end
+    					</p>
+                        <p><span class="font_2 lin_24">￥$product.skuPrice</span>#*<m class="present fr">赠</m>*#</p>
+                        <!-- 价格 -->
+                        <div class="fl wid_70">
+							<span skuId="$product.skuId" class="jia" onclick="changeProductTimeout('$product.skuId',-1)">-</span>
+								<input skuId="$product.skuId" previousValue="$product.quantity" maxlength="10" onkeyup="validateValue(this,event);" onchange="onchangeValue(this);" proStore="$product.qty" value="$product.quantity" type="tel" class="wid_15 input_1 fl"/>
+							<span skuId="$product.skuId" class="jian" onclick="changeProductTimeout('$product.skuId',1)">+</span>
+						</div>
+						<div class="clear"></div>
+<!-- 						<p class="fl" style="padding-top: .6em;"> -->
+<!-- 							<span>库存：$!product.qty</span> -->
+<!-- 						</p> -->
+						#*<p class="fr">促销优惠</p>*#
+                    </dd><!-- 商品文字 end-->
+                </dl><!-- 商品介绍 end-->
+                <div class="clear"></div>
+			</div>
+    		#end
+            <!-- 优惠 -->
+            <dl class="">
+                
+                <dd class="fr">
+                    #*<p>优惠：￥2.00</p>
+                    <p class="lin_24">优惠：<span class="font_2">￥2.00</span></p>
+    				*#
+    				#*foreach($promotion in $product.promotions)##活动只有2中类型，直降和满减
+    					<p>优惠：￥2.00</p>
+        			#end*#
+                </dd>
+            </dl>
+            <div class="clear"></div>
+        </div><!-- 商品优惠 end-->
+        <div class="clear"></div>
+    #end
+    <div class="go bg_01">
+        <p class="fl hei_32 font_1_2">
+			<i onclick="checkAll(this);"  class="fa #if($myCart.checked)fa-check-circle #else fa-circle-thin #end font_3" ></i>
+			全选
+			
+			
+		</p>
+		<p class=" hei_32 fr" style="margin-right: 1em;">
+			总计：
+			<span class="font_2">
+				￥$myCart.total
+			</span>
+		</p>
+		<div class="fr mar_t10 mar_r2">已选择$!{myCart.quantity}件商品</div>
+        <div class="font_right clear">
+<!--             <button onclick="qx();" class="button_1  hei_32 " style="display: none;" id="qx">取消</button> -->
+			<button onclick="toOrderConfirm($myCart.total);return false;" class="button_1  hei_32 " id="ljjz">立即结账</button>
+			 <button onclick="delPick();"  class="button_1  hei_32 ">删除商品</button>
+		</div>
+        <div class="clear"></div>
+    </div>
+#else
+	<div class="shop_car_empty">
+		<div class="shop_none">
+			  <img style="width: 100px;height:100px;" src="assets/images/shop.png" />
+		</div>
+		<div class="font_cen mar_t15">
+			<a href="./" class="font_e3 font_2_0">去逛逛</a>
+		</div>
+    </div>
+#end
+<div class="clear"></div>
+
+

@@ -1,0 +1,65 @@
+<input type="hidden" id="shopId" value="{{item.shopId}}"/>
+<input type="hidden" id="itemId" value="{{item.itemId}}"/>
+<input type="hidden" id="sellerId" value="{{item.sellerId}}"/>
+<input type="hidden" id="itemName" value="{{item.itemName}}"/>
+<input type="hidden" id="itemStatus" value="{{item.itemStatus}}"/>
+<input type="hidden" id="marketPrice" value="{{item.marketPrice}}"/>
+<input type="hidden" id="hasPrice" value="{{item.hasPrice}}"/>
+<input type="hidden" id="skuId" value="{{skuId}}"/>
+<input type="hidden" id="areaCode" value="{{skuItem.areaCode}}"/>
+<input type="hidden" id="logging_status" value="{{logging_status}}"/>
+<input type="hidden" id="imageServerAddr" value="{{imageServerAddr}}"/>
+<input id="address" name="address" value="$!{address}" type="hidden" />
+
+{{#if skuItem}}
+	<input type="hidden" id="qty_js" value="{{skuItem.qty}}">
+{{else}}
+	<input type="hidden" id="qty_js" value="{{item.inventory}}">
+{{/if}}
+
+<div class="op_bg po_re" onclick="show_shop_back_ctiy()"></div>
+<div class="po_ab shop_b">
+    <dl class="shopp_xinxi">
+		<div class="icon">
+        	<dt class="fl">
+				{{#if skuItem}}
+                    <img src="{{gix}}{{skuItem.skuPicUrl}}" />
+				{{else}}
+					<img src="{{gix}}{{getPicUrl0 item.picUrls}}" />
+				{{/if}}
+			</dt>
+        </div>
+        <dd class="fr mar_t10 mar_r10" style="margin-right: 5%;">
+            <div class="fl" style="padding-left: 7%;">
+                {{#compare item.hasPrice "==" 1}}
+                	{{#if skuItem}}
+                		<p class="font_e5"     guidPrice>￥{{skuItem.skuPrice}}</p>
+                	{{else}}
+                		<p class="font_e5"  guidPrice>￥{{item.guidePrice}}</p>
+                	{{/if}}
+                {{else}}
+                	没有价格，需要询价
+                {{/compare}}
+                {{#if skuItem}}
+                	<p  >库存：<span qty_js>{{skuItem.qty}}</span></p>
+            	{{else}}
+                	<p  >库存：<span qty_js>{{item.inventory}}</span></p>
+            	{{/if}}
+            </div>
+            <div class="fr" onclick="show_shop_back_ctiy()">
+                <i class="fa fa-times-circle bigfont"></i>
+            </div>
+        </dd>
+        <div class="clear"></div>
+    </dl>
+    <div class="num">
+			<h3 class="lin_55">&nbsp;&nbsp;配送地址：</h3>
+			<p>&nbsp;&nbsp;&nbsp;&nbsp;省:<select id="province_select" class="wid_63 input_3"  name="province_select" ><option>请选择</option></select></p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;市:<select id="city_select"  class="wid_63 input_3" name="city_select"><option>请选择</option></select></p>        
+    </div>
+
+</div>
+
+<script type="text/javascript">
+	js_getAddress();
+</script>

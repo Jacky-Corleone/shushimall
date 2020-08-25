@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+
+	<!--反点信息调用 -->
+    <dubbo:reference id="sattleCatExpenseExportService" registry="qingdaoRegistry"
+            owner="zhangfan" interface="com.camelot.settlecenter.service.SattleCatExpenseExportService"
+            version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    <!--结算单信息调用 -->
+    <dubbo:reference id="statementExportService" registry="qingdaoRegistry"
+             owner="zhangfan" interface="com.camelot.settlecenter.service.StatementExportService"
+             version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    <!--订单信息调用 -->
+    <dubbo:reference id="tradeOrderExportService" registry="qingdaoRegistry"
+             owner="zhangfan" interface="com.camelot.tradecenter.service.TradeOrderExportService"
+             version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+    <dubbo:reference id="citicExportService" registry="qingdaoRegistry"
+                     owner="zhangfan" interface="com.camelot.payment.CiticExportService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    <dubbo:reference id="settleItemExpenseExportService" interface="com.camelot.settlecenter.service.SettleItemExpenseExportService"
+                   owner="zhangfan"  version="1.0" protocol="dubbo"  init="true" registry="qingdaoRegistry" />
+
+
+</beans>

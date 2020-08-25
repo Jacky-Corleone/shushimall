@@ -1,0 +1,49 @@
+#set($layout = "common/order.vm")
+#if($rows.size() != $0)
+	#foreach($model in $rows)
+		<!-- 中间内容 -->
+			<p class="pad_lr5 hei_34 mar_t10 border_2">
+				<span class="fl font_5 font_1_2">对账单号:$!{model.id}</span><span
+					class="fr font_5 font_1_2">$!date.format('yyyy-MM-dd HH:mm:ss', $!{model.createDate})</span>
+			</p>
+			<dl class="border_2 pad_tb5 lin_24 pad_lr5">
+				<dt class="fl wid_75">
+					<p class="font_1_2 one wid_75">$!{model.orderCode}</p>
+					<p class="font_5 mar_t10">$!date.format('yyyy-MM-dd HH:mm:ss', $!{model.createDate})</p>
+				</dt>
+				<dd class="fr font_right wid_15">
+					<p class=" font_1_2">-72</p>
+					<p class="font_3 mar_t10">
+					##${ordreStatus}
+					#if($1 == $model.orderStates) 
+						待付款
+					#elseif($2 == $model.orderStates) 
+						待配送
+					#elseif($3 == $model.orderStates) 
+						待收货
+					#elseif($4 == $model.orderStates) 
+						待评价
+					#elseif($5 == $model.orderStates) 
+						 已完成
+					#elseif($6 == $model.orderStates) 
+						已取消
+					#elseif($7 == $model.orderStates) 
+						待审核
+					#elseif($8 == $model.orderStates) 
+						待确认
+					#else
+						haha
+					#end
+					</p>
+				</dd>
+				<div class="clear"></div>
+			</dl>
+			<div class="font_right lin_24 mar_t10 mar_r2">
+				<p class="font_1_2">总计：$!{model.amount}</p>
+				<p class="font_2">(未付：$!{model.npaidAmount})</p>
+			</div>
+		<!--中间结束 -->
+	#end		
+#else
+对账单没有数据!
+#end

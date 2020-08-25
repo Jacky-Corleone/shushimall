@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.payment.dao.RefundOrderDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="refundOrderMap" type="refundOrder">
+		<result property="id" column="id"/>
+		<result property="refundNo" column="refund_no"/>
+		<result property="orderNo" column="order_no"/>
+		<result property="itemId" column="item_id"/>
+		<result property="skuId" column="sku_id"/>
+		<result property="orderPrice" column="order_price"/>
+		<result property="orderLabel" column="order_label"/>
+		<result property="outTradeNo" column="out_trade_no"/>
+		<result property="transactionNo" column="transaction_no"/>
+		<result property="buyerId" column="buyer_id"/>
+		<result property="buyerName" column="buyer_name"/>
+		<result property="buyerPhone" column="buyer_phone"/>
+		<result property="refundAmount" column="refund_amount"/>
+		<result property="refundReason" column="refund_reason"/>
+		<result property="refundTime" column="refund_time"/>
+		<result property="refundRemark" column="refund_remark"/>
+		<result property="buyAccountNo" column="buy_account_no"/>
+		<result property="buyAccountName" column="buy_account_name"/>
+		<result property="buyBankName" column="buy_bank_name"/>
+		<result property="bankBranchJointLine" column="bank_branch_joint_line"/>
+		<result property="sameBank" column="same_bank"/>
+		<result property="orderPayBank" column="order_pay_bank"/>
+		<result property="reproNo" column="repro_no"/>
+		<result property="reproLabel" column="repro_label"/>
+		<result property="status" column="status"/>
+		<result property="created" column="created"/>
+		<result property="modifiedId" column="modified_id"/>
+		<result property="modified" column="modified"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			refund_order_.id
+ 			,refund_order_.refund_no
+ 			,refund_order_.order_no
+ 			,refund_order_.item_id
+ 			,refund_order_.sku_id
+ 			,refund_order_.order_price
+ 			,refund_order_.order_label
+ 			,refund_order_.out_trade_no
+ 			,refund_order_.transaction_no
+ 			,refund_order_.buyer_id
+ 			,refund_order_.buyer_name
+ 			,refund_order_.buyer_phone
+ 			,refund_order_.refund_amount
+ 			,refund_order_.refund_reason
+ 			,refund_order_.refund_time
+ 			,refund_order_.refund_remark
+ 			,refund_order_.buy_account_no
+ 			,refund_order_.buy_account_name
+ 			,refund_order_.buy_bank_name
+ 			,refund_order_.bank_branch_joint_line
+ 			,refund_order_.same_bank
+ 			,refund_order_.order_pay_bank
+ 			,refund_order_.repro_no
+ 			,refund_order_.repro_label
+ 			,refund_order_.status
+ 			,refund_order_.created
+ 			,refund_order_.modified_id
+ 			,refund_order_.modified
+		FROM 
+		refund_order refund_order_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.refundNo != null  and entity.refundNo !=''">
+				<![CDATA[ and refund_order_.refund_no = #{entity.refundNo} ]]>
+			</if>
+			<if test="entity.orderNo != null  and entity.orderNo !=''">
+				<![CDATA[ and refund_order_.order_no = #{entity.orderNo} ]]>
+			</if>
+			<if test="entity.outTradeNo != null  and entity.outTradeNo !=''">
+				<![CDATA[ and refund_order_.out_trade_no = #{entity.outTradeNo} ]]>
+			</if>
+			<if test="entity.transactionNo != null  and entity.transactionNo !=''">
+				<![CDATA[ and refund_order_.transaction_no = #{entity.transactionNo} ]]>
+			</if>
+			<if test="entity.buyerId != null  and entity.buyerId !=''">
+				<![CDATA[ and refund_order_.buyer_id = #{entity.buyerId} ]]>
+			</if>
+			<if test="entity.buyAccountNo != null  and entity.buyAccountNo !=''">
+				<![CDATA[ and refund_order_.buy_account_no = #{entity.buyAccountNo} ]]>
+			</if>
+			<if test="entity.orderPayBank != null  and entity.orderPayBank !=''">
+				<![CDATA[ and refund_order_.order_pay_bank = #{entity.orderPayBank} ]]>
+			</if>
+			<if test="entity.reproNo != null  and entity.reproNo !=''">
+				<![CDATA[ and refund_order_.repro_no = #{entity.reproNo} ]]>
+			</if>
+			<if test="entity.status != null">
+				<![CDATA[ and refund_order_.status = #{entity.status} ]]>
+			</if>
+			<if test="entity.orderPrice != null">
+				<![CDATA[ and refund_order_.order_price = #{entity.orderPrice} ]]>
+			</if>
+            <if test="entity.reproNos != null">
+                <![CDATA[ and refund_order_.repro_no in]]>
+                <foreach collection="entity.reproNos" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   
+   <select id="selectRefundByRePro" resultMap="refundOrderMap" parameterType="String">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where refund_order_.repro_no = #{repro}
+		]]>
+	</select>
+	
+	<select id="selectRefInfoByRefNo" resultMap="refundOrderMap" parameterType="String">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where refund_order_.refund_no = #{refundNo}
+		]]>
+	</select>
+
+    <select id="findRefInfoByReturnGoodsCode" resultMap="refundOrderMap" parameterType="String">
+        <include refid="selectAllColumns" />
+        <![CDATA[
+		where refund_order_.repro_no = #{reproNo}
+		]]>
+    </select>
+    <select id="selectRefundOrderByOrderIdAndRefundGoodsStatus" resultMap="refundOrderMap">
+        <include refid="selectAllColumns" />
+        <if test="states != null">
+			<![CDATA[
+				JOIN trade_return_goods trade_return_goods_ 
+		   	 	ON refund_order_.repro_no = trade_return_goods_.code_no
+				WHERE trade_return_goods_.order_id = #{orderId} AND trade_return_goods_.state IN 
+			]]>
+			<foreach collection="states" item="state" open="(" separator="," close=")">
+				#{state}
+			</foreach>
+		</if>
+    </select>
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="refundOrderMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		refund_order refund_order_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="refundOrder" useGeneratedKeys="true" keyProperty="id">
+		<selectKey keyProperty="refundNo" order="BEFORE" resultType="String">
+			SELECT get_refund_no()
+		</selectKey>	
+		<![CDATA[
+		insert into refund_order (
+		    	 refund_no
+		    	 ,order_no
+		    	 ,item_id
+		    	 ,sku_id
+		    	 ,order_price
+		    	 ,order_label
+		    	 ,out_trade_no
+		    	 ,buyer_id
+		    	 ,buyer_name
+		    	 ,buyer_phone
+		    	 ,refund_amount
+		    	 ,refund_reason
+		    	 ,buy_account_no
+		    	 ,buy_account_name
+		    	 ,buy_bank_name
+		    	 ,bank_branch_joint_line
+		    	 ,same_bank
+		    	 ,order_pay_bank
+		    	 ,repro_no
+		    	 ,repro_label
+		    	 ,status
+		    	 ,created
+		   )values(
+		    	#{refundNo}
+		    	,#{orderNo}
+		    	,#{itemId}
+		    	,#{skuId}
+		    	,#{orderPrice}
+		    	,#{orderLabel}
+		    	,#{outTradeNo}
+		    	,#{buyerId}
+		    	,#{buyerName}
+		    	,#{buyerPhone}
+		    	,#{refundAmount}
+		    	,#{refundReason}
+		    	,#{buyAccountNo}
+		    	,#{buyAccountName}
+		    	,#{buyBankName}
+		    	,#{bankBranchJointLine}
+		    	,#{sameBank}
+	    		,#{orderPayBank}
+		    	,#{reproNo}
+		    	,#{reproLabel}
+		    	,#{status}
+		    	,now()
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="refundOrder">
+		update refund_order set modified = now()
+		<if test="refundNo !=null">
+   			,refund_no = #{refundNo}
+   		</if>
+		<if test="itemId !=null">
+   			,item_id = #{itemId}
+   		</if>
+		<if test="skuId !=null">
+   			,sku_id = #{skuId}
+   		</if>
+   		<if test="orderPrice !=null">
+   			,order_price = #{orderPrice}
+   		</if>
+   		<if test="outTradeNo !=null">
+   			,out_trade_no = #{outTradeNo}
+  		</if>
+   		<if test="transactionNo !=null">
+   			,transaction_no = #{transactionNo}
+   		</if>
+   		<if test="buyerId !=null">
+   			,buyer_id = #{buyerId}
+   		</if>
+   		<if test="buyerName !=null">
+   			,buyer_name = #{buyerName}
+   		</if>
+   		<if test="buyerPhone !=null">
+   			,buyer_phone = #{buyerPhone}
+   		</if>
+   		<if test="refundAmount !=null">
+   			,refund_amount = #{refundAmount}
+   		</if>
+   		<if test="refundReason !=null">
+   			,refund_reason = #{refundReason}
+   		</if>
+   		<if test="refundTime !=null">
+   			,refund_time = #{refundTime}
+   		</if>
+   		<if test="refundRemark !=null">
+   			,refund_remark = #{refundRemark}
+   		</if>
+   		<if test="buyAccountNo !=null">
+   			,buy_account_no = #{buyAccountNo}
+   		</if>
+   		<if test="buyAccountName !=null">
+   			,buy_account_name = #{buyAccountName}
+   		</if>
+   		<if test="buyBankName !=null">
+   			,buy_bank_name = #{buyBankName}
+   		</if>
+   		<if test="bankBranchJointLine !=null">
+   			,bank_branch_joint_line = #{bankBranchJointLine}
+   		</if>
+   		<if test="sameBank !=null">
+   			,same_bank = #{sameBank} 
+   		</if>
+   		<if test="reproNo !=null">
+   			,repro_no = #{reproNo}
+   		</if>
+   		<if test="reproLabel !=null">
+   			,repro_label = #{reproLabel}
+   		</if>
+   		<if test="status !=null">
+   			,status = #{status}
+   		</if>
+   		<if test="modifiedId !=null">
+   			,modified_id = #{modifiedId}
+   		</if>
+		 where id = #{id}
+	</update>
+	
+</mapper>

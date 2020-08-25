@@ -1,0 +1,30 @@
+@CHARSET "UTF-8";
+
+.cart-loading {
+    background: url('../images/loading04.gif') no-repeat fixed center center;
+    height: 100%;
+    left: 0;
+    opacity: 0.9;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+    position: fixed;
+}
+
+
+.submit-loading {
+    background: url('../images/loading-3.gif') no-repeat fixed center center;
+    height: 100%;
+    left: 0;
+    opacity: 0.5;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+    position: fixed;
+    background-color: #efefef;
+}
+

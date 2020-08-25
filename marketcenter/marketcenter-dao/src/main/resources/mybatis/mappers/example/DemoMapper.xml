@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.example.dao.DemoMybatisDAO">
+
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="demoMap" type="com.camelot.example.domain.Demo">
+		<result property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="password" column="password"/>
+		<result property="status" column="status"/>
+		<result property="email" column="email"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                        -->
+    <!-- =========================================================== -->
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+			id,
+			name,
+			password,
+			status,
+			email
+		from 
+			tdemo tdemo_
+		]]>
+	</sql>
+	<sql id="where_fragement">
+		where 1=1
+			<if test="entity.id != null and entity.id != ''">
+			and id = #{entity.id}
+			</if>
+			<if test="entity.name != null and entity.name != ''">
+			and name = #{entity.name}
+			</if>
+	</sql>
+	<!-- mysql 分页尾 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- Dao方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+    <!-- 插入记录 -->
+    <insert id="add" parameterType="Object">
+		<![CDATA[
+		insert into tdemo
+		  (id
+				,name
+				,pwd
+				,createdatetime
+		   )
+		values
+		  (#{id}
+				,#{name}
+				,#{pwd}
+				,#{createDateTime}
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id查询 -->
+	<select id="queryById" resultMap="demoMap" parameterType="Object">
+		<include refid="selectAllColumns"/>
+		<![CDATA[
+		where tdemo_.id = #{id}
+		]]>	
+	</select>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="Object">
+		<![CDATA[
+		update tdemo
+		   set 
+					name = #{name},
+					modifydatetime = #{modifyDateTime}
+		 where id = #{id}
+		]]>
+	</update>
+	
+	<!-- 修改记录，只修改只不为空的字段 -->
+	<update id="updateBySelect" parameterType="Object">
+		update tdemo
+		   set
+   			<if test="name != null  ">
+				name = #{name}
+			</if>
+		 where id = #{id}
+	</update>
+	
+	<!-- 删除记录 -->
+	<delete id="delete" parameterType="Object">
+		<![CDATA[
+		delete from tdemo where id = #{id}
+		]]>
+	</delete>
+	
+	<!-- 查询总数 -->
+	<select id="queryCount" resultType="java.lang.Long">
+		select count(1) from tdemo
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="demoMap">
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<!-- order by 手工添加 -->
+		<include refid="pagination_tail" />
+	</select>
+</mapper>

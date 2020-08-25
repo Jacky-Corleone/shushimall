@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.basecenter.dao.DictionaryDAO">
+
+	<resultMap id="DictionaryDTOMapper" type="com.camelot.basecenter.dto.DictionaryDTO">
+			<result property="id" column="ID" />
+			<result property="name" column="NAME" />
+			<result property="code" column="CODE" />
+			<result property="type" column="TYPE" />
+			<result property="parentId" column="PARENT_ID" />
+			<result property="status" column="STATUS" />
+			<result property="createdTime" column="CREATED_TIME" />
+			<result property="changeTime" column="CHANGE_TIME" />
+			<result property="creater" column="CREATER" />
+			<result property="changer" column="CHANGER" />
+			<result property="parentName" column="PARENT_NAME" />
+			<result property="remark" column="REMARK" />
+			<result property="parameter1" column="PARAMETER1" />
+			
+	</resultMap>
+	
+	<select id="queryDictionaryNameList" resultMap="DictionaryDTOMapper" >
+		SELECT ID,NAME FROM base_dictionary  
+	</select>
+	
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	
+	<!-- 通过id查询字典 -->
+	<select id="queryDictionaryById" resultMap="DictionaryDTOMapper" >
+		SELECT * FROM base_dictionary WHERE ID = #{id}
+	</select>
+	
+	<select id="queryDictionaryByCode" resultMap="DictionaryDTOMapper">
+	 	SELECT NAME,CODE FROM base_dictionary 
+	 	WHERE 1=1
+	 	<if test="code != null and code != ''">
+			 and CODE = #{code}
+		</if>
+		and TYPE = #{type}
+	</select>
+	
+	<!-- 针对没有父节点ID的字典信息的查询 -->
+	<select id="queryDictionaryNoParent" resultMap="DictionaryDTOMapper">
+	 	SELECT NAME,CODE FROM base_dictionary WHERE 1=1
+		<if test="entity!=null">
+            <if test="entity.code != null and entity.code != ''">
+               	and CODE = #{entity.code}
+            </if>
+            <if test="entity.name != null and entity.name != ''">
+            	<![CDATA[ and NAME  LIKE CONCAT('%',#{entity.name},'%') ]]>
+            </if>
+            <if test="entity.type != null and entity.type != ''">
+               	and TYPE = #{entity.type}
+            </if>
+        </if>
+		<!-- 分页 -->
+		<if test="page!=null">
+            <include refid="pagination_tail"/>
+        </if>
+	</select>
+	<!-- 针对没有父节点ID的字典信息的查询 -->
+    <select id="queryCountNoParent" resultType="java.lang.Long">
+        select count(1) from base_dictionary WHERE 1=1
+       	<if test="entity!=null">
+            <if test="entity.code != null and entity.code != ''">
+               	and CODE = #{entity.code}
+            </if>
+            <if test="entity.name != null and entity.name != ''">
+            	<![CDATA[ and NAME  LIKE CONCAT('%',#{entity.name},'%') ]]>
+            </if>
+            <if test="entity.type != null and entity.type != ''">
+               	and TYPE = #{entity.type}
+            </if>
+        </if>
+    </select>
+	
+	<insert id="add" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO base_dictionary(
+			NAME,
+			CODE,
+			TYPE,
+			PARENT_ID,
+			STATUS,
+			CREATED_TIME,
+			CHANGE_TIME,
+			CREATER,
+			CHANGER,
+			REMARK,
+			PARAMETER1
+		)VALUES(
+			#{name},
+			#{code},
+			#{type},
+			#{parentId},
+			#{status},
+			#{createdTime},
+			#{changeTime},
+			#{creater},
+			#{changer},
+			#{remark},
+			#{parameter1}
+		)
+	</insert>
+	
+	<update id="update">
+		update base_dictionary 
+		<set>
+			<if test="name != null and name != ''">
+				NAME = #{name},
+			</if>
+			<if test="code != null and code !=''">
+				CODE = #{code},
+			</if>	
+			<if test="type != null and type !=''">
+				TYPE = #{type},
+			</if>	
+			<if test="parentId != null ">
+				PARENT_ID = #{parentId},
+			</if>	
+			<if test="status != null ">
+				STATUS = #{status},
+			</if>	
+			<if test="changer != null and changer !=''">
+				CHANGER = #{changer},
+			</if>
+			<if test="changeTime != null and changeTime !=''">
+				CHANGE_TIME = #{changeTime}
+			</if>
+	    </set>
+		where ID = #{id}
+	</update>
+	
+	<select id="queryDictionaryByCondition" resultMap="DictionaryDTOMapper" >
+		SELECT 
+			bd1.ID,
+			bd1.NAME,
+			bd1.CODE,
+			bt.NAME AS TYPE,
+			bd1.STATUS,
+			bd1.CREATED_TIME,
+			bd1.CHANGE_TIME,
+			bd1.CREATER,
+			bd1.CHANGER,
+			bd1.PARENT_ID,
+			bd1.REMARK,
+			bd1.PARAMETER1,
+			bd2.NAME AS PARENT_NAME
+		FROM base_dictionary bd1 
+			LEFT JOIN base_dictionary bd2 
+			ON bd2.ID=bd1.PARENT_ID 
+			LEFT JOIN bace_type bt
+			ON bd2.TYPE = bt.TYPE
+		where 1 = 1
+		<if test="entity.name != null and entity.name != ''">
+			and bd1.NAME = #{entity.name} 
+		</if>
+		<if test="entity.code != null and entity.code !=''">
+			and bd1.CODE = #{entity.code} 
+		</if>	
+		<if test="entity.type != null and entity.type !=''">
+			and bd1.TYPE = #{entity.type} 
+		</if>	
+		<if test="entity.parentId != null ">
+			and bd1.PARENT_ID = #{entity.parentId} 
+		</if>	
+		<if test="entity.status != null ">
+			and bd1.STATUS = #{entity.status}
+		</if>
+		<if test="entity.parentName != null and entity.parentName !=''">
+			and bd2.NAME = #{entity.parentName}
+		</if>
+		<if test="entity.remark != null and entity.remark !=''">
+			and bd1.REMARK = #{entity.remark}
+		</if>
+		<if test="entity.parameter1 != null and entity.parameter1 !=''">
+			and bd1.PARAMETER1 = #{entity.parameter1}
+		</if>
+		GROUP BY bd1.ID
+		<include refid="pagination_tail"/>
+	</select>
+	
+	<!-- 查询总数 -->
+	<select id="queryDictionaryByConditionCount" resultType="java.lang.Long">
+		SELECT 
+		COUNT(1)
+		FROM base_dictionary bd1 LEFT JOIN base_dictionary bd2 
+		ON bd2.ID=bd1.PARENT_ID 
+		where 1=1
+		<if test="entity.name != null and entity.name != ''">
+			and bd1.NAME = #{entity.name} 
+		</if>
+		<if test="entity.code != null and entity.code !=''">
+			and bd1.CODE = #{entity.code} 
+		</if>	
+		<if test="entity.type != null and entity.type !=''">
+			and bd1.TYPE = #{entity.type} 
+		</if>	
+		<if test="entity.parentId != null ">
+			and bd1.PARENT_ID = #{entity.parentId} 
+		</if>	
+		<if test="entity.status != null ">
+			and bd1.STATUS = #{entity.status}
+		</if>
+		<if test="entity.parentName != null and entity.parentName !=''">
+			and bd2.NAME = #{entity.parentName}
+		</if>
+		<if test="entity.remark != null and entity.remark !=''">
+			and bd1.REMARK = #{entity.remark}
+		</if>
+	</select>
+	
+    
+</mapper>

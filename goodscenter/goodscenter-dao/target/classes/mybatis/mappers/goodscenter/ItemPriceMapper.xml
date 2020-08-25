@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.goodscenter.dao.ItemPriceDAO">
+	<resultMap id="itemPriceMapper" type="com.camelot.goodscenter.domain.ItemPrice">
+			<result property="id" column="id" />
+			<result property="itemId" column="item_id" />
+			<result property="sellPrice" column="sell_price" />
+			<result property="minNum" column="min_num" />
+			<result property="maxNum" column="max_num" />
+			<result property="priceStatus" column="price_status" />
+			<result property="created" column="created" />
+			<result property="modified" column="modified" />
+			<result property="areaId" column="area_id" />
+			<result property="areaName" column="area_name" />
+			<result property="sellerId" column="seller_id" />
+			<result property="shopId" column="shop_id" />
+			<result property="stepIndex" column="step_index" />
+	</resultMap>
+	<resultMap id="itemSellPricesMap" type="com.camelot.goodscenter.dto.SellPrice"> 
+				<result property="sellPrice" column="sell_price"/>
+				<result property="maketPirce" column="market_price"/>
+				<result property="costPrice" column="cost_price"/>
+				<result property="minNum" column="min_num"/>
+				<result property="maxNum" column="max_num"/>
+				<result property="areaId" column="area_id"/>
+				<result property="areaName" column="area_name"/>
+				<result property="stepIndex" column="step_index"/>
+				<result property="shopId" column="shop_id"/>
+				
+	</resultMap>
+	
+	
+	<select id="queryPage" resultType="map">
+		select * from item_price
+	</select>
+	
+	<select id="findById" resultMap="itemPriceMapper" >
+		select * from item_price
+		where id = #{id}
+	</select>
+	
+	<insert id="add">
+		insert into item_price(
+				item_id,
+				sell_price,
+				min_num,
+				max_num,
+				price_status,
+				created,
+				modified,
+				area_id,
+				area_name,
+				seller_id,
+				shop_id,
+				step_index
+		)values(
+				#{itemId},
+				#{sellPrice},
+				#{minNum},
+				#{maxNum},
+				1,
+				now(),
+				now(),
+				#{areaId},
+				#{areaName},
+				#{sellerId},
+				#{shopId},
+				#{stepIndex}
+		)
+	</insert>
+	
+	<update id="update">
+		update item_price set
+				id = #{id},
+				item_id = #{itemId},
+				sell_price = #{sellPrice},
+				min_num = #{minNum},
+				max_num = #{maxNum},
+				price_status = #{priceStatus},
+				created = #{created},
+				modified = #{modified},
+				area_id = #{areaId},
+				area_name = #{areaName},
+				seller_id = #{sellerId},
+				shop_id = #{shopId},
+				step_index = #{stepIndex}
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from item_price
+		<if test=" codes != null and codes.size() > 0 ">
+			where id in
+			<foreach collection="codes" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test=" codes == null or codes.size() == 0 ">
+			where 1 = 3
+		</if>
+	</delete>
+	
+	<select id="findAll" resultType="map">
+		select * from item_price
+	</select>
+	
+	<select id="querySkuSellPrices" resultMap="itemSellPricesMap" >
+		SELECT 
+		  p.cost_price,
+		  p.market_price,
+		  p.sell_price,
+		  p.min_num,
+		  p.max_num,
+		  p.area_id,
+		  p.area_name,
+		  p.shop_id,
+		  p.sku_id
+		FROM
+		  trade_sku_price  p
+		WHERE p.sku_id =#{id}
+	</select>
+	
+	<!-- p.area_id 为  a,d,b,v 类字符串  ，所以查询时候判断地域id是否存在在p.area_id的字符串中 -->
+	<select id="getSkuAreaPrice" resultType="java.math.BigDecimal">
+		<![CDATA[
+		SELECT 
+		  p.sell_price
+		FROM
+		  item_sku s,
+		  trade_sku_price p 
+		WHERE 
+		  IF(find_in_set(#{param.areaCode},p.area_id) >0,find_in_set(#{param.areaCode},p.area_id) >0 ,p.area_id = 0)
+		  AND p.sku_id = s.sku_id 
+		  AND s.sku_id = #{param.skuId}
+		  AND p.max_num>=#{param.qty}
+		  AND p.min_num<=#{param.qty}
+		  ORDER BY find_in_set(#{param.areaCode},p.area_id) desc LIMIT 1
+		  ]]>
+	</select>
+	
+	<select id="queryItemSellPrices" resultMap="itemSellPricesMap" >
+		SELECT 
+		  p.sell_price,
+		  p.min_num,
+		  p.max_num,
+		  p.area_id,
+		  p.area_name,
+		  p.step_index 
+		FROM
+		  item_price p 
+		WHERE p.item_id =#{id}
+	</select>
+	
+	<select id="getItemAreaPrice" resultType="java.math.BigDecimal">
+		<![CDATA[
+		SELECT 
+		  p.sell_price
+		FROM
+		  item_price p 
+		WHERE p.item_id = #{param.skuId}
+		  AND p.area_id = #{param.areaCode}
+		  AND p.max_num>=#{param.qty}
+		  AND p.min_num<=#{param.qty}
+		  ]]>
+	</select>
+	
+	<delete id="deleteItemPrices">
+		<![CDATA[
+			DELETE FROM item_price WHERE item_price.item_id=#{itemId}
+		]]>
+	</delete>
+</mapper>

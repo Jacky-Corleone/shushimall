@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.cmscenter.dao.CMSExperStoreDAO">
+	<resultMap id="CmsExperStoreMapper" type="com.camelot.cmscenter.dto.CmsExperStoreDTO">
+			<result property="id" column="id" />
+			<result property="storeName" column="store_name" />
+			<result property="coordinate" column="coordinate" />
+			<result property="address" column="address" />
+			<result property="provinceId" column="province_id" />
+			<result property="pernetId" column="pernet_id" />
+			<result property="cityId" column="city_id" />
+			<result property="introduce" column="introduce" />
+			<result property="delFlag" column="del_flag" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			
+	</resultMap>
+
+	<select id="queryObjByid" resultMap="CmsExperStoreMapper" >
+		select * from cms_exper_store where id = #{id}
+	</select>
+	
+	<insert id="add" parameterType="com.camelot.cmscenter.dto.CmsExperStoreDTO" useGeneratedKeys="false" keyProperty="id">
+		INSERT INTO cms_exper_store (id,store_name,coordinate,address,province_id,pernet_id,city_id,introduce,del_flag,create_by,create_date,remarks)
+		VALUES(#{id},#{storeName},#{coordinate},#{address},#{provinceId},#{pernetId},#{cityId},#{introduce},#{delFlag},#{createBy},NOW(),#{remarks})
+	</insert>
+	
+	<update id="update" parameterType="com.camelot.cmscenter.dto.CmsExperStoreDTO">
+		UPDATE cms_exper_store SET store_name=#{storeName},coordinate=#{coordinate},address=#{address},
+		province_id=#{provinceId},pernet_id=#{pernetId},city_id=#{cityId},introduce=#{introduce},del_flag=#{delFlag},update_by=#{updateBy},update_date=NOW(),remarks=#{remarks} where id=#{id}
+	</update>
+
+	<select id="getCount" parameterType="com.camelot.cmscenter.dto.CmsExperStoreDTO" resultType="long">
+		select count(*) from cms_exper_store 
+		<include refid="where_fragement" />
+	</select>
+
+	<!-- 查询 -->
+	<select id="queryByPageList" resultMap="CmsExperStoreMapper">
+		select *
+		from cms_exper_store
+		<include refid="where_fragement" />
+		ORDER BY create_date ASC
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<update id="delete" parameterType="com.camelot.cmscenter.dto.CmsExperStoreDTO">
+		update cms_exper_store set del_flag=1,update_by=#{updateBy},update_date=NOW() where id = #{id}
+	</update>
+
+	<sql id="where_fragement">
+		where 1 = 1 and del_flag NOT IN (1)
+		<if test="cmsExperStoreDTO.id!=null and cmsExperStoreDTO.id!=''">
+			and id = #{cmsExperStoreDTO.id}
+		</if>
+		<if test="cmsExperStoreDTO.storeName!=null and cmsExperStoreDTO.specialSubjectCategory!=''">
+			and store_name = '%#{cmsExperStoreDTO.storeName}%' 
+		</if>
+		<if test="cmsExperStoreDTO.coordinate!=null and cmsExperStoreDTO.coordinate!=''">
+			and coordinate = #{cmsExperStoreDTO.coordinate}
+		</if>
+		<if test="cmsExperStoreDTO.address!=null and cmsExperStoreDTO.address!=''">
+			and address like  '%#{cmsExperStoreDTO.address}%' 
+		</if>
+		<if test="cmsExperStoreDTO.provinceId!=null and cmsExperStoreDTO.provinceId!=''">
+			and province_id = #{cmsExperStoreDTO.provinceId} 
+		</if>
+		<if test="cmsExperStoreDTO.cityId!=null and cmsExperStoreDTO.cityId!=''">
+			and city_id = #{cmsExperStoreDTO.cityId}
+		</if>
+		<if test="cmsExperStoreDTO.introduce!=null and cmsExperStoreDTO.introduce!=''">
+			and introduce = #{cmsExperStoreDTO.introduce}
+		</if>
+	</sql>
+
+	<sql id="pagination_tail">
+		limit #{page.pageOffset} , #{page.rows}
+	</sql>
+</mapper>

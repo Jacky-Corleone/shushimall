@@ -1,0 +1,306 @@
+#set($layout = "/none_layout.vm")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>设置广告词</title>
+<link href="$request.contextPath/static/css/manage_style.css" rel="stylesheet" type="text/css" />
+<link href="$request.contextPath/static/css/basic.css" rel="stylesheet" type="text/css" />
+
+<script language="javascript" type="text/javascript" src="$request.getContextPath()/static/js/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+</script>
+</head>
+
+<body>
+<!--头部开始-->
+<div class="header_top" style="border:none">
+	<div class="top_mid">
+       <div class="top_mid_l">
+        <i class="demo-icons fa-map-marker font_20 font_82"></i><b class="font_14 mar_r10">北京市</b>查看省份<i class="demo-icons fa-sort-desc font_14"></i>
+        <i class="demo-icons fa-weibo font_16 mar_lr10"></i>
+        <i class="demo-icons  fa-wechat font_16"></i>
+        </div><!--top_mid_l end-->
+        <div class="top_mid_r">
+        <a href="#">商城首页</a><i class="mar_lr10 font_ec">|</i>
+        <i class="demo-icons fa-star font_82"></i><a href="#">收藏夹</a><i class="demo-icons fa-sort-desc font_14 font_c7"></i>
+        <i class="mar_lr10 font_ec">|</i>
+        <i class="fa-cart"></i><a href="#">购物车</a><i class="demo-icons fa-sort-desc font_14 font_c7"></i>
+        </div><!--top_mid_r end-->
+    </div><!--top_mid end-->
+</div><!--header_top end-->
+<div class="clear"></div>
+ <!--导航菜单start-->
+ <div class="Center_head">
+   <div class="Center_head_min">
+     <div class="Center_head_Logo"><a href="#"><img src="$request.contextPath/static/images/logo.png" alt=""></a></div><!--Center_head_Logo end-->
+     <div class="Center_head_midtab">
+     	<ul>
+            <li>个人中心</li>
+        	<li class="focus_mid">卖家中心</li>
+        </ul>
+     </div><!--Center_head_midtab end -->
+     <div class="Center_head_Search">
+       <span class="Center_Search_list">
+         <ul>
+           <li><a href="#">店 铺</a></li>
+           <li><a href="#">全部</a></li>
+           <li><a href="#">知识库</a></li>
+           <li><a href="#">专家</a></li>
+           <li><a href="#">知识社区</a></li>
+           <li><a href="#">部门群落</a></li>
+         </ul>
+         <i class="Center_Search_chose fa-sort-desc"></i>
+       </span>
+       <span class="Center_Search_input_box"><input name="wwaq" type="text" class="Center_Search_input" onBlur="if(this.value=='') {this.value='搜索店铺/搜索产品';this.style.color='#999'}" onFocus="if(this.value=='搜索店铺/搜索产品') this.value='';this.style.color='#222'" onpaste="return false;" autocomplete="off" value="搜索店铺/搜索产品" style="color: rgb(153,153,153);"></span>
+       <span class="Center_Search_btn fa-search"></span><!--搜索按钮-->
+     </div><!--Center_head_Search end-->
+   </div><!--Center_head_min end-->
+ </div><!--Center_head end-->
+ <!--导航菜单end-->
+ 
+<div id="main">
+<!--中间部分开始-->
+
+<div id="leftSeller" class="border-4">
+    <div class="head-pic"><img src="$request.contextPath/static/images/pic.png" /></div>	
+    <dl>
+    <dt><i class="demo-icons fa-unlock-alt font_16 mar_r10"></i>卖家中心</dt>
+    <dd>商品管理<i class="fa-sort-up fr mar_r10"></i><!--向上class="fa-sort-up" 向下class="fa-sort-desc"的箭头--></dd>
+        <ul>
+          <li>商品列表</li>
+          <li>添加商品</li>
+          <li>库存管理</li>
+          <li>代售商品管理</li>
+          <li>销售属性管理</li>
+          <li>商品评价管理</li>
+        </ul>
+    <dd>店铺管理<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>基本设置</li>
+          <li>店铺设置管理</li>
+          <li>权限管理</li>
+          <li>公告管理</li>
+          <li>类目管理</li>
+          <li>店铺信誉</li>
+          <li>店铺装修</li>
+          <li>消息中心</li>
+        </ul>
+    <dd>订单中心<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>全部订单</li>
+          <li>等待买家付款</li>
+          <li>等待我发货</li>
+          <li>等待买家收货</li>
+          <li>需要评价</li>
+          <li>交易完成</li>
+          <li>交易取消</li>
+          <li>我收到的转单</li>
+        </ul>
+     <dd>信息设置<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>基本信息设置</li>
+          <li>安全信息设置</li>
+          <li>审核进度查看</li>
+        </ul> 
+     <dd>售后管理<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>退款处理</li>
+          <li>售后服务处理</li>
+          <li>地址管理</li>
+        </ul> 
+     <dd>运营分析<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>经营状况</li>
+          <li>销售分析</li>
+        </ul>  
+     <dd>会员管理<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>会员管理</li>
+        </ul> 
+    <dd>服务认证<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>实地认证管理</li>
+          <li>服务保障管理</li>
+        </ul>
+    <dd>促销管理<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>促销管理</li>
+        </ul> 
+   <dd>财务管理<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>提现管理</li>
+        </ul> 
+   <dd>结算中心<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>结算单管理</li>
+          <li>账务核对</li>
+        </ul> 
+    <dd>价格管理<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>协议价管理</li>
+          <li>询价管理</li>
+        </ul>  
+        <dd>物流管理<i class="fa-sort-desc fr mar_r10"></i></dd>
+        <ul>
+          <li>运费模板设置</li>
+       </ul>
+     </dl>                                      
+</div><!--left end -->
+
+<!--右边部分开始-->
+<div id="right">
+    <div id="right_top" class="right_top border-4 bg_06">
+	<form method="post" id="searchForm" action="$request.contextPath/sellcenter/sellProduct/goodsList">
+		<div class="right_top_l">
+			<ul class="list">
+				<li class="wid_220">
+					<span class="font_wid">商品名称：</span><input class="input_Style2 wid_120 hei_30" type="text" name="itemName"/>
+				</li>
+				<li class="wid_220">
+					<span class="font_wid">商品编码：</span><input type="text" class="input_Style2 wid_120 hei_30" name="id"/>
+					</li>
+				<li>
+					<span class="font_wid">店铺分类：</span>
+					<select class="input_Style2 wid_90 mar_r10 hei_35" id="levelOne">
+						<option value="">一级分类</option>
+						#foreach( $shopCategorySellerDTO in $shopCategorySellerDTOList) 
+	                    	 <option value="$!shopCategorySellerDTO.cid"> $!shopCategorySellerDTO.cname </option>
+						#end 
+					</select>
+					<select class="input_Style2 wid_90 mar_r10 hei_35" id="levelTwo" name="shopCid">
+						<option value="">二级分类</option>
+					</select>
+				</li>
+				<li class="wid_220">
+					<span class="font_wid">SKU编码：</span><input name="skuId" class="input_Style2 wid_120 hei_30" type="text" />
+				</li>
+				<li class="wid_220">
+					<span class="font_wid">商品货号：</span><input name="productId" type="text" class="input_Style2 wid_120 hei_30"/>
+					</li>
+				<li>
+					<span class="font_wid">库存区间：</span>
+						<input name="minInvetory" class="input_Style2 wid_120 hei_30" type="text" />
+						<i class="demo-icons">-</i>
+						<input name="maxInvetory" class="input_Style2 wid_120 hei_30" type="text" />				
+				</li>
+				<li>
+					<span class="font_wid">售价区间：</span>
+						<input name="minPrice" class="input_Style2 wid_120 hei_30" type="text" />
+						<i class="demo-icons">-</i>
+						<input name="maxPrice" class="input_Style2 wid_120 hei_30" type="text" />				
+				</li>
+				<li><span class="font_wid mar_l">商品状态：</span>
+					<select name="itemStatus" class="input_Style2 wid_90 mar_r10 hei_35 ">
+						<option>请选择</option>
+						<option value="1">未发布</option>
+						<option value="2">待审核</option>
+						<option value="3">待上架</option>
+						<option value="4">在售</option>
+						<option value="5">已下架</option>
+						<option value="6">锁定</option>
+						<option value="7">申请解锁</option>
+						<option value="20">审核驳回</option>
+					</select>
+				</li>		
+			</ul>
+		</div>
+    </form>
+		<div class="right_top_r ">
+			<button type="button" class="button_4 but_cx1" onclick="submitGoodsForm();">
+				<a class="font_1c hei_24" onclick="topage(1)">查 询</a>
+			</button>
+		</div>
+	</div>
+	<!-- right结束 -->
+
+	<div id="right_bot" class="right_bot border-4 mar_t10 bg_06">
+    <!-- 商品列表开头 -->
+		<div class="right_xinxi mar_l14">
+
+			<ul class="list_top bg_08 font_14b">
+				<li class="wid_260 font_cen hei_35">商品信息</li>
+				<li class="wid_80 font_cen hei_35">商品编码</li>
+				<li class="wid_120 font_cen hei_35">所属类目</li>
+				<li class="wid_120  hei_35">销售价</li>
+				<li class="wid_90 font_cen hei_35">30天销量</li>
+				<li class="wid_90 font_cen hei_35">总库存</li>
+				<li class="wid_90 font_cen hei_35">商品状态</li>
+				<li class="wid_90 font_cen hei_35">操作</li>
+			</ul>
+      <!-- 类型选择 -->
+      <ul class="right_select">
+        <li><input type="checkbox" class="mar_lr5 hei_22" id="all_select"/>全选</li>
+        <li><button type="button" class="button_4 mar_l10 hei_24"><a class="font_1c" onclick="publishMore(4);">批量上架</a></button></li>
+        <li><button type="button" class="button_4 mar_l10 hei_24"><a class="font_1c" onclick="publishMore(5);">批量下架</a></button></li>
+        <li><button type="button" class="button_4 mar_l10 hei_24"><a class="font_1c" onclick="setAdWords();">设置广告词</a></button></li>
+        <li><button type="button" class="button_4 mar_l10 hei_24"><a class="font_1c" onclick="setCategory();">迁移类目</a></button></li>
+        <span class="fr mar_tb10"><button type="button" class="button_4  hei_24 " onclick="addNewGoods();"><a class="font_1c">+添加新商品</a></button></span>
+      </ul>
+      <!-- 商品信息 -->
+      <table class="information" id="information ">
+		#foreach($goods in $pager.records)
+		<tr>
+          <td class="wid_260 border-1">
+            <input type="checkbox"  class="mar_lr5" value="$!goods.itemId" name="itemId" />
+            <img src="$!imageServerAddr$!goods.pictureUrl" width="75" height="50"/>
+            <span>$!goods.itemName</span>
+          </td>
+          <td class="wid_80 border-1 font_cen">$!goods.itemId</td>
+          <td class="wid_120 border-1 font_cen">$!goods.cName</td>
+          <td class="wid_120 border-1 font_cen">
+          	 #foreach($sellPrice in $!goods.areaPrices)
+          	 	$!sellPrice.minNum - $!sellPrice.maxNum  &nbsp;&nbsp;&nbsp;sellPrice
+          	 	<br/>
+          	 #end
+          </td>
+          <td class="wid_90 border-1 font_cen "></td>
+          <td class="wid_90 border-1 font_cen">$!goods.inventory</td>
+          <td class="wid_90 border-1 font_cen">
+          	#if($!goods.itemStatus == 1)
+          		未发布
+			#elseif($!goods.itemStatus == 2)
+				待审核
+			#elseif($!goods.itemStatus == 3)
+				待上架
+			#elseif($!goods.itemStatus == 4)
+				在售
+			#elseif($!goods.itemStatus == 5)
+				已下架
+			#elseif($!goods.itemStatus == 6)
+				锁定
+			#elseif($!goods.itemStatus == 7)
+				申请解锁
+			#else
+				审核驳回
+			#end
+          </td>
+          <td class="wid_90 border-1 ">
+          	<p class="mar_l32 wid_30">
+          		<a class="font_1c" onclick="edit();">编辑</a>
+          		<br/>
+          		#if($!goods.itemStatus == 3)
+					<a class="font_1c" onclick="publish($!goods.itemId,4);">上架</a>
+				#elseif($!goods.itemStatus == 5)
+					<a class="font_1c" onclick="publish($!goods.itemId,4);">上架</a>
+				#elseif($!goods.itemStatus == 4)
+					<a class="font_1c" onclick="publish($!goods.itemId,5);">下架</a>
+				#end
+          	</p>
+          </td>
+		</tr>
+		#end
+      </table>
+      #pageVelocity($pager)
+      <div class="clear"></div>
+	  </div>
+	</div>
+      
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->
+</body>
+</html>        
+    
+
+

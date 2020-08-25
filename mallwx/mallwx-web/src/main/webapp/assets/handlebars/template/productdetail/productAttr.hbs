@@ -1,0 +1,58 @@
+<div class="op_bg po_re"></div>
+<div class="po_ab shop_b">
+    <dl class="shopp_xinxi">
+        <dt class="fl"><img src="images/u65.png"></dt>
+        <dd class="fl mar_t10">
+            <div class="fl">
+                {{#compare item.hasPrice "==" 1}}
+                	<p class="font_e5">￥{{item.guidePrice}}</p>
+                {{else}}
+                	没有价格，需要询价
+                {{/compare}}
+            </div>
+            <div class="fr" onclick="show_hide()">
+                <i class="fa fa-times-circle"></i>
+            </div>
+        </dd>
+        <div class="clear"></div>
+    </dl>
+    <div class="shop_main mar_lr5">
+		{{#each item.attrSale}}
+			<h3 class="lin_24">{{attrSale.name}}</h3>
+			<p>
+			{{#each values}}
+				{{#if ../../skuItem}}
+					{{#each attrSales}}
+						{{#compare id "==" ../../id}}
+							{{#each values}}
+								{{#compare id "==" ../../id}}
+									<button class="button_bor js_attr border_e3" attrid="$attrSale.id" valueid="$values.id" name="$values.id:$values.name" _selected="true">$values.name</button>
+								{{else}}
+									<button class="button_bor js_attr border_ee" attrid="$attrSale.id" valueid="$values.id" name="$values.id:$values.name" _selected="false" onclick="chooseAttr(this);return false;">$values.name</button>
+								{{/compare}}
+							{{/each}}
+						{{else}}
+							
+						{{/compare}}
+					{{/each}}
+				{{else}}
+					<button class="button_bor js_attr border_ee" attrid="$attrSale.id" valueid="$values.id" name="$values.id:$values.name" _selected="false" onclick="chooseAttr(this);return false;">$values.name</button>
+				{{/if}}
+			{{/each}}
+			</p>
+		{{/each}}
+        <div class="num border_2">
+            <dl>
+                <dt class="fl">购买数量</dt>
+                <dd class="fr"><span class="kuai">+</span><input type="text" id="number_js" value="1" class="kuai" /><span class="kuai">-</span></dd>
+            </dl>
+            <div class="clear"></div>
+        </div>
+        
+         
+    </div>
+    
+</div>
+<div class="po_ab btn wid_100 font_cen">
+    <button class="button_2 hei_34 wid_60" onclick="addToCart();return false;">加入购物车</button>
+</div>

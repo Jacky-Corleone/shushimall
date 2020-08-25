@@ -1,0 +1,13 @@
+
+        <span id="login_container" style="width:100%;height:100%;padding-left:200px;"></span>
+        <script src="http://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js"></script>
+        <script>
+            var obj = new WxLogin({
+              id: "login_container",
+              appid: "wxf5eb96bb40e8722f",
+              redirect_uri: encodeURIComponent("http://ss.comeherebuy.com/wx/getToken"),
+              scope: "snsapi_login",
+              state: Math.ceil(Math.random()*1000),
+              style: "black",
+              href: ""});
+        </script>

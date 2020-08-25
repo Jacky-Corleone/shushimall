@@ -1,0 +1,69 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+<script type="text/javascript">
+	$(function(){
+		$("#leftBuyer").load("$request.contextPath/leftBuyer");
+	});
+</script>
+<!--内容流程start-->
+    <div class="stepflex" >
+        <dl class="first doing" style="width:213px;"><!--正在哪个流程就加入 doing 这个样式 -->
+            <dt class="s-num">1</dt>
+            <dd class="s-text">验证身份<s></s><b></b></dd>
+        </dl>
+        <dl class="normal"  style="width:213px;">
+            <dt class="s-num">2</dt>
+            <dd class="s-text">设置绑定信息<s></s><b></b></dd>
+        </dl>
+        <dl class="last"  style="width:214px;">
+            <dt class="s-num"><i class="fa-check"></i></dt>
+            <dd class="s-text">完成<s></s><b></b></dd>
+        </dl>
+    </div><!--stepflex end -->
+    <div class="clear"></div>   
+    <div class="register_content">
+        	<div class="register_box_mid"  style="margin-top:40px">
+            	<dl>
+                    <dt>请选择验证身份方式：</dt>
+                    <dd style="border:none">
+                    <!--第一个下拉选 -->
+                        <select name="" id="" class="input_Style1 wid_200">
+                        <option value="请选择" selected="selected"> 请选择 </option>
+                        <option value="北京"> 北京 </option>
+                        <option value="上海"> 上海 </option>
+                        <option value="广州"> 广州 </option>
+                        <option value="深圳"> 深圳 </option>
+                       </select>
+                    </dd>
+                </dl>
+                <!--如需增加可循环dl结束-->
+                <dl>
+                    <dt>昵称：</dt>
+                    <dd style="border:none">
+                    	叽叽嘎嘎
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>已验证手机：</dt>
+                    <dd style="border:none"><i class="font_16">137****6754</i>
+                    <button class="mar_lr20 button_4 hei_24" type="button"><a href="#">发送验证码</a></button>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>请填写手机校验码：</dt>
+                    <dd style="border:none"><input name="" type="text"  class="input_Style1 wid_180" />
+                    </dd>
+                </dl>
+                <div style="margin:auto"  class="font_1c">
+                    <i class="hei_24 mar_t10 mar_r10"><a href="#">新增绑定信息（手机）</a></i>
+                    <i class="hei_24 mar_t10 mar_r10"><a href="#">修改绑定信息（手机）</a></i>
+                    <i class="hei_24 mar_t10 mar_r10"><a href="#">新增绑定信息（邮箱）</a></i>
+                    <i class="hei_24 mar_t10"><a href="#">新增绑定信息（邮箱）</a></i>
+                </div>
+                <div class="button_1 hei_40 font_16">下一步</div>
+             </div><!--register_box-->
+    </div><!--register_content-->
+<!--内容end-->
+</div>
+ </body>
+</html>

@@ -1,0 +1,181 @@
+#set($staticPath="$request.contextPath/assets")
+#set($controllerPath="$request.contextPath/shopItemListIndexController")
+#set($ctx="$request.contextPath")
+#set($layout = "/shop_layout.vm")
+<script type="text/javascript" src="$staticPath/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$staticPath/js/shopdr/shopDR.js"></script>
+<script type="text/javascript" src="$staticPath/js/shopdr/shopLeft.js"></script>
+<script type="text/javascript" src="$staticPath/js/shopdr/template/template1.js"></script>
+<script type="text/javascript">
+	var ctx = "$ctx";
+	var imageServerAddr = "$!imageServerAddr";
+	var tmpColor = "$!shopTemplates.color";
+	//变换颜色
+	$(function(){
+		/**初始化模版信息*/
+		$("#index").addClass("focus_li");
+		template1.init();
+		initShopLeft();
+		if(!tmpColor){
+			tmpColor ="E50011";
+			$(".left_box .left_top").css({"height":"35px","line-height":"35px","border-bottom":"1px solid #e8e8e8","text-align":"left","font-weight":"bold","font-size":"14px","background":tmpColor,"color":"#fff"});
+			$("#changColor").css({"height":"35px","line-height":"35px","border-bottom":"1px solid #e8e8e8","text-align":"left","font-weight":"bold","font-size":"14px","background":tmpColor,"color":"#fff"});
+		}
+		
+	});
+	
+	/**推荐位编辑：选择一个产品时，修改推荐位的预览图片、图片地址等信息*/
+	function updateProImage(productId, imageUrl, itemId, price, itemName, hasPrice){
+		$("#productDialog_previewImage").attr("src","$!imageServerAddr"+imageUrl);
+		$("#productDialog_pictureUrlText").val(imageUrl);
+		$("#productDialog_skuId").val(itemId);
+		var chainUrl = "/productController/details?id=" + itemId;
+		$("#productDialog_chainUrl").val(chainUrl);
+		$("#productDialog_marketPrice").val(price);
+		$("#productDialog_itemName").val(itemName);
+        $("#productDialog_hasPrice").val(hasPrice);
+	}
+	
+	//到指定的分页页面
+	function topage(page){
+		var form = $("#contentForm").get(0);
+		form.page.value = page;
+		form.submit();
+	}
+	
+	function topage1(page){
+		$.ajax({ 
+			url: ctx + "/shopItemListIndexController/queryShopProduct", 
+			type: "post",
+			cache: false,
+			data: {
+			 itemName:$("#_itemName").val(),
+			 itemId:$("#_itemId").val(),
+			 shopId:$("#shopId").val(),
+			 page:page
+			},
+			dataType: "html",
+			success: function(data){
+				$("#prolist").html(data);
+				/*showTable(data.obj);
+				var  i=$("li a[id=back_"+page+"]").text().trim();
+				if(i==page){
+				 $("#backpage a").removeClass();
+				 $("#backpage a").removeAttr("style");
+				 $("li a[id=back_"+page+"]").css("background","#E50011");
+				}
+				 showPager(data.obj);*/
+			}
+		});
+	}
+
+
+	 //ajax查询后拼接table代码
+    function showTable(pager){
+        var list=pager.records;
+        var table = $("#information1");
+        table.empty();
+        if(list){
+            $(list).each(function (n, entity) {
+            
+                var a=$("<input>").attr("type","radio").attr("name","choiceImage").attr("onclick",'updateProImage(\''+entity.productId+'\',\''+entity.pictureUrl+'\',\''+entity.itemId+'\',\''+entity.guidePrice+'\',\''+entity.itemName+'\',\''+entity.hasPrice+'\')');
+                var tr=$("<tr>").attr("class","hei_40");
+                tr.append($("<td>").attr("class","wid_80 font_cen").append(a));
+               // tr.append($("<td>").attr("class","wid_80 font_cen").text(getcode(n+1)));
+                tr.append($("<td>").attr("class","wid_200 font_cen").text(getcode(entity.itemId)));
+                tr.append($("<td>").attr("class","wid_200 font_cen").text(getcode(entity.itemName)));
+                tr.append($("<td>").attr("class","wid_200 font_cen").text(getcode(entity.guidePrice)));
+                tr.append($("<td>").attr("class","wid_200 font_cen").text(getcode(entity.inventory)));
+                table.append(tr);
+            });
+        }
+    }
+    //ajax查询后拼接分页代码
+    function showPager(pager){
+        var page = $("#pagerul");
+        page.empty();
+        var firsta=$("<a>").attr("href","javascript:topage(1)").text("首页");
+        var firstl=$("<li>").attr("class","lastPage").append(firsta);
+        var beforea=$("<a>").attr("href","javascript:topage("+pager.previewPage+")").text("上一页");
+        var beforel=$("<li>").attr("class","lastPage").append(beforea);
+        page.append(firstl);
+        page.append(beforel);
+        for(var pageNo=pager.startPageIndex;pageNo<=pager.endPageIndex;pageNo++){
+            var zhonga=$("<a>").attr("href","javascript:topage("+pageNo+")");
+            if(pager.page==pageNo){
+                zhonga.attr("class","curr");
+            }
+            if((pager.pageCode/2)==pageNo){
+                zhonga.text("...");
+            }else{
+                zhonga.text(pageNo);
+            }
+            var zhongl=$("<li>").append(zhonga);
+            page.append(zhongl);
+        }
+        var nexta=$("<a>").attr("href","javascript:topage("+pager.nextPage+")").text("下一页");
+        var nextl=$("<li>").attr("class","nextPage").append(nexta);
+        var enda=$("<a>").attr("href","javascript:topage("+pager.totalPage+")").text("末页");
+        var endl=$("<li>").attr("class","nextPage").append(enda);
+        page.append(nextl);
+        page.append(endl);
+    }
+        function getcode(date){
+        if(date){
+            return date;
+        }else{
+            return '';
+        }
+    }
+</script>
+<form id="contentForm" action="$ctx/shopItemListIndexController/toListIndex" method="get">
+	<input type="hidden" name="shopCid" id="shopCid" value="$!itemInDTO.shopCid" />
+	<input type="hidden" name="page" id="page" value="1" />
+	<input type="hidden" name="shopId" id="shopId" value="$!shopId" />
+</form>
+
+	<input type="hidden" id="templatesId" value="$!shopTemplates.id" />
+	
+	<!-- 小广告条、导航、轮播start -->
+	#parse("/sellcenter/shop/common/shopTop.vm")
+    <!-- 小广告条、导航、轮播end -->
+	
+	<!-- 中间内容开始 -->
+	
+	<!-- 店铺广告位 开始 -->
+  	#parse("/sellcenter/shop/common/template1/ad.vm")
+	<!-- 店铺广告位 end -->
+	
+		<!--下面 包含左侧和右侧的div 开始 -->
+		<div id="shop_content">
+			<!-- 店铺优惠券 -->
+				#parse("/sellcenter/shop/common/coupons.vm")
+			<!--  优惠券结束 -->
+		
+			<!-- 商品列表-左start -->
+			#parse("/sellcenter/shop/common/shopLeft.vm")
+			<!-- 商品列表-左end -->
+			
+			<!-- 商品列表-右start -->
+			<div class="fl" id="shop_right">
+				<!--广告图片start -->
+				#parse("/sellcenter/shop/common/template1/adBigImg.vm")
+                <!--广告图片end -->
+                <!-- 产品图片start -->
+                <div class="shopping_leixin">
+                	<!-- 店铺公告 start -->
+					#parse("/sellcenter/shop/common/notice.vm")
+					<!-- 店铺公告end -->
+                	
+                    <!-- 模版1产品列表start -->
+                    #parse("/sellcenter/shop/common/template1/proList.vm")
+                    <!-- 模版1产品列表end -->
+                </div>
+                <!-- 产品图片end -->
+			</div>
+			<!-- 商品列表-右end -->
+		</div><!-- 商品分类 end-->
+  	</div><!-- shop_content end -->
+
+
+#parse("/sellcenter/shop/common/template1/dialog.vm")

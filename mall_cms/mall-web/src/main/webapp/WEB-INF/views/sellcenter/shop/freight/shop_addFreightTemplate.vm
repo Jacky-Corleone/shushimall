@@ -1,0 +1,943 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<link href="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="$staticPath/js/jQuery-jcDate.js"></script>
+<script type="text/javascript" src="$staticPath/js/common.js"></script>
+<script language="javascript" type="text/javascript" src="$request.getContextPath()/assets/js/tab.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/jquery-validation/1.11.1/jquery.validate.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/jquery-validation/1.11.1/messages_zh.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<style type="text/css">
+    .displayBlock{
+        display: block;
+    }
+    .displayNone{
+        display: none;
+    }
+</style>
+<script type="text/javascript">
+	// 解决IE8下不支持indexOf方法
+	if (!Array.prototype.indexOf){
+		Array.prototype.indexOf = function(elt){
+            var len = this.length >>> 0;
+            var from = Number(arguments[1]) || 0;
+            from = (from < 0)
+                 ? Math.ceil(from)
+                 : Math.floor(from);
+            if (from < 0)
+              from += len;
+            for (; from < len; from++){
+              if (from in this && this[from] === elt)
+                return from;
+            }
+            return -1;
+		};
+    }
+    var tancengs="";//运送至公共变量
+    var o_city="";//选择城市
+    var path = "$request.getContextPath()";
+    var minNum="";//公共变量-新增运送方式
+    var isView = "$!doType" == "view";
+    var postageFree = "$!postageFree";
+    var doType = "$!doType";
+    $(function() {
+    	var val=$('input:radio[name="valuationWay"]:checked').val();
+		jiJiaFangshi(val);
+    	//点击页面除弹出地区外地区弹出框隐藏
+    	$("body").not(".editKuaidi").on("click", function (e) {
+    		if ($(e.target).closest(".citySelect").hasClass("citySelect") || $(e.target).hasClass("editKuaidi")){
+    			
+    		}else{
+    			$("#deliveLi .city").hide();
+    		}
+        });
+    	//查看功能初始化
+    	if(isView){
+			$("#main input").attr("readonly","readonly");
+			$("#main select").attr("disabled","disabled");
+			$("#main input[type='checkbox']").attr("disabled","disabled");
+			$("#main input[type='radio']").attr("disabled","disabled");
+		}
+		
+    	var id = $("#id").val();
+    	//填充省市县下拉框
+    	if(!id && doType!="copy"){
+    		optionItems("$request.contextPath/shopBaseInfoController/queryAddress",0,"businessLicence_provinces","$!shopInfo.provinceCode");//加载省份数据
+            optionItems("$request.contextPath/shopBaseInfoController/queryAddress","$!shopInfo.provinceCode","businessLicence_city","$!shopInfo.cityCode");//加载市数据
+            /* optionItems("$request.contextPath/shopBaseInfoController/queryAddress","$!shopInfo.cityCode","businessLicence_area","$!shopInfo.districtCode");//加载县(区)数据 */
+    	}
+    	//优惠方式按件数不能输入小数
+    	if($("#deliveryTypes").val()==1){
+    		$("#manId").attr("onkeyup","value=value.replace(/[^\\d]/g,'')");
+            $("#baoyouId").attr("onkeyup","value=value.replace(/[^\\d]/g,'')");
+    	}
+    	//是否包邮点击事件
+        if((!$("#freeId").val() || $("#freeId").val()==1) && postageFree!="2"){
+            $("#postFreeId").addClass("displayBlock");
+            $("#postFreeId").removeClass("displayNone");
+        }else{
+            $("#postFreeId").addClass("displayNone");
+            $("#postFreeId").removeClass("displayBlock");
+        }
+        //优惠方式，动态更改优惠方式以及满减和包邮的单位
+        var preferentialWay="$!preferentialWay";
+        if(preferentialWay!=null && preferentialWay!="4"){
+            #foreach($deliveryTypeEnum in $deliveryTypeEnum)
+                if("$deliveryTypeEnum.code"==preferentialWay){
+                	$(".check2").attr("checked",true);
+                	 $(".o1").css("display","block");
+                     $(".o2").css("display","block");
+                    preferentislWay("$deliveryTypeEnum.label","1");
+                    jiJiaFangshi("$deliveryTypeEnum.code");
+                }
+            #end
+        }else{
+            #foreach($deliveryTypeEnum in $deliveryTypeEnum)
+                if("$deliveryTypeEnum.code"=="$!valuationWay"){
+                	$(".check1").attr("checked",true);
+                	$(".o1").css("display","block");
+                    $(".o2").css("display","block");
+                    preferentislWay("$deliveryTypeEnum.label","4");
+                    jiJiaFangshi("$deliveryTypeEnum.code");
+                }
+            #end
+        }
+        //当修改时，获取运送方式的数据数然后依次往后加1
+        var deliveryTypeResult=$("#numSize").val();
+        if(!deliveryTypeResult || deliveryTypeResult == null || deliveryTypeResult == 0){
+            minNum = 3;
+        }else{
+            minNum = parseInt(deliveryTypeResult) + 3;
+        }
+        //加载左侧菜单
+        $("#leftSeller").load("$request.contextPath/leftSeller");
+        //延期付款 和  待付款 选项卡切换
+        $('#tabs li').click(function () {
+            var $this = $(this);
+            var $t = $this.index();
+                $li.removeClass();
+                $this.addClass('active');
+        });
+
+        //以下三个事件未知
+        $("#quanguo").click(function(){
+            $(".all_chain").show();
+        })
+
+        $(".xx").click(function(){
+            $(".all_chain").hide();
+        })
+
+        $("input.jcDate").jcDate({
+            IcoClass : "jcDateIco",
+            Event : "click",
+            Speed : 100,
+            Left : 0,
+            Top : 28,
+            format : "-",
+            Timeout : 100
+        });
+
+
+        //金额点击事件
+        $(".check1").click(function(){
+            $(".manjianyuan").text("元");
+            $(".manyuan").text("元");
+            $(".check2").attr("checked",false);
+            if($(".check1").is(':checked')){
+            	$("#deliveryTypes").val("4");
+            	$(".o1").css("display","block");
+                $(".o2").css("display","block");
+                $("#manId").attr("onkeyup","numInput(this)");
+                $("#baoyouId").attr("onkeyup","numInput(this)");
+            }else{
+            	$("#deliveryTypes").val("");
+            	$(".o1").css("display","none");
+                $(".o2").css("display","none");
+            }
+            $("#jianId").val("");
+            $("#manId").val("");
+            $("#baoyouId").val("");
+        });
+        //按件数/按体积/按重量点击事件
+        $(".check2").click(function(){
+            var c2=$(".c2").text();
+            preferentislWay(c2,"1");
+            $(".check1").attr("checked",false);
+            if($(".check2").is(':checked')){
+            	$(".o1").css("display","block");
+                $(".o2").css("display","block");
+                if($('input:radio[name="valuationWay"]:checked').val()==1){
+                	$("#manId").attr("onkeyup","value=value.replace(/[^\\d]/g,'')");
+                    $("#baoyouId").attr("onkeyup","value=value.replace(/[^\\d]/g,'')");
+                }
+            }else{
+            	$("#deliveryTypes").val("");
+            	$(".o1").css("display","none");
+                $(".o2").css("display","none");
+            }
+            $("#jianId").val("");
+            $("#manId").val("");
+            $("#baoyouId").val("");
+        });
+
+        //省市县下拉框切换
+        $("#businessLicence_provinces").change(function(){
+            //$("#businessLicence_area").empty().append($("<option>").text("请选择").val(""));
+            optionItems("$request.contextPath/information/register/queryAddress",$("#businessLicence_provinces").val(),"businessLicence_city","");
+        });
+        /* $("#businessLicence_city").change(function(){
+            optionItems("$request.contextPath/information/register/queryAddress",$("#businessLicence_city").val(),"businessLicence_area","");
+        }); */
+
+        //填充省市县下拉框
+        if(id!="" || doType=="copy"){
+        	optionItems("$request.contextPath/shopBaseInfoController/queryAddress",0,"businessLicence_provinces","$!freightTemplate.provinceId");//加载省份数据
+            optionItems("$request.contextPath/shopBaseInfoController/queryAddress","$!freightTemplate.provinceId","businessLicence_city","$!freightTemplate.cityId");//加载市数据
+            //optionItems("$request.contextPath/shopBaseInfoController/queryAddress","$!freightTemplate.cityId","businessLicence_area","$!freightTemplate.countyId");//加载县(区)数据
+        }
+        //根据计价方式动态改变单位
+        $(".deliveryTypeState").click(function(){
+        	deliveryTypeStateClick();
+        });
+		function deliveryTypeStateClick(){
+			var val=$('input:radio[name="valuationWay"]:checked').val();
+			jiJiaFangshi(val);
+			$(".o1").css("display","none");
+			$(".o2").css("display","none");
+			$(".manjianyuan").text("元");
+			$(".manyuan").text("元");
+			$(".check1").attr("checked",false);
+			$(".check2").attr("checked",false);
+			$("#manId").val("");
+			$("#jianId").val("");
+			$("#baoyouId").val("");
+		}
+        //运送方式点击事件
+        $(".deliveryTypeClicks").click(function(){
+        	var deliveryType=$(this).val();
+            var strId=$(this).attr("abc");
+            if($(this).is(":checked")){
+                $("#"+strId).addClass("displayBlock");
+                $("#"+strId).removeClass("displayNone");
+            }else{
+            	if(confirm("取消后，所有区域运费将被设置为0元，且无法恢复，确定取消勾选？")){
+            		$("#"+strId).removeClass("displayBlock");
+                    $("#"+strId).addClass("displayNone");
+                    $("#jian"+deliveryType).val("");
+                    $("#yuan"+deliveryType).val("");
+                    $("#once"+deliveryType).val("");
+                    $("#fei"+deliveryType).val("");
+					// ----针对复制模版start-----
+                    $(this).parent().next().find(".jian").val("");
+                    $(this).parent().next().find(".yuan").val("");
+                    $(this).parent().next().find(".fixedDeliveryTo").text("");
+					// ----针对复制模版end-----
+                    $(this).parent().next().find(".shoujian").val("");
+                    $(this).parent().next().find(".shoufei").val("");
+                    $(this).parent().next().find(".address").val("");
+                    $(this).parent().next().find(".deliveryTo").val("");
+                    $(this).parent().next().find(".allcity").text("");
+            	}else{
+            		$(this).prop("checked",true);
+            	}
+                
+            }
+        });
+
+        //是否包邮点击事件
+        $(".postageFreeCheck").click(function(){
+            if($(this).val()==1){
+                $("#postFreeId").addClass("displayBlock");
+                $("#postFreeId").removeClass("displayNone");
+                $("input[name='valuationWay']:eq(0)").prop("checked",true);
+                deliveryTypeStateClick();
+            }else{
+            	if(confirm("选择“卖家承担运费”后，所有区域运费将被设置为0元，且无法恢复，建议先保存原有运费设置。确定继续选择？")){
+            		clearSetting();
+            	}else{
+            		$("#free1").prop("checked",true);
+            	}
+            }
+        })
+		
+		// 对于末尾带.00的整数，格式化
+		$(":text").each(function() {
+			var onkeyupVal = $(this).attr("onkeyup");
+			if (onkeyupVal&&onkeyupVal.indexOf("replace")!=-1) {
+    			$(this).val($(this).val().replace(/.00$/,''));
+			}
+		});
+    });
+	// 清空设置
+	function clearSetting(){
+		$("#postFreeId").addClass("displayNone");
+		$("#postFreeId").removeClass("displayBlock");
+        $(".deliveryTypeState").attr("checked",false);
+        $(".deliveryTypeClicks").attr("checked",false);
+        $(".jian").val("");
+        $(".yuan").val("");
+        $(".shoujian").val("");
+        $(".shoufei").val("");
+        $(".deliveryTo").val("");
+        $(".address").val("");
+        $(".allcity").text("");
+        $(".check1").attr("checked",false);
+        $(".check2").attr("checked",false);
+        $("#manId").val("");
+        $("#jianId").val("");
+        $("#baoyouId").val("");
+	}
+
+    //快递增加  删除
+    function deliveryTypeClick(id,param){
+    	var state=$('input[name="valuationWay"]:checked').val();
+        var val="";
+        $('input[name="deliveryType"]:checked').each(function(){
+            val+=$(this).val();
+        });
+        if(val.indexOf(id)==-1){
+            alert("请先选择运送方式！");
+            return false;
+        }else{
+            minNum = parseInt(minNum) + 1;
+            tancengs="tancengs"+minNum;
+            o_city="o_city"+minNum;
+            var counTryId="counTryId"+minNum;
+            $(param).css("display","block");
+            var deliveryTo="shopDeliveryTypeList["+minNum+"].deliveryTo";
+            var firstPart="shopDeliveryTypeList["+minNum+"].firstPart";
+            var firstPrice="shopDeliveryTypeList["+minNum+"].firstPrice";
+            var continues="shopDeliveryTypeList["+minNum+"].continues";
+            var deliveryType="shopDeliveryTypeList["+minNum+"].deliveryType";
+            var continuePrice="shopDeliveryTypeList["+minNum+"].continuePrice";
+            var deliveryAddress="shopDeliveryTypeList["+minNum+"].deliveryAddress";
+            var html="<tr><input type=\"hidden\" value=\""+id+"\" name=\""+deliveryType+"\"/><td class=\"pad_l10 po_re\"><span class=\""+o_city+" o_citys\">";
+            html+="<input type=\"hidden\" name=\""+deliveryTo+"\"  class=\"deliveryTo\"/>";
+            html+="<input type=\"hidden\" name=\""+deliveryAddress+"\" class=\"address\"/></span><span class=\"font_7a fr mar_r10\"><span href=\"#\"";
+            html+="onclick=\"editCountry('"+id+"','"+tancengs+"','"+o_city+"','"+counTryId+"')\" class=\"editKuaidi tanba cursor\">编辑</span></span><div class=\"citySelect "+counTryId+"\"></div></td>";
+            html+="<td class=\"font_cen\"><input onkeyup=\"value=value.replace(/[^\\d]/g,'')\" id='shou"+minNum+"' maxlength='12'  name=\""+firstPart+"\"  type=\"text\" class=\"wid_70 hei_24 input_Style2 shoujian\"/></td>";
+            html+="<td class=\"font_cen\"><input onkeyup=\"numInput(this)\"  maxlength='12' name=\""+firstPrice+"\" type=\"text\" class=\"wid_70 hei_24 input_Style2 shoufei\" /></td>";
+            html+="<td class=\"font_cen\"><input onkeyup=\"value=value.replace(/[^\\d]/g,'')\" maxlength='12' name=\""+continues+"\" type=\"text\"  class=\"wid_70 hei_24 input_Style2 shoujian\"/></td>";
+            html+="<td class=\"font_cen\"><input onkeyup=\"numInput(this)\" id='xufei"+minNum+"' maxlength='12' name=\""+continuePrice+"\" type=\"text\"  class=\"wid_70 hei_24 input_Style2 shoufei\"/></td>";
+            html+="<td class=\"font_7a font_cen\" style=\"cursor: pointer\"  onclick=\"deltr(this)\" >删除</td></tr>";
+            $(param).append(html);
+        }
+        if(state==1){
+        	$(".jian").attr("onkeyup","value=value.replace(/[^\\d]/g,'')");
+        	$(".shoujian").attr("onkeyup","value=value.replace(/[^\\d]/g,'')");
+        }else if(state==2){
+        	$(".jian").attr("onkeyup","numInput(this)");
+        	$(".shoujian").attr("onkeyup","numInput(this)");
+        }else{
+        	$(".jian").attr("onkeyup","numInput(this)");
+        	$(".shoujian").attr("onkeyup","numInput(this)");
+        }
+        
+    };
+
+    //动态改运送方式的单位
+    function jiJiaFangshi(val){
+        if(val==1){
+        	$(".jian").attr("onkeyup","value=value.replace(/[^\\d]/g,'')");
+        	$(".shoujian").attr("onkeyup","value=value.replace(/[^\\d]/g,'')");
+            $(".moren").text("件内，");
+            $(".meizengjia").text("件，");
+            $(".shou").text("首件（件）");
+            $(".xu").text("续件（件）");
+            $(".c2").text("按件数");
+        }else if(val==2){
+        	$(".jian").attr("onkeyup","numInput(this)");
+        	$(".shoujian").attr("onkeyup","numInput(this)");
+            $(".moren").text("KG内，");
+            $(".meizengjia").text("KG，");
+            $(".shou").text("首重（KG）");
+            $(".xu").text("续重（KG）");
+            $(".c2").text("按重量");
+            $("#manId").attr("onkeyup","numInput(this)");
+            $("#baoyouId").attr("onkeyup","numInput(this)");
+        }else{
+        	$(".jian").attr("onkeyup","numInput(this)");
+        	$(".shoujian").attr("onkeyup","numInput(this)");
+        	$("#manId").attr("onkeyup","numInput(this)");
+            $("#baoyouId").attr("onkeyup","numInput(this)");
+            $(".moren").text("m³内，");
+            $(".meizengjia").text("m³，");
+            $(".shou").text("首体积（m³）");
+            $(".xu").text("续体积（m³）");
+            $(".c2").text("按体积");
+        }
+		if(!$("#id")){
+			$(".jian").val("");
+	        $(".yuan").val("");
+	        $(".shoujian").val("");
+	        $(".shoufei").val("");
+		}
+    }
+
+    //点击优惠方式切换公共事件
+    function preferentislWay(c2,c3){
+        if(c3!=4){
+            $(".o1").css("display","block");
+            $(".o2").css("display","block");
+        }
+        if(c3=="1"){
+            if(c2=="按件数"){
+                $(".manjianyuan").text("件");
+                $(".manyuan").text("件");
+                $("#deliveryTypes").val("1");
+            }else if(c2=="按重量"){
+                $(".manjianyuan").text("KG");
+                $(".manyuan").text("KG");
+                $("#deliveryTypes").val("2");
+            }else{
+                $(".manjianyuan").text("m³");
+                $(".manyuan").text("m³");
+                $("#deliveryTypes").val("3");
+            }
+        }
+    }
+
+    /**
+     * 省市区数据填充
+     * parentCode 父级编码
+     * opitonId 需要填充数据的下拉列表框的id
+     * selectVal 默认选中的值
+     * name 服务器返回的数据中，作为下拉框option的text的字段名，默认为"name"
+     * code 服务器返回的数据中，作为下拉框option的value的字段名，默认为"code"
+     */
+    function optionItems(url, parentCode, optionId,selectVal, name, code){
+        $.ajax({
+            url:url,
+            type:"post",
+            data:{
+                parentCode:parentCode
+            },
+            dataType: "json",
+            success:function(data){
+                var optionItem = $("#"+optionId);
+                optionItem.empty();
+                optionItem.append($("<option>").text("请选择").val(""));
+                $.each(data, function (n, address) {
+                    if(!name){
+                        name = "name";
+                    }
+                    if(!code){
+                        code = "code";
+                    }
+                    var option = $("<option>").text(address[name]).val(address[code]);
+                    if(address.code == selectVal){
+                        option.attr("selected",true);
+                    }
+                    optionItem.append(option);
+                });
+            }
+        });
+    }
+
+    //删除刚新增的运送方式行
+    function deltr(delbtns1){
+    	if(confirm("确定删除该区域运费？")){
+    		 $(delbtns1).parents("tr").remove();
+    	}
+    };
+
+    //保存运费模板
+    function saveTemplate(){
+        //模板名称验证
+        var templateName=$.trim($("#templateName").val());
+        if(templateName==""){
+            alert("模板名称不能为空！");
+            return false;
+        }
+        //宝贝地址验证
+        var businessLicence_provinces=$("#businessLicence_provinces").val();
+        var businessLicence_city=$("#businessLicence_city").val();
+        //var businessLicence_area=$("#businessLicence_area").val();
+        if(businessLicence_provinces=="" || businessLicence_city=="" /* || businessLicence_area=="" */){
+            alert("宝贝地址不能为空！");
+            return false;
+        }
+        //发货时间验证
+        var deliveryTime=$("#deliveryTime").val();
+        if(deliveryTime==""){
+            alert("发货时间不能为空");
+            return false;
+        }
+        //运送方式验证
+        var val="";
+        var res={};
+        $('input[name="deliveryType"]:checked').each(function(){
+            val+=$(this).val()+",";
+        });
+         var postageFreeId="";
+        $('input[name="postageFree"]:checked').each(function(){
+            postageFreeId+=$(this).val();
+        });
+        if(val=="") {
+            if(postageFreeId == 1){
+                alert("请至少选择一种运送方式进行保存！");
+            return false;
+           }
+        }else{
+        	res=val.split(",");
+        	var n=0;
+        	var i=0,len=res.length;
+        	for(;i<len;){
+        		if($("#jian"+res[i]).val()==""||$("#yuan"+res[i]).val()==""||$("#once"+res[i]).val()==""||$("#fei"+res[i]).val()==""){
+        			alert("运费信息设置不完整，无法保存，请检查输入");
+            		return false;
+        		}
+        		$(".tab"+res[i]).find("td input").each(function(){
+        		    if($(this).val()==""){
+        		    	alert("运费信息设置不完整，无法保存，请检查输入");
+        		    	n=1;
+        	            return false;
+        		    }
+        		  });
+        		if(n==1){
+        	        return false;
+        	    }
+        		i++;
+        	}
+        }
+        //优惠方式校验
+        if($(".check1").is(':checked')||$(".check2").is(':checked')){
+        	if($(".r1").is(':checked')){
+        		if($.trim($("#manId").val())==""||$.trim($("#jianId").val())==""){
+        			alert("满减信息不能为空");
+        			 return false;
+        		}
+        	}else if($(".r2").is(':checked')){
+        		if($.trim($("#baoyouId").val())==""){
+        			alert("包邮信息不能为空");
+        			 return false;
+        		}
+        	}
+        }
+        var id=$("#id").val();
+        var flag=false;
+    	$.ajax({
+			url:"$request.contextPath/storecenter/freightTemplate/checkName",
+			type:"post",
+			data:{
+				templateName:templateName,
+				id:id
+			},
+			dataType: "json",
+			success:function(data){
+				 if(data.success==true){
+					 if (confirm(data.msg)){
+						flag=true;
+					}
+				 }else{
+					    flag=true;
+				 }
+				 if(flag){
+				 	$("#btn_save").loadingMsg();
+				 	var url = $("#templateForm").attr("action");
+			        var itemFormObj = $("#templateForm").serialize();
+			        $.ajax({
+			            url:url,
+			            type:"post",
+			            data:itemFormObj,
+			            dataType: "json",
+			            success:function(data){
+							$("#btn_save").hideMsg();
+			                if(data.result){
+			                    alert("保存成功!");
+			                    window.location.href = path + "/storecenter/freightTemplate/queryFreight";
+			                }else if(data.message){
+			                    alert(data.message);
+			                }else{
+			                    alert("操作失败!");
+			                }
+			            }
+			        });
+				 }
+			}
+		});
+    }
+
+    //点击编辑运送至事件
+    function editCountry(id,tancengs,o_city1,counTryId){
+    	$("#deliveLi .citySelect").html("");
+        var selecttedVals=$("."+o_city1).find(".address").val();
+        var cityText="";
+        var val="";
+        $('input[name="deliveryType"]:checked').each(function(){
+            val+=$(this).val();
+        });
+        //获取每一行已选的省份
+        $(".tab" + id + " .o_citys").each(function(){
+            cityText+=$(this).text();
+        });
+        var selectShuzu="";
+        var cityTextValue="";
+        if(selecttedVals==""){
+            cityTextValue=cityText;
+        }else{
+            cityTextValue=cityText;
+            var selectShuzu=selecttedVals.split("、");
+            for(var i=0;i<selectShuzu.length;i++){
+                //从所有的已选城市中去掉编辑旧运送地址信息
+                cityTextValue=cityTextValue.replace(selectShuzu[i],"");
+            }
+        }
+        var country="<div class=\"city bg_06 border-4 box-shadow1 po_ab "+tancengs+"\" style=\"top:50px\">";
+        country+="<h1 class=\"mar_lr10 bg_05 pad_l10 mar_tb10 hei_30\">请选择您的收货地区<i class=\"demo-icons fa-times-circle font_16 fr mar_r10 no\" style=\"cursor:pointer;\"></i></h1>";
+        #foreach($address in $!addressList)
+            #if($!{velocityCount}==$!{addressList.size()} - 1 || $!{velocityCount}==$!{addressList.size()})
+                if (selectShuzu.indexOf("$address.name")!=-1) {
+                    country += "<dl class=\"wid_200 fl hei_35\"><dd class=\"fl mar_l10\">";
+                    country += "<span erg=\"$!address.code\" style=\"border:2px solid #00a2ea;\" class=\"fl min_press_classes min_press_classes po_re border-8\">$!address.name<b class='po_ab pa_07'></b></span></dd></dl>";
+                }else {
+                    if(cityTextValue.indexOf("$address.name")!=-1) {
+                        country += "<dl class=\"wid_200 fl hei_35\"><dd class=\"fl mar_l10\">";
+                        country += "<span erg=\"$!address.code\" class=\"font_c7 fl min_press_classes\">$!address.name<b></b></span></dd></dl>";
+                    }else{
+                        country += "<dl class=\"wid_200 fl hei_35\"><dd class=\"fl mar_l10\">";
+                        country += "<span erg=\"$!address.code\" class=\"fl min_press_classes\">$!address.name<b></b></span></dd></dl>";
+                    }
+                }
+            #else
+                #if($!{velocityCount}%2!=0)
+                    if (selectShuzu.indexOf("$address.name")!=-1) {
+                        country += "<dl class=\"wid_200 fl hei_35\"><dd class=\"fl mar_l10\">";
+                        country += "<span erg=\"$!address.code\" style=\"border:2px solid #00a2ea;\" class=\"fl min_press_classes min_press_classes po_re border-8\">$!address.name<b class='po_ab pa_07'></b></span>";
+                    }else {
+                        if(cityTextValue.indexOf("$address.name")!=-1) {
+                            country += "<dl class=\"wid_200 fl hei_35\"><dd class=\"fl mar_l10\">";
+                            country += "<span erg=\"$!address.code\" class=\"font_c7 fl min_press_classes\">$!address.name</span>";
+                        }else{
+                            country += "<dl class=\"wid_200 fl hei_35\"><dd class=\"fl mar_l10\">";
+                            country += "<span erg=\"$!address.code\" class=\"fl min_press_classes\">$!address.name</span>";
+                        }
+                    }
+                #else
+                if (selectShuzu.indexOf("$address.name")!=-1) {
+                    country += "<span erg=\"$!address.code\" style=\"border:2px solid #00a2ea;\" class=\"fl min_press_classes min_press_classes po_re border-8\">$!address.name<b class='po_ab pa_07'></b></span></dd></dl>";
+                }else {
+                    if(cityTextValue.indexOf("$address.name")!=-1) {
+                        country += "<span erg=\"$!address.code\" class=\"font_c7 fl min_press_classes\">$!address.name<b></b></span></dd></dl>";
+                    }else{
+                        country += "<span erg=\"$!address.code\" class=\"fl min_press_classes\">$!address.name<b></b></span></dd></dl>";
+                    }
+                }
+                #end
+            #end
+        #end
+        country+="</div>";
+        $("."+counTryId).html(country);
+        //编辑运送地址时的js
+        $(".no").click(function(){
+            $("."+tancengs).css("display","none");
+        })
+        $("."+tancengs).css("display","none");
+        if(!$(".city").hasClass(tancengs)){
+           $(".city").addClass(tancengs);
+        }
+        o_city=o_city1;
+        $("."+tancengs).css("display","block");
+        //运送至城市点中事件
+        $("."+tancengs+" span").click(function(){
+            if(cityTextValue.indexOf($(this).text())==-1){
+                var cityCode = $(this).attr("erg");
+            if($(this).hasClass("border-8")){
+                $(this).removeClass("min_press_classes po_re border-8");
+                $(this).css("border","2px solid white");
+                $(this).addClass("fl min_press_classes ");
+                $(this).children('b').remove();
+                $("."+o_city).children("span[cityCode='"+cityCode+"']").remove();
+                var name=$("."+o_city).find(".address").val();
+                $("."+o_city).find(".address").val(name.replace($(this).text()+"、",""));
+                var code=$("."+o_city).find(".deliveryTo").val();
+                $("."+o_city).find(".deliveryTo").val(code.replace(cityCode+"、",""));
+            }else{
+                $("."+o_city).append("<span class='allcity'  cityCode='"+cityCode+"'>"+$(this).text()+'&nbsp;'+"</span>");
+                $("."+o_city).find(".address").val($(this).text()+"、"+$("."+o_city).find(".address").val());
+                $("."+o_city).find(".deliveryTo").val(cityCode+"、"+$("."+o_city).find(".deliveryTo").val());
+                $(this).addClass("min_press_classes po_re border-8");
+                $(this).css("border","2px solid #00a2ea");
+                $(this).append("<b class='po_ab pa_07'></b>");
+            }
+            }
+        });
+    }
+
+    function deleteDeliveryType(id){
+        var templateId=$("#id").val();
+        if(confirm("是否确认删除？")){
+        $.ajax({
+            url:path + "/storecenter/freightTemplate/deleteDeliveryType",
+            type:"post",
+            data:{
+                id:id
+            },
+            dataType: "json",
+            success:function(data){
+                if(data.result){
+                    alert("删除成功!");
+                    window.location.href = path + "/storecenter/freightTemplate/updateFreightTemplate?id="+templateId;
+                }else if(data.message){
+                    alert(data.message);
+                }else{
+                    alert("删除失败!");
+                }
+            },
+            error:function(){
+                alert("请求超时!");
+            }
+        });
+        }
+    }
+	
+    function cancelTemplate(){
+        window.location.href = path + "/storecenter/freightTemplate/queryFreight";
+    }
+</script>
+<div id="main">
+    <!--中间部分开始-->
+    <!--left start -->
+    <div id="leftSeller" class="border-4">
+
+    </div>
+    <!--left end -->
+    <form id="templateForm" name="templateForm" action="$request.contextPath/storecenter/freightTemplate/save" method="post">
+        <!--优惠方式type-->
+        <input type="hidden" name="shopPreferentialWayList[0].deliveryType" value="$!preferentialWay" id="deliveryTypes"/>
+        <!--选中的运送方式数据数，当修改时为新增运送方式的时候不会和现有的运送方式冲突-->
+        <input type="hidden" value="$!deliveryTypeResultSize" id="numSize"/>
+        #if($!freightTemplate.id)
+        <input type="hidden" value="$!postageFree" id="freeId" name="postageFree"/>
+        #end
+        <!--新增或者修改type-->
+        <input type="hidden" value="$!addEditType" name="addEditType" id="addEditType"/>
+        <input type="hidden" value="$!freightTemplate.id" id="id" name="id"/>
+        <div id="right" class="bg_06 border-4" style="overflow:">
+            <div class="add_newshop bg_06 mar_lr10">
+                <div class="shop_xinxi mar_t10"><!-- 添加商品属性 -->
+                    <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" >#if($!addEditType==1)新增运费模板#elseif($!addEditType==2)编辑运费模板#end</p>
+                    <ul class="list">
+                        <li class="wid_950">
+                            <span class="font_wid">模板名称：</span>
+                            <input type="text" value="$!freightTemplate.templateName" id="templateName"  name="templateName" class="wid_260 hei_30 input_Style2"  maxlength="12"/>
+                        </li>
+                        <li class="wid_950">
+                            <span class="font_wid">宝贝地址：</span>
+							<span class="mar_r10">
+								<select class="wid_180 input_Style2 hei_30" id="businessLicence_provinces" name="provinceId">
+									<option value=""  selected="selected"> 请选择 </option>
+                                    #foreach($address in $addressList)
+                                        <option value="$!address.code"> $!address.name </option>
+                                    #end
+								</select>
+							</span>
+							<span class="mar_r10">
+								<select id="businessLicence_city" name="cityId" class="wid_180 input_Style2 hei_30">
+									<option value=""  selected="selected"> 请选择 </option>
+								</select>
+							</span>
+							<!-- <span class="mar_r10">
+								<select class="wid_180 input_Style2 hei_30" id="businessLicence_area" name="countyId">
+									<option value="" selected="selected"> 请选择 </option>
+								</select>
+							</span> -->
+                        </li>
+                        <li class="wid_950">
+                            <span class="font_wid">发货时间：</span>
+							<span class="mar_r10">
+								<select id="deliveryTime" name="deliveryTime" selected="selected"  class="wid_180 input_Style2 hei_30">
+									<option value="" selected="selected" > 请选择 </option>
+									#foreach($listMap in $listMap)
+										<option #if($!deliveryTime == $!listMap.deliveryName) selected="selected" #end value="$!listMap.deliveryName"> $!listMap.deliveryName </option>
+									#end
+								</select>
+							</span>如实设定宝贝的发货时间，不仅可以避免发货咨询和纠纷，还能促进成交
+                        </li>
+                        <li class="wid_950">
+                            <span class="font_wid">是否包邮：</span>
+							<span>
+								<input type="radio" #if($!postageFree == 1 || !$!postageFree) checked="checked" #end   id="free1"
+										#if($!freightTemplate.id) disabled #end name="postageFree" class="mar_l15r5 postageFreeCheck"  value="1" />自定义运费</span>
+							<span>
+								<input type="radio"#if($!postageFree == 2) checked="checked" #end  id="free2"
+										#if($!freightTemplate.id) disabled #end  name="postageFree" class="mar_l15r5 postageFreeCheck" value="2" />卖家承担运费</span>
+                            </li>
+                        </ul>
+                        <ul id="postFreeId" class="displayBlock list">
+                        <li class="wid_950">
+                            <span class="font_wid">计价方式：</span>
+                            #foreach($deliveryTypeEnum in $deliveryTypeEnum)
+                                <span><input
+                                    #if($!valuationWay==$deliveryTypeEnum.code) 
+                                            checked="checked"
+                                    #else
+                                        #if($!{velocityCount}==1)
+                                            checked="checked"
+                                        #end
+                                    #end
+                                    #if($!freightTemplate.id)
+                                            disabled
+                                    #end
+                                            type="radio" name="valuationWay" value="$deliveryTypeEnum.code" class="mar_l15r5 deliveryTypeState"  />$deliveryTypeEnum.label</span>
+                            #end
+                        <li class="wid_950">
+                            <span class="font_wid">运送方式：</span>
+                            <span class="font_7a">除指定地区外，其余地区运费采用默认运费</span>
+                        </li>
+                        <li class="font_wid"><!--留着占位置--></li>
+                        <li class="wid_820" id="deliveLi">
+                            <!--运送方式循环开始-->
+                            #foreach($shopPreferentialWayEnum in $!shopPreferentialWayEnum)
+                                <h1 class="hei_40"><input type="checkbox" id="$!shopPreferentialWayEnum.code"
+                                    #if($!shippingmethod.indexOf("$!shopPreferentialWayEnum.code")>-1)
+                                           checked="checked"
+                                    #end
+                                           abc="display$!shopPreferentialWayEnum.code"  name="deliveryType" class="deliveryTypeClicks" value="$!shopPreferentialWayEnum.code"/>$!shopPreferentialWayEnum.label </h1>
+                                <!--快递开始 -->
+                                <div id="display$!shopPreferentialWayEnum.code" class="border-1 min-hei box-shadow1
+									#if($!shippingmethod.indexOf("$!shopPreferentialWayEnum.code")>-1)
+                                       displayBlock
+									   #else
+											displayNone
+									#end
+									">
+									#foreach($json in $!jsonArray)
+                                        #if($!json.deliveryTypeResult.deliveryTo=="0" && $!json.deliveryTypeResult.deliveryType==$!shopPreferentialWayEnum.code)
+                                            <ul class="hei_40 bg_08 mar_lr10 mar_tb10 list">
+                                                <input name="shopDeliveryTypeList[$!shopPreferentialWayEnum.code].deliveryAddress" type="hidden" value="0" />
+                                                <input name="shopDeliveryTypeList[$!shopPreferentialWayEnum.code].deliveryTo" value="0" type="hidden"/>
+                                                <input name="shopDeliveryTypeList[$!shopPreferentialWayEnum.code].deliveryType" value="$!json.deliveryTypeResult.deliveryType" type="hidden"/>
+                                                <input name="shopDeliveryTypeList[$!shopPreferentialWayEnum.code].id" value="$!json.deliveryTypeResult.id" type="hidden"/>
+                                                <li class="wid_90 font_right">默认运费：</li>
+                                                <li class="wid_150"><input onkeyup="value=value.replace(/[^\d]/g,'')"  maxlength="12" name="shopDeliveryTypeList[$!shopPreferentialWayEnum.code].firstPart" id="jian$!shopPreferentialWayEnum.code" value="$!json.deliveryTypeResult.firstPart" type="text" class="wid_80 hei_24 input_Style2 jian"/><i class="demo-icons moren">件内，</i></li>
+                                                <li class="wid_140"><input onkeyup="numInput(this)" maxlength="12"  name="shopDeliveryTypeList[$!shopPreferentialWayEnum.code].firstPrice" value="$!json.deliveryTypeResult.firstPrice" id="yuan$!shopPreferentialWayEnum.code" type="text" class="wid_80 hei_24 input_Style2 yuan"/><i class="demo-icons">元，</i></li>
+                                                <li class="wid_60 font_right">每增加</li>
+                                                <li class="wid_150"><input onkeyup="value=value.replace(/[^\d]/g,'')" maxlength="12"  name="shopDeliveryTypeList[$!shopPreferentialWayEnum.code].continues" id="once$!shopPreferentialWayEnum.code" value="$!json.deliveryTypeResult.continues" type="text" class="wid_80 hei_24 input_Style2 jian"/><i class="demo-icons meizengjia">件，</i></li>
+                                                <li class="wid_60 font_right">增加运费</li>
+                                                <li class="wid_140"><input onkeyup="numInput(this)" maxlength="12" name="shopDeliveryTypeList[$!shopPreferentialWayEnum.code].continuePrice" id="fei$!shopPreferentialWayEnum.code" value="$!json.deliveryTypeResult.continuePrice" type="text" class="wid_80 hei_24 input_Style2 yuan"/><i class="demo-icons">元</i></li>
+                                            </ul>
+											#break;
+                                        #end
+									#end
+                                    <table width="790"  border="1" cellspacing="0" cellpadding="0" class="information mar_lr10 border-4 tab$!shopPreferentialWayEnum.code">
+                                        <tr class="bg_05 font_cen">
+                                            <th width="300" height="35">运送到</th>
+                                            <th width="100" class="shou">首件（件）</th>
+                                            <th width="100">首费（元）</th>
+                                            <th width="100" class="xu">续件（件）</th>
+                                            <th width="100">续费（元）</th>
+                                            #if("$!doType" != "view")
+                                            <th width="90">操作</th>
+                                            #end
+                                        </tr>
+										#foreach($json in $!jsonArray)
+											<input type="hidden" class="address_$!shopPreferentialWayEnum.code" value=""/>
+                                            <input type="hidden" value="$!{deliveryTypeResult.size()}" id="deliveryTypeResult"/>
+											#if($!json.deliveryTypeResult.deliveryTo!="0" && $!json.deliveryTypeResult.deliveryType==$!shopPreferentialWayEnum.code)
+												#set($countNum=$!{velocityCount}+3)
+                                                <tr>
+                                                    <input name="shopDeliveryTypeList[$countNum].deliveryType" value="$!json.deliveryTypeResult.deliveryType"  type="hidden"/>
+                                                    <input name="shopDeliveryTypeList[$countNum].id" value="$!json.deliveryTypeResult.id"  type="hidden"/>
+                                                    <td class="pad_l10 po_re">
+                                                        <span class="o_citys o_city$countNum">
+                                                            <input type="hidden" value="$!json.deliveryTypeResult.deliveryAddress" name="shopDeliveryTypeList[$countNum].deliveryAddress" class="address"/>
+                                                            <input type="hidden" value="$!json.deliveryTypeResult.deliveryTo" name="shopDeliveryTypeList[$countNum].deliveryTo" class="deliveryTo"/>
+                                                                #foreach($jsonArrays in $!json.address)
+																	<span cityCode="$!jsonArrays.code" class="fixedDeliveryTo">$!jsonArrays.codeName&nbsp;</span>
+                                                                #end
+                                                        </span>
+                                                         #if("$!doType" != "view")
+                                                        <span class="font_7a fr mar_r10"><span href="#" onclick="editCountry('$!shopPreferentialWayEnum.code','tancengs$countNum','o_city$countNum','counTryId$countNum')" class="editKuaidi tanba cursor">编辑</span></span>
+                                                        #end
+                                                        <div class="citySelect counTryId$countNum"></div>
+                                                    </td>
+                                                    <td class="font_cen"><input type="text" onkeyup="value=value.replace(/[^\d]/g,'')" name="shopDeliveryTypeList[$countNum].firstPart" maxlength="12" class="wid_70 hei_24 input_Style2 jian" value="$!json.deliveryTypeResult.firstPart" /></td>
+                                                    <td class="font_cen"><input type="text" onkeyup="numInput(this)" name="shopDeliveryTypeList[$countNum].firstPrice" maxlength="12" class="wid_70 hei_24 input_Style2 yuan" value="$!json.deliveryTypeResult.firstPrice" /></td>
+                                                    <td class="font_cen"><input type="text" onkeyup="value=value.replace(/[^\d]/g,'')" name="shopDeliveryTypeList[$countNum].continues" maxlength="12" class="wid_70 hei_24 input_Style2 jian" value="$!json.deliveryTypeResult.continues"/></td>
+                                                    <td class="font_cen"><input type="text" onkeyup="numInput(this)" name="shopDeliveryTypeList[$countNum].continuePrice" maxlength="12" value="$!json.deliveryTypeResult.continuePrice" class="wid_70 hei_24 input_Style2 yuan"/></td>
+                                                    #if("$!doType" != "view")
+														#if("$!doType" == "copy")
+															<td class="font_7a font_cen" style="cursor: pointer" onclick="deltr(this)">删除</td>
+														#else
+															<td class="font_7a font_cen" style="cursor: pointer" onclick="deleteDeliveryType('$json.deliveryTypeResult.id')">删除</td>
+														#end
+                                                    #end
+                                                    </tr>
+                                            #end
+                                        #end
+##                                    #end
+                                    </table>
+                                    #if("$!doType" != "view")
+                                    <p onclick="deliveryTypeClick('$!shopPreferentialWayEnum.code','.tab$!shopPreferentialWayEnum.code')" class="mar_lr10 font_fe cursor">为指定地区城市设置运费批量操作</p>
+                                   #end
+                                    </div>
+                            #end
+                            <!--快递 结束-->
+                            <!--运送方式循环结束-->
+                        </li>
+                        <li class="wid_950" >
+                            <input name="shopPreferentialWayList[0].id"value="$!wayId"  type="hidden"/>
+                            <span class="font_wid fl">优惠方式：</span>
+                            <span class="fl">  
+								<input type="checkbox" class="check1" name="shopPreferentialWayList[0].deliveryType"/>
+                                <span class="c1">按商品金额</span>
+                                <input type="checkbox" class="check2 mar_l10" name="shopPreferentialWayList[0].deliveryType"/>
+                                <span class="c2">按件数</span>
+                            </span>
+                        </li>
+                        <li class="font_wid"><!--留着占位置--></li>
+                        <li class="wid_820" id="wayLi">
+                            <ul class="hei_40 list o1" style="display:none">
+                                <li class="wid_220" style="width:200px"><input type="radio" name="shopPreferentialWayList[0].strategy" class="r1"
+                                    #if($!strategy==1 || !$!strategy)
+                                                           checked="checked"
+                                    #end
+                                                           value="1" />
+                                    <span style="background:#a3b4cc;color:#fff;padding: 0 5px;margin-left:-2px" class="mar_lr10">满减</span>满
+                                    <input type="text" onkeyup="numInput(this)" id="manId" maxlength='12'
+                                        #if($!strategy==1)
+                                        		value="$!full"
+                                        #else
+                                           value=""
+                                        #end
+                                           name="shopPreferentialWayList[0].full" class="wid_80 hei_24 input_Style2"/><i class="demo-icons manjianyuan">元</i></li>
+                                <li class="wid_160">减<input type="text" onkeyup="numInput(this)" id="jianId" maxlength='12'
+                                    #if($!strategy==1)
+                                    		value="$!reduce"
+                                    #else
+                                                            value=""
+                                    #end
+                                                            name="shopPreferentialWayList[0].reduce" class="wid_80 hei_24 input_Style2"/><i class="demo-icons">元</i></li>
+                            </ul>
+                            <ul class="hei_40 list mar_tb10 o2" style="display:none">
+                                <li><input type="radio" value="2" class="r2" 
+                                    #if($!strategy==2)
+                                           checked="checked"
+                                    #end
+                                           name="shopPreferentialWayList[0].strategy" /><span style="background:#7fbda9;color:#fff;padding: 0 5px;margin-left:2px" class="mar_lr10">包邮</span>满
+                                    <input type="text" onkeyup="numInput(this)" id="baoyouId" maxlength='12'
+                                        #if($!strategy==2)
+                                        		value="$!full"
+                                        #else
+                                           value=""
+                                        #end
+                                           name="full" id="full" value="" class="wid_80 hei_24 input_Style2"/><i class="demo-icons manyuan">元</i>&nbsp;&nbsp;包邮</li>
+                            </ul>
+                        </li>
+                        </ul>
+                    <ul class="list">
+                        <li class="font_wid"><!--留着占位置--></li>
+                        <li class="wid_820">
+                        #if("$!doType" != "view")
+                            <button class="button_2 hei_30 mar_tb20" id="btn_save" loadMsg="正在保存..." onclick="saveTemplate()" type="button">保 存</button>
+                        #end   
+                            <button class="button_2 hei_30 mar_tb20" id="btn_cancel" onclick="cancelTemplate()" type="button">取 消</button>
+                        </li>
+                    </ul>
+                </div><!-- 添加商品属性 end -->
+            </div>
+        </div><!--id="right" end-->
+    </form>
+</div><!--#main end -->

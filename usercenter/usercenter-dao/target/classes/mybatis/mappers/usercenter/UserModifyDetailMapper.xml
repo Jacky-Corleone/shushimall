@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.usercenter.dao.UserModifyDetailMybatisDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="userModifyDetailMap" type="userModifyDetailDTO">
+				<result property="id" column="id"/>
+				<result property="modifyInfoId" column="modify_info_id"/>
+				<result property="propertiesColumn" column="properties_column"/>
+				<result property="beforeChange" column="before_change"/>
+				<result property="afterChange" column="after_change"/>
+				<result property="createTime" column="create_time"/>
+				<result property="reviewReason" column="review_reason"/>
+				<result property="reviewUserId" column="review_user_id"/>
+				<result property="reviewTime" column="review_time"/>
+				<result property="tableName" column="table_name"/>
+				<result property="beforeChangeValue" column="before_change_value"/>
+				<result property="afterChangeValue" column="after_change_value"/>
+				<result property="changeColumnName" column="change_column_name"/>
+				<result property="columnName" column="column_name"/>
+				<result property="changeValueId" column="change_value_id"/>
+				
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{pager.pageOffset} , #{pager.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,modify_info_id
+ 			,properties_column
+ 			,before_change
+ 			,after_change
+ 			,create_time
+ 			,review_reason
+ 			,review_user_id
+ 			,review_time
+ 			,table_name
+ 			,before_change_value
+ 			,after_change_value
+ 			,column_name
+ 			,change_value_id
+ 			,change_column_name
+		FROM 
+		user_modify_detail user_modify_detail_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			
+			<if test="entity.modifyInfoId != null  and entity.modifyInfoId !=''">
+				<![CDATA[ and user_modify_detail_.modify_info_id  =#{entity.modifyInfoId} ]]>
+			</if>
+<!-- 			<if test="entity.propertiesColumn != null  and entity.propertiesColumn !=''"> -->
+<!-- 				<![CDATA[ and user_modify_detail_.properties_column  LIKE '%'||#{entity.propertiesColumn}||'%' ]]> -->
+<!-- 			</if> -->
+<!-- 			<if test="entity.beforeChange != null  and entity.beforeChange !=''"> -->
+<!-- 				<![CDATA[ and user_modify_detail_.before_change  LIKE '%'||#{entity.beforeChange}||'%' ]]> -->
+<!-- 			</if> -->
+<!-- 			<if test="entity.afterChange != null  and entity.afterChange !=''"> -->
+<!-- 				<![CDATA[ and user_modify_detail_.after_change  LIKE '%'||#{entity.afterChange}||'%' ]]> -->
+<!-- 			</if> -->
+<!-- 			<if test="entity.createTime != null  and entity.createTime !=''"> -->
+<!-- 				<![CDATA[ and user_modify_detail_.create_time  LIKE '%'||#{entity.createTime}||'%' ]]> -->
+<!-- 			</if> -->
+<!-- 			<if test="entity.reviewReason != null  and entity.reviewReason !=''"> -->
+<!-- 				<![CDATA[ and user_modify_detail_.review_reason  LIKE '%'||#{entity.reviewReason}||'%' ]]> -->
+<!-- 			</if> -->
+<!-- 			<if test="entity.reviewUserId != null  and entity.reviewUserId !=''"> -->
+<!-- 				<![CDATA[ and user_modify_detail_.review_user_id  LIKE '%'||#{entity.reviewUserId}||'%' ]]> -->
+<!-- 			</if> -->
+<!-- 			<if test="entity.reviewTime != null  and entity.reviewTime !=''"> -->
+<!-- 				<![CDATA[ and user_modify_detail_.review_time  LIKE '%'||#{entity.reviewTime}||'%' ]]> -->
+<!-- 			</if> -->
+<!-- 			<if test="entity.tableName != null  and entity.tableName !=''"> -->
+<!-- 				<![CDATA[ and user_modify_detail_.table_name  LIKE '%'||#{entity.tableName}||'%' ]]> -->
+<!-- 			</if> -->
+<!-- 			<if test="entity.beforeChangeValue != null  and entity.beforeChangeValue !=''"> -->
+<!-- 				<![CDATA[ and user_modify_detail_.before_change_value  LIKE '%'||#{entity.beforeChangeValue}||'%' ]]> -->
+<!-- 			</if> -->
+<!-- 			<if test="entity.afterChangeValue != null  and entity.afterChangeValue !=''"> -->
+<!-- 				<![CDATA[ and user_modify_detail_.after_change_value  LIKE '%'||#{entity.afterChangeValue}||'%' ]]> -->
+<!-- 			</if> -->
+
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="userModifyDetailMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where user_modify_detail_.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="selectList" resultMap="userModifyDetailMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="pager!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectCount" resultType="long">
+		<include refid="count_Tail" />
+		user_modify_detail user_modify_detail_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="userModifyDetailDTO">
+		<![CDATA[
+		insert into user_modify_detail (
+		    	
+		    	 modify_info_id
+		    	 ,properties_column
+		    	 ,before_change
+		    	 ,after_change
+		    	 ,create_time
+		    	 ,review_reason
+		    	 ,review_user_id
+		    	 ,review_time
+		    	 ,table_name
+		    	 ,before_change_value
+		    	 ,after_change_value
+		    	
+		    	 ,column_name
+		    	 ,change_value_id
+		    	 ,change_column_name
+		   )values(
+		    	
+		    	#{modifyInfoId}
+		    	,#{propertiesColumn}
+		    	,#{beforeChange}
+		    	,#{afterChange}
+
+		    	,#{createTime}
+		    	,#{reviewReason}
+		    	,#{reviewUserId}
+		    	,#{reviewTime}
+		    	,#{tableName}
+		    	,#{beforeChangeValue}
+		    	,#{afterChangeValue}
+		    	,#{columnName}
+		    	,#{changeValueId}
+		    	,#{changeColumnName}
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="userModifyDetailDTO">
+		<![CDATA[
+		update user_modify_detail set
+   			id = #{id}
+   			,modify_info_id = #{modifyInfoId}
+   			,properties_column = #{propertiesColumn}
+   			,before_change = #{beforeChange}
+   			,after_change = #{afterChange}
+   			,create_time = #{createTime}
+   			,review_reason = #{reviewReason}
+   			,review_user_id = #{reviewUserId}
+   			,review_time = #{reviewTime}
+   			,table_name = #{tableName}
+   			,before_change_value = #{beforeChangeValue}
+   			,after_change_value = #{afterChangeValue}
+   			
+		 where id = #{id}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from user_modify_detail where id = #{id}
+		]]>
+	</delete>
+	
+	
+	<update id="updateTableColumnValue" parameterType="userModifyDetailDTO" >
+		<![CDATA[
+		update ${tableName} set   ${columnName} =#{afterChangeValue}
+   		
+		 where ${changeColumnName} = #{changeValueId}
+		]]>
+	</update>
+</mapper>

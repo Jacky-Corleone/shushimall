@@ -1,0 +1,290 @@
+#set($layout = "common/blanklayout.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>设置支付密码</title>
+#parse("common/scriptAndCss.vm")
+<script type="text/javascript" src="$request.contextPath/assets/plugin/common/checkPwd.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	passwordCheck.initEvent.initPage();
+});
+
+var passwordCheck = {
+		initEvent:{
+			//初识化
+			initPage:function(){
+				//初识化新密码输入框
+				this.initNewPwdInp();
+				//初识化重复新密码输入框
+				this.initReNewPwdInp();
+				//初识化提交按钮
+				this.initSubmitBtn();
+			},
+			initNewPwdInp:function(){
+				$('#loginpwd_id').keydown(passwordCheck.newPwdkeydown).keyup(passwordCheck.newPwdkeyup).focus(passwordCheck.newPwdfocusOn).blur(passwordCheck.newPwdfocusOut);
+			},
+			initReNewPwdInp:function(){
+				$('#pwd_id').focus(passwordCheck.reNewPwdfocusOn).blur(passwordCheck.reNewPwdfocusOut);
+			},
+			initSubmitBtn:function(){
+				//$('#btn_submit_modifypwd').click(passwordCheck.sumitBtnClick);
+			}
+		},
+		
+		newPwdkeydown:function(){
+			
+		},
+		
+		newPwdkeyup:function(){
+			$('#loginpwd_id').checkPwdStrong();
+		},
+		
+		newPwdfocusOut:function(){
+			$('#loginpwd_id').checkPwdOut();
+		},
+		
+		newPwdfocusOn:function(){
+			
+		},
+		
+		reNewPwdfocusOn:function(){
+			$('#pwd_id').reNewPwdfocusOn();
+		},
+		
+		reNewPwdfocusOut:function(){
+			$('#pwd_id').checkPwdToo();
+		},
+		
+		sumitBtnClick:function(){
+			if($('#loginpwd_id').checkPwdOut() && $('#pwd_id').checkPwdToo() && checkCaptcha()){
+				var uid = "$!userinfo.uid";
+				$("#uid_id").val(uid);
+				$("#from_info_pwd").submit();
+			}
+			return false;
+		}
+};
+
+//获取验证码
+function sendCaptcha(){
+	$("#mag").html("");
+	var pwd = $("#loginpwd_id").val();
+	if(!$("#loginpwd_id").checkPwdOut()){
+		$("#mag").html("密码至少由数字、字母、符号两个以上组合");
+		return false;
+	}else if(!$('#pwd_id').checkPwdToo()){
+		return false;
+	} else {
+		$("#mag").html("");
+	}
+	$("#captcha_send").html("重新发送(90)");
+	$("#captcha_send").attr("disabled", "disabled");
+	sand_timer();
+// 	var contact = $("#select_contact_id option:selected").html();
+// 	var selected = $("#select_contact_id").val();
+	var contact = 2;
+	var selected = 2;
+	var smsType = '';
+	if(selected == 1){
+		smsType = "EMAIL_SET_PAY_PWD";	
+	}else if(selected == 2){
+		smsType = "SETPAYPWD";	
+	}
+	var data = {contact:contact, type:selected,smsType:smsType};
+	$.ajax({
+		timeout:90000,
+		url:"$request.contextPath/user/send",
+		type:"post",
+		data:data,
+		success:function(data){
+			//if(data == 2){
+			//	$("#captcha_send").html("重新发送(90)");
+			//	$("#captcha_send").attr("disabled", "disabled");
+			//	sand_timer();
+			//} else 
+			data = eval("("+data+")");
+			if(data.isOK == 1) {
+				window.clearInterval(timer);//去掉定时器 
+				time = 90;
+				$("#captcha_send").removeAttr("disabled");
+				if(data.message!=''){
+					alert(data.message);
+				}else{
+					alert("验证码发送失败");
+				}
+				$("#captcha_send").html("重新发送");
+			}else{
+				$('#code_key').val(data.codeKey);
+			}
+		}
+	});
+}
+
+var time = 90;
+var timer;
+function sand_timer(){
+	timer = window.setInterval(showalert, 1000); 
+}
+function showalert(){
+	time--;
+	if(time > 0){
+		$("#captcha_send").html("重新发送(" + time + ")");
+	} else {
+		$("#captcha_send").html("发送验证码");
+		$("#captcha_send").removeAttr("disabled");
+		window.clearInterval(timer);//去掉定时器 
+		time = 90;
+	}
+}
+$(document).ready(function(){
+	//验证码
+	$("#captcha_id").focus(function(){
+		$("#mag").html("");
+	});
+	
+	$('#captcha_id').blur(function(){
+		var val = $(this).val();
+		if(val.length == 6){
+			var data = {code:val,codeKey:$('#code_key').val()};
+			$.ajax({
+				url:"$request.contextPath/user/check",
+				type:"post",
+				data:data,
+				dataType: "json",
+				success:function(data){
+					console.debug(JSON.stringify(data)+"===================");
+					if(!data.message){
+						$("#mag").html("验证码不正确");
+						$('#checked').val('');
+					} else {
+						$("#mag").html("");
+						$('#checked').val('true');
+					}
+				}
+			});
+		}
+	});
+});
+//校验验证码
+
+// $("#btn_submit_modifypwd").click(function(){
+// 	if($('#loginpwd_id').checkPwdOut() && $('#pwd_id').checkPwdToo() && checkCaptcha()){
+// 		var uid = "$!userinfo.uid";
+// 		$("#uid_id").val(uid);
+// 		$("#from_info_pwd").submit();
+// 	}
+// });
+
+function checkToo(){
+	$('#pwd_id').checkPwdToo();
+}
+
+function checkCaptcha(){
+	var captcha = $("#captcha_id").val();
+	var captchaFormat = /^[a-zA-Z0-9]{6}$/;
+	if(!captchaFormat.test(captcha)){
+		$("#mag").html("验证码不正确");
+		return false;
+	}
+	var data = {code:captcha,codeKey:$('#code_key').val()};
+	$.ajax({
+		url:"$request.contextPath/user/check",
+		type:"post",
+		data:data,
+		success:function(data){
+			console.debug(JSON.stringify(data)+"----------");
+			if(!data.message){
+				$("#mag").html("验证码不正确!");
+				$('#checked').val('');
+			} else {
+				$("#mag").html("");
+				$('#checked').val('true');
+			}
+		}
+	});
+	return $('#checked').val() == 'true' ;
+}
+
+function formSubmit(){
+	if($('#loginpwd_id').checkPwdOut() && $('#pwd_id').checkPwdToo()){
+		
+		var captcha = $("#captcha_id").val();
+		var captchaFormat = /^[a-zA-Z0-9]{6}$/;
+		if(!captchaFormat.test(captcha)){
+			$("#mag").html("验证码不正确");
+			return false;
+		}
+		var data = {code:captcha,codeKey:$('#code_key').val()};
+		$.ajax({
+			url:"$request.contextPath/user/check",
+			type:"post",
+			data:data,
+			success:function(data){
+				console.debug(JSON.stringify(data)+"----------");
+				if(!data.message){
+					$("#mag").html("验证码不正确!");
+					$('#checked').val('');
+				} else {
+					alert("密码设置成功");
+					$("#mag").html("");
+					$('#checked').val('true');
+					
+					var uid = "$!userinfo.uid";
+					$("#uid_id").val(uid);
+					$("#from_info_pwd").submit();
+				}
+			}
+		});
+		
+	}
+	
+}
+</script>
+</head>
+<body >
+
+<div id="main" class="po_ab">
+    <!-- 中间内容 -->
+    <form id="from_info_pwd" method="post" action="$request.contextPath/user/setpaypwd">
+    	<input type="hidden" name="uid" id="uid_id"/>
+    	<input type="hidden" name="level" id="level_id" value="1"/>
+        <div class="content" id="wrapper">
+            <div class="hei_100 font_cen wid_100">
+                <img src="$request.contextPath/assets/images/logo-ke.png"  style="max-width: 100%;max-height: 100%"/>
+            </div>
+            <div class="hei_50 font_cen font_1_5">设置支付密码</div>
+            <h3 class="hei_50 font_cen"><span id="mag" style="color: #c80000"></span></h3>
+            <ul class="pass mar_cen wid_87">
+                <li>
+                	<input type="password" id="loginpwd_id" name="paypwd" maxlength="25" class="wid_95  input_3" placeholder="设置密码" />
+                	<div style="display: none">
+                         <span id="pwd_level_1" class="bg_09 font_12" style="display:none">弱</span><!--密码长度为短就用第一个span -->
+                         <span id="pwd_level_2" class="bg_10 font_12" style="display:none">中</span><!--密码长度为中就用到第一个和第二个span -->
+                         <span id="pwd_level_3" class="bg_11 font_12" style="display:none">强</span><!--密码长度为高就用到第一个和第二个和第三个span -->
+                     </div>
+                </li>
+                <li>
+                	<input type="password" id="pwd_id" name="loginname" onblur="checkToo()" maxlength="25" class="wid_95  input_3" placeholder="确认密码" />
+                </li>
+                <li>
+                	<input type="text" id="select_contact_id" name="select_contact_id" class="wid_95 input_3" value="$!{userinfo.userMobile}" readonly="readonly" placeholder="输入手机号" />
+                </li>
+                <li>
+                    <input type="hidden" id='checked'>
+                    <input type="hidden" id="code_key" name="codeKey">
+                    <input type="text" id="captcha_id" name="captcha" class="wid_57 input_3 fl mar_r2" maxlength="10" placeholder="输入验证码"/>
+                    <button id="captcha_send" onclick="sendCaptcha();return false;" class="button_2 fl wid_20 hei_32 pad_lr5">获取验证码</button>
+                 </li>
+            </ul>
+            <div class="font_cen"><button id="btn_submit_modifypwd" onclick="formSubmit();return false;" class="button_1 wid_87 hei_32">确定</button></div>
+        </div>
+    </form>
+    <!-- 中间内容 end-->
+</div>
+</body>
+</html>

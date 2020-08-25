@@ -1,0 +1,132 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+
+<link href="$request.contextPath/assets/plugin/kindeditor/themes/default/default.css" rel="stylesheet" />
+<link href="$request.contextPath/assets/plugin/jquery-validation/1.11.1/jquery.validate.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/jquery-validation/1.11.1/jquery.validate.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/jquery-validation/1.11.1/messages_zh.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/ueditor/ueditor.all.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/ueditor/lang/zh-cn/zh-cn.js"></script>
+
+<script type="text/javascript">
+	$(function(){
+		//加载左侧菜单 
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+	});
+	
+	$(document).ready(function() {
+		//公告内容赋值
+		//$("#editor_id").html("$!mallNoticeDTO.noticeContent");
+		$("#noticeTitle").focus();
+		
+		
+		var ue = UE.getEditor('editor',{
+			serverUrl:'$request.contextPath/ueditor/exec',
+			imageUrlPrefix:"$!imageServerAddr"
+		});
+		ue.addListener('ready',function(){
+			
+			var imgObjs = $("#ueditor_0").contents().find("img");
+			imgObjs.each(function () {
+	           if($(this).attr("src") != "" && $(this).attr("src").indexOf("http://") < 0){
+	        	   $(this).attr("src","$!imageServerAddr"+$(this).attr("src"));
+	           }
+	           if($(this).attr("_src") != "" && $(this).attr("_src").indexOf("http://") < 0){
+	        	   $(this).attr("_src","$!imageServerAddr"+$(this).attr("_src"));
+	           }
+	        });
+			//如果是查看状态，不可编辑
+	        if('$!action'=='view'){
+				UE.getEditor('editor').setDisabled('fullscreen');
+			}
+		});
+	});
+	
+	
+	function noticeAdd(val) {
+		if(!$("#noticeTitle").val()){
+			alert("请输入公告标题");
+			$("#noticeTitle").focus();
+			return;
+		}
+		if (!UE.getEditor('editor').getContent()) {
+			alert("请输入公告内容");
+				return;
+		} else {
+			$("#noticeContent").val(UE.getEditor('editor').getContent());
+            var ct = $("#noticeContent").val();
+            if(ct.length > 20000){
+                alert("您输入的字符过长！");
+                return;
+            }
+       		$("#noticeStatus").val(val);
+       		var id = $("#noticeId").val();
+       		if(id == ""){
+       			$("#inputForm").submit();
+       		}else{
+       			$("#inputForm").attr("action","$request.contextPath/sellcenter/sellNotice/edit").submit();
+       		}
+		}
+	}
+</script>
+
+<div id="main">
+<!--中间部分开始-->
+<!--left start -->
+<div id="leftSeller" class="border-4">
+</div>
+<!--left end -->
+
+<!--右边部分开始-->
+<div id="right" class="bg_06 border-4">
+ <form id="inputForm" method="post" action="$request.contextPath/sellcenter/sellNotice/save">
+  <div class="add_newshop bg_06 mar_lr10">
+  	<input type="hidden" name="noticeId" id="noticeId" value="$!mallNoticeDTO.noticeId" />
+  	<input type="hidden" name="noticeContent" id="noticeContent"/>
+  	<input type="hidden" name="noticeStatus" id="noticeStatus" />
+  	<input type="hidden" name="page" id="page" value="1" />
+    <div class="shop_xinxi mar_t20"><!-- 添加基本信息 -->
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" >$!message</span></p>
+      <ul class="add_xx mar_t10 mar_l10 ">
+        <li class="wid_460 mar_tb10 " style="width:100%">
+        		<i class="font_fs mar_l2">*</i>公告标题 :
+        		<input name="noticeTitle" id="noticeTitle" type="text" maxlength="20" value="$!mallNoticeDTO.noticeTitle" class="input_Style2 wid_160"  #if($action=='view') readonly ='true' #end/>
+        </li>
+        <li class="wid_460 mar_tb10"><i class="font_fs mar_l2">*</i>公告内容 : 
+        	<textarea id="editor" name="content" style="width:700px;height:300px;">$!mallNoticeDTO.noticeContent</textarea><font color="red">20000字符以内</font>
+        </li>
+      </ul> 
+    </div><!-- 添加基本信息 end -->
+    <div class="clear"></div>
+    
+     <div class="shop_xinxi mar_t20"><!-- 其他信息 -->
+      <p class="mar_tb10">
+         <button type="button" class="button_2 hei_32" onclick="history.go(-1)">取消</button>
+		 #if($!action != "view" )
+		 <button type="button" class="button_2 hei_32" onclick="noticeAdd(1)">发布</button> 
+         <button type="button" class="button_2 hei_32" onclick="noticeAdd(2)">保存</button> 
+		 #end
+       </p>
+      </div><!-- 其他信息 end -->
+  </div>
+  </form>
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+
+</div><!--#main end -->
+<!--
+<script type="text/javascript">
+$(function (){
+$("input.jcDate").jcDate({                 
+  IcoClass : "jcDateIco",
+  Event : "click",
+  Speed : 100,
+  Left : 0,
+  Top : 28,
+  format : "-",
+  Timeout : 100
+});
+});
+</script>
+-->

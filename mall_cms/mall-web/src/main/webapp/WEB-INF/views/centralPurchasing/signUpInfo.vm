@@ -1,0 +1,52 @@
+#set($layout = "/none_layout.vm")
+
+	<ul class="list_top bg_08 font_14b">
+        
+        <li style="width:100px" class="font_cen hei_35">活动名称</li>
+        <li style="width:80px" class="font_cen hei_35">活动编号</li>
+        <li style="width:100px;" class="font_cen hei_35">采购单位</li>
+        <li style="width:100px;" class="font_cen hei_35">联系人</li>
+        <li style="width:100px;" class="font_cen hei_35">联系电话</li>
+        <li style="width:100px;" class="font_cen hei_35">联系地址</li>
+        <li style="width:80px" class="font_cen hei_35">预期采购数量</li> 
+        <li style="width:100px" class="font_cen hei_35">预期采购价格</li>
+      
+    </ul>
+    <table class="information border-1" style="width: 100%;" id="information ">
+	#foreach($querySignUpInfoDTO in $pager.records)
+		<tr>
+			<td  class="font_cen wid_100 border-6 hei_60">${querySignUpInfoDTO.activityName}</td>
+			<td  class="font_cen wid_80 border-6 hei_60">${querySignUpInfoDTO.activitesDetailsId}</td>
+			<td  class="font_cen wid_100 border-6 hei_60">${querySignUpInfoDTO.enterpriseName}</td>
+			<td  class="font_cen wid_100 border-6 hei_60">${querySignUpInfoDTO.enterpriseLinkman}</td>
+			<td  class="font_cen wid_100 border-6 hei_60">${querySignUpInfoDTO.phoneNo}</td>
+			<td  class="font_cen wid_100 border-6 hei_60">${querySignUpInfoDTO.address}</td>
+			<td  class="font_cen wid_80 border-6 hei_60">${querySignUpInfoDTO.enterpriseEstimateNum}</td>
+			<td  class="font_cen wid_100 border-6 hei_60">${querySignUpInfoDTO.enterpriseEstimatePrice}</td>
+		</tr>
+	#end
+</table>
+     <ul style="float:right;width:auto;margin-top: 10px;">
+		 	<li class="lastPage" style=" float:left;padding-right: 10px; padding-left: 10px; border: 1px solid #dedede;">
+		 		<a href="javascript:viewSignUpInfo(${querySignUpInfoDTO.activitesDetailsId},1)">首页</a>
+		 	</li>
+		 	<li class="lastPage" style=" float:left;padding-right: 10px; padding-left: 10px; border: 1px solid #dedede; border-left: 0px;">
+		 		<a href="javascript:viewSignUpInfo(${querySignUpInfoDTO.activitesDetailsId},$pager.previewPage)">上一页</a>
+		 	</li>
+		 	#foreach($pageNo in [$!pager.startPageIndex .. $!pager.endPageIndex])
+		 	<li style=" float:left;padding-right: 10px; padding-left: 10px; border: 1px solid #dedede; border-left: 0px;">
+		 		<a #if($pageNo==$pager.page) class="curr" #end href="javascript:viewSignUpInfo(${querySignUpInfoDTO.activitesDetailsId},$pageNo)">$pageNo</a>
+		 	</li>
+		 	#end
+		 	<li class="nextPage" style=" float:left;padding-right: 10px; padding-left: 10px; border: 1px solid #dedede; border-left: 0px;">
+		 		<a href="javascript:viewSignUpInfo(${querySignUpInfoDTO.activitesDetailsId},$pager.nextPage)">下一页</a>
+		 	</li>
+		 	<li class="nextPage" style=" float:left;padding-right: 10px; padding-left: 10px; border: 1px solid #dedede; border-left: 0px;">
+		 		<a href="javascript:viewSignUpInfo(${querySignUpInfoDTO.activitesDetailsId},$pager.totalPage)">末页</a>&nbsp;
+		 	</li>
+		 	<li class="nextPage" style=" float:left;padding-right: 10px; padding-left: 10px;">
+		 		<input type="hidden" value="$pager.totalPage" id="signTotal"/>
+		 		共$pager.totalPage页，第<input class="input_Style2 wid_20 hei_26" value="$pager.page" onkeyup="value=this.value.replace(/\\D+/g,'')" onkeydown="enter_press_page(event.keyCode||event.which);" id="pageNum"/>页
+		 		 <span class="cursor font_fe" id="signNum" onclick="page_signUp(${querySignUpInfoDTO.activitesDetailsId})">[跳转]&nbsp;&nbsp;</span>
+		 	</li>
+		 </ul>

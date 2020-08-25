@@ -1,0 +1,191 @@
+#set($layout = "common/order.vm")
+<div class="mar_lr5">
+    <!-- 发货商城 -->
+    <div class="hei_32 border_2" style="height: 66px">
+        <p class="fl"><span style="font-weight:bold">协议序号：</span>
+            <span>$!contract.contractOrderNo</span>
+            <input type="hidden" name="contractNo" value="$!contract.contractNo"/>
+        </p>
+
+        <p class="fr ">
+            <span style="font-weight:bold">协议状态：</span>
+            <span class="font_e5">$!statusMap.get($contract.status)</span>
+        </p>
+
+        <p class="fl"><span style="font-weight:bold">协议名称：</span>
+            <span>$!contract.contractName</span>
+        </p>
+        
+         <p class="fl"><span style="font-weight:bold">协议类型：</span>
+            <span>
+             #if("1"==$!contract.protocolType)
+                                           单价
+             #end
+              #if("2"==$!contract.protocolType)
+                                        数量 
+             #end
+             #if("3"==$!contract.protocolType)
+                                     总价格
+             #end
+              <input type='hidden'  maxlength='8' value="$!contract.protocolType" name='protocolType' id="protocolType" />   
+            </span>
+        </p>
+    </div>
+    <!-- 发货商城 -->
+    <!-- 发货信息 -->
+    <div class="border_2 shop_order pad_tb5">
+        <p><span class="font_e5" style="font-size:15px">买方信息</span></p>
+
+        <p class="fl shop_order_p" style="margin-left:0%">
+            <span style="font-weight:bold">联系人：</span>
+            <span>$!buyer.uname</span>
+        </p>
+
+        <div class="clear"></div>
+        <p class="fl shop_order_p" style="margin-left:0%">
+            <span style="font-weight:bold">公司名称：</span>
+            <span>$!buyer.companyName</span>
+        </p>
+
+        <div class="clear"></div>
+        <p class="fl shop_order_p" style="margin-left:0%">
+            <span style="font-weight:bold">联系人电话：</span>
+            <span>$!buyer.umobile</span>
+        </p>
+
+        <div class="clear"></div>
+        <p class="fl shop_order_p" style="margin-left:0%">
+            <span style="font-weight:bold">联系人邮箱：</span>
+            <span>$!buyer.userEmail</span>
+        </p>
+
+        <div class="clear"></div>
+    </div>
+
+    <div class="border_2 shop_order pad_tb5">
+        <p><span class="font_e5" style="font-size:15px">卖方信息</span></p>
+
+        <p class="fl shop_order_p" style="margin-left:0%">
+            <span style="font-weight:bold">联系人：</span>
+            <span>$!seller.uname</span>
+        </p>
+
+        <div class="clear"></div>
+        <p class="fl shop_order_p" style="margin-left:0%">
+            <span style="font-weight:bold">公司名称：</span>
+            <span>$!seller.companyName</span>
+        </p>
+
+        <div class="clear"></div>
+        <p class="fl shop_order_p" style="margin-left:0%">
+            <span style="font-weight:bold">联系人电话：</span>
+            <span>$!seller.umobile</span>
+
+        </p>
+
+        <div class="clear"></div>
+        <p class="fl shop_order_p" style="margin-left:0%">
+            <span style="font-weight:bold">联系人邮箱：</span>
+            <span>$!seller.userEmail</span>
+        </p>
+
+        <div class="clear"></div>
+    </div>
+    <div class="border_2 shop_order pad_tb5">
+        <ul class="font_t" style="float:left;width:40%">
+            <li style="font-weight:bold">协议开始日期</li>
+            <div class="clear"></div>
+            <li>$!date.format('yyyy-MM-dd',$contract.beginDate)</li>
+        </ul>
+        <ul class="font_t" style="float:right;width:40%">
+            <li style="float:right;font-weight:bold">协议结束日期</li>
+            <div class="clear"></div>
+            <li style="float:right">$!date.format('yyyy-MM-dd',$contract.endDate)</li>
+        </ul>
+        <div class="clear"></div>
+    </div>
+
+    <input type="hidden" value="$contract.contractNo" name="contrantNo">
+    <input type="hidden" value="$date.format('yyyy-MM-dd',$contract.beginDate)" name="contractBeginDate">
+    <input type="hidden" value="$date.format('yyyy-MM-dd',$contract.endDate)" name="contractEndDate">
+
+    <div class="border_2 shop_order pad_tb5">
+        <p class="wid_69 fl" style="font-weight:bold">账期</p>
+
+        <div class="fr lin_24">
+            #if($contractPayment.paymentType==1)
+                <p>$!contractPayment.paymentDays月</p>
+            #else
+                <p>$!contractPayment.paymentDays天</p>
+            #end
+        </div>
+        <div class="clear"></div>
+    </div>
+     #foreach($contractMat in $contract.contractMatDTOs)
+    <div id="contractOrderItem">
+            <ul class="mar_lr5"  >
+                <div class="hei_32 border_2">
+                    <p class="fl over_ell">
+                        <input type="checkbox" name="chosenItem">
+                        <span>商品名称：$!contractMat.get("itemName")</span>
+                    </p>
+                    <input type="hidden" value="$contract.supplierId" name="sellerId">
+                    <input type="hidden" name="shopId" value="$!contractMat.get('shopId')">
+                    <input type="hidden" name="skuId" value="$!contractMat.get('skuId')">
+                    <input type="hidden" name="itemId" value="$!contractMat.get('itemId')">
+                    <input type="hidden" name="skuPrice" value="$!contractMat.get('matPrice')">
+                    <input type="hidden" name="matId" value="$contractMat.get('id')">
+                </div>
+                <div class="border_2 shop_order pad_tb5" id="shop_order">
+                    <p class="wid_95 fl shop_order_p over_ell" style="height: 40px;">
+                        <span>商品编号：$!contractMat.get("skuId")</span>
+                    </p>
+
+                    <p class="wid_95 fl shop_order_p over_ell" style="height: 40px;">
+                        <span>商品属性：$!contractMat.get("salerAttr")</span>
+                    </p>
+                    
+                    #if("2"==$!contract.protocolType)
+                    <p class="wid_95 fl shop_order_p over_ell" style="height: 40px;">
+                        <span>总数量：$!contractMat.get("number")</span>
+                       	<input type='hidden' maxlength='8' class='form-control wid_30 hei_24' value="$!contractMat.get('number')" name='number' id='numberec'/>
+                  		#foreach($countCostList in $countCostList)
+  	  						 #if($!contractMat.get('skuId')==$!countCostList.skuId)
+                       			 <span>已购买数量：$!countCostList.number</span>
+                       			 <input type='hidden'  maxlength='8' class='form-control wid_30 hei_24' value="$!countCostList.number" name='countNumber' id="countNumber" />   
+                         	#end
+        		    	 #end
+                   </p>
+                    #end
+                     #if("3"==$!contract.protocolType)
+ 					<p class="wid_95 fl shop_order_p" style="height: 40px;">
+                        <span>总价值：￥$!contractMat.get("cost")
+                        </span>
+                       <input type='hidden'  maxlength='8' class='form-control wid_30 hei_24' value="$!contractMat.get('cost')" name='cost' id="costec" />   
+						#foreach($countCostList in $countCostList)
+  	  						 #if($!contractMat.get('skuId')==$!countCostList.skuId)
+                       			 <span>已购买金额：￥$!countCostList.pay</span>
+                       			 <input type='hidden'  maxlength='8' class='form-control wid_30 hei_24' value="$!countCostList.pay" name='countpay' id="countpay" />   
+                         	#end
+        		    	 #end
+					
+					</p>
+                    #end
+                    <p class="wid_95 fl shop_order_p" style="height: 40px;">数量：
+                        <input  type= "tel" name="quantity" onblur="if(this.value=='')value=1;accounts(this);" 
+                               onfocus="if(this.value==1)value='';" value=1 class="wid_11 input_3" id="quantity">
+                        <span class="fr">￥$!contractMat.get("matPrice")</span>
+                     </p>
+                      <p >
+                        <input type='hidden'  maxlength='8' class='form-control wid_30 hei_24' value="$!contractMat.get('matPrice')" name='matPriceec' id="matPriceec" />   
+                     </p>
+                    <div class="clear"></div>
+                </div>
+            </ul>
+    </div>
+    #end
+       
+    <div class="clear"></div>
+    <div style="width:100%;padding-top:25%">
+    </div>
+</div>

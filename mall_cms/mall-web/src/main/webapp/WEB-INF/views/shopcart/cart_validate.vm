@@ -1,0 +1,66 @@
+#set($layout = "/none_layout.vm")
+#if( $myCart.unusualCount > 0 || $myCart.unusualMsg.size() > 0)
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$(".mc_prompt_close").click(function(){
+			$(this).parents(".po_fai").fadeOut();
+			#if( $myCart.unusualCount > 0 )
+				location.href = "$request.contextPath/shopCart/toCart";
+			#else
+				toOrderDetail();
+			#end
+		});
+	});
+</script>
+<div class="po_fai">
+    <div class="po_fai_bg"></div>
+    <div class="po_main" style="min-height:200px;overflow-y: auto;">
+		<span class="mc_prompt_close" style="top: 5px; right: 5px;">
+			<i class="fa-times-circle font_18" title="点击关闭返回购物车列表"></i>
+		</span>
+		#if( $myCart.unusualCount > 0 )
+			#foreach( $shop in $myCart.shops )
+    			#if( $shop.unusualCount > 0 )
+    				<div class="man1_con">
+        				#foreach( $product in $shop.products )
+        					#if($product.unusualState)
+    			        		<div style="margin-bottom: 5px; height: 70px; line-height: 70px;">
+    			 	          		<div style="float:left; width: 64px;height: 64px; margin-right: 5px;">
+    			 		               	<img src="$!imageServerAddr$!product.src" style="width: 64px;height: 64px;"/>
+    			        	   		</div>
+    			    	            <div style="float:left; line-height: 35px; width: 180px;">
+    			     		           	<span>$product.title</span><br>
+    			      		      		<span style="height: 30px;width: 180px; white-space:nowrap; overflow: hidden; text-overflow: ellipsis;">
+    			           		 			#foreach( $attr in $product.attrs )
+    			            					$attr.name:$attr.value &nbsp;
+    			            				#end
+    			            			</span>
+    			                	</div>
+    			                	<div style="float:left; width: 230px; height: 70px; line-height: 35px; white-space:nowrap; overflow: hidden; text-overflow: ellipsis;">
+    									<span style="color: #c90202;">
+    										#foreach($unusualMsg in $product.unusualMsg )
+    											$unusualMsg<br>
+    										#end
+    									</span>
+    			               		</div>
+    			             	</div>
+    			         	#end
+        				#end
+        			</div>
+        		#end
+        	#end
+		#end
+		#if( $myCart.unusualMsg.size() > 0 )
+            <div class="fl" style="width:100%">
+				#foreach( $unusualMsg in $myCart.unusualMsg )
+					<span style="display:block;color: #c90202;height:18px;line-height:18px">
+						$unusualMsg
+					</span><br>
+    			#end
+			</div>
+		#end
+	</div>
+</div>
+
+#end

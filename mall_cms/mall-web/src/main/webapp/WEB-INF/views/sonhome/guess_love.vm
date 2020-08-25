@@ -1,0 +1,30 @@
+#set($layout = "/none_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+#if($guessLovePage.records && $guessLovePage.records.size() > 0 )
+       #foreach($ad in $guessLovePage.records )
+       
+       <dl class="top_dl fl bg_06 mar_r10 box_shadow">
+            <dt class="fl"><a onclick="adVisit('$!ad.id','$!ad.adURL',1)" href="javascript:void(0);" >
+   				<img  title="" src="$!imageServerAddr$!ad.adSrc" class="imgk" width="190" height="190">
+   			</a></dt>
+            <dd class="fl">
+                <h2 class="mar_b10"></h2>
+                <div style="width:170px;height:45px;line-height:20px;overflow:hidden;">
+					<a href="javascript:void(0);" onclick="adVisit('$!ad.id','$!ad.adURL',1)" title="$!ad.title">$!ad.title</a>
+				</div>
+                <p style="line-height:45px;">价格：<span style="font-size:16px;">#if($!ad.hasPrice == 1) ￥$!ad.guidePrice #elseif($!ad.hasPrice == 2)暂无报价 #end</span></p>
+                <div class="border-9 mar_t10">
+					##  <a href="javascript:;" class="fl"><i><img src="$staticPath/images/imgs/pic_pic03.png" width="16" height="16" class="mar_r10"></i>联系客服</a>
+					## <a href="javascript:;" class="fr"><i><img src="$staticPath/images/imgs/pic_pic04.png" width="16" height="16" class="mar_r10"></i>加入购物车</a><!--如果没有以上两个可注释a-->
+                  <p><a onclick="adVisit('$!ad.id','$!ad.adURL',1)" href="javascript:void(0);"><font size="4">欢迎您来抢购</font></a></p>
+                </div>
+            </dd>
+		</dl>
+	   #end
+    #else
+    <script type="text/javascript">
+		$(document).ready(function(){
+			$("#boutique").hide();
+		})
+      </script>
+#end

@@ -1,0 +1,196 @@
+#set($layout = "common/blanklayout.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>求购管理</title>
+<link href="$request.contextPath/assets/css/detail.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="$request.contextPath/assets/js/iscroll.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/tab.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/ajaxfileupload.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    changeIconToRed(3);
+    queryrepAskItemInfo($("#myTab0")[0].children[0],0);
+    var o_url = "$request.contextPath/askItemInfoController/queryRepAskItemInfo?flag=response&num="+0;
+    var totalCount0 = $("#totalCount0").val();
+	$.dropDownFresh('3',o_url, totalCount0 , "queryDiv0","wrapper");
+});
+    
+function queryrepAskItemInfo(thisObj, Num) {
+	if (thisObj.className == "active"){
+		return;
+	}
+	$("#itemName").val('');
+	$("#translationName").val('');
+	addLoadMask();
+	var tabObj = thisObj.parentNode.id;
+	var tabList = document.getElementById(tabObj).getElementsByTagName("li");
+	document.getElementById('myTab0_Content0').style.display = "block";
+	for (i = 0; i < tabList.length; i++) {
+		if (i == Num) {
+			thisObj.className = "active";
+			$("#button_" + i).show();
+			$("#queryDiv" + i).show();
+			//显示相关的页面信息
+			$.ajax({
+			   type: "POST",
+			   url: "$request.contextPath/askItemInfoController/queryRepAskItemInfo?flag=response&pageSize=1&num="+Num,
+			   dataType: "html",
+			   success: function(data){
+				   $("#queryDiv"+Num).html(data);
+				   var names ={};
+					names.itemName = '';
+					names.translationName = '';
+					//刷新条件查询的分页总数
+					$.ajax({
+						url : $("#contextPath").val()+"/askItemInfoController/queryRepAskItemInfoCount",
+						type : 'post',
+						dataType:"json",
+						data :names,
+						success : function(res) {
+							$("#totalCount0").val(res.totalCount0);
+							$("#totalCount1").val(res.totalCount1);
+							$("#totalCount2").val(res.totalCount2);
+							var t_url = "$request.contextPath/askItemInfoController/queryRepAskItemInfo?flag=response&num="+Num;
+						    var totalCount0 = $("#totalCount"+Num).val();
+						    $.dropDownFresh('3',t_url, totalCount0 , "queryDiv" + Num,"wrapper");
+						    removeLoadMask();
+						},
+						error : function() {
+							console.log("网络错误");
+						}
+					});
+			   }
+			});
+		} else {
+            tabList[i].className = "normal";
+            $("#button_" + i).hide();
+            $("#queryDiv" + i).hide();
+		}
+	}
+}
+
+//附件上传
+var sccount=0;
+//文件上传
+	function startUpload(){
+        //判断图片格式
+        var fileInput = $("#fileInput")[0].files[0].name;
+        var maxSize = 10240000;
+        if ($("#fileInput")[0].files[0].size > maxSize) {
+            $("#fileInput").replaceWith('<input type="file" id="fileInput" class="wid_50 form-control hei_20" name="file" onchange="startUpload();" />');
+            alert("上传文件过大！");
+            return false;
+        }
+        $.ajaxFileUpload({
+            url: '$request.getContextPath()/orderWx/upload?size=10240000', //用于文件上传的服务器端请求地址
+            secureuri: false, //是否需要安全协议，一般设置为false
+            fileElementId: 'fileInput', //文件上传域的ID
+            dataType: 'text', //返回值类型 一般设置为json
+            type:"post",
+            success: function (data, status){  //服务器成功响应处理函数
+    			data = JSON.parse(data.substring(data.indexOf("{"),data.indexOf("}")+1));
+                if(data.success){
+                    sccount=sccount+1;
+                    var trid="trid"+sccount;
+                    appendtable(data.url,trid);
+                }else{
+                    alert(data.msg);
+                    $("#fileInput").replaceWith('<input type="file" id="fileInput" class="wid_50 form-control hei_20" name="file" onchange="startUpload();" />');
+                }
+            },
+            error: function (data, status, e){//服务器响应失败处理函数
+			alert(JSON.stringify(data));
+				alert(e);
+                alert("亲系统繁忙，请稍后再试");
+                $("#fileInput").replaceWith('<input type="file" id="fileInput" class="wid_50 form-control hei_20" name="file" onchange="startUpload();" />');
+            }
+        });
+    }
+    function appendtable(url,id){
+	    var imageUrl = '$!imageServerAddr'+url;
+		$("#annex").val(imageUrl);
+        $("#uploadLi").html("<p class='wid_25 fl font_right pad_r5'><span class='font_e5'></span>附件</p><p class='fl wid_30 one' ><a href='" + imageUrl + "'>" + fileName + "</a></p><a href=javascript:cancleimg() >删除</a>");
+       
+    }
+	
+	//清除指定tr
+    function cancleimg(){
+        $("#uploadLi").html("<p class='wid_25 fl font_right pad_r5'><span class='font_e5'></span>附件</p><input type='file' class='wid_50 mar_t10' id='fileInput' name='file' onchange='startUpload();'/>");
+		$("#annex").val('');
+    }
+	
+	
+</script>
+<!--询价相关js方法-->
+<script type="text/javascript" src="$request.contextPath/assets/js/askItemInfo/askItemInfo.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/dropDownFresh/dropDownFresh.js"></script>
+</head>
+<body class="bg_02">
+<input type="hidden" id="contextPath" value="$request.getContextPath()"/>
+<div id="main" class="po_re">
+    <!-- 中间内容 -->
+       <div class="nTab">
+           <!-- 标题开始 -->
+           <div class="TabTitle bg_01 ">
+             <ul id="myTab0" class="myTab0">
+               <li class="normal"  style="width: 33%"  onclick="queryrepAskItemInfo(this,0);">全部求购</li>
+               <li class="normal"  style="width: 33%"  onclick="queryrepAskItemInfo(this,1);">报价中</li>
+               <li class="normal"  style="width: 34%"  onclick="queryrepAskItemInfo(this,2);">已确认</li>
+             </ul>
+           </div><!-- 标题开始 end-->
+           <!-- 内容开始 -->
+           <div class="TabContent" >
+			<div class="content" id="wrapper" style="margin-top: 39px;overflow-x:hidden;">
+			 <!-- 内容开始 -->
+            <div class="TabContent mar_t10" style="margin-top: -5px">
+			  <!-- 切换内容    1   -->     
+                <div id="myTab0_Content0">
+                	<div  id="queryInfo_0" class="bg_01">
+				      <ul class="font_t pad_lr5">
+				       <li class="hei_32">
+				        <p class="wid_25 fl font_right pad_r5">供应商</P>
+							<input name="supplierName" id="supplierName" class="form-control wid_50 hei_20"  value="$!uName" readonly/>
+							<input type="hidden"  id="supplierId" value="$!uid"/>
+							<input type="hidden"  id="totalCount0" value="$!totalCount0"/>
+							<input type="hidden"  id="totalCount1" value="$!totalCount1"/>
+							<input type="hidden"  id="totalCount2" value="$!totalCount2"/>
+							</li>
+						      <li class="hei_32">
+						       <p class="wid_25 fl font_right pad_r5">物品名称</P>
+							<input class="form-control wid_50 hei_20" id="itemName" name="itemName" /></li>
+						      <li class="hei_32">
+						       <p class="wid_25 fl font_right pad_r5">求购名称</P><input class="form-control wid_50 hei_20" id="translationName"/></li>
+						  </ul>
+				      <div id="button_0"><button class="button_1 pad_lr5 hei_32 fr" id="queryTranslation" onclick="queryRepAskItemInfoSeller(0,'response');">求购查询</button></div>
+				      <div id="button_1" style="display:none"><button class="button_1 pad_lr5 hei_32 fr" id="queryTranslation" onclick="queryRepAskItemInfoSeller(1,'response');">求购查询</button></div>
+				      <div id="button_2" style="display:none"><button class="button_1 pad_lr5 hei_32 fr" id="queryTranslation" onclick="queryRepAskItemInfoSeller(2,'response');">求购查询</button></div>
+				      <div id="button_reset"><button class="button_1 pad_lr5 hei_32 fr" onclick="resetButton();">重置</button></div>
+				      <div class="clear"></div>
+				  	</div>
+				  	 <!-- 显示内容div   1   -->    
+				  	<div  id="queryDiv0">
+				  	
+				  	</div>
+				  	 <!-- 显示内容div   1   -->    
+				  	<div  id="queryDiv1">
+				  	
+				  	</div>
+				  	 <!-- 显示内容div   1   -->    
+				  	<div  id="queryDiv2">
+				  	
+				  	</div>
+                </div><!-- 切换内容    1   -->  
+                </div>
+            </div>
+           </div>
+   	</div>
+	<!-- 中间内容 end-->
+</div>
+    #parse("common/footer.vm")
+</body>
+</html>

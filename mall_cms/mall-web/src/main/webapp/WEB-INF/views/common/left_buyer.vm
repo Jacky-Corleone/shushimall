@@ -1,0 +1,62 @@
+#set($layout = "/none_layout.vm")
+#set($assetsPath="$request.contextPath/assets")
+<script type="text/javascript">
+	function closeMenu(){
+		$.cookie('clicked_menu', null, {path:'/'});
+	}
+	$(function(){
+		//默认收缩所有菜单
+		$("#leftBuyer dl ul ").hide();
+		//存储需要高亮显示的菜单
+		$('dl ul li a').click(function(){
+			$.cookie('clicked_menu', this.href, {path:'/'});
+		});
+
+		//当前点击的菜单高亮显示，判断浏览器地址栏url与a标签href url相同则表示选择的是此菜单
+		$('dl ul li a').each(function(index,item){
+
+			var menuSeled = $.cookie('clicked_menu');
+			if(menuSeled && menuSeled==item.href){
+				//高亮显示
+				$(item).addClass("font_fe").addClass("font_wei");
+				$.cookie('clicked_menu', item.href, {path:'/'});
+				$(item).parent().parent().show();//展开菜单
+				$(item).parent().parent().prev().children("i").removeClass("fa-sort-desc").addClass("fa-sort-up");
+			}
+		});
+
+		//变换图标样式
+		$("#leftBuyer dl dd").click(function(){
+            var _url = $(this).attr("url");
+            if($.trim(_url)){
+                window.location.href = "$request.contextPath" + _url;
+            }
+			if($(this).children("i").hasClass("fa-sort-desc")){
+				$("#leftBuyer dl ul").hide();
+				$("#leftBuyer dl dd i").removeClass("fa-sort-up").addClass("fa-sort-desc");
+				$(this).children("i").removeClass("fa-sort-desc").addClass("fa-sort-up");
+				$(this).next().show();
+			}else{
+				$(this).children("i").removeClass("fa-sort-up").addClass("fa-sort-desc");
+				$(this).next().hide();
+			}
+		});
+	});
+</script>
+<!--left Start -->
+	<dl>
+		<dt><i class="demo-icons fa-unlock-alt font_16 mar_r10"></i><a href="$request.contextPath/buyercenter/loadBuyerCenter" onclick="closeMenu()">买家中心</a></dt>
+		#foreach($entity in $reslist)
+			<dd url="$!entity.url" onclick="closeMenu()">$entity.resourceName<i class="fa-sort-desc fr mar_r10"></i></dd>
+			<ul>
+			#foreach($child in $entity.userMallResourceList)
+				 #if( !$child.url ||$child.url == '')
+					<li><a href="javascript:void(0);">$child.resourceName</a></li>
+				 #else
+					<li><a href="$request.contextPath$child.url">$child.resourceName</a></li>
+				 #end
+			#end
+			</ul>
+		#end
+	</dl>
+<!--left end -->

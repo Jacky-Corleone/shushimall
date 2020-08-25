@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 
+<typeAlias alias="tradeReturnPic" type="com.camelot.tradecenter.entity.dto.TradeReturnPic" />
+ -->
+<mapper namespace="com.camelot.aftersale.dao.TradeReturnPicMybatisDAO">
+
+    <!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+    <resultMap id="tradeReturnPicMap" type="tradeReturnPic">
+        <result property="id" column="id"/>
+        <result property="picUrl" column="pic_url"/>
+        <result property="returnGoodsId" column="return_goods_id"/>
+        <result property="createdDt" column="created_dt"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="lastUpdDt" column="last_upd_dt"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="deletedFlag" column="deleted_flag"/>
+    </resultMap>
+
+    <!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+    <!-- mysql 分页 -->
+    <sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+    <!-- mysql 查询总数 -->
+    <sql id="count_Tail">
+		select count(1) from 
+	</sql>
+
+    <sql id="selectAllColumns">
+		<![CDATA[
+
+		select
+ 			id
+ 			,pic_url
+ 			,return_goods_id
+ 			,created_dt
+ 			,created_by
+ 			,last_upd_dt
+ 			,last_upd_by
+ 			,deleted_flag
+		FROM 
+		trade_return_pic trade_return_pic_
+
+        ]]>
+	</sql>
+
+    <sql id="where_fragement">
+        where 1=1 and deleted_flag='0'
+        <if test="entity!=null">
+            <if test="entity.id != null  and entity.id !=''">
+                <![CDATA[ and trade_return_pic_.id  =#{entity.id}]]>
+            </if>
+            <if test="entity.picUrl != null  and entity.picUrl !=''">
+                <![CDATA[ and trade_return_pic_.pic_url  LIKE CONCAT('%',#{entity.picUrl},'%')]]>
+            </if>
+            <if test="entity.returnGoodsId != null  and entity.returnGoodsId !=''">
+                <![CDATA[ and trade_return_pic_.return_goods_id  =#{entity.returnGoodsId}]]>
+            </if>
+            <if test="entity.createdDt != null  and entity.createdDt !=''">
+                <![CDATA[ and trade_return_pic_.created_dt  LIKE CONCAT('%',#{entity.createdDt},'%')]]>
+            </if>
+            <if test="entity.createdBy != null  and entity.createdBy !=''">
+                <![CDATA[ and trade_return_pic_.created_by  LIKE CONCAT('%',#{entity.createdBy},'%')]]>
+            </if>
+            <if test="entity.lastUpdDt != null  and entity.lastUpdDt !=''">
+                <![CDATA[ and trade_return_pic_.last_upd_dt  LIKE CONCAT('%',#{entity.lastUpdDt},'%')]]>
+            </if>
+            <if test="entity.lastUpdBy != null  and entity.lastUpdBy !=''">
+                <![CDATA[ and trade_return_pic_.last_upd_by  LIKE CONCAT('%',#{entity.lastUpdBy},'%')]]>
+            </if>
+
+        </if>
+    </sql>
+
+    <!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+    <select id="getAll" resultMap="tradeReturnPicMap">
+        <include refid="selectAllColumns"/>
+    </select>
+    <select id="get" resultMap="tradeReturnPicMap" parameterType="long">
+        <include refid="selectAllColumns"/>
+        <![CDATA[
+		where trade_return_pic_.id = #{id}
+		]]>
+    </select>
+    <!-- 根据id查询 -->
+    <select id="selectById" resultMap="tradeReturnPicMap" parameterType="long">
+        <include refid="selectAllColumns"/>
+        <![CDATA[
+		where trade_return_pic_.id = #{id}
+		]]>
+    </select>
+
+    <!-- 分页查询 -->
+    <select id="queryList" resultMap="tradeReturnPicMap">
+        <include refid="selectAllColumns"/>
+        <include refid="where_fragement"/>
+        <if test="page!=null">
+            <include refid="pagination_tail"/>
+        </if>
+    </select>
+
+    <select id="searchByCondition" resultMap="tradeReturnPicMap">
+        <include refid="selectAllColumns"/>
+        <include refid="where_fragement"/>
+
+    </select>
+    <select id="queryCount" resultType="long">
+        <include refid="count_Tail"/>
+        trade_return_pic trade_return_pic_
+        <include refid="where_fragement"/>
+    </select>
+
+    <insert id="add" parameterType="tradeReturnPic">
+		
+		<![CDATA[
+
+		insert into trade_return_pic
+		  (
+				pic_url
+				,return_goods_id
+				,created_dt
+				,created_by
+				,last_upd_dt
+				,last_upd_by
+				,deleted_flag
+		   )
+		values
+		  (
+				#{picUrl}
+				,#{returnGoodsId}
+				,#{createdDt}
+				,#{createdBy}
+				,#{lastUpdDt}
+				,#{lastUpdBy}
+				,#{deletedFlag}
+		   )
+
+        ]]>
+	</insert>
+
+
+    <!-- 根据id，修改记录 -->
+    <update id="update" parameterType="tradeReturnPic">
+		<![CDATA[
+
+		update trade_return_pic set
+   			id = #{id}
+   			,pic_url = #{picUrl}
+   			,return_goods_id = #{returnGoodsId}
+   			,created_dt = #{createdDt}
+   			,created_by = #{createdBy}
+   			,last_upd_dt = #{lastUpdDt}
+   			,last_upd_by = #{lastUpdBy}
+   			,deleted_flag = #{deletedFlag}
+		 where id = #{id}
+
+        ]]>
+	</update>
+
+    <delete id="delete" parameterType="long">
+		<![CDATA[
+
+		delete from trade_return_pic where id = #{id}
+
+        ]]>
+	</delete>
+    <sql id="updateSelective_set">
+        <set>
+            <trim suffix="" suffixOverrides=",">
+            <if test="tradeReturnPic.picUrl!= null">
+                pic_url = #{tradeReturnPic.picUrl},
+            </if>
+            <if test="tradeReturnPic.returnGoodsId!= null">
+                return_goods_id = #{tradeReturnPic.returnGoodsId},
+            </if>
+            <if test="tradeReturnPic.createdDt!= null">
+                created_dt = #{tradeReturnPic.createdDt},
+            </if>
+            <if test="tradeReturnPic.createdBy!= null">
+                created_by = #{tradeReturnPic.createdBy},
+            </if>
+            <if test="tradeReturnPic.lastUpdDt!= null">
+                last_upd_dt = #{tradeReturnPic.lastUpdDt},
+            </if>
+            <if test="tradeReturnPic.lastUpdBy!= null">
+                last_upd_by = #{tradeReturnPic.lastUpdBy},
+            </if>
+            <if test="tradeReturnPic.deletedFlag!= null">
+                deleted_flag = #{tradeReturnPic.deletedFlag},
+            </if>
+            </trim>
+        </set>
+    </sql>
+    <sql id="updateAll_set">
+        <set>
+            pic_url = #{tradeReturnPic.picUrl},
+            return_goods_id = #{tradeReturnPic.returnGoodsId},
+            created_dt = #{tradeReturnPic.createdDt},
+            created_by = #{tradeReturnPic.createdBy},
+            last_upd_dt = #{tradeReturnPic.lastUpdDt},
+            last_upd_by = #{tradeReturnPic.lastUpdBy},
+            deleted_flag = #{tradeReturnPic.deletedFlag},
+        </set>
+    </sql>
+    <update id="updateSelective" parameterType="tradeReturnPic">
+        update trade_return_pic
+        <include refid="updateSelective_set"/>
+        where id = #{tradeReturnPic.id}
+    </update>
+
+    <update id="updateAllWithDateTimeCheck">
+        update trade_return_pic
+        <include refid="updateAll_set"/>
+        where id = #{tradeReturnPic.id}
+        and LAST_UPD_DT = #{prevUpdDt}
+    </update>
+
+    <update id="updateSelectiveWithDateTimeCheck">
+        update trade_return_pic
+        <include refid="updateSelective_set"/>
+        <![CDATA[
+		 	where id = #{tradeReturnPic.id}
+		 	and LAST_UPD_DT = #{prevUpdDt}
+		]]>
+    </update>
+
+    <update id="updateAllByReturnGoodsId" >
+        update trade_return_pic
+        <include refid="updateSelective_set"/>
+        where return_goods_id = #{tradeReturnPic.returnGoodsId}
+    </update>
+    <sql id="searchByCondition_fragement">
+        <include refid="selectAllColumns"/>
+        where 1=1
+        <if test="tradeReturnPic != null">
+            <if test="tradeReturnPic.picUrl != null">
+                and pic_url = #{tradeReturnPic.picUrl}
+            </if>
+            <if test="tradeReturnPic.returnGoodsId != null">
+                and return_goods_id = #{tradeReturnPic.returnGoodsId}
+            </if>
+            <if test="tradeReturnPic.createdDt != null">
+                and created_dt = #{tradeReturnPic.createdDt}
+            </if>
+            <if test="tradeReturnPic.createdBy != null">
+                and created_by = #{tradeReturnPic.createdBy}
+            </if>
+            <if test="tradeReturnPic.lastUpdDt != null">
+                and last_upd_dt = #{tradeReturnPic.lastUpdDt}
+            </if>
+            <if test="tradeReturnPic.lastUpdBy != null">
+                and last_upd_by = #{tradeReturnPic.lastUpdBy}
+            </if>
+            <if test="tradeReturnPic.deletedFlag != null">
+                and deleted_flag = #{tradeReturnPic.deletedFlag}
+            </if>
+        </if>
+    </sql>
+
+
+    <update id="updateSelectiveByIdList">
+        update trade_return_pic
+        <include refid="updateSelective_set"/>
+        where id in
+        <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <update id="updateAllByIdList">
+        update trade_return_pic
+        <include refid="updateAll_set"/>
+        where id in
+        <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+
+</mapper>

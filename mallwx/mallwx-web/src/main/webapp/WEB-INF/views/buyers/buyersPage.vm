@@ -1,0 +1,185 @@
+#set($layout = "common/blanklayout.vm")
+<!DOCTYPE html >
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>买家中心</title>
+    <link href="assets/css/detail.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" src="css/detail.js"/>
+    <link rel="stylesheet" type="text/css" src="css/style.js"/>
+    <script type="text/javascript" src="assets/js/iscroll.js"></script>
+    <script type="text/javascript" src="assets/js/zepto.js"></script>
+    <script src="assets/js/jquery-1.11.2.min.js"></script>
+    <script src="assets/js/jquery-finger-v0.1.0.min.js"></script>
+    <script>
+        function checkLogin(_this, _type) {
+            $.ajax({
+                url: '$request.contextPath/user/checkLogin',
+                dataType: 'json',
+                success: function (res) {
+                    var aa = $(_this).attr("href");
+                    if (res.userType < 2 && _type == 2) {
+                        alert("您不是认证买家，无法进行协议操作");
+                        return;
+                    } else {
+                        window.location = aa;
+                    }
+                }
+            });
+            return false
+        }
+
+        function checkLoginInfo(_this, _type) {
+            $.ajax({
+                url: '$request.contextPath/user/checkLogin',
+                dataType: 'json',
+                success: function (res) {
+                    var aa = $(_this).attr("href");
+                    if (_type == 3) {
+                        if (res.userStatus != "4" && res.userStatus != "6") {
+                            alert("您账号未通过审核，无法进行询价操作!");
+                            return;
+                        } else {
+                            window.location = aa;
+                        }
+                    }
+                    if (_type == 4) {
+                        if (res.userStatus != "4" && res.userStatus != "6") {
+                            alert("您账号未通过审核，无法进行求购操作!");
+                            return;
+                        } else {
+                            window.location = aa;
+                        }
+                    }
+                    if (_type == 2) {
+                        if (res.userStatus != "4" && res.userStatus != "6") {
+                            alert("您账号未通过审核，无法进行协议操作!");
+                            return;
+                        } else {
+                            window.location = aa;
+                        }
+                    }
+                }
+            });
+            return false
+        }
+        
+        function toBuyerAuthentication(){
+        	window.location = "$request.contextPath/buyerAuthentication";
+        }
+    </script>
+
+</head>
+<body class="bg_03">
+<div id="main" class="po_re">
+    <!-- 头部 -->
+    <!-- <header class="po_re">
+        <div class="top_l fl">
+            <i class="fa fa-angle-left"></i>返回
+        </div>
+        <div class="top_c fl">
+            买家中心
+        </div>
+         <div class="top_r fr">
+            <img src="images/more.png" />
+        </div>
+        <div class="clear"></div>
+    </header> --> <!-- 头部 end-->
+    <!-- 中间内容 -->
+    <div class="content" id="wrapper">
+
+        <dl class="party">
+            <dt class="fl"><img src="$request.contextPath/assets/images/u65.png"/></dt>
+            <dd class="fl mar_t20 wid_65">
+                <p class="font_1_2">帐号:<span class="mar_l2"><a
+                        href="$request.contextPath/user/queryUserInfoById?uid=$!{user.uid}&cus=buyers">$!{user.uname}</a></span>
+                </p>
+                <!--                 <p>金牌用户</p> -->
+            </dd>
+            <div class="font_right"> 
+	        <dd class="fl mar_t20 wid_65" style="float: right;padding-right: 3%;padding-bottom: 2%">
+	               	<button class="hei_32 pad_lr10 button_buyer" onclick="toBuyerAuthentication()">买家认证</button>
+	               	<!-- 
+	               	#if($!user.userstatus == 1 || $!user.userstatus == 2) 买家认证
+	               	#elseif($!user.userstatus == 3 && $!user.auditStatus == 0) 买家认证驳回
+	               	#elseif($!user.userstatus == 3) 买家认证中
+                    #elseif($!user.userstatus == 4) 买家已认证 
+                    #else 买家已认证
+                    #end
+                     -->
+	              </a>
+	        </dd>
+	        </div>
+            <div class="clear"></div>
+        </dl>
+        
+        <div class="clear"></div>
+
+        <div class="bg_01 tio_list">
+            <dl>
+                <dt><i class="fa-file-text-o font_1_8"></i></dt>
+                <dd><a href="$request.contextPath/orderWx/toOrderSubmit?orderSource=buyers">全部订单</a></dd>
+            </dl>
+            <dl>
+                <dt><i class="fa-credit-card font_1_8"></i></dt>
+                <dd>
+                    <a href="$request.contextPath/orderWx/toOrderSubmitByStatue?orderStatus=1&orderSource=buyers">待付款</a>
+                </dd>
+            </dl>
+            <dl>
+                <dt><i class="fa-truck font_1_8"></i></dt>
+                <dd>
+                    <a href="$request.contextPath/orderWx/toOrderSubmitByStatue?orderStatus=3&orderSource=buyers">配送中</a>
+                </dd>
+            </dl>
+            <dl id="border_none">
+                <dt><i class="fa-refresh font_1_8"></i></dt>
+                <dd><a href="$request.getContextPath()/orderWx/refundOrcservice">退换货</a></dd>
+            </dl>
+            <div class="clear"></div>
+        </div>
+
+        <div class="bg_01 mar_t10">
+            <ul class="individual mar_lr5">
+                <a href="contract/contractPage?sourcePage=buyer" onclick="return checkLoginInfo(this,2)">
+                    <li class="border_2"><span class="wid_95 fl">年度协议管理</span><i
+                            class="fa fa-angle-right fr"></i></li>
+                </a>
+                <a href="$request.contextPath/orderWx/toOrderSubmit?orderSource=buyers">
+                    <li class="border_2"><span class="wid_95 fl">订单管理</span><i
+                            class="fa fa-angle-right fr"></i></li>
+                </a>
+                <a href="$request.contextPath/statement/statementPage?source=2">
+                    <li class="border_2"><span class="wid_95 fl">对账单管理</span><i
+                            class="fa fa-angle-right fr"></i></li>
+                </a>
+                <a href="requestPriceController/requestPrice" onclick="return checkLoginInfo(this,3)">
+                    <li class="border_2"><span class="wid_95 fl">询价管理</span><i class="fa fa-angle-right fr"></i>
+                    </li>
+                </a>
+                <a href="askItemInfoController/askItemInfo" onclick="return checkLoginInfo(this,4)">
+                    <li class="border_2"><span class="wid_95 fl">求购管理</span><i
+                            class="fa fa-angle-right fr"></i></li>
+                </a>
+                <a href="$request.contextPath/orderWx/queryApprove?approve=loadApprove">
+                    <li class="border_2"><span class="wid_95 fl">订单审核管理</span><i
+                            class="fa fa-angle-right fr"></i></li>
+                </a>
+                <a href="$request.contextPath/coupons/index?type=2&costAllocation=&shopId=">
+                    <li class="border_2"><span class="wid_95 fl">我的优惠券</span><i
+                            class="fa fa-angle-right fr"></i></li>
+                </a>
+            </ul>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <!-- 中间内容 end-->
+
+</div>
+    #parse("common/footer.vm")
+</body>
+</html>

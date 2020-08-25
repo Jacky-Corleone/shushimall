@@ -1,0 +1,97 @@
+<script type="text/javascript">
+$(function(){
+	//初始化验证
+	initValidPluginOrganization();
+
+	/*暂存：组织机构代码信息*/
+	$("#organizationBtn").click(function(){
+		//暂存操作
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			url:"$request.contextPath/information/registerSeller/stagingInformation",
+			data:$("#organizationForm").serializeArray(),
+			success: function(data){
+				alert(data.result);
+			}
+		});
+	});
+});
+
+/*初始化校验控件*/
+function initValidPluginOrganization(){
+	$("#organizationForm").validate({
+		rules: {
+			"userOrganizationDTO.organizationId":{
+                organizationId:true,
+				required: true
+			},
+			"userOrganizationDTO.userfulTime":{
+				required: true
+			}
+		}
+	});
+
+    jQuery.validator.addMethod("organizationId", function(value, element) {
+        var chrnum = /^[a-zA-Z0-9_\-|\w]{4,40}$/;
+        return this.optional(element) || (chrnum.test(value));
+    }, "请按照公司组织机构代码证上的代码填写，不要省略“—”");
+
+}
+</script>
+
+<!--组织机构代码信息 start -->
+<form id="organizationForm" method="post">
+<div id="hideOrganizationDiv">
+<div id="organizationDiv" class="bg_07 border-6">
+<div class="approve_buyer" id="approve_buyer">
+	<h1 class="font_18 mar_20">组织机构代码信息：</h1>
+	<input  name="stagingType" type="hidden" value="2"/>
+	<ul>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>组织机构代码：</span>
+			<span class="userInfo_class_show">$!userOrganizationDTO.organizationId</span>
+			<div class="userInfo_class_hide">
+			<input id="organizationId" name="userOrganizationDTO.organizationId" value="$!userOrganizationDTO.organizationId"
+				type="text" class="input_Style1 wid_250" placeholder="输入组织机构代码..." maxlength="20"/>
+			</div>
+		</li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>组织机构代码有效期：</span>
+			<span class="userInfo_class_show">$!userOrganizationDTO.userfulTime</span>
+			<div class="userInfo_class_hide">
+			<input id="userfulTime" name="userOrganizationDTO.userfulTime" value="$!userOrganizationDTO.userfulTime"
+				type="text" class="input_Style1 wid_250" placeholder="输入组织机构代码有效期..." maxlength="20" readonly="readonly"
+				onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+			</div>
+		</li>
+		<div class="clear"></div>
+		<span style="color: red">&nbsp;&nbsp;提示:&nbsp;上传图片仅支持JPG、JPEG、PNG、BMP格式，上传图片大小不得超过1M</span>
+		<div class="clear"></div>
+		<div class="fl">
+			<li>
+				<p class="font_span"><i class="demo-icons font_fs">*</i>组织机构代码证电子版：</p>
+				<img id="organizationPicSrcImg" src="$!imageServerAddr$!userOrganizationDTO.organizationPicSrc"
+					alt="" width="55" height="55" class="mar_lr10 fl po_re_img" title="点击查看大图">
+				<div class="userInfo_class_hide">
+				<p class="hei_40 fl registere_class_hide z-upload">
+					<button type="button" class="button_4 font_12 border-1 button_small">上传图片</button>
+					<input type="file" id="organizationPicSrcFile" class="file-img" name="file"
+					onchange="startUpload('organizationPicSrcFile','organizationPicSrcImg','organizationPicSrc')">
+				</p>
+				</div>
+				<input id="organizationPicSrc" name="userOrganizationDTO.organizationPicSrc" type="hidden" value="$!userOrganizationDTO.organizationPicSrc"/>
+			</li>
+		</div>
+		#if("$!pageState"!="view")
+		<div class="fl mar_l170">
+			<p><img src="$request.contextPath/assets/images/organizationPic.jpg" width="150" height="80" class="po_re_img"/></p>
+		</div>
+		#end
+	</ul>
+	#if("$!pageState"=="register")
+	<div class="button_2 hei_40 font_14b" style="margin:20px auto" id="organizationBtn">暂 存</div>
+	#end
+</div></div></div>
+</form>
+<!--组织机构代码信息end-->

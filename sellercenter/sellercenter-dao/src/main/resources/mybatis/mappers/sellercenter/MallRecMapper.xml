@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.sellercenter.dao.MallRecMybatisDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="mallRecommendMap" type="mallRecommend">
+				<result property="id" column="id"/>
+				<result property="floorNum" column="floor_num"/>
+				<result property="title" column="title"/>
+				<result property="position" column="position"/>
+				<result property="recType" column="rec_type"/>
+				<result property="created" column="created"/>
+				<result property="modified" column="modified"/>
+				<result property="status" column="status"/>
+				<result property="categoryId" column="category_id"/>
+				<result property="smalltitle" column="smalltitle"/>
+				<result property="colorref" column="colorref"/>
+		        <result property="bgColor" column="bg_color"/>
+		        <result property="floorType" column="floor_type"/>
+		        <result property="themeId" column="theme_id"/>
+		        <result property="engName" column="eng_name"/>
+	</resultMap>
+	
+	<resultMap id="mallRecommendDTOMap" type="mallRecommendDTO">
+				<result property="idDTO" column="id"/>
+				<result property="floorNumDTO" column="floor_num"/>
+				<result property="titleDTO" column="title"/>
+				<result property="positionDTO" column="position"/>
+				<result property="recTypeDTO" column="rec_type"/>
+				<result property="createdDTO" column="created"/>
+				<result property="modifiedDTO" column="modified"/>
+				<result property="statusDTO" column="status"/>
+				<result property="categoryIdDTO" column="category_id"/>
+				<result property="smalltitleDTO" column="smalltitle"/>
+				<result property="colorrefDTO" column="colorref"/>
+		        <result property="bgColorDTO" column="bg_color"/>
+		        <result property="floorTypeDTO" column="floor_type"/>
+		        <result property="themeId" column="theme_id"/>
+		        <result property="engNameDTO" column="eng_name"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			mall_recommend_.id
+ 			,mall_recommend_.floor_num
+ 			,mall_recommend_.title
+ 			,mall_recommend_.position
+ 			,mall_recommend_.rec_type
+ 			,mall_recommend_.created
+ 			,mall_recommend_.modified
+ 			,mall_recommend_.status
+ 			,mall_recommend_.category_id
+ 			,mall_recommend_.smalltitle
+ 			,mall_recommend_.colorref
+ 			,mall_recommend_.bg_color
+ 			,mall_recommend_.floor_type
+ 			,mall_recommend_.theme_id
+ 			,mall_recommend_.eng_name
+		FROM 
+		mall_recommend mall_recommend_ left join mall_theme mt on mall_recommend_.theme_id=mt.id
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			
+			<if test=" entity.themeId != null and entity.themeId != '' ">
+				<![CDATA[and mall_recommend_.theme_id = #{entity.themeId} ]]>
+			</if>
+			
+			<if test="entity.idDTO != null  and entity.idDTO !=''">
+				<![CDATA[ and mall_recommend_.id  = #{entity.idDTO} ]]>
+			</if>
+			<if test="entity.floorNumDTO != null  and entity.floorNumDTO !=''">
+				<![CDATA[ and mall_recommend_.floor_num  = #{entity.floorNumDTO} ]]>
+			</if>
+			<if test="entity.titleDTO != null  and entity.titleDTO !=''">
+				<![CDATA[ and mall_recommend_.title  = #{entity.titleDTO} ]]>
+			</if>
+			<if test="entity.positionDTO != null  and entity.positionDTO !=''">
+				<![CDATA[ and mall_recommend_.position  = #{entity.positionDTO} ]]>
+			</if>
+			<if test="entity.recTypeDTO != null  and entity.recTypeDTO !=''">
+				<![CDATA[ and mall_recommend_.rec_type = #{entity.recTypeDTO} ]]>
+			</if>
+			<if test="entity.createdDTO != null  and entity.createdDTO !=''">
+				<![CDATA[ and mall_recommend_.created = #{entity.createdDTO} ]]>
+			</if>
+			<if test="entity.modifiedDTO != null  and entity.modifiedDTO !=''">
+				<![CDATA[ and mall_recommend_.modified  = #{entity.modifiedDTO} ]]>
+			</if>
+			<if test="entity.statusDTO != null  and entity.statusDTO !=''">
+				<![CDATA[ and mall_recommend_.status  = #{entity.statusDTO} ]]>
+			</if>
+			<if test="entity.categoryIdDTO != null  and entity.categoryIdDTO !=''">
+				<![CDATA[ and mall_recommend_.category_id  = #{entity.categoryIdDTO} ]]>
+			</if>
+			<if test="entity.smalltitleDTO != null  and entity.smalltitleDTO !=''">
+				<![CDATA[ and mall_recommend_.smalltitle  = #{entity.smalltitleDTO} ]]>
+			</if>
+			<if test="entity.floorTypeDTO != null">
+				<![CDATA[ and mall_recommend_.floor_type  = #{entity.floorTypeDTO} ]]>
+			</if>
+			
+		</if>
+	</sql>
+	
+	<sql id="where_fragementDTO">
+		where 1=1
+		<if test="entity!=null">
+			
+			<if test=" entity.themeId != null  ">
+				<if test = "entity.themeId==-1">
+					<![CDATA[ and mall_recommend_.theme_id != 0]]>
+				</if>
+				<if test = "entity.themeId!=-1">
+					<![CDATA[ and mall_recommend_.theme_id = #{entity.themeId} ]]>
+				</if>
+			</if>
+			<if test="entity.idDTO != null  and entity.idDTO !=''">
+				<![CDATA[ and mall_recommend_.id  = #{entity.idDTO} ]]>
+			</if>
+			<if test="entity.floorNumDTO != null  and entity.floorNumDTO !=''">
+				<![CDATA[ and mall_recommend_.floor_num  = #{entity.floorNumDTO} ]]>
+			</if>
+			<if test="entity.titleDTO != null  and entity.titleDTO !=''">
+				<![CDATA[ and mall_recommend_.title   like concat('%',#{entity.titleDTO},'%')]]>
+			</if>
+			<if test="entity.positionDTO != null  and entity.positionDTO !=''">
+				<![CDATA[ and mall_recommend_.position   = #{entity.positionDTO} ]]>
+			</if>
+			<if test="entity.recTypeDTO != null  and entity.recTypeDTO !=''">
+				<![CDATA[ and mall_recommend_.rec_type  = #{entity.recTypeDTO} ]]>
+			</if>
+			<if test="entity.createdDTO != null  and entity.createdDTO !=''">
+				<![CDATA[ and mall_recommend_.created  = #{entity.createdDTO} ]]>
+			</if>
+			<if test="entity.modifiedDTO != null  and entity.modifiedDTO !=''">
+				<![CDATA[ and mall_recommend_.modified  = #{entity.modifiedDTO} ]]>
+			</if>
+			<if test="entity.statusDTO != null">
+				<![CDATA[ and mall_recommend_.status  = #{entity.statusDTO} ]]>
+			</if>
+			<if test="entity.categoryIdDTO != null  and entity.categoryIdDTO !=''">
+				<![CDATA[ and mall_recommend_.category_id  = #{entity.categoryIdDTO} ]]>
+			</if>
+			<if test="entity.smalltitleDTO != null  and entity.smalltitleDTO !=''">
+				<![CDATA[ and mall_recommend_.smalltitle  = #{entity.smalltitleDTO} ]]>
+			</if>
+			<if test="entity.floorTypeDTO != null">
+				<![CDATA[ and mall_recommend_.floor_type  = #{entity.floorTypeDTO} ]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="mallRecommendMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		   where mall_recommend_.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 根据id查询 -->
+	<select id="queryDTOById" resultMap="mallRecommendDTOMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		   where mall_recommend_.id = #{idDTO}
+		]]>
+	</select>
+	
+	
+	<!--  分页查询 
+	<select id="queryList" resultMap="mallRecommendMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select> -->
+	
+	<!-- 分页查询 -->
+	<select id="queryDTOList" resultMap="mallRecommendDTOMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragementDTO" />
+		<![CDATA[ order by  floor_num ]]>
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		 mall_recommend mall_recommend_ left join mall_theme mt on mall_recommend_.theme_id=mt.id
+		<include refid="where_fragementDTO" />
+	</select>
+	
+	
+		<insert id="add" parameterType="mallRecommend">
+		<![CDATA[
+		insert into mall_recommend (
+		    	floor_num
+		    	 ,title
+		    	 ,category_id
+		    	 ,smalltitle
+		    	 ,created 
+		    	  ,position
+		    	 ,rec_type
+		    	  ,status
+		    	  ,colorref
+		    	  ,bg_color
+		    	  ,floor_type
+		    	  ,theme_id
+		    	  ,eng_name
+		   )values(
+		    	#{floorNum}
+		    	,#{title}
+		    	,#{categoryId}
+		    	,#{smalltitle}
+		    	,now()
+		    	,#{position}
+		    	,#{recType}
+		    	,#{status}
+		    	,#{colorref}
+		    	,#{bgColor}
+		    	,#{floorType}
+		    	,#{themeId}
+		    	,#{engName}
+		   )
+	    ]]>	
+	    <selectKey resultType="long" order="AFTER" keyProperty="id">
+			select @@IDENTITY
+		</selectKey>
+	</insert>
+	<!-- 插入记录 
+	<insert id="add" parameterType="mallRecommend">
+		<![CDATA[
+		insert into mall_recommend (
+		    	 id
+		    	 ,floor_num
+		    	 ,title
+		    	 ,position
+		    	 ,rec_type
+		    	 ,created
+		    	 ,modified
+		    	 ,status
+		    	 ,category_id
+		    	 ,smalltitle
+		   )values(
+		    	#{id}
+		    	,#{floorNum}
+		    	,#{title}
+		    	,#{position}
+		    	,#{recType}
+		    	,#{created}
+		    	,#{modified}
+		    	,#{status}
+		    	,#{categoryId}
+		    	,#{smalltitle}
+		   )
+	    ]]>	
+	</insert> -->
+	
+	<update id="update" parameterType="mallRecommend">
+		update mall_recommend set
+			modified = now()
+			<if test="floorNum != null">
+   				,floor_num = #{floorNum}
+   			</if>
+   			<if test="title != null">
+   				,title = #{title}
+   			</if>
+   			<if test="categoryId!=null">
+   				,category_id = #{categoryId}
+   			</if>
+   			<if test="smalltitle != null">
+   				,smalltitle = #{smalltitle}
+   			</if>
+   			<if test="position!=null">
+   				,position = #{position}
+   			</if>
+			<if test="recType!=null">
+				,rec_type = #{recType}
+			</if>
+   			<if test="colorref!=null">
+   				,colorref = #{colorref}
+   			</if>
+   			<if test="bgColor!=null">
+   				,bg_color=#{bgColor}
+   			</if>
+   			<if test="themeId!=null">
+				,theme_id=#{themeId}
+			</if>
+   			<if test="floorType!=null">
+				,floor_type=#{floorType}
+			</if>
+			<if test="engName!=null">
+				,eng_name=#{engName}
+			</if>
+		 where id = #{id}
+	</update>
+	
+	<!--  根据id，修改记录 
+	<update id="update" parameterType="mallRecommend">
+		<![CDATA[
+		update mall_recommend set
+   			id = #{id}
+   			,floor_num = #{floorNum}
+   			,title = #{title}
+   			,position = #{position}
+   			,rec_type = #{recType}
+   			,created = #{created}
+   			,modified = #{modified}
+   			,status = #{status}
+   			,category_id = #{categoryId}
+   			,smalltitle = #{smalltitle}
+		 where id = #{id}
+		]]>
+	</update> -->
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from mall_recommend where id = #{id}
+		]]>
+	</delete>
+	
+	<update id="modifyMallRecStatus" parameterType="mallRecommend">
+		<![CDATA[
+		update mall_recommend set
+   			status = #{status}
+   			,modified = now()
+		 where id = #{id}
+		]]>
+	</update>
+	
+	<update id="updateStatusByFloorType" >
+		<![CDATA[
+		update mall_recommend set
+   			status = 0
+   			,modified = now()
+		 where floor_type = 1 and theme_id = #{themeId}
+		]]>
+	</update>
+
+</mapper>

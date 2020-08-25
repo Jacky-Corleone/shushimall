@@ -1,0 +1,435 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/${sourcePage}_layout.vm")
+<script language="javascript" type="text/javascript" src="$staticPath/js/js.js"></script>
+<script type="text/javascript" src="$staticPath/js/common.js"></script>
+<script language="javascript" type="text/javascript" src="$staticPath/js/tab.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="$staticPath/js/contract/contract.js"></script>
+<link href="$staticPath/assets/css/manage_style.css">
+<input id="contextPath" type="hidden" value="$request.contextPath">
+<input id="sourcePage" type="hidden" value="$sourcePage">
+<input id="gix" type="hidden" value="$gix">
+<script type="text/javascript">
+    $(document).ready(function () {
+        //加载左侧菜单
+        if ("${sourcePage}" == "buyer") {
+            $("#leftBuyer").load("$request.contextPath/leftBuyer");
+        }
+        if ("${sourcePage}" == "seller") {
+            $("#leftSeller").load("$request.contextPath/leftSeller");
+        }
+    });
+    // 分页
+    function topage(page) {
+        toCompanyPage(page);
+    }
+</script>
+<!--导航菜单end-->
+<div id="main">
+    #if(${sourcePage}=="buyer")
+        <!-- left start -->
+        <div id="leftBuyer" style="width: 198px; float: left;">&nbsp;</div>
+        <!-- left end -->
+    #end
+    #if($sourcePage=="seller")
+        <!-- left start -->
+        <div id="leftSeller" style="width: 198px; float: left;">&nbsp;</div>
+        <!-- left end -->
+    #end
+    <!--中间部分开始-->
+    <!--右边部分开始-->
+    <div id="right" class="bg_06 border-4">
+        <div class="mar_lr10 pad_tb20">
+            <form id="contractInfoForm" method="post">
+                <p class="font_16 hei_32 pad_l10 bg_05">创建协议</p>
+                <ul class="list mar_t10 mar_l10 ">
+                    <li class="wid_460 mar_tb10 ">
+                        <span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>协议编号 : </span>
+                        <input type="text" class="wid_260 input_Style2 hei_30" name="contractOrderNo"/>
+                    </li>
+                    <li class="wid_460 mar_tb10">
+                        <span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>协议名称 : </span>
+                        <input type="text" class="wid_260 input_Style2 hei_30" id="contractName" name="contractName"/>
+                    </li>
+                </ul>
+                <div class="clear"></div>
+                <!-- 联系方式 开始 -->
+                <p class="font_16 hei_32 pad_l10 bg_05">联系方式</p>
+                <input id="userType" type="hidden" value="$!user.userType">
+                #if($!sourcePage=="seller")
+                    <!-- 印刷厂信息start -->
+                    <div style="float:left" class="wid_460 fl">
+                        <ul class="list mar_t10 mar_l10 ">
+                            <li class="wid_460 mar_tb10 ">
+                                <span class="font_wid mar_r10"><i class="font_fs mar_l2">*</i>买方 : </span>
+                                <input type="text" class="wid_260 input_Style2 hei_30"
+                                       placeholder="点击此处选择买方信息" id="buyerCompany"
+                                       readonly="true" onclick="getCompany(1)"/>
+                                <input type="hidden" id="buyerParentId">
+                            </li>
+                            <li class="wid_460 mar_tb10" >
+                                <span class="font_wid mar_r10"><i class="font_fs mar_l2">*</i>联系人: </span>
+                                <input type="text" class="wid_260 input_Style2 hei_30"
+                                       readonly="true" id="buyerConector"/>
+                                <input type="hidden" id="buyerCompayId" name="printerId">
+                            </li>
+                            <li class="wid_460 mar_tb10 " >
+                                <span class="font_wid mar_r10"><i class="font_fs mar_l2">*</i>联系电话 : </span>
+                                <input type="text" class="wid_95 input_Style2 hei_30" placeholder="手机号"
+                                       readonly="true" id="buyerMobile"/>
+                            </li>
+                            <li class="wid_460 mar_tb10 " >
+                                <span class="font_wid mar_r10">传真 : </span>
+                                <input type="text" class="wid_40 input_Style2 hei_30" readonly="true"/>
+                                <i class="mar_lr10">-</i>
+                                <input type="text" class="wid_95 input_Style2 hei_30" readonly="true"/>
+                            </li>
+                            <li class="wid_460 mar_20 mar_tb10" >
+                                <span class="font_wid mar_r10"><i class="font_fs mar_l2">*</i>电子邮箱 : </span>
+                                <input type="text" class="wid_260  input_Style2 hei_30" readonly="true"
+                                       id="buyerEmail"/>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- 印刷厂信息end -->
+                    <!-- 供货商信息start -->
+                    <div style="float:right" class="wid_460 fl">
+                        <ul class="list mar_t10 mar_l10 ">
+                            <li class="wid_460 mar_tb10">
+                                <span class="font_wid mar_r10">卖方 : </span>
+                                <input type="text" class="wid_260 input_Style2 hei_30" value="$!userDTO.companyName"
+                                       readonly="readonly"/>
+                            </li>
+                            <li class="wid_460 mar_20 mar_tb10">
+                                <span class="font_wid mar_r10">联系人 : </span>
+                                <input type="text" class="wid_260  input_Style2 hei_30" value="$!user.loginname"
+                                       readonly="readonly"/>
+                                <input name="supplierId" type="hidden" value="$!user.uid">
+                                <input id="sellerSupplierId" type="hidden" value="$user.shopId">
+                            </li>
+                            <li class="wid_460 mar_tb10 ">
+                                <span class="font_wid mar_r10">联系电话 : </span>
+                                <input type="text" class="wid_95 input_Style2 hei_30" value="$!user.userMobile"
+                                       readonly="readonly"/>
+                            </li>
+                            <li class="wid_460 mar_tb10 ">
+                                <span class="font_wid mar_r10">传真 : </span>
+                                <input type="text" class="wid_40 input_Style2 hei_30" readonly="true"/>
+                                <i class="mar_lr10">-</i>
+                                <input type="text" class="wid_95 input_Style2 hei_30" readonly="true"/>
+                            </li>
+                            <li class="wid_460 mar_20 mar_tb10">
+                                <span class="font_wid mar_r10">电子邮箱 : </span>
+                                <input type="text" class="wid_260  input_Style2 hei_30" readonly="readonly"
+                                       value="$user.userEmail"/>
+                            </li>
+                        </ul>
+                    </div>
+                    <!--  供货商信息end -->
+                    <!-- 联系方式 end -->
+                #elseif($!sourcePage=="buyer")
+                    <!-- 印刷厂信息start -->
+                    <div style="float:left" class="wid_460 fl">
+                        <ul class="list mar_t10 mar_l10 ">
+                            <li class="wid_460 mar_tb10 ">
+                                <span class="font_wid mar_r10">买方 : </span>
+                                <input type="text" class="wid_260 input_Style2 hei_30" id="contractPrinterId"
+                                       value="$!userDTO.companyName" readonly="true"/>
+                                <input name="printerId" type="hidden" value="$!user.uid">
+                            </li>
+                            <li class="wid_460 mar_tb10">
+                                <span class="font_wid mar_r10">联系人 : </span>
+                                <input type="text" class="wid_260 input_Style2 hei_30" id="contractSupplierId"
+                                       value="$!user.loginname" readonly="true"/>
+                                <input type="hidden" name="createBy" value="$!user.uid">
+                            </li>
+                            <li class="wid_460 mar_tb10 ">
+                                <span class="font_wid mar_r10">联系电话 : </span>
+                                <input type="text" class="wid_95 input_Style2 hei_30" id="contractMobilePhone"
+                                       value="$!user.userMobile" placeholder="手机号" readonly="true"/>
+                            </li>
+                            <li class="wid_460 mar_tb10 ">
+                                <span class="font_wid mar_r10">传真 : </span>
+                                <input type="text" class="wid_40 input_Style2 hei_30" readonly="true"/>
+                                <i class="mar_lr10">-</i>
+                                <input type="text" class="wid_95 input_Style2 hei_30" readonly="true"/>
+                            </li>
+                            <li class="wid_460 mar_20 mar_tb10">
+                                <span class="font_wid mar_r10">电子邮箱 : </span>
+                                <input type="text" id="contractEmail" class="wid_260  input_Style2 hei_30"
+                                       value="$!user.userEmail" readonly="true"/>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- 印刷厂信息end -->
+                    <!-- 供货商信息start -->
+                    <div style="float:right" class="wid_460 fl">
+                        <ul class="list mar_t10 mar_l10 ">
+                            <li class="wid_460 mar_tb10">
+                                <span class="font_wid mar_r10"><i class="font_fs mar_l2">*</i>卖方 : </span>
+                                <input type="text" class="wid_260 input_Style2 hei_30" value=""
+                                       onclick="getCompany(1)"
+                                       readonly="true" placeholder="点击此处选择卖方信息" id="companyName"/>
+                                <input type="hidden" id="supplierShopId">
+                                <input type="hidden" name="supplierId" id="conSupplierId">
+                            </li>
+                            <li class="wid_460 mar_20 mar_tb10">
+                                <span class="font_wid mar_r10"><i class="font_fs mar_l2">*</i>联系人 : </span>
+                                <input type="text" class="wid_260 input_Style2 hei_30"
+                                       readonly="true" id="supplierConector"/>
+                            </li>
+                            <li class="wid_460 mar_tb10 ">
+                                <span class="font_wid mar_r10"><i class="font_fs mar_l2">*</i>联系电话 : </span>
+                                <input type="text" class="wid_95 input_Style2 hei_30" id="mobilePhone" placeholder="手机号"
+                                       readonly="true"/>
+                            </li>
+                            <li class="wid_460 mar_tb10 ">
+                                <span class="font_wid mar_r10">传真 : </span>
+                                <input type="text" class="wid_40 input_Style2 hei_30" readonly="true"/>
+                                <i class="mar_lr10">-</i>
+                                <input type="text" class="wid_95 input_Style2 hei_30" readonly="true"/>
+                            </li>
+                            <li class="wid_460 mar_20 mar_tb10">
+                                <span class="font_wid mar_r10">电子邮箱 : </span>
+                                <input type="text" class="wid_260  input_Style2 hei_30" id="Email" readonly="true"/>
+                            </li>
+                        </ul>
+                    </div>
+                    <!--  供货商信息end -->
+                    <!-- 联系方式 end -->
+                #end
+                <div class="clear"></div>
+                <!-- 协议条件 开始 -->
+                <p class="font_16 hei_32 pad_l10 bg_05 mar_t20">协议条件</p>
+                <ul class="list mar_t10 mar_l10 ">
+                    <!--协议有效期 开始-->
+                    <li class="wid_920 mar_tb10">
+                        <span class="font_wid mar_r10"><i class="font_fs mar_l2">*</i>协议有效期 : </span>
+                        <input class="jcDate wid_170 hei_30 input_Style2" type="text"
+                               id="beginDate" name="beginDate"
+                               value="$!date.format('yyyy-MM-dd HH:mm:ss', $!contractInfoDTO.beginDate)"
+                               onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+                    ##                        <input class="jcDate wid_170 hei_30 input_Style2" name="beginDate" id="beginDate"
+                    ##                               value="$!contractInfoDTO.beginDate"/>
+                        <i class=" mar_lr10">至</i>
+                    ##                        <input class="jcDate wid_170 hei_30 input_Style2" name="endDate" id="endDate"
+                    ##                               value="$!contractInfoDTO.endDate"/>
+                        <input class="jcDate wid_170 hei_30 input_Style2" type="text"
+                               id="endDate" name="endDate"
+                               value="$!date.format('yyyy-MM-dd HH:mm:ss', $!contractInfoDTO.beginDate)"
+                               onclick="WdatePicker({minDate:'%y-%M-%d',isShowClear:false});"/>
+                    </li>
+                    <!--协议有效期 end-->
+                    <li class="wid_920 mar_tb10">
+                        <span class="font_wid mar_r10"><i class="font_fs mar_l2">*</i>协议账期 : </span>
+                        <input type="radio" value="0" name="paymentType" onclick="radioChange()"/>
+                        <select id="choseDay" disabled="true" class="wid_100 input_Style2 hei_30"
+                                name="paymentDays">
+                            <option value="">请选择</option>
+                            <option value="7">7</option>
+                            <option value="15">15</option>
+                            <option value="30">30</option>
+                            <option value="45">45</option>
+                            <option value="60">60</option>
+                            <option value="70">75</option>
+                            <option value="90">90</option>
+                            <option value="120">120</option>
+                            <option value="180">180</option>
+                        </select>
+                         <i class="mar_lr10">天</i>
+                        <input type="radio" value="1" onclick="radioChange()" name="paymentType"/>
+                        <select name="paymentMonth" id="choseMonth" disabled="true" style="padding-left:0%"
+                                class="wid_100 input_Style2 hei_30">
+                            <option value="">请选择</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                        </select>
+                        <i class="mar_lr10">月</i>
+                        <i class="mar_lr20">需要审批</i><!--创建完毕:0;协议需要审批:1;审批完毕:2;确认完毕:4;-->
+                        <input type="checkbox" id="needApprove" name="status" value="7"
+                               onchange="showApproveList(this)"/>
+
+                        <div id="approveBy" style="display: none">
+                            <span class="font_wid mar_r10">选择审批人:</span>
+                            <select id="approveList" class="wid_150 input_Style2 hei_30" name="approveBy">
+                                #foreach($approve in $approveList)
+                                    <option value="$approve.userId">$!approve.username</option>
+                                #end
+                            </select>
+                        </div>
+                    </li>
+                    <li class="wid_920 mar_20 mar_tb10">
+                        <span class="font_wid mar_r10"><i class="font_fs mar_l2">*</i>协议类型: </span>
+                        <select class="wid_100  input_Style2 hei_30" id="protocolTypeId" name="protocolType" onchange="empty();display();" >
+                             <option value="1">单价</option>
+                              <option value="2">数量</option>
+                              <option value="3">总价值</option>
+                        </select>
+                    </li>
+                    <li id="uploadLi" class="wid_920 mar_20 mar_tb10">
+                        <span class="font_wid mar_r10">附件 : </span>
+
+                        <input type="file" class="wid_260  input_Style2 hei_30" id="fileInput" name="file"
+                               onchange="startUpload();"/></li>
+                    <input type="hidden" id="annex" name="annex"/>
+                    <li class="wid_920 mar_20 mar_tb10">
+                        <span class="font_wid mar_r10">备注 : </span>
+                        <textarea cols="" rows="" name="remark" value="$!contractInfoDTO.remark" maxlength="300"
+                                  class="wid_500 input_Style2 hei_100"></textarea>
+                    </li>
+                </ul>
+            </form>
+            <!-- 协议条件 end -->
+            <div class="clear"></div>
+            <!-- 协议物品 开始 -->
+            <p class="font_16 hei_32 pad_l10 bg_05 mar_t20">协议物品</p>
+
+            <div class="right_xinxi mar">
+                <p class="hei_40">
+                    <span class="fr"><button type="button" class="button_2 hei_24 " onclick="showItemSearchDIV()">+增加
+                    </button></span>
+                </p>
+                <!-- 协议物品 开头 -->
+                 <ul class="list_top bg_08 font_cen font_14b" id="dj">
+                    <li class="wid_150">产品编号</li>
+                    <li class="wid_150">所属类目</li>
+                    <li class="wid_230">物品名称</li>
+                    <li class="wid_110">销售属性</li>
+                    <li class="wid_200">单价</li>
+                    <li class="wid_80">操作</li>
+                </ul>
+                <ul class="list_top bg_08 font_cen font_14b" id="znumber" style="display: none;">
+                    <li class="wid_120">产品编号</li>
+                    <li class="wid_160">所属类目</li>
+                    <li class="wid_150">物品名称</li>
+                    <li class="wid_150">销售属性</li>
+                    <li class="wid_140">单价</li>
+                    <li class="wid_140">总数量</li>
+                    <li class="wid_80">操作</li>
+                </ul> 
+              <ul class="list_top bg_08 font_cen font_14b" id="zcost" style="display: none;">
+                    <li class="wid_120">产品编号</li>
+                    <li class="wid_160">所属类目</li>
+                    <li class="wid_150">物品名称</li>
+                    <li class="wid_150">销售属性</li>
+                    <li class="wid_140">单价</li>
+                    <li class="wid_140">总价值</li>
+                    <li class="wid_80">操作</li>
+                </ul>
+                <div id="itemList">
+                </div>
+            </div>
+            <!--right_xinxi end-->
+            <div class="clear"></div>
+            <div class="wid_330 mar_cen">
+                <button type="button" class="button_2 hei_35" onclick="addContractInfo()">保 存</button>
+                <button type="button" class="button_2 hei_35" onclick="immediately()">立即发布</button>
+                <button type="button" class="button_3 hei_35 mar_l14" onclick="closeDiv1('$sourcePage')">取 消</button>
+            </div>
+            <!-- 类型选择 -->
+        </div>
+        <!--mar_lr10 end -->
+    </div>
+    <!--id="right" end-->
+    <!--右边部分结束-->
+</div>
+<!--#main end -->
+<style>
+    .city_shi ol li {
+        float: left;
+        width: 60px;
+        height: 30px;
+        line-height: 30px;
+        text-align: center;
+    }
+
+    .city_shi ol li:hover {
+        background: #f00;
+    }
+</style>
+<script type="text/javascript">
+    $("#quanguo").click(function () {
+        $(".all_chain").show();
+    })
+    $(".xx").click(function () {
+        $(".all_chain").hide();
+    })
+</script>
+
+<!-- 选择卖方信息 -->
+<div id="Idiv" class="po_fai" style=" display:none">
+    <div class="po_main_Mess pad_t10" style="width:560px">
+        <div class="hei_32 bg_05 pad_l10 font_14b"><i class="demo-icons fa-times-circle font_16 fr mar_r10 no"
+                                                      onclick="closeDiv(this)"></i>公司名称
+            <input class="wid_220 input_Style2 hei_24" name="company"
+                   placeholder="请输入要查询的公司名称" class="wid_11 input_3">
+            <button class="button_1 hei_24" onclick="searchCompany()">查询</button>
+        </div>
+        <!--标题 end -->
+        <input type="hidden" id="IdivOperate">
+
+        <div id="partBDetail">
+        </div>
+        <!--内容div end -->
+    </div>
+    <!--po_main_Mess end-->
+</div>
+
+<!-- 背景蒙板 -->
+<div class="po_fai" id="loadMask" style="display: none">
+    <div class="po_fai_bg"></div>
+</div>
+
+<!--联系人列表-->
+<div id="Odiv" style="display: none; position: absolute; z-index: 20000; border:solid;background:#dedede">
+    <div id="conector_head"
+         style="width:800px; height:500px; border:1px solid red ; z-index: 20001; position: absolute;">
+        <div style="float:center;width:800px;height:30px">
+            <input type="button" value="关闭" onclick="closeOdiv();" style="float:right"/>
+        </div>
+        <div class="clear"></div>
+        <form id="conectorPage" method="post">
+            <input name="page" type="hidden">
+        </form>
+        <div id="conectorDetail" style="background:white;width:800px;height:470px">
+
+        </div>
+    </div>
+</div>
+
+<!-- 查询物品信息 -->
+<div id="itemSearchDIV" class="po_fai" style="display:none;">
+    <!--弹出蒙版背景-->
+    <div class="po_main_Mess pad_t10" style="width:560px;overflow-y: auto;height:60%;">
+        <div class="hei_32 bg_05 pad_l10 font_14b"><i class="demo-icons fa-times-circle font_16 fr mar_r10 no"
+                                                      onclick="closeDiv(this)"></i>卖方物品列表
+            <input class="wid_220 input_Style2 hei_24" style="margin-left:25px"
+                   name="keyword" onblur="if($.trim(this.value)=='') value='请输入要查询的物品名称';"
+                   onfocus="if(this.value=='请输入要查询的物品名称') value='';" value='请输入要查询的物品名称' class="wid_11 input_3">
+            <button class="button_1 hei_24" onclick="searchItemByKeyword()">查询</button>
+        </div>
+        <!--标题 end -->
+        <div id="itemSearchResult">
+        </div>
+        <!--内容div end -->
+
+        <div class="clear"></div>
+        <div class="wid_200 mar_cen" style="position: absolute;bottom: 0;left:0;right:0;">
+            <button class="button_2 hei_35 " onclick="createItemLi()">
+                确定
+            </button>
+            <button class="button_3  hei_35" onclick="closeDiv(this)">
+                取消
+            </button>
+        </div>
+        <!-- 确认 取消 结束 -->
+    </div>
+    <!--po_main_Mess end-->
+</div>
+
+

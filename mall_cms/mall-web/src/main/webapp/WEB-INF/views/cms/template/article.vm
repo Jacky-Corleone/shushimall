@@ -1,0 +1,22 @@
+<div>
+	工程案例
+	<hr>
+		<div>
+			<ul>
+				<@cmsCategoryListTag name="工程案例" delFlag="0">
+					<#list categoryList as category>
+						<li>
+							<@cmsArticleListTag cityid="${category.id}" delFlag="0">
+									<#list articleList as article>
+										<a href="${article.link}" title="${article.title}">
+											<img src="${article.image}" border="0"  width="670" height="450"/>
+										</a>
+									</#list>
+								</li>
+							</@cmsArticleListTag>
+						</li>
+					</#list>
+				</@cmsCategoryListTag>
+			</ul>
+		</div>
+</div>

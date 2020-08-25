@@ -1,0 +1,307 @@
+<link href="$request.contextPath/assets/css/Details.css" rel="stylesheet" type="text/css"/>
+<link href="$request.contextPath/assets/css/loading.css" rel="stylesheet" type="text/css"/>
+<link href="$request.contextPath/assets/css/manage_style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+// javascript:window.history.forward(1);
+	$(document).ready(function(){
+// 		$("#recommend").load("$request.contextPath/recommend");
+		//判断是否可以结算服务商品
+		var cityCode = $.cookie('regionCode');
+  		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "$request.contextPath/shopCart/checkMallTheme",
+			data: {
+				cityCode : cityCode
+			},
+			success: function(data){
+				if(data.result){
+					$("#mallTheme").val('ok');
+				}else{
+					$("#mallTheme").val(data.resultMessage);
+				}
+			}
+		});
+  		
+	});
+	
+	function checkAll(obj){
+		$(".list_main").append("<div id='ke-loading' class='cart-loading' ></div>")
+		var checked = $(obj).is(":checked");
+		$.ajax({
+			type: 'post',
+			url: "$request.contextPath/shopCart/checkAll",
+			data: {"checked":checked},
+			dataType: "text",
+			success: function(data){
+				$(obj).parents(".list_main").html(data)
+			}
+		});
+	}
+
+	function checkShop(obj){
+		$(".list_main").append("<div id='ke-loading' class='cart-loading' ></div>")
+		var checked = $(obj).is(":checked");
+		var shopid = $(obj).val();
+		$.ajax({
+			type: 'post',
+			url: "$request.contextPath/shopCart/checkShop",
+			data: {"shopid":shopid,"checked":checked},
+			dataType: "text",
+			success: function(data){
+				$(obj).parents(".list_main").html(data)
+			}
+		});
+	}
+
+	function onkeyup_product(obj){
+		//var quantity = $(obj).parents("ul").find("[name='quantity']").val();
+		$(obj).val($(obj).val().replace(/\D/g,''));
+	}
+	
+	// 记住旧的数量
+    var oldQuantity;
+	// 数量获得焦点
+	function setOldQuantity(obj){
+		oldQuantity = $(obj).val().replace(/\D/g,'');
+	}
+	
+	// 数量失去焦点
+	function reCalcShopCart(obj){
+		var quantity = $(obj).parents("ul").find("[name='quantity']").val();
+		quantity = quantity.replace(/\D/g,'');
+		if(oldQuantity && quantity){
+			if(parseInt(oldQuantity) != parseInt(quantity)){
+				editProduct(obj);
+			}
+		} else{
+			alert("请输入正确的商品数量");
+		}
+	}
+	
+	function editProduct(obj){
+		var quantity = $(obj).parents("ul").find("[name='quantity']").val();
+		quantity = quantity.replace(/\D/g,'');
+		if( quantity.length == 0 || parseInt(quantity) == 0 ){
+			quantity = 1;
+		}else if( parseInt(quantity) > 1000000 ){
+			quantity = 1000000;
+		}
+		$(obj).parents("ul").find("[name='quantity']").val(quantity);
+
+		// 是否为集采商品
+		var isCentralPurchasing = $(obj).parents("ul").find(".isCentralPurchasing").val();
+		var proAllQty = $(obj).parents("ul").find(".qty_js").val();
+//		if( parseInt(quantity) > parseInt(proAllQty) ){
+//			if(!isCentralPurchasing){
+//				alert("购买数量已超库存数！");
+//			} else{
+//				alert("每位用户限购" + proAllQty + "件");
+//			}
+//			quantity=parseInt(proAllQty);
+//			//return false;
+//		}
+
+		$(".list_main").append("<div id='ke-loading' class='cart-loading' ></div>")
+		var shopid = $(obj).parents(".main").find("[name='shopid']").val();
+		var skuid = $(obj).parents("ul").find("[name='skuid']").val();
+		var checked = $(obj).parents("ul").find("[name='skuid']").is(":checked");
+		var promid = $(obj).parents("ul").find("[name='promid']").val();
+		var activitesDetailsId = $(obj).parents("ul").find("[name='activitesDetailsId']").val();
+		$.ajax({
+			type: 'post',
+			url: "$request.contextPath/shopCart/edit",
+			data: {"skuId":skuid,"shopId":shopid,"quantity": quantity,"promId":promid,"checked":checked,"activitesDetailsId":activitesDetailsId},
+			dataType: "text",
+			success: function(data){
+				$(obj).parents(".list_main").html(data)
+				
+			}
+		});
+		
+	}
+
+	function subQuantity(obj){
+		var quantity = $(obj).parent().find("[name='quantity']").val();
+		if(quantity > 1){
+			$(obj).parent().find("[name='quantity']").val(parseInt(quantity) - 1);
+			editProduct(obj);
+		}
+	}
+
+	function addQuantity(obj){
+		var quantity = $(obj).parent().find("[name='quantity']").val();
+		$(obj).parent().find("[name='quantity']").val(parseInt(quantity) + 1);
+		editProduct(obj);
+	}
+
+	function removeProduct(obj){
+		$(".list_main").append("<div id='ke-loading' class='cart-loading' ></div>")
+		var shopid = $(obj).parents(".main").find("[name='shopid']").val();
+		var skuid = $(obj).parents("ul").find("[name='skuid']").val();
+		var activitesDetailsId = $(obj).parents("ul").find("[name='activitesDetailsId']").val();
+		$.ajax({
+			type: 'post',
+			url: "$request.contextPath/shopCart/del",
+			data: {"skuId":skuid,"shopId":shopid,"activitesDetailsId":activitesDetailsId},
+			dataType: "text",
+			success: function(data){
+				$(obj).parents(".list_main").html(data)
+			}
+		});
+	}
+
+	function checkProduct(obj){
+		$(".list_main").append("<div id='ke-loading' class='cart-loading' ></div>")
+		editProduct(obj);
+	}
+
+  	function winDelOpen(obj){
+  		$(".del_box").hide();
+  		$(obj).parent().find(".del_box").show();
+   	}
+  	function winDelClose(obj){
+   		$(obj).parent().hide();
+   	}
+
+  	function mvProToFavourite(obj){
+		var shopId = $(obj).parents(".main").find("[name='shopid']").val();
+		var itemId = $(obj).parents("ul").find("[name='itemId']").val();
+		var sellerId = $(obj).parents("ul").find("[name='sellerId']").val();
+		var skuid = $(obj).parents("ul").find("[name='skuid']").val();
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "$request.contextPath/favourite/addItem",
+			data: {
+				shopId: shopId,
+				itemId: itemId,
+				sellerId: sellerId,
+				skuId: skuid
+			},
+			success: function(data){
+				if( data.success ){
+					alert("收藏成功");
+					removeProduct(obj)
+				}
+			}
+		});
+  	}
+  	function toOrderView(obj){
+  		var a = $("input:checkbox[name='skuid']:checked");
+	  	if (a.length == 0) {
+	  	        alert("请至少选中一件商品！");
+	  	        return;
+	  	}
+	  	//是否有纯服务商品
+	  	var isServiceKey = false;
+	  	//是否有其他商品 不包含纯服务商品
+	  	var isOtherItem = false;
+	  	$(a).each(function () {
+	  		//大于3表示有纯服务商品
+	  		if($(this).attr("class") > 3){
+	  			isServiceKey = true;
+	  		}else{
+	  			isOtherItem = true;
+	  		}
+	   	});
+  		
+	  	if(isServiceKey && isOtherItem){
+	  		alert("纯服务商品不可以与套装商品 、普通商品同时购买。");
+	  		return;
+	  	}
+	  	
+	  	//只购买纯服务商品  验证是否维护子站
+	  	if(isServiceKey && !isOtherItem){
+	  		var mallTheme = $("#mallTheme").val();
+	  		if(mallTheme != 'ok'){
+	  			alert(mallTheme);
+	  			return;
+	  		}
+	  	}
+	  	
+	  	$(".list_main").append("<div class='submit-loading' ></div>");
+  		var quantity = $(".list_main").find("[name='proQuantity']").val();
+  		if( quantity && parseInt(quantity) > 0 ){
+  			$.ajax({
+  				url: "$request.contextPath/shopCart/validate",
+				data: {orderType : 2},
+  				dataType: "html",
+  				success: function(data){
+  					if( data != null && data != "" ){
+  						$(".submit-loading").fadeOut().remove();
+  						$("#xxx").append(data);
+  					}else{
+						$("#cartForm").submit();
+  					}
+  				}
+  			});
+  		}else{
+  			$(".submit-loading").fadeOut().remove();
+  			alert("请至少选中一件商品！");
+  		}
+	  	
+  	}
+  	
+
+    function goShop(){
+        location.href="$request.contextPath/";
+    };
+
+    
+    
+ // 领取优惠券
+function getCoupons(couponId,obj){
+	if(confirm("确认领取优惠券？")){
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "$request.contextPath/coupons/getCoupons",
+			data: {
+				couponId: couponId
+			},
+			success: function(data){
+				if(data.resultMessage == "领取成功"){
+					refushCart(data.resultMessage,obj);
+				}else{
+					alert(data.resultMessage);
+				}
+			}
+		});
+	}
+}
+ 
+function refushCart(msg,obj){
+	$(".list_main").append("<div id='ke-loading' class='cart-loading' ></div>");
+	$.ajax({
+		type: 'post',
+		url: "$request.contextPath/shopCart/getCoupons",
+		dataType: "text",
+		success: function(data){
+			$(obj).parents(".list_main").html(data);
+			alert(msg);
+		}
+	});
+}
+    
+</script>
+#parse("/common/search.vm")
+#parse("/common/index_head.vm")
+<div class="wid mar_tb20">
+	<!--以下为：我的购物车-->
+    <div class="my_shop">
+    	<h1><span></span>我的购物车</h1>
+    	<input type="hidden" id= "mallTheme">
+    </div>
+	<div class="tree tree_1"></div>
+    <div class="clear">
+	</div>
+<div class="list_main">
+	#parse("/shopcart/cart.vm")
+</div>
+
+<!-- <div id="recommend" style="width: 1200px; min-height: 250px;"></div> -->
+
+<div id="xxx"></div>
+
+#set($layout = "/mini_layout.vm")

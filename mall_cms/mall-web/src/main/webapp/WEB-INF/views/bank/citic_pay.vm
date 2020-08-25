@@ -1,0 +1,281 @@
+#set($layout = "/none_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+#parse("/common/tdk.vm")
+<link rel="stylesheet" style="text/css" href="$staticPath/bank/citic/css/login.css">
+<link href="$staticPath/css/basic.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="$staticPath/js/jquery-1.11.2.min.js"></script>
+<style type="text/css">
+	.po_fai .po_main ul li{width:100%; text-align: left; line-height:40px;}
+</style>
+<script type="text/javascript">
+document.onkeydown = function(event) {  
+    var target, code, tag;  
+    if (!event) {  
+        event = window.event; //针对ie浏览器  
+        target = target;  
+        code = event.keyCode;  
+        if (code == 13) {  
+            tag = target.tagName;  
+            if (tag == "TEXTAREA") {
+				return true; 
+			}  
+            else {
+				return false; 
+			}  
+        }  
+    }  
+    else {  
+        target = event.target; //针对遵循w3c标准的浏览器，如Firefox  
+        code = event.keyCode;  
+        if (code == 13) {  
+            tag = target.tagName;
+            if (tag == "INPUT") {
+				return false; 
+			}  
+            else {
+				return true; 
+			}  
+        }  
+    }  
+};
+
+
+	$(document).ready(function(){
+		$(".mc_prompt_close").click(function(){
+			$("#payValid").hide();
+		});
+	});
+	
+	function jump(count) { 
+        window.setTimeout(function(){ 
+            count--; 
+            if(count > 0) { 
+            	$("#secondsCount").html(count+" 秒后跳转到我的订单！");
+                jump(count); 
+            } else { 
+            	$("#secondsCount").html("正在为您跳转到我的订单，请稍等...");
+                location.href="$request.contextPath/order/queryBuyer"; 
+            } 
+        }, 1000); 
+    } 
+	
+	function payOrder(){
+    	
+		var password = $.trim($("#payPassword").val());
+		if( password != "" && password.length > 0 ){
+	    	$("#payLoadMessage").show();	//正在加载弹出层
+			$.ajax({
+				url: "$request.contextPath/citic/payOrder",
+				data: $("#payForm").serialize(),
+				type: "post",
+				dataType: "json",
+				success: function(data){
+					
+				
+					//王东晓添加，在确认付款前需要检验余额是否充足
+                	//如果余额不足
+            		
+                	if($!bankOrder.balance<$!bankOrder.orderAmount){
+            			if(confirm("余额不足，是否去充值")){
+                            location.href="$request.contextPath/security/selectBank";
+                        }
+            			return ;
+            		}
+                	
+                	//王东晓添加end
+				
+				
+					$("#payValid").find(".title").html("");
+					$("#payValid").find(".message").html("");
+					$("#payValid").find(".toolbars").html("<a href='$request.contextPath' class='font_7a'>返回商城</a>");
+					
+					$("#payLoadMessage").hide();
+					
+					if( data.success ){
+						$("#icon_pay_end").addClass("fa-check-circle demo-icons font_24 mar_r10 font_7a");
+						$("#payValid").find(".title").html("订单支付成功！").addClass("font_7a");
+						$("#payValid").find(".mc_prompt_close").hide();
+						$("#payValid").find(".toolbars").html("<span id='secondsCount'>5  秒后跳转到我的订单！</span> &nbsp;&nbsp;<a href='$request.contextPath/order/queryBuyer' class='font_fe'>如未跳转，请点击这里</a>");
+						jump(5);
+					}else{
+						$("#icon_pay_end").addClass("fa-info-circle demo-icons font_24 mar_r10 font_fe");
+						$("#payValid").find(".mc_prompt_close").show();
+						$("#payValid").find(".title").html("订单支付失败！").addClass("font_fe");
+						if( data.resultMessage == "1" ){
+							//$("#payValid").find(".message").html("账户余额不足  \"<a href='$request.contextPath/security/selectBank'>请充值</a>\"");
+							//var toolbars = "&nbsp;&nbsp;&nbsp;<a href='javascript:modifyOrderJob()'>已充值，完成付款</a>";
+							//$("#payValid").find(".toolbars").append(toolbars);
+						}else{
+							var errorMessages = "";
+							$(data.errorMessages).each(function(i,msg){
+								errorMessages += msg + "<br>";
+							});
+							$("#payValid").find(".message").html(errorMessages);
+							$("#payPassword").val("");
+						}
+					}
+					$("#payValid").show();
+				}
+			});
+		}else{
+			alert("请输入支付密码!");
+		}
+	}
+	
+	function modifyOrderJob(){
+		var outTradeNo = $("[name='outTradeNo']").val();
+		$.ajax({
+			url: "$request.contextPath/citic/modifyOrderJob",
+			type: "post",
+			data: {"outTradeNo": outTradeNo}
+		});
+		location.href="$request.contextPath/";
+	}
+	function recharge(){
+		location.href="$request.contextPath/security/selectBank";
+	}
+	function custom_close(){
+        if(confirm("您确定要离开本页吗？")){
+            window.opener=null;
+            window.open('','_self');
+            window.close();
+        }
+        else{}
+    }
+</script>
+</head>
+<body class="login_bg">
+	<div id="container">
+    	<img src="$staticPath/bank/citic/images/top_logo.jpg" alt="中信银行LOGO" align="absmiddle">
+        <div id="centerBox">
+        	<div id="mainBox">
+				<p style="text-indent: 5em">请您及时付款，以便订单尽快处理！</p>
+				<p style="text-indent: 5em">企业付款（到账周期为1-4个工作日）</p>
+				
+        		<div class="main">
+        			<div id="menu">
+        			 	<!-- update start by sunn 20130312-->
+	                	<div style="margin-top:7px">
+	               			<div class="menu_title">订单信息</div>
+	               			<!--<div class="menu_title2">商户名称: 中信银行</div> -->
+	               			<div class="menu_title2">订单编号: $!bankOrder.orderNo</div>
+	               			<div class="menu_title2">订单金额: $!bankOrder.orderAmount</div>
+	               			<div class="menu_title2">支付币种: $!bankOrder.curType</div>
+ 	               			<div class="menu_title2">账户余额: $!bankOrder.balance</div> 
+	  					</div>
+						<!-- update end by sunn 20130312-->  
+               		</div>
+       				<div class="left">
+       					<form id="payForm" action="$request.contextPath/citic/payOrder" method="post">
+        					<table class="table_inf" border="0" cellpadding="0" cellspacing="0" width="100%">
+                     			<tbody>
+									<tr id="certUserId" style="height: 50px; line-height: 50px;">
+										<td class="paddingRight" colspan="2">
+											网上银行支付：适用于便捷支付客户
+										</td>
+									</tr>
+									<tr id="noCertUserId">
+										<td class="tdRight">支付密码：</td>
+										<td class="paddingRight">
+											<input name="outTradeNo" value="$!bankOrder.outTradeNo" type="hidden">
+											<input name="orderAmount" class="inputOut" type="hidden" value="$!bankOrder.orderAmount">
+											<input id="payPassword" name="payPassword" size="22" class="inputOut" type="password">
+										</td>
+									</tr>
+									<tr>
+				                        <td height="36">&nbsp;</td>
+				                        <td class="paddingRight" style="padding-top:2px;">
+				                        	<div id="logonDiv" style="float:left">
+				                        		<button type="button" onclick="recharge()" class="button_1 hei_25 font_10b">充值
+				                        		<!--	<img src="$staticPath/bank/citic/images/login_btn_2008.jpg" align="absmiddle" height="26" width="86">-->
+				                        		</button>
+												#if($userInfo.isHavePayPassword==1)
+													<a href="$request.contextPath/security/findpaypwdpage?userType=buyer">忘记支付密码?</a>
+												#elseif($userInfo.isHavePayPassword==0)
+													<a href="$request.contextPath/security/setpaypwdpage?userType=buyer">设置支付密码</a>
+												#end
+				                        	</div>		
+				                        </td>
+                      				</tr>
+									<tr>
+				                        <td height="36">&nbsp;</td>
+				                        <td class="paddingRight" style="padding-top:2px;">
+				                        	<div id="logonDiv" style="float:left">
+				                        		<button type="button" onclick="payOrder()" class="button_1 hei_25 font_10b">确认
+				                        		</button>
+				                        		<button type="button" onclick="custom_close()"  class="button_2 hei_25 font_10b">取消
+				                        		</button>
+				                        	</div>		
+				                        </td>
+                      				</tr>
+									
+									
+                     			</tbody>
+                     		</table>
+       					</form>
+       				</div>
+            		<div class="tip_2" style="display:none">
+	                	<dl>
+	                		<dt style="line-height:23px;">
+	                			<span style="color:#c72727">·</span>
+	                			首次使用网银前下载安装网银伴侣。用户名默认为您的身份证件号码，登录后点击"网银管理-&gt;用户名修改"功能可进行修改。
+	                		</dt>
+	                	  	<dt style="line-height:23px;">
+	                	  		<span style="color:#c72727">·</span>
+	                	  		为了保证您顺利使用，推荐您使用win2000、winXP操作系统、IE6.0以上版本浏览器，并将计算机显示器的分辨率调整为1024*768。
+	                	  	</dt>
+	                	  	<dt style="line-height:23px;">
+	                	  		<span style="color:#c72727">·</span>
+	                	  		您使用我行个人网银，须遵守《中信银行个人网上银行业务章程》。您在使用过程中如有任何疑问，请咨询95558。
+	                	  	</dt>
+	                    </dl>
+           	  		</div>
+        		</div>
+          	</div>
+        </div>
+        
+        <div class="bottom"></div>
+        <div class="copyRight">
+            	Copyright &copy; 舒适100 版权所有，并保留所有权利 | 京ICP备15027467号<br/>
+                                                       舒适100字体由汉仪字库提供 | Tel：400-9987-466 | E-mail：service@shushi100.com
+        </div>
+	</div>
+	
+	
+	<div id="payValid" class="po_fai" style="display: none;">
+    	<div class="po_fai_bg"></div>
+    	<div class="po_main3">
+    		<!-- 支付失败时 显示关闭按钮 -->
+			<span class="mc_prompt_close" style="top: 5px; right: 5px;">
+				<i class="fa-times-circle font_18"></i>
+			</span>
+			<ul>
+	    		<li class="font_18">
+	    			<i id="icon_pay_end"></i>
+	    			<span class="title"></span>
+	    		</li>
+	        	<li class="message font_fe"></li>
+	        	<li class="toolbars">
+	        	</li>
+	        	<li>如果您在支付过程中遇到问题，请拨打客服电话：400-9987-466</li>
+    		</ul>
+		</div>
+	</div>
+	
+	
+	<!-- 阶梯价加载弹出曾 -->
+	<div class="po_fai" id="payLoadMessage" style="display:none;z-index:10000">
+	    <div class="po_fai_bg"></div>
+	    <div class="po_main1">
+	      <div class="tit bg_05 hei_30 pad_l10">提示</div>
+	    <ul>
+	        <li><img src="$request.contextPath/assets/images/loading.gif" alt="" />&nbsp;&nbsp;正在支付,请稍候...</li>
+	    </ul>
+	  </div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.camelot.openplatform.common</groupId>
+	<artifactId>common</artifactId>
+	<packaging>pom</packaging>
+	<version>1.0.3-SNAPSHOT</version>
+	<name>Camelot common 工程</name>
+	<url>http://maven.apache.org</url>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<file.encoding>UTF-8</file.encoding>
+	</properties>
+	<modules>
+		<module>common-core</module>
+	</modules>
+</project>

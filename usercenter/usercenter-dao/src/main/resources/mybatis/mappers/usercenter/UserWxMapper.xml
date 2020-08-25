@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.usercenter.dao.UserWxDAO">
+
+    <!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+    <resultMap id="userWxDTOMap" type="com.camelot.usercenter.dto.UserWxDTO">
+        <result property="uid" column="id"/>
+        <result property="uname" column="username"/>
+        <result property="umobile" column="mobile"/>
+        <result property="usertype" column="type"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="userEmail" column="email"/>
+        <result property="nickname" column="nickname"/>
+        <result property="userstatus" column="status"/>
+        <result property="shopId" column="shop_id"/>
+        <result property="securityLevel" column="security_level"/>
+        <result property="auditor" column="auditor"/>
+        <result property="auditRemark" column="audit_remark"/>
+        <result property="quickType" column="quick_type"/>
+        <result property="created" column="created_time"/>
+        <result property="updated" column="updated_time"/>
+        <result property="paymentStatus" column="payment_status"/>
+        <result property="linkMan" column="link_man"/>
+        <result property="department" column="department"/>
+        <result property="linkPhoneNum" column="link_phone_num"/>
+        <result property="companyName" column="company_name"/>
+        <result property="companyAddr" column="company_address"/>
+        <result property="auditStatus" column="result"/>
+        <result property="auditTime" column="time"/>
+        <result property="password" column="password"/>
+        <result property="deleted" column="deleted"/>
+        <result property="wxopenid" column="wxopenid"/>
+
+
+
+    </resultMap>
+
+    <!--微信绑定 验证成功后写入   单独接口 便于后期修改-->
+    <update id="bindingWX" parameterType="Object">
+        update user
+        set
+        wxopenid = #{wxopenid},
+        updated_time = now()
+        where id = #{uid}
+    </update>
+    <!--根据微信绑定ID获取用户信息    单独接口 便于后期修改-->
+    <select id="getUserInfoByOpenId" resultMap="userWxDTOMap">
+        SELECT *
+        FROM user
+        WHERE 1=1
+        <if test="userWxDTO.wxopenid != null  and userWxDTO.wxopenid !=''">
+            and wxopenid = #{userWxDTO.wxopenid}
+        </if>
+        <if test="userWxDTO.uname != null  and userWxDTO.uname !=''">
+            and username = #{userWxDTO.uname}
+        </if>
+        <if test="userWxDTO.uid != null  and userWxDTO.uid !=''">
+            and id = #{userWxDTO.uid}
+        </if>
+    </select>
+    <!--微信解绑 验证成功后写入   单独接口 便于后期修改-->
+    <update id="cancelBinding" parameterType="Object">
+        update user
+        set
+        wxopenid = null,
+        updated_time = now()
+        where id = #{uid}
+    </update>
+
+
+
+    <resultMap id="userDTOMap" type="com.camelot.usercenter.dto.UserDTO">
+        <result property="uid" column="id"/>
+        <result property="uname" column="username"/>
+        <result property="umobile" column="mobile"/>
+        <result property="usertype" column="type"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="userEmail" column="email"/>
+        <result property="nickname" column="nickname"/>
+        <result property="userstatus" column="status"/>
+        <result property="shopId" column="shop_id"/>
+        <result property="securityLevel" column="security_level"/>
+        <result property="auditor" column="auditor"/>
+        <result property="auditRemark" column="audit_remark"/>
+        <result property="quickType" column="quick_type"/>
+        <result property="created" column="created_time"/>
+        <result property="updated" column="updated_time"/>
+        <result property="paymentStatus" column="payment_status"/>
+        <result property="linkMan" column="link_man"/>
+        <result property="department" column="department"/>
+        <result property="linkPhoneNum" column="link_phone_num"/>
+        <result property="companyName" column="company_name"/>
+        <result property="companyAddr" column="company_address"/>
+        <result property="auditStatus" column="result"/>
+        <result property="auditTime" column="time"/>
+        <result property="password" column="password"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+    <select id="queryPage" resultMap="userDTOMap">
+        select * from user user
+        inner join user_extends ue on user.id=ue.user_id
+        where (user.type='2' or user.type='3')
+
+        <if test="userDTO.companyName != null  and userDTO.companyName !=''">
+            and ue.company_name like CONCAT('%',TRIM(#{userDTO.companyName}),'%')
+        </if>
+        <if test="userDTO.platformId != null and userDTO.platformId !=''">
+            <![CDATA[ and user.platform_id = #{userDTO.platformId} ]]>
+        </if>
+        limit #{pager.pageOffset},#{pager.rows}
+    </select>
+
+    <select id="queryPageCount" resultType="long">
+        select count(0) from user user
+        inner join user_extends ue on user.id=ue.user_id
+        where (user.type='2' or user.type='3')
+        <if test="userDTO.companyName != null  and userDTO.companyName !=''">
+            and ue.company_name like CONCAT('%',TRIM(#{userDTO.companyName}),'%')
+        </if>
+        <if test="userDTO.platformId != null and userDTO.platformId !=''">
+            <![CDATA[ and user.platform_id = #{userDTO.platformId} ]]>
+        </if>
+    </select>
+
+    <select id="findUserListByUserIds" resultType="map">
+        SELECT
+        user.id uid,
+        username uname,
+        PASSWORD,
+        mobile umobile,
+        TYPE usertype,
+        parent_id parentId,
+        email userEmail,
+        nickname nickname,
+        STATUS userstatus,
+        shop_id shopId,
+        user.deleted,
+        security_level securityLevel,
+        auditor auditor,
+        audit_remark auditRemark,
+        quick_type quickType,
+        created_time created,
+        updated_time updated,
+        payment_status paymentStatus,
+        user_extends_.company_name companyName,
+        user_audit_.result auditStatus,
+        link_man linkMan,
+        department department,
+        link_phone_num linkPhoneNum,
+        CASE
+        WHEN paymentCode IS NULL
+        THEN 0
+        WHEN paymentCode = ''
+        THEN 0
+        ELSE 1
+        END isHavePayPassword
+        FROM
+        USER
+        LEFT JOIN user_extends user_extends_
+        ON user.id = user_extends_.user_id
+        LEFT JOIN user_audit user_audit_
+        ON user.id = user_audit_.context_id
+        WHERE user.id in
+        <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="findUserListByUserIdsCount" resultType="long">
+        SELECT count(*)
+        FROM
+        USER
+        LEFT JOIN user_extends user_extends_
+        ON user.id = user_extends_.user_id
+        LEFT JOIN user_audit user_audit_
+        ON user.id = user_audit_.context_id
+        WHERE user.id in
+        <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

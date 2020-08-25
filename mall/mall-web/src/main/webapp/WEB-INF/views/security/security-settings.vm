@@ -1,0 +1,198 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+<script type="text/javascript">
+	$(function(){
+		$("#leftBuyer").load("$request.contextPath/leftBuyer");
+
+        <!--绑定手机-->
+        $("#bundPhone").click(function(){
+            $("#bundPhoneForm").submit();
+        });
+
+        <!--修改手机-->
+        $("#editPhone").click(function(){
+            $("#editPhoneForm").submit();
+        });
+
+        <!--绑定邮箱-->
+        $("#bundMail").click(function(){
+            $("#bundMailForm").submit();
+        });
+
+        <!--修改邮箱-->
+        $("#editMail").click(function(){
+            $("#editMailForm").submit();
+        });
+
+	});
+</script>
+<div id="main">
+<!--中间部分开始-->
+
+<!-- left start -->
+<div id="leftBuyer"></div>
+<!-- left end -->
+
+<!--右边部分开始-->
+<div id="right">
+      <h3>买家安全信息管理>安全信息设置</h3>
+      <div class="tit bg_02">
+      #if($!userinfo.securityLevel == 1)
+                            安全级别：低
+        <span class="plan po_re">
+            <span class="po_ab plan_scale" style="width:33px;"></span><!--进度宽度 中间style控制宽度 end -->
+        </span><!--进度条最下面背景色 end -->
+      #elseif($!userinfo.securityLevel == 2)
+      	 安全级别：中
+        <span class="plan po_re">
+            <span class="po_ab plan_scale" style="width:67px;"></span><!--进度宽度 中间style控制宽度 end -->
+        </span><!--进度条最下面背景色 end -->
+      #elseif($!userinfo.securityLevel == 3)
+      	 安全级别：高
+        <span class="plan po_re">
+            <span class="po_ab plan_scale" style="width:100px;"></span><!--进度宽度 中间style控制宽度 end -->
+        </span><!--进度条最下面背景色 end -->
+      #elseif($!userinfo.isHavePayPassword == "0")
+      	 安全级别：您还未设置支付密码
+      	<span class="plan po_re">
+            <span class="po_ab plan_scale" style="width:0px;"></span><!--进度宽度 中间style控制宽度 end -->
+        </span><!--进度条最下面背景色 end -->
+      #end
+     </div><!--tit end -->
+      <div class="Info border-4">
+      <ul>
+      <!--每一块信息 开始 -->
+      	<li class="border-5">
+              <div class="Info-left">
+              <img src="$request.getContextPath()/assets/images/Login_password.jpg" width="77" height="77"/>
+                  <ul >
+                    <li class="Info-conent">安全性高的密码可以使账号更安全。建议您定期更换密码，且设置一个包含数字和字母，并长度6位以上的密码。</li>
+<!--                     <li class="Info-conent">忘记密码？点此链接快速找回密码</li> -->
+                  </ul>   
+              </div><!--team-2 end-->
+            <!-- 右侧按钮 start-->
+              <div class="Info-right">
+                <button id="btn_modifyPwd" type="button" class="button_1 hei_35 ">修  改</button>
+              </div> 
+            <!-- 右侧按钮 end-->
+        </li>
+      <!--每一块信息 结束-->
+        
+      <!--每一块信息 开始 -->
+      	<li class="border-5">
+              <div class="Info-left">
+              <img src="$request.getContextPath()/assets/images/Bound_phone.jpg" width="77" height="77"/>
+                  <ul>
+                    <li>绑定手机后，您可以免费享受平台的短信提示服务，同时可用于找回账户登录密码和支付密码。</li>
+                    #if($!userinfo.umobile)
+		                <li>已绑定手机：$!userinfo.umobile</li>
+		            #end
+                  </ul>   
+              </div><!--team-2 end-->
+            <!-- 右侧按钮 start-->
+              <div class="Info-right">
+                  #if($!userinfo.umobile)
+	                <button id="editPhone" type="button" class="button_1 hei_35 ">修  改</button>
+	              #else
+	                <button id="bundPhone" type="button" class="button_1 hei_35 ">立即绑定</button>
+	              #end
+              </div> 
+            <!-- 右侧按钮 end-->
+        </li>
+      <!--每一块信息 结束-->
+      
+      <!--每一块信息 开始 -->
+      	<li class="border-5">
+              <div class="Info-left">
+              <img src="$request.getContextPath()/assets/images/Binding_mailbox.jpg" width="77" height="77"/>
+              <ul>
+                <li>绑定邮箱后，您可以免费享受平台的邮件提示服务，同时可用于找回账户登录密码和支付密码。</li>
+                #if($!userinfo.userEmail)
+                	<li>已绑定邮箱:$!userinfo.userEmail</li>
+                #end
+              </ul>   
+              </div><!--Info-left end-->
+            <!-- 右侧按钮 start-->
+              <div class="Info-right">
+                  #if($!userinfo.userEmail!='')
+	                <button id="editMail" type="button" class="button_1 hei_35 ">修  改</button>
+	              #else
+	                <button id="bundMail" type="button" class="button_1 hei_35 ">立即绑定</button>
+	              #end
+              </div> <!--Info-right end -->
+            <!-- 右侧按钮 end-->
+        </li>
+      <!--每一块信息 结束-->
+      
+      <!--每一块信息 开始 -->
+      	<li class="border-5">
+              <div class="Info-left">
+              <img src="$request.getContextPath()/assets/images/Pay_cipher.jpg" width="77" height="77"/>
+              <ul>
+                <li>余额付款、确认收货、账户充值提现时使用。用于保障账户资金安全。</li>
+<!--                 <li>密码强度：中</li> -->
+              </ul>   
+              </div><!--Info-left end-->
+            <!-- 右侧按钮 start-->
+              <div class="Info-right">
+              #if($!userinfo.isHavePayPassword == "1")
+                <button id="btn_modify_pay_pwd" type="button" class="button_1 hei_35 ">修  改</button>
+                <div style="margin-left: 30px;margin-top: -30px; font-size: 14px;"><a href="$request.contextPath/security/findpaypwdpage">找回密码</a></div>
+              #else
+                <button id="btn_set_pay_pwd" type="button" class="button_1 hei_35 ">设  置</button>
+              #end
+              </div> <!--Info-right end -->
+            <!-- 右侧按钮 end-->
+        </li>
+      <!--每一块信息 结束-->
+      </ul>
+   </div> <!--Info end--> 
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+
+    <!--绑定手机空Form-->
+    <form method="post" action="$request.contextPath/sellcenter/information/newAuth" id="bundPhoneForm">
+        <input type="hidden" name="changeType" value="phone">
+        <input type="hidden" name="uid" value="$!userinfo.uid">
+        <input type="hidden" name="url" value="/security/securitypage">
+    </form>
+
+    <!--修改手机空Form-->
+    <form method="post" action="$request.contextPath/sellcenter/information/authenticate" id="editPhoneForm">
+        <input type="hidden" name="changeType" value="phone">
+        <input type="hidden" name="uid" value="$!userinfo.uid">
+        <input type="hidden" name="url" value="/security/securitypage">
+    </form>
+
+    <!--绑定邮箱空Form-->
+    <form method="post" action="$request.contextPath/sellcenter/information/newAuth" id="bundMailForm">
+        <input type="hidden" name="changeType" value="mail">
+        <input type="hidden" name="uid" value="$!userinfo.uid">
+        <input type="hidden" name="url" value="/security/securitypage">
+    </form>
+
+    <!--修改邮箱空Form-->
+    <form method="post" action="$request.contextPath/sellcenter/information/authenticate" id="editMailForm">
+        <input type="hidden" name="changeType" value="mail">
+        <input type="hidden" name="uid" value="$!userinfo.uid">
+        <input type="hidden" name="url" value="/security/securitypage">
+    </form>
+
+
+</div><!--#main end -->
+
+<script type="text/javascript">
+
+	$("#btn_modifyPwd").click(function(){
+		window.location.href="$request.contextPath/security/verifyuser";
+	});
+	
+	$("#btn_set_pay_pwd").click(function(){
+		window.location.href="$request.contextPath/security/setpaypwdpage?userType=buyer";
+	});
+
+	$("#btn_modify_pay_pwd").click(function(){
+		window.location.href="$request.contextPath/security/modifypaypwdpage?userType=buyer";
+	});
+	
+</script>

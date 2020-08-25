@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.usercenter.dao.UserIntegralTrajectoryDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="userIntegralTrajectory" type="com.camelot.usercenter.domain.UserIntegralTrajectory">
+		<result property="id" column="id"/>
+		<result property="integralType" column="integral_type"/>
+		<result property="orderId" column="order_id"/>
+		<result property="integralValue" column="integral_value"/>
+		<result property="usingTime" column="using_time"/>
+		<result property="userId" column="user_id"/>
+		<result property="shopId" column="shop_id"/>
+		<result property="insertTime" column="insert_time"/>
+		<result property="insertBy" column="insert_by"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateBy" column="update_by"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{pager.pageOffset} , #{pager.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id,
+ 			integral_type,
+ 			order_id,
+ 			integral_value,
+ 			using_time,
+ 			user_id,
+ 			shop_id,
+ 			insert_time,
+ 			insert_by,
+ 			update_time,
+ 			update_by
+
+		FROM 
+		USER_INTEGRAL_TRAJECTORY trajectory_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.id != null"><![CDATA[ and trajectory_.id = #{entity.id} ]]></if>
+			<if test="entity.integralType != null"><![CDATA[ and trajectory_.integral_type = #{entity.integralType} ]]></if>
+			<if test="entity.orderId != null and entity.orderId !=''"><![CDATA[ and trajectory_.order_id = #{entity.orderId} ]]></if>
+			<if test="entity.integralValue != null"><![CDATA[ and trajectory_.integral_value = #{entity.integralValue} ]]></if>
+			<if test="entity.usingTime != null"><![CDATA[ and trajectory_.using_time = #{entity.usingTime} ]]></if>
+			<if test="entity.userId != null"><![CDATA[ and trajectory_.user_id = #{entity.userId} ]]></if>
+			<if test="entity.shopId != null"><![CDATA[ and trajectory_.shop_id = #{entity.shopId} ]]></if>
+			<if test="entity.insertTime != null"><![CDATA[ and trajectory_.insert_time = #{entity.insertTime} ]]></if>
+			<if test="entity.insertBy != null"><![CDATA[ and trajectory_.insert_by = #{entity.insertBy} ]]></if>
+			<if test="entity.updateTime != null"><![CDATA[ and trajectory_.update_time = #{entity.updateTime} ]]></if>
+			<if test="entity.updateBy != null"><![CDATA[ and trajectory_.update_by = #{entity.updateBy} ]]></if>
+		</if>
+	</sql>
+	
+	<sql id="where_fragement_type">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.id != null"><![CDATA[ and trajectory_.id = #{entity.id} ]]></if>
+			<if test="entity.integralType != null">
+				<if test="entity.integralType == 1">
+					and trajectory_.integral_value > 0
+<!-- 					<![CDATA[ and (trajectory_.integral_type = 1 or trajectory_.integral_type = 2 or trajectory_.integral_type = 5 or trajectory_.integral_type = 6) ]]> -->
+				</if>
+				<if test="entity.integralType == 2">
+					<![CDATA[ and trajectory_.integral_type = 3 ]]>
+				</if>
+			</if>
+			<if test="entity.orderId != null and entity.orderId !=''"><![CDATA[ and trajectory_.order_id = #{entity.orderId} ]]></if>
+			<if test="entity.integralValue != null"><![CDATA[ and trajectory_.integral_value = #{entity.integralValue} ]]></if>
+			<if test="entity.usingTime != null"><![CDATA[ and trajectory_.using_time = #{entity.usingTime} ]]></if>
+			<if test="entity.userId != null"><![CDATA[ and trajectory_.user_id = #{entity.userId} ]]></if>
+			<if test="entity.shopId != null"><![CDATA[ and trajectory_.shop_id = #{entity.shopId} ]]></if>
+
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="selectById" resultMap="userIntegralTrajectory" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where trajectory_.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="selectList" resultMap="userIntegralTrajectory" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="pager!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectCount" resultType="long">
+		<include refid="count_Tail" />
+		USER_INTEGRAL_TRAJECTORY trajectory_
+		<include refid="where_fragement" />
+	</select>
+	
+	<select id="selectByType" resultMap="userIntegralTrajectory" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement_type" />
+		ORDER BY trajectory_.using_time desc
+		<if test="pager!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectByTypeCount" resultType="long">
+		<include refid="count_Tail" />
+		USER_INTEGRAL_TRAJECTORY trajectory_
+		<include refid="where_fragement_type" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.camelot.usercenter.domain.UserIntegralTrajectory">
+		<![CDATA[
+		insert into USER_INTEGRAL_TRAJECTORY (
+			integral_type,
+			order_id,
+			integral_value,
+			using_time,
+			user_id,
+			shop_id,
+			insert_time,
+			insert_by,
+			update_time,
+			update_by
+
+	   )values(
+			#{integralType},
+			#{orderId},
+			#{integralValue},
+			now(),
+			#{userId},
+			#{shopId},
+			now(),
+			#{insertBy},
+			now(),
+			#{updateBy}
+
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.usercenter.domain.UserIntegralTrajectory">
+		<![CDATA[
+		update USER_INTEGRAL_TRAJECTORY set id = #{id}]]>
+			<if test="integralType != null">,integral_type = #{integralType}</if>
+			<if test="orderId != null and orderId !=''">,order_id = #{orderId}</if>
+			<if test="integralValue != null">,integral_value = #{integralValue}</if>
+			<if test="usingTime != null">,using_time = #{usingTime}</if>
+			<if test="userId != null">,user_id = #{userId}</if>
+			<if test="shopId != null">,shop_id = #{shopId}</if>
+			<if test="updateTime != null">,update_time = now()</if>
+			<if test="updateBy != null">,update_by = #{updateBy}</if>
+		<![CDATA[
+		 where id = #{id}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from USER_INTEGRAL_TRAJECTORY where id = #{id}
+		]]>
+	</delete>
+	
+	<select id="selectTotalIntegral" resultType="long">
+		SELECT SUM(integral_value) FROM USER_INTEGRAL_TRAJECTORY 
+		where 1 = 3 
+		<if test="userId != null">
+			or user_id = #{userId}
+		</if>
+	</select>
+</mapper>

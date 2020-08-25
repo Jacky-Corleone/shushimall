@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.goodscenter.dao.ItemSkuPackageDAO">
+	
+	<resultMap type="com.camelot.goodscenter.dto.ItemSkuPackageDTO" id="itemSkuPackages">
+	    <result column="package_id" property="packageId"/>
+		<result column="package_item_id" property="packageItemId"/>
+		<result column="package_sku_id" property="packageSkuId"/>
+		<result column="sub_item_id" property="subItemId"/>
+		<result column="sub_sku_id" property="subSkuId"/>
+		<result column="add_source" property="addSource"/>
+		<result column="sub_num" property="subNum"/>
+	</resultMap>
+	
+	<sql id="where_fragement">
+		WHERE 1=1
+		<if test="itemSkuPackage.packageItemId != null">
+		AND	package_item_id = #{itemSkuPackage.packageItemId}
+		</if>
+		<if test="itemSkuPackage.packageSkuId != null">
+		AND	package_sku_id = #{itemSkuPackage.packageSkuId}
+		</if>
+		<if test="itemSkuPackage.subItemId != null">
+		AND	sub_item_id = #{itemSkuPackage.subItemId}
+		</if>
+		<if test="itemSkuPackage.subSkuId != null">
+		AND	sub_sku_id = #{itemSkuPackage.subSkuId}
+		</if>
+		<if test="itemSkuPackage.addSource != null">
+		AND	add_source = #{itemSkuPackage.addSource}
+		</if>
+		<if test="itemSkuPackage.subNum != null">
+		AND	sub_num = #{itemSkuPackage.subNum}
+		</if>
+		<if test="itemSkuPackage.subSkuIds != null and itemSkuPackage.subSkuIds.size() > 0">
+			AND sub_sku_id in
+			<foreach collection="itemSkuPackage.subSkuIds" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test="itemSkuPackage.addSources != null and itemSkuPackage.addSources.size() > 0">
+			AND add_source in
+			<foreach collection="itemSkuPackage.addSources" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+	</sql>
+
+	<insert id="add" keyProperty="packageId" useGeneratedKeys="true" parameterType="com.camelot.goodscenter.dto.ItemSkuPackageDTO">
+		INSERT INTO item_sku_package
+			(
+				package_item_id,
+				package_sku_id,
+				sub_item_id,
+				sub_sku_id,
+				add_source,
+				sub_num
+			)
+		VALUES
+			<foreach collection="subSkuIds" item="subSkuId" separator=",">
+			(
+				#{packageItemId},
+				#{packageSkuId},
+				(SELECT item_id FROM item_sku WHERE sku_id = #{subSkuId}),
+				#{subSkuId},
+				1,
+				#{subNum}
+			)
+			</foreach>
+	</insert>
+	
+	<insert id="addItemSkuPackage" keyProperty="packageId" useGeneratedKeys="true" parameterType="com.camelot.goodscenter.dto.ItemSkuPackageDTO">
+		INSERT INTO item_sku_package
+			(
+				package_item_id,
+				package_sku_id,
+				sub_item_id,
+				sub_sku_id,
+				add_source,
+				sub_num
+			)
+		VALUES
+				(
+				#{packageItemId},
+				#{packageSkuId},
+				(SELECT item_id FROM item_sku WHERE sku_id = #{subSkuId}),
+				#{subSkuId},
+				#{addSource},
+				#{subNum}
+				)
+	</insert>
+	
+	<delete id="delete">
+		DELETE FROM item_sku_package
+		<include refid="where_fragement"></include>
+	</delete>
+	
+	<select id="getPackages" resultMap="itemSkuPackages">
+		SELECT
+		    package_id,
+			package_item_id,
+			package_sku_id,
+			sub_item_id,
+			sub_sku_id,
+			add_source,
+			sub_num
+		FROM
+			item_sku_package
+		<include refid="where_fragement"></include>
+	</select>
+	<update id="update">
+	update item_sku_package
+		set sub_sku_id=#{subSkuId}
+		<if test="packageSkuId != null">
+			,package_item_id = #{packageItemId}
+		</if>
+		<if test="subItemId != null">
+			 ,sub_item_id=#{subItemId}
+		</if>
+		<if test="addSource != null">
+			,add_source=#{addSource}
+		</if>
+		<if test="subSkuId != null">
+			 ,package_sku_id = #{packageSkuId}
+		</if>
+		<if test="subNum != null">
+			 ,sub_num=#{subNum}
+		</if>
+		    where package_id=#{packageId}
+	</update>
+</mapper>

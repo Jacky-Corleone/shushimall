@@ -1,0 +1,401 @@
+#set($staticPath="$request.contextPath/assets")
+<link type="text/css" href="$staticPath/css/basic.css" rel="stylesheet"/>
+<script type="text/javascript" src="$staticPath/js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="$staticPath/js/jquery.cookie.js"></script>
+<script type="text/javascript" src="$staticPath/js/xiaoguo.js"></script>
+
+<script>
+
+$(function() {
+
+	$("#regionSwitch").mouseover(function() {
+			$("#regionPanel").show();
+			if($('#areaList0').height() > $('#areaList0_par').height())
+			{
+				$('#tra_top_box').show();
+				DragAuto();
+			}else{
+				$('#tra_top_box').hide();
+				$('#tra_top_box').css({'visibility':'hidden;'});
+			}
+			
+<!----------------拖拽start--------------->
+			function DragAuto(){
+	           var rBox=$('#tra_top_box').height(); //右侧父级高度;
+	           var rBoxS=$('#tra_top_box_sp').height();//右侧子级高度;
+	           var lBox=$('#areaList0').height();
+	           var lBo=$('#areaList0_par').height();
+			   var oDiv=document.getElementById('tra_top_box_sp');  
+			   var oCon=document.getElementById('areaList0');
+			   var MaxSpan=rBox-rBoxS;
+			   var MaxDiv=lBox-lBo;
+ 
+	           oDiv.onmousedown=function(ev){
+					var oEvent=ev || event;
+					
+					var disY=oEvent.clientY-oDiv.offsetTop;
+					
+					document.onmousemove=function(ev){
+						var oEvent=ev || event;
+						var top=oEvent.clientY-disY;
+						
+						if(top < 0)
+						{
+							top=0;
+						}
+						if(top > MaxSpan)
+						{
+							top= MaxSpan
+						}
+						var scale=top/MaxSpan;
+						oDiv.style.top=top+'px';
+						oCon.style.top=-MaxDiv*scale+'px';
+					}
+					document.onmouseup=function(){
+						document.onmousemove=null;
+						document.onmouseup=null;	
+						oDiv.releaseCapture && oDiv.releaseCapture();
+					}
+					oDiv.setCapture && oDiv.setCapture();
+					return false;	
+				}
+			}
+			$("#regionPanel").mouseout(function(){
+				$(this).hide();
+			})
+<!----------------拖拽end-------------------------->  
+		}
+	);
+	
+    $("#areaWrapper li").click(function(){
+		$(this).prop('class', 'current');
+		$(this).siblings('.current').prop('class', '');
+		$("#areaList"+$(this).index()).show();
+		$("#areaList"+$(this).index()).siblings().hide();
+	});
+})
+
+function forwardGetSubAddress(addressId, code, name){
+	selectRegion(code, name);
+}
+
+
+</script>
+<script type="text/javascript" src="$staticPath/js/js.js"></script>
+<script type="text/javascript">
+
+	$(document).ready(function(){
+		// ajax global setting
+		$.ajaxSetup({
+			type: 'post',
+			cache: false,
+			timeout: 30000,
+			dataType: 'json',
+			error: function(evt, request, settings){
+				if(evt.status == "600" ){
+			    	$("#winFastLogin").show();
+				}
+			}
+		});
+		$("#winFastLogin").keydown(function(e){ 
+            var curkey = e.which;
+            if(curkey == 13){
+                $("#top_btn_submit").click(); 
+                return false;
+			}
+		}); 
+		
+		var region = $.cookie('region');
+		if(!region){
+			selectRegion("0","全国");
+		}else{
+			var regionCode = $.cookie('regionCode');
+			$.ajax({
+				url:"$request.contextPath/address/validationMallTheme",
+				type:"POST",
+				data:{"addressCode":regionCode},
+				dataType:"text",
+				success:function(d){
+					if(d=="1"){
+						$("#region").text(region);
+					}else{
+						$("#region").text("全国");
+					}
+				}
+			});
+		}
+		
+		$("#shop_car a").mouseenter(function(){
+			$("#mini_cart").load("$request.contextPath/shopCart/mini");
+		});
+		
+		var nickname = $.cookie('uname');
+		if(nickname != null && nickname != "") {
+			$("#top_login_id").html("Hi,<a href='javascript:' class='font-c1'>"+nickname+"</a>欢迎来到舒适100网！<a class='font-c2' href='$request.contextPath/user/logout'>[注销]</a>");
+			$(".top_mid_l").attr("style","width:40%;height:35px")
+		}
+		
+		$.getJSON("$request.contextPath/shopCart/cart",function(data){
+			//购物车商品数量超过99的时候
+			if(data.allQuantity > 99 ){
+				$("#cartQuantity").html('99+');
+			}else{
+				$("#cartQuantity").html(data.allQuantity);
+			}
+		});
+		
+		$.getJSON("$request.contextPath/user/status",function(data){
+			if(data.msg){
+                var htmlStr = "您好，<a href='$request.contextPath/buyercenter/loadBuyerCenter' class='font-c1' onclick='closeMenu()'>" + data.user.loginname + "</a>欢迎来到舒适100网！<a class='font-c2' href='$request.contextPath/user/logout'>[注销]</a>";
+				$("#top_login_id").html(htmlStr);
+				if(!data.buyer){
+					var html = '<a class="selected2 posr" href="$request.contextPath/order/querySeller" onclick="closeMenu()">卖家中心</a>';
+					var msgLabel = $("#msgCount").parent();
+					msgLabel.prop('href', msgLabel.prop('href').replace('/buyer/news','/seller/news'));
+				}
+				$.get('$request.contextPath/webmsg/queryCount', {
+                  wmToUserid: data.user.uid,
+                  wmRead: 1
+                }, function (data) {
+                	if(data>99){
+                	$("#msgCount").html((data>99?'99<sup>+</sup>':data));
+                	$("#msgCount").css("line-height","10px");
+                    }
+                	else{ 
+                		$("#msgCount").html((data>99?'99<sup>+</sup>':data));
+                		$("#msgCount").css("line-height","18px")
+                	}
+                  
+                    var msgLabel = $("#msgCount").parent();
+                    data != 0 && msgLabel.prop('href',msgLabel.prop('href')+'?wmRead=1' )
+                })
+
+				$("#openShopId").html(html);
+			} else {
+				$("#top_login_id").html("<a href='$request.contextPath/user/login' class='font-c1'>请登录</a> <a href='$request.contextPath/qq/index'> <img src='$staticPath/images/qq.png'></a> <i class=\"mar_lr10 font_ec\">|</i><a class='font-c2' href='$request.contextPath/information/register/initRegister'>免费注册</a>");
+                $("#msgCount").next().andSelf().remove();
+               
+			}
+		});
+		/**当图片地址不存在时，修改图片的src为"",避免出现裂图的问题*/
+		$("img").each(function(index){
+			if($(this).attr("src")=="$!imageServerAddr"){
+				$(this).attr("src","");
+			}
+		});
+		
+		$.getJSON("$request.contextPath/logo", function(data){
+			if(data){
+				$("#logo").attr("src","$!imageServerAddr"+data.picUrl).attr("title",data.logoName);
+			}
+		});
+	});
+	function selectRegion(code,name){
+		$.cookie('region',name,{expires: 7, path:"/"});
+		$.cookie('regionCode',code,{expires: 7, path:"/"});
+		$("#region").text(name);
+		$(".city").hide();
+		if("$homeStatus"=="1"){
+			window.location.href="$request.contextPath/";
+		}else{
+			window.location.reload(true);
+		}
+	}
+	
+	Date.prototype.format = function(format) {
+		var o = {
+			"M+" : this.getMonth() + 1, // month
+			"d+" : this.getDate(), // day
+			"h+" : this.getHours(), // hour
+			"m+" : this.getMinutes(), // minute
+			"s+" : this.getSeconds(), // second
+			"q+" : Math.floor((this.getMonth() + 3) / 3), // quarter
+			"S" : this.getMilliseconds()
+			// millisecond
+		}
+		if (/(y+)/.test(format)) {
+			format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+		}
+		for ( var k in o) {
+			if (new RegExp("(" + k + ")").test(format)) {
+				format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+			}
+		}
+		return format;
+	};
+</script>
+<style type="text/css">
+
+
+</style>
+
+<!--头部开始-->
+<div class="header_top">
+	<div class="top_mid po_re clearfix">
+        <!--top_mid_l end-->
+        <ul class="nav_list clearfix">
+        	<li class="drop-menu-effect fl" id="regionSwitch">
+            	<a>
+            		<span class="demo-icons fa-map-marker font_20 font_82"></span>
+        	 		<b id="region" class="font_14"></b>
+            		<b class='font-c1'>[切换城市]</b>
+					<!-- <i class="demo-icons fa-sort-desc font_14"></i> -->
+    	        </a>
+    	        <!-- 城市 -->
+    	        <div class="city submenu" id="regionPanel">
+    				<!-- 标题开始 -->
+					<div id="areaWrapper">
+						<b></b>
+                    	<div class="clearfix city_con posr" id="areaList0_par">
+                    	<!--动态添加城市start-->
+                    		<div id="areaList0" class="fl posa">
+                    			#foreach($member in $newAddressBaseDTOMap.entrySet())
+                    			 	<div class="clearfix areaList0_li">
+	                    				<div class="fl areaList0_left"><a>$member.key</a></div>
+	                    				<div class="fl areaList0_right clearfix">
+	                    					<!-- 遍历地区 -->
+	                    					#foreach($city in $member.value)
+                    							<a class="cursor" onclick="selectRegion('$city.code','$city.name')">$city.name</a>
+                    						#end
+		                    			</div>
+	                    			</div>
+							     #end 
+                    		</div>
+                    	<!--end-->	
+                    	<!--模拟滚动条start-->
+                    	<div class="fr tra_top_box posr" id="tra_top_box" >
+                    		<span class="posa" id="tra_top_box_sp"></span>
+                    	</div>
+                    	<!--模拟滚动条end-->
+                    	
+                    	</div>
+                    </div>
+              	</div>
+        	</li>
+        	<li class="drop-menu-effect fr" style="cursor: default;"><img src="$staticPath/images/phone.png" ></li>
+            <li class="drop-menu-effect fr"><span class="selected2 posr" onclick="closeMenu()"><i class="header_top_icon fa-phone posa"></i>手机商城</span>
+            <!--<a href="$request.contextPath/buyercenter/loadBuyerCenter" class="selected2 posr" onclick="closeMenu()"><i class="header_top_icon fa-phone posa"></i>手机商城</a>-->
+            <ul class="submenu collect">
+                <img src="$staticPath/images/tdcode.png" >
+              </ul>
+            </li>
+        	<li class="drop-menu-effect fr hei_cart" id="shop_car">
+        	<a href="$request.contextPath/shopCart/toCart" class='posr'><i class="header_top_icon fa-cart posa"></i>我的购物车
+        	<span class="tip" id="cartQuantity"></span><i class="demo-icons fa-sort-desc font_14 font_c7"></i></a>
+		    	<div id="mini_cart" class="shopping box-shadow1 hide">
+					<div class="shopping_tit">最新加入的商品</div>
+					<div class="car_shopping">
+						<img src="$staticPath/images/loading-1j.gif">
+					</div>
+		    	</div>
+        	</li>
+        	<li class="drop-menu-effect fr"><a class="posr" href="$request.contextPath/favourite/products"><i class="header_top_icon fa-collect posa"></i>我的收藏</a>
+             <!--   <ul class="submenu collect">
+                <li style="padding-left:0px;"><a href="$request.contextPath/favourite/shops">店铺收藏</a></li>
+                <li style="padding-left:0px;"><a href="$request.contextPath/favourite/products">我的收藏</a></li>
+              </ul> -->
+            </li>
+            <li class="drop-menu-effect fr" id="openShopId" style="min-width:60px;"></li>
+            <li class="drop-menu-effect fr" style="min-width:60px; margin-left:15px;"><a href="$request.contextPath/order/queryBuyer" class="selected2 posr" onclick="closeMenu()">我的订单</a></li>
+            <li class="drop-menu-effect fr" style="min-width:70px; position: relative;"><a href="$request.contextPath/buyer/news" class="selected2 posr">我的消息
+            	<span class="head_message" id="msgCount"><img src="$staticPath/images/round01.png"></span></a>
+            </li>
+            <li class="drop-menu-effect fr">
+        	 		<span id="top_login_id">
+        	 			<a href='$request.contextPath/user/login' class='font-c1'>请登录</a>
+        	 			<a href="$request.contextPath/qq/index"> <img src="$staticPath/images/qq.png"></a>
+        	 			<i class="mar_lr20 font_82">|</i>
+        	 			<a class='font-c2' href='$request.contextPath/information/register/initRegister'>免费注册</a>
+        	 		</span>
+        	 </li>
+        </ul>
+        
+    </div><!--top_mid end-->
+</div><!--header_top end-->
+
+
+
+<!--以下为弹出层-->
+<div id="winFastLogin" class="po_fai" style="display: none;">
+    <div class="po_fai_bg"></div>
+    <div class="po_main" style="width:400px; margin-left:-200px;">
+    	<form action="$request.contextPath/user/homepage" id="top_login_form" method="post">
+      		<input id="def_id" type="hidden" name="def" value="2"/>
+      		<div class="tit pad_l10 hei_24 bg_05" >
+        		<p class="fl">您尚未登录</p><i id="winFastLoginClose"  class="fa-times-circle fr font_14 mar_r10 cursor"></i>
+      		</div>
+      		<div class="mar_l30 mar_r30">
+         		<h3 class="hei_35  font_16 fl">舒适100会员</h3>
+         		<p class="fr font_65 hei_35 cursor">
+         			<i class="fa fa-arrow-right"></i><a href="$request.contextPath/information/register/initRegister">免费注册</a>
+         		</p>
+        		<div class="clear"></div>
+        		<div class="user">
+            		<i class="fa fa-uesr wid_30 hei_32 fl bg_05 font_cen border-1 border-12"></i>
+            		<input type="text" id="top_loginname_id" name="loginname" class="input_Style2 hei_30 wid_220" value="" placeholder="用户名" />
+        		</div>
+        		<div class="user mar_t20 ">
+            		<i class="fa fa-lock wid_30 hei_32 fl bg_05 font_cen border-1 border-12"></i>
+            		<input type="password" id="top_loginpwd_id" name="loginpwd" class="input_Style2 hei_30 wid_220" value="" placeholder="密码" />
+        		</div>
+        		<div class="jizhu mar_t20 ">
+<!--           	<input name="remember" type="checkbox" value="remember" class="fl"/><span class="fl">自动登录</span> -->
+          			<span class="fr mar_r20 cursor"><a href="$request.contextPath/findpwd/editusername">忘记密码？</a></span>
+        		</div> 
+        		<div class="clear"></div>
+        		<div class="font_cen mar_t20 pad_t50" >
+          			<button class="button_1 hei_30 " type="button" style="width:200px;" id="top_btn_submit">登录</button>
+        		</div>
+        		<p>使用合作网站帐号登录舒适100</p>
+        		<p class="hei_40">
+        			<a href="$request.contextPath/twitte/index"><i class="demo-icons fa-weibo font_16 mar_r10"></i></a>
+        			<a href="$request.contextPath/qq/index"> <img src="$staticPath/images/qq.png" ></a>	    		</p>
+  	  		</div>
+  	  	</form>
+	</div>
+</div>
+<!--以上为弹出层-->
+
+<script type="text/javascript">
+  $("#winFastLoginClose").click(function(){
+    $("#winFastLogin").hide();
+	window.location.reload();
+  });
+  
+  $("#top_login_id_i").click(function(){
+	  $("#winFastLogin").show();
+  });
+
+	$("#top_btn_submit").click(function(){
+		$("#top_btn_submit").attr({"disabled":"disabled"});
+		$("#top_btn_submit").html('正在登录...');
+	  	var logname = $("#top_loginname_id").val();
+	  	var logpwd = $("#top_loginpwd_id").val();
+	  	$.ajax({
+			url:"$request.contextPath/user/ajaxLogin",
+			type:"post",
+			data:{loginname:logname, loginpwd:logpwd},
+			success:function(data){
+				if(data.success){
+					//if(data.ustatus > 1){
+						$("#winFastLogin").hide();
+					//} else {
+					//	window.location.href="$request.contextPath/user/login";
+					//}
+					window.location.reload();
+				}else{
+					alert(data.errorMessages);
+					$("#top_btn_submit").html('登录');
+					$("#top_btn_submit").removeAttr("disabled");
+				}
+			}
+		});
+	  });
+  	
+</script>
+
+<!--模拟滚动条JS-->
+<script>
+
+</script>
+	

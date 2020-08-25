@@ -1,0 +1,106 @@
+﻿#set($layout = "/none_layout.vm")
+<script type="text/javascript">
+$(function(){
+	//关闭 申请退款弹层
+	$(".js_choice_close").click(function(){
+		$(".js_choice").hide();
+	});
+	//选择商品 全选复选框
+	$("#js_checkbox").click(function(){
+		if($(this).prop("checked")){
+			$(".js_checkbox_children").each(function(){
+				$(this).prop("checked", true);
+			});
+		}else{
+			$(".js_checkbox_children").each(function(){
+				$(this).prop("checked", false);
+			});
+		}
+		var num = $(".js_checkbox_children:checked").length;
+		$("#choiceItemsNum").html(num);
+	});
+	$(".js_checkbox_children").click(function(){
+		var num = $(".js_checkbox_children:checked").length;
+		var total = $(".js_checkbox_children").length;
+		if(parseInt(num) == parseInt(total)){
+			$("#js_checkbox").prop("checked", true);
+		}else{
+			$("#js_checkbox").prop("checked", false);
+		}
+		$("#choiceItemsNum").html(num);
+	});
+});
+function refundAgreement(){
+	var orderId = $("#orderId").val();
+	var arrRefundItem = new Array();
+	$(".js_checkbox_children:checked").each(function(){
+		var itemId = $(this).val();
+		var skuId = $(this).attr("name");
+		var item = new RefundItem(itemId,skuId);
+		arrRefundItem.push(item);
+	});
+	if(arrRefundItem.length>0){
+		var jsonRefundItem = JSON.stringify(arrRefundItem);
+		$("#form_orderId").val(orderId);
+		$("#form_jsonRefundItem").val(jsonRefundItem);
+		$("#myForm").submit();
+		//window.location.href = "$request.getContextPath()/order/refundAgreement?orderId="+orderId+"&jsonRefundItem="+jsonRefundItem;
+	}
+}
+//创建加入购物车对象
+function RefundItem(itemId,skuId){
+	this.itemId = itemId;//商品id
+	this.skuId = skuId;
+	if (typeof sayName != "function" ){
+		RefundItem.prototype.sayName= function(){};
+    }
+}
+</script>
+<div class="hei_32 bg_05 pad_l10 font_14b"><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor js_choice_close"></i>申请退款</div>
+<div class="clear"></div>
+<div class="list mar_t10">
+	<!-- 商品列表开头 -->
+	<ul class="list_top bg_08 font_14b fl">
+		<li style="width:20px;">
+			<input type="checkbox" id="js_checkbox"/>
+		</li>
+		<li style="width:400px;" class="font_cen hei_35">货品</li>
+		<li style="width:120px;" class="wid_60 font_cen hei_35">单价（元）</li>
+		<li style="width:120px;" class="wid_60 font_cen hei_35">数量</li>
+	</ul>
+	<div class="clear"></div>
+	<!-- 商品信息 -->
+	<div><input type="hidden" value="$!jsonObject.orderId" id="orderId"/></div>
+	<table class="information" id="choiceItems">
+		#foreach($entityItem in $!jsonObject.items)
+		<tr>
+			<td style="width:20px;" class="border-1">
+				<input type="checkbox" value="$!entityItem.itemId" name="$!entityItem.skuId" class="js_checkbox_children"/>
+			</td>
+			<td style="width:400px;" class="border-1">
+				<img src="$!imageServerAddr$!entityItem.skuPicUrl" width="50" height="50" /> 
+				<span>$!entityItem.itemName</span>
+			</td>
+			<td style="width:120px;" class="wid_60 border-1 font_cen">$!entityItem.payPrice</td>
+			<td style="width:120px;" class="wid_60 border-1 font_cen">$!entityItem.num</td>
+		</tr>
+		#end
+	</table>
+	<div class="fr mar_t10">
+		<a href="#">共选择<span class="font_e3" id="choiceItemsNum">0</span>种商品</a>
+		<br />
+		<!-- <a href="#">本次退款货品金额总计<span class="font_e3">27000.0</span>元</a>  -->
+		<button type="button" class="button_2 but_cx mar_r20 hei_30 mar_20" onclick="refundAgreement();">
+			#if($jsonObject.state == 2 || $jsonObject.state == 3)
+			<a class="font_ff">确认退款货品</a>
+			#elseif($jsonObject.state > 3 && $jsonObject.state < 6 )
+			<a class="font_ff">确认申请售后</a>
+			#end
+		</button>
+	</div>
+	<form id="myForm" action="$request.getContextPath()/order/refundAgreement" method="POST">
+		<input type="hidden" name="orderId" id="form_orderId" value=""/>
+		<input type="hidden" name="jsonRefundItem" id="form_jsonRefundItem" value=""/>
+	</form>
+	<div class="clear"></div>
+</div>

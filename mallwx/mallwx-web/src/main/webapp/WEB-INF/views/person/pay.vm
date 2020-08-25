@@ -1,0 +1,275 @@
+#set($layout = "common/blanklayout.vm")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<base href="${request.getContextPath()}/"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>订单支付</title>
+    <link type="text/css" rel="stylesheet" href="assets/css/detail.css"/>
+    <link rel="stylesheet" type="text/css" src="assets/css/detail.js" />
+    <link rel="stylesheet" type="text/css" src="assets/css/style.js" />
+    <script type="text/javascript" src="assets/js/tab.js"></script>
+    <script type="text/javascript" src="assets/js/jquery-1.11.2.min.js"></script>
+    <script type="text/javascript">
+    var canbeopenPop=true;
+	    $(document).ready(function(){
+	    	var param = {};
+
+	        //registerGoBack(param);
+            history.pushState(param,"nothing");
+            setTimeout(function(){ window.onpopstate=function () {
+                console.debug("--------");
+                window.location.href="$request.contextPath/orderWx/toOrderSubmit?orderSource=buyers";
+            };},1000);
+
+	    });
+	    
+    	$(document).ready(function(){
+    		$("ul li").click(function(){
+//     			console.debug($(this).children(":first"));
+//     			console.debug($(this).siblings());
+    			$(this).children(":last").children(":first").removeClass().addClass("fa-check-circle font_3 fr");
+    			$(this).children(":first").prop("checked",true);
+//     			$(this).siblings().children(":last").children(":first").removeClass().addClass("fa-check-circle font_c3 fr");
+// 				console.debug($(this).siblings().children(":last").children(":first"));
+				$(this).siblings().each(function(i){
+					$(this).children(":last").children(":first").removeClass().addClass("fa-check-circle font_c3 fr");
+
+					$(this).children(":first").prop("checked",false);
+				})
+				var chlast=$(this).children(":last");
+				if(chlast.html().indexOf("支付宝")>=0){
+                    $("#Pop_layer0").show();
+				}
+    		});
+    	});
+    
+    
+    	//表单校验
+    	function formValidate(){
+			if(!$("input[name='paymentMethod']").is(":checked")){
+				alert("请选择支付方式");
+	    		return false;
+			}
+			if($("input[name='paymentMethod']:checked").val()=='wx'){
+				var url = '$!wxUrl';
+				var appid = '$!appid';
+				var redirect_uri = "$!redirecturi";
+				var state = '$!orderNo';
+				$("#payform").prop("action",url + "?appid=" + appid + "&redirect_uri=" + redirect_uri + "&response_type=code&scope=snsapi_base&state="+state+"#wechat_redirect");
+			}
+			return true;
+            var zfbcheck=$("#zfbcheckbtn");
+			if(canbeopenPop&&zfbcheck.hasClass('fa-check-circle')){
+				$("#Pop_layer0").show();
+                canbeopenPop=false;
+                return false;
+			}else{
+				return true
+			}
+
+    	}
+        function popLayerclick0(){
+            $("#Pop_layer0").hide();
+            $("#Pop_layer1").show();
+        }
+		function popLayerclick1(){
+            $("#Pop_layer1").hide();
+		}
+		function hide0(e){
+            $("#Pop_layer0").hide();
+			e.stopPropagation();
+		}
+	</script>
+</head>
+
+<body >
+<div id="main" class="po_re">
+	#parse("common/common.vm")
+	<form id="payform" action="person/payOrder" method="post" onsubmit="return formValidate()">
+        <input type="hidden" name="orderNo" value="$!orderNo"/>
+        <input type="hidden" name="totalPrice" value="$!totalPrice"/>
+	    <div class="content" id="wrapper">
+        <div class="hei_70 wid_100">
+        	<img src="assets/images/logo_zf.png" width="80%"/>
+        </div>
+	<!-- 中间内容 -->
+	    <!-- 内容开始 -->
+	    <!--这是我刚刚写的开始  ----------------->
+	        <div class="pay_details">
+	            <h3 class="pad_lr5 border_2">
+	                <span class="font_2 fl">订单号：$!orderNo</span>
+	            </h3>
+	            <h3 class="pad_lr5 border_2">
+	                <span class="font_2 fl">应付金额:￥$!totalPrice</span>
+	            </h3>
+	        </div><!-- pay_details end-->
+	        <div class="bg_01">
+	            <ul class="arbitration mar_lr5">
+	                #if( $jrtFalg )
+	                    <li class="border_2">
+		                    <input type="radio" style="display: none" name="paymentMethod" checked="checked" value="jrt" />
+		                    <div class="pay_details_left"><img src="assets/images/xyzfinpany.png" /></div>
+		                    <div class="pay_details_right">小印支付/INPAY<i class="fa-check-circle font_3 fr"></i>
+		                    </div>
+	                	</li>
+                    #else
+		                <li class="border_2">
+		                	<input type="radio" style="display: none"  name="paymentMethod" value="wnzx" />
+		                    <div class="pay_details_left"><img src="assets/images/jdlogo-60X60.png" /></div>
+		                    <div class="pay_details_right">京东支付<i class="fa-check-circle font_c3 fr"></i>
+		                    </div>
+		                </li>
+		                <li class="border_2">
+		                	<input type="radio" style="display: none"  name="paymentMethod" value="zfb" />
+		                    <div class="pay_details_left"><img src="assets/images/ali_pay.jpg" /></div>
+		                    <div class="pay_details_right">支付宝<i id="zfbcheckbtn" class="fa-check-circle font_c3 fr"></i></div>
+		                </li>
+ 		                <li class="border_2"> 
+ 		                	<input type="radio" style="display: none"  name="paymentMethod" value="wx" /> 
+ 		                    <div class="pay_details_left"><img src="assets/images/WeChat_pay.jpg" /></div> 
+ 		                    <div class="pay_details_right">微信支付<i class="fa-check-circle font_c3 fr"></i></div> 
+ 		                </li> 
+	                #end
+	            </ul>
+	        </div>
+	        <div class="font_cen"><button class="button_1 hei_32 wid_87" type="submit">提交</button></div>
+	    <!--这是我刚刚写的开始  ----------------->
+	    </div><!-- 中间内容 end-->
+    </form>
+</div>
+
+
+
+    <!-- 中间内容 -->
+<!--     <form id="" action="person/payOrder" method="post"> -->
+<!--         <input type="hidden" name="orderNo" value="$!orderNo"/> -->
+<!--         <input type="hidden" name="totalPrice" value="$!totalPrice"/> -->
+<!--     <div class="content"> -->
+<!--         <div class="hei_70 wid_100"> -->
+<!--             <img src="assets/images/logo_zf.png" width="80%"/> -->
+<!--         </div> -->
+<!--         <div class="pad_lr5 mar_t20"> -->
+<!--             <div class="hei_50 font_1_5 font_3 "><i class="fa fa-check-circle  font_3"></i>提交订单完成，请尽快支付。</div> -->
+<!--             <div class="hei_32 font_1_2 pad_lr10">订单号：<span class="font_2">$!orderNo</span></div> -->
+<!--             <div class="hei_32 font_1_2 pad_lr10">应付金额（元）:<span class="font_2">$!totalPrice</span></div> -->
+<!--             <div class="payment"> -->
+<!--                 <div class="fl hei_34 font_1_2 pad_lr10">支付</div> -->
+<!--                 <div class="fl wid_65"> -->
+<!--                     判断是否金融通用户 -->
+<!--                     #if( $jrtFalg ) -->
+<!-- 	                    <dl class="mar_t10"> -->
+<!-- 	                        <dt class="fl"><input type="radio"  name="paymentMethod" class="hei_45" value="jrt" / ></dt> -->
+<!-- 	                        <dd class="fl wid_69 mar_l2 hei_45"><img src="assets\images\jrt.jpg" class="wid_100"></dd> -->
+<!-- 	                    </dl> -->
+<!-- 	                    <div class="clear"></div> -->
+<!--                     #else -->
+<!-- 	                    <dl class="mar_t10"> -->
+<!-- 	                        <dt class="fl"><input type="radio" checked="true" name="paymentMethod" class="hei_45" value="wnzx" / ></dt> -->
+<!-- 	                        <dd class="fl wid_69 mar_l2 hei_45"><img src="assets\images\wnzx.jpg" class="wid_100"></dd> -->
+<!-- 	                    </dl> -->
+<!-- 	                    <div class="clear"></div> -->
+<!-- 	                    <dl class="mar_t10"> -->
+<!-- 	                        <dt class="fl"><input type="radio"  name="paymentMethod" class="hei_45" value="zfb" / ></dt> -->
+<!-- 	                        <dd class="fl wid_69 mar_l2 hei_45"><img src="assets\images\Alipay.jpg" class="wid_75"></dd> -->
+<!-- 	                    </dl> -->
+<!-- 	                    <div class="clear"></div> -->
+	
+<!-- 	                    <dl class="mar_t10"> -->
+<!-- 	                        <dt class="fl"><input type="radio"  name="paymentMethod" class="hei_45" value="wx" / ></dt> -->
+<!-- 	                        <dd class="fl wid_69 mar_l2 hei_45"><img src="assets\images\WeChat_pay.jpg" class="wid_100"></dd> -->
+<!-- 	                    </dl> -->
+<!-- 	                    <div class="clear"></div> -->
+<!--                     #end -->
+
+<!--                 </div> -->
+<!--                 <div class="font_right"> <button class="button_1 pad_lr5 hei_32"  type="submit" >确定支付</button></div> -->
+<!--                 <div class="clear"></div> -->
+<!--             </div> -->
+<!--         </div> -->
+<!--     </form> -->
+
+<!--     </div>中间内容 end -->
+    <!-- 底部 -->
+   #* <div class="foot bg_02">
+        <footer>
+            <dl class="fl">
+                <dt><img src="images/house.png"></dt>
+                <dd>搜索</dd>
+            </dl>
+            <dl class="fl">
+                <dt><img src="images/shopping.png"></dt>
+                <dd>购物车</dd>
+            </dl>
+            <dl class="fl">
+                <dt><img src="images/mai.png"></dt>
+                <dd>买家中心</dd>
+            </dl>
+            <dl class="fl">
+                <dt><img src="images/maijia.png"></dt>
+                <dd>买家中心</dd>
+            </dl>
+        </footer>
+    </div>*# <!-- 底部 -->
+<!-- </div> -->
+
+<!-- 弹出页提示信息 -->
+<div  class="Pop_layer" id="Pop_layer0" style="display: none" onclick="popLayerclick0();">
+    <div class="Pop_content1">
+        <div class="content_pic4">
+            <img src="assets/images/pop_6.png" height="25"/>
+            <img src="assets/images/pop_8.png" height="45" class="pop_3"/>
+        </div><!--content_pic4 end -->
+        <div class="content_pic5">
+            <ul class="arbitration mar_lr5">
+                <li class="border_2">
+                    <div class="pay_details_left"><img src="assets/images/ali_pay.jpg" /></div>
+                    <div class="pay_details_right">支付宝<i class="fa-check-circle font_3 fr"></i>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="content_pic4">
+            <img src="assets/images/pop_7.png" height="25"/>
+            <button type="button" onclick="return false;" class="button_1 wid_87 hei_34">提 交</button>
+            <img src="assets/images/pop_9.png" height="45" class="pop_4"/>
+        </div><!--content_pic4 end -->
+
+        <div class="content_pic3">
+            <img src="assets/images/pop_5.png" onclick="hide0(event);" class="fl" height="80"/>
+        </div><!--content_pic3 end -->
+    </div><!-- Pop_content1 end-->
+</div><!--Pop_layer end -->
+
+
+
+<!-- 弹出页提示信息 -->
+<div  class="Pop_layer" id="Pop_layer1" style="display: none" onclick="popLayerclick1();">
+    <div class="Pop_content">
+        <div class="content_pic1">
+            <img src="assets/images/pop_1.png" class="pop_1" height="88"/>
+            <img src="assets/images/pop_2.png" class="pop_2" height="60"/>
+        </div><!--content_pic1 end -->
+        <div class="content_pic2">
+            <img src="assets/images/pop_3.png" height="55"/>
+        </div><!--content_pic2 end -->
+        <div class="content_pic4">
+            <img src="assets/images/pop_10.png" height="60" class="pop_5"/>
+            <img src="assets/images/pop_9.png" height="45" class="pop_6"/>
+        </div><!--content_pic4 end -->
+        <div class="content_pic2">
+            <img src="assets/images/pop_4.png" height="25"/>
+        </div><!--content_pic2 end -->
+
+        <div class="content_pic3">
+            <img src="assets/images/pop_5.png" class="fl" height="80"/>
+        </div><!--content_pic3 end -->
+    </div><!-- Pop_content end-->
+</div><!--Pop_layer end -->
+
+</body>
+</html>

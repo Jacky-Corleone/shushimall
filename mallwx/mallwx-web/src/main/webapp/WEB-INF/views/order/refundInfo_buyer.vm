@@ -1,0 +1,459 @@
+#set($layout="common/order.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>详情</title>
+#parse("common/scriptAndCss.vm")
+<script type="text/javascript" src="$request.contextPath/assets/js/ajaxfileupload.js"></script>
+<script type="text/javascript">
+
+$(document).ready(function(){
+// 	var param = {};
+//     param.callback = function () {
+//     	console.debug("--------");
+//     	window.location.href="$request.getContextPath()/orderWx/refundOrcservice?back=1";
+//     };
+//     registerGoBack(param);
+    
+    changeIconToRed(2);
+});
+
+$(document).ready(function(){
+	if('$!tradeReturnDto.state' == 6){//退款完成
+		
+		$("#refundHand").parent().attr("class","normal");
+		$("#refundHand").attr("class","s-num num-bg-1");
+		$("#refundHand").html("2");
+		
+		$("#refundSuccess").parent().attr("class","normal doing");
+		$("#refundSuccess").attr("class","s-num num-bg-2");
+		$("#refundSuccess").html("<i class='fa-check'></i>");
+		$("#divInfo").prepend('<p class="font_1_0 lin_24">卖家已同意您的退款申请，请及时确认是否已经收到货款</p>');
+	}else{
+		//退款中
+		$("#refundSuccess").attr("class","s-num num-bg-1");
+		$("#refundSuccess").html("3");
+	}
+});
+
+//修改退款协议
+function  modifyAgreement(){
+	$("#agreement").hide();
+	$("#updateAgreement").show();
+}
+
+var imgcount=0;
+var sccount=0;
+function startUpload(){
+	if(imgcount>4){
+        alert("最多只能上传5张图片");
+        return false;
+    }
+	//判断图片格式
+    var fileInput = $("#fileInput").val();
+    var extStart = fileInput.lastIndexOf(".");
+    var ext = fileInput.substring(extStart,fileInput.length).toUpperCase();
+    if(ext!=".JPG" && ext!=".jpg" && ext!=".BMP"&&ext!=".bmp"&& ext!=".PNG"&&ext!=".PNG"&& ext!=".JPEG" && ext!=".jpeg"&&ext!=".gif"&&ext!=".GIF"){
+        alert("图片限于JPG,BMP,PNG,JPEG格式");
+        return false;
+    }
+    $.ajaxFileUpload({
+        url: '$request.getContextPath()/orderWx/upload?size=1024000', //用于文件上传的服务器端请求地址
+        secureuri: false, //是否需要安全协议，一般设置为false
+        fileElementId: 'fileInput', //文件上传域的ID
+        dataType: 'text', //返回值类型 一般设置为json
+        type:"post",
+        success: function (data, status){  //服务器成功响应处理函数
+        	console.info(JSON.stringify(data));
+        	var dataStr = data;
+        	if(dataStr.indexOf("<pre>") != -1){
+        		dataStr = dataStr.replace("<pre>","")
+        	}
+        	if(dataStr.indexOf("<pre style=\"word-wrap: break-word; white-space: pre-wrap;\">") != -1){
+        		dataStr = dataStr.replace("<pre style=\"word-wrap: break-word; white-space: pre-wrap;\">","")
+        	}
+        	if(dataStr.indexOf("</pre>") != -1){
+        		dataStr = dataStr.replace("</pre>","")
+        	}
+        	var data = eval("("+dataStr+")");
+        	if(data.success){
+                sccount=sccount+1;
+                var trid="trid"+sccount;
+                appendtable(data.url,trid);
+            }else{
+                alert(data.msg);
+                $("#fileInput").replaceWith('<input type="file" id="fileInput" class="input_3 wid_95 mar_r2" name="file" onchange="startUpload();" />');
+            }
+        },
+        error: function (data, status, e){//服务器响应失败处理函数
+        	console.info(JSON.stringify(data));
+        	alert(JSON.stringify(data));
+        	alert(status);
+        	alert(e);
+            alert("亲系统繁忙，请稍后再试");
+            $("#fileInput").replaceWith('<input type="file" id="fileInput" class="input_3 wid_95 mar_r2" name="file" onchange="startUpload();" />');
+        }
+    });
+}
+
+function appendtable(url,id){
+    var imgtable=$("#imgtable");
+    var urlqd='$!imageServerAddr';
+//     var tr=$("<tr>").attr("id",id);
+    var div=$("<div>").attr("id",id).attr("class","shop_order  mar_l4 fl wid_29 mar_t10");//创建div
+    var p=$("<p>").attr("class","shop_order_img"); //创建<p>
+    var p1=$("<p>").attr("class","lin_24");; //创建<p>
+    var img=$("<img>").attr("src",urlqd+url).attr("width","75px").attr("height","75px");
+    var input=$("<input>").attr("value",url).attr("type","hidden");
+	p.append(img);
+	p.append(input);
+	div.append(p);
+//     tr.append(div);
+    var a=$("<a>").text("删除").attr("href","javascript:cancleimg('"+id+"')");
+    var span=$("<span>").attr("class","pad_l5").text("上传成功").append("&nbsp;&nbsp;&nbsp;");
+    p1.append(a);
+    p1.append(span);
+    div.append(p1);
+//     tr.append(div);
+//     var td3=$("<td>").attr("width","150");
+//     tr.append(td3);
+    imgtable.append(div);
+    imgcount=imgcount+1;
+    $("#fileInput").replaceWith('<input type="file" id="fileInput" class="input_3 wid_95 mar_r2" name="file" onchange="startUpload();" />');
+}
+//清除指定tr
+function cancleimg(id){
+    $("#"+id).remove("");
+    imgcount=imgcount-1;
+}
+
+function refundAgreementSubmit(){
+	var orderId = $("#orderId").val();
+	var returnResult = $("#returnResult").val();//退款原因
+	if(returnResult!=null && $.trim(returnResult)==""){
+		alert("请选择退款原因");
+		return;
+	}else{
+		returnResult = $("#returnResult").find("option:selected").text();
+	}
+	var refundFreight = $("#refundFreight").val();//退款运费金额
+	var remark = $("#remark").val();//退款说明
+	if(remark!=null && $.trim(remark)==""){
+		alert("请填写退款说明");
+		return;
+	}
+	if($.trim(remark).length>300){
+		alert("长度不能超过300");
+		return false;
+	}
+	
+	var imgtable=$("#imgtable input");
+    var picUrl="";
+    if(imgtable){
+        $(imgtable).each(function(){
+            if($(this).val()){
+                picUrl=picUrl+$(this).val()+";";
+            }
+        });
+    }
+    $.ajax({
+		type: "POST",
+		dataType: "json",
+		timeout : 1000*60*5, //超时时间设置，单位毫秒
+		url: "$request.getContextPath()/orderWx/refundAgreementSubmit",
+		data: {
+			orderId: orderId,
+			//jsonRefundItem: jsonRefundItem,
+			returnResult: returnResult,
+			remark:remark,
+			//refundGoods:refundGoods,
+			//refundFreight:refundFreight,
+			picUrl:picUrl
+		},
+		success: function(data){
+// 			$.unblockUI();
+			if(data.success){
+				window.location.href = "$request.getContextPath()/orderWx/refundSubmitSucc?orderId="+orderId;
+			}else{
+				alert("申请退款失败："+data.errorMessages);
+			}
+		}
+	});
+}
+//申请仲裁
+function complain(){
+	window.location.href = "$request.getContextPath()/orderWx/gocomplainadd?tradeReturnid=$!{orderId}";
+}
+//买家收款
+function receivables(returnId, orderId, state){
+	if(parseInt(state) == 7){
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "$request.getContextPath()/orderWx/updateTradeReturn",
+			data: {
+				returnId: returnId,
+				orderId: orderId,
+				type:4
+			},
+			success: function(data){
+				/* if(data.success){
+				//window.location.href = location.href;
+				//window.location.href="$request.getContextPath()/order/updateTradeReturnSucc";
+			} */
+			// 不管失败成功都刷新页面
+			window.location.href="$request.getContextPath()/orderWx/refundSubmitSucc?returnId=$!tradeReturnDto.id";
+			}
+		});
+	}
+}
+
+//查看仲裁信息
+function gocomplainadd(tradeReturnid,status){
+	window.location.href="$request.getContextPath()/orderWx/gocomplainadd?tradeReturnid="+tradeReturnid+"&status="+status;
+}
+</script>
+</head>
+<body class="pad_lr5">
+<div class="content">
+	<div class="stepflex">
+        <dl class="normal">
+            <dt class="s-num num-bg-1">1</dt>
+            <dd class="s-text">退款原因、金额<s></s><b></b></dd>
+        </dl>
+        <dl class="normal doing">
+            <dt class="s-num num-bg-2" id="refundHand"><i class="fa-check"></i></dt>
+            <dd class="s-text">退款处理<s></s><b></b></dd>
+        </dl>
+        <dl class="last">
+            <dt class="s-num num-bg-1" id="refundSuccess">3</dt>
+            <dd class="s-text">退款完成<s></s><b></b></dd>
+        </dl>
+        <div class="clear"></div>
+    </div>
+
+	<div class="td_l" id="agreement" style="overflow-y:auto;">
+<!-- 		<dl class="wid_500 hei_40"> -->
+<!-- 			<dd class="fl font_right wid_220 mar_r10"><span style="color:red;padding-right:5px;">*</span>退款原因：</dd> -->
+<!-- 			<dt class="fl font_e3">$!tradeReturnDto.returnResult</dt> -->
+<!-- 		</dl> -->
+
+		<dl class="hei_34">
+          <dd class="fl font_right wid_35 mar_r2">退款原因<i class="font_e3"></i></dd>
+          <dt class="fl wid_57">
+<!--           	<select class="input_3 wid_95" id="returnResult"> -->
+<!--           		<option value="">请选择退款原因</option> -->
+<!--           		<option value="1">等待时间过长</option> -->
+<!--           		<option value="2">订单重复</option> -->
+<!--           		<option value="3">不想要了</option> -->
+<!--           	</select> -->
+				$!tradeReturnDto.returnResult
+          </dt>
+        </dl>
+        <div class="clear"></div>
+           
+<!-- 		<dl class="wid_500 hei_40"> -->
+<!-- 			<dd class="fl font_right wid_220 mar_r10"><span style="color:red;padding-right:5px;">*</span>退款金额：</dd> -->
+<!-- 			<dt class="fl"><span class="font_e3">$!tradeOrdersDTO.paymentPrice</span>元</dt> -->
+<!-- 		</dl> -->
+
+		<dl class="hei_34 mar_t10">
+          <dd class="fl font_right wid_35 mar_r2 ">需退款的金额<i class="font_e3"></i></dd>
+          <dt class="fl wid_55">$!tradeOrdersDTO.paymentPrice 元</dt>
+        </dl>
+        <div class="clear"></div>
+
+<!-- 		<dl class="wid_500 min-hei"> -->
+<!-- 			<dd class="fl font_right wid_220 mar_r10"><span style="color:red;padding-right:5px;">*</span>退款说明：</dd> -->
+<!-- 			<dt class="fl"><textarea style="width:250px; height:80px;" disabled="disabled">$!tradeReturnDto.remark</textarea></dt> -->
+<!-- 		</dl> -->
+
+		<dl class="min-hei mar_t15">
+          <dd class="fl font_right hei_34 wid_35 mar_r2">退款说明<i class="font_e3"></i></dd>
+          <dt class="fl wid_57"><textarea class="wid_87 hh_100" style="color: black" id="remark" disabled="disabled">$!tradeReturnDto.remark</textarea></dt>
+        </dl>
+        <div class="clear"></div>
+
+<!-- 		<dl class="wid_500 hei_60"> -->
+<!-- 			<dd class="fl font_right wid_220 mar_r10">凭证：</dd> -->
+<!-- 			<dt class="fl"> -->
+<!-- 			#foreach($picDTO in $!tradeReturnDto.picDTOList) -->
+<!-- 			<div><img src="$!imageServerAddr$!picDTO.picUrl" width="60" height="60" class="mar_l10"></div> -->
+<!-- 			#end -->
+<!-- 			</dt> -->
+<!-- 		</dl> -->
+		
+		
+		<dl class="hei_34 mar_t15">
+          <dd class="fl font_right wid_35 mar_r2">上传凭证</dd>
+          <dt class="fl">
+			#foreach($picDTO in $!tradeReturnDto.picDTOList)
+				<img src="$!imageServerAddr$!picDTO.picUrl" width="60" height="60" class="mar_l10">
+			#end
+			</dt>
+        </dl>
+        <div class="clear"></div>
+		
+		
+		#if($!tradeReturnDto.state == 2)
+<!-- 			<dl class="wid_500 min-hei"> -->
+<!-- 				<dd class="fl font_right wid_220 mar_r10"><span style="color:red;padding-right:5px;">*</span>拒绝退款原因：</dd> -->
+<!-- 				<dt class="fl"><textarea style="width:250px; height:80px;" disabled="disabled">$!tradeReturnDto.auditRemark</textarea></dt> -->
+<!-- 			</dl> -->
+
+			<dl class="min-hei mar_t15">
+	          <dd class="fl font_right hei_34 wid_35 mar_r2">拒绝退款原因：<i class="font_e3"></i></dd>
+	          <dt class="fl wid_57"><textarea class="wid_87 hh_100" style="color: black" id="remark" disabled="disabled">$!tradeReturnDto.auditRemark</textarea></dt>
+	        </dl>
+	        <div class="clear"></div>
+		#end
+		<div id="agreeSellerInfo" #if($!tradeReturnDto.state != 4) style="display: none" #end>
+			<dl class="wid_500 hei_min_60">
+				<dd class="fl font_right wid_220 mar_r10">退货快递单号：</dd>
+				<dt class="fl wid_270" style="word-break:break-all;">$!tradeReturnDto.expressNo</dt>
+			</dl>
+			<br/><br/>
+			<dl class="wid_500 hei_min_60">
+				<dd class="fl font_right wid_220 mar_r10">快递公司：</dd>
+				<dt class="fl wid_270" style="word-break:break-all;">$!tradeReturnDto.expressName</dt>
+			</dl>
+		</div>
+		#if($!tradeReturnDto.state == 3 || $!tradeReturnDto.state == 4)
+		<div id="agreeSellerInfo" class="bg_01" #if($!tradeOrdersDTO.state > 3 && $!tradeOrdersDTO.state < 6) style="display: block;" #else style="display: none" #end>
+<!-- 			<dl class="wid_500 hei_60"> -->
+<!-- 				<dd class="fl font_right wid_220 mar_r10"></dd> -->
+<!-- 				<dt class="fl"> -->
+<!-- 				</dt> -->
+<!-- 			</dl> -->
+<!-- 			<dl class="wid_500 hei_60"> -->
+<!-- 				<dd class="fl font_right wid_220 mar_r10">收货地址：</dd> -->
+<!-- 				<dt class="fl"> -->
+<!-- 					$!tradeReturnDto.returnAddress -->
+<!-- 				</dt> -->
+<!-- 			</dl> -->
+<!-- 			<dl class="wid_500 hei_60"> -->
+<!-- 				<dd class="fl font_right wid_220 mar_r10">联系电话：</dd> -->
+<!-- 				<dt class="fl"> -->
+<!-- 					$!tradeReturnDto.returnPhone -->
+<!-- 				</dt> -->
+<!-- 			</dl> -->
+<!-- 			<dl class="wid_500 hei_60"> -->
+<!-- 				<dd class="fl font_right wid_220 mar_r10">邮政编码：</dd> -->
+<!-- 				<dt class="fl"> -->
+<!-- 					$!tradeReturnDto.returnPostcode -->
+<!-- 				</dt> -->
+<!-- 			</dl> -->
+<!-- 			<div class="bg_01"> -->
+	            <ul class="arbitration mar_lr5">
+	                <li class="border_2"><div class="arbitration_left">收货地址：</div><div class="arbitration_right">$!tradeReturnDto.returnAddress</div></li>
+	                <li class="border_2"><div class="arbitration_left">联系电话：</div><div class="arbitration_right">$!tradeReturnDto.returnPhone</div></li>
+	                <li class="border_2"><div class="arbitration_left">邮政编码：</div><div class="arbitration_right">$!tradeReturnDto.returnPostcode</div></li>
+	            </ul>
+<!-- 	        </div> -->
+		</div>
+		#end
+		<div class="clear"></div>
+		<div class="wid_600 mar_cen font_cen">
+		#if($!tradeOrdersDTO.locked == 1)
+			#if($!tradeReturnDto.state == 1)<!-- 退款申请等待卖家确认中 -->
+<!-- 			<button class="button_3 hei_30" id="button_lang" type="button">等待卖家处理</button> -->
+				<button class="button_6 pad_lr5 hei_32" id="button_lang" type="button">等待卖家处理</button>
+			#elseif($!tradeReturnDto.state == 2)<!-- 卖家不同意协议,等待买家修改 -->
+			<button class="button_2 pad_lr5 hei_32" id="button_lang" style="width: 130px" type="button" onclick="modifyAgreement();">修改退款协议</button>
+			#if($!complainStatus==0 || $!complainStatus==1)
+<!-- 				<a href="$request.getContextPath()/orderWx/gocomplainadd?tradeReturnid=$!tradeReturnDto.id&status=$!complainStatus"> -->
+<!-- 					<p class="button_2 pad_lr5 hei_32" id="button_lang">查看仲裁信息</p> -->
+<!-- 				</a> -->
+				<button class="button_2 pad_lr5 hei_32" id="gocomplainadd" type="button" onclick="gocomplainadd($!tradeReturnDto.id,$!complainStatus);">查看仲裁信息</button>
+			#elseif($!complainStatus==2)
+				<a href="$request.getContextPath()/orderWx/gocomplainadd?tradeReturnid=$!tradeReturnDto.id">
+					<button class="button_2 pad_lr5 hei_32" id="button_lang" type="button">申请仲裁</button>
+				</a>
+			#end
+			#elseif($!tradeReturnDto.state == 3)<!-- 退款申请达成,等待买家发货 -->
+			<!-- <button class="button_2 hei_30" id="button_lang" type="button" onclick="deliverGoods($!tradeReturnDto.id);">发货</button> -->
+			#elseif($!tradeReturnDto.state == 4)<!-- 买家已退货,等待卖家确认收货 -->
+			<button class="button_6 pad_lr5 hei_32" style="width:100px;" id="button_lang" type="button">等待卖家收货</button>
+			#elseif($!tradeReturnDto.state == 5)<!-- 退款关闭 -->
+			#elseif($!tradeReturnDto.state == 6)<!-- 退款成功 -->
+			<button class="button_6 pad_lr5 hei_32" id="button_lang" type="button">已退款</button>
+			#elseif($!tradeReturnDto.state == 7)
+			<button class="button_2 pad_lr5 hei_32" id="button_lang" type="button" onclick="receivables($!tradeReturnDto.id, $!tradeOrdersDTO.orderId, $!tradeReturnDto.state);">确认收到货款</button>
+			#end
+		#else
+			<button class="button_6 pad_lr5 hei_32" id="button_lang" type="button">订单已被冻结</button>
+		#end
+		</div>
+	</div>
+
+
+	<div class="td_l" style="display: none" id="updateAgreement">
+       	<input name="orderId" value="$!tradeOrdersDTO.orderId" id="orderId" type="hidden"/>
+         <dl class="hei_34">
+            <dd class="fl font_right wid_35 mar_r2">退款原因<i class="font_e3">※</i></dd>
+            <dt class="fl wid_57">
+            	<select class="input_3 wid_95" id="returnResult">
+            		<option value="">请选择退款原因</option>
+<!--             		<option value="1" #if($!tradeReturnDto.returnResult=="等待时间过长") selected="selected" #end>等待时间过长</option> -->
+<!--             		<option value="2" #if($!tradeReturnDto.returnResult=="订单重复") selected="selected" #end>订单重复</option> -->
+<!--             		<option value="3" #if($!tradeReturnDto.returnResult=="不想要了") selected="selected" #end>不想要了</option> -->
+            		<option value="不想买了" #if($!tradeReturnDto.returnResult=="不想买了") selected="selected" #end>不想买了</option>
+					<option value="信息填写错误重新买" #if($!tradeReturnDto.returnResult=="信息填写错误重新买") selected="selected" #end>信息填写错误重新买</option>
+					<option value="卖家缺货" #if($!tradeReturnDto.returnResult=="卖家缺货") selected="selected" #end>卖家缺货</option>
+					<option value="未收到货" #if($!tradeReturnDto.returnResult=="未收到货") selected="selected" #end>未收到货</option>
+					<option value="收到商品破损" #if($!tradeReturnDto.returnResult=="收到商品破损") selected="selected" #end> 收到商品破损</option>
+					<option value="商品错发／漏发" #if($!tradeReturnDto.returnResult=="商品错发／漏发") selected="selected" #end>商品错发／漏发</option>
+					<option value="商品需要维修" #if($!tradeReturnDto.returnResult=="商品需要维修") selected="selected" #end>商品需要维修</option>
+					<option value="收到商品与描述不符" #if($!tradeReturnDto.returnResult=="收到商品与描述不符") selected="selected" #end>收到商品与描述不符</option>
+					<option value="商品质量问题" #if($!tradeReturnDto.returnResult=="商品质量问题") selected="selected" #end>商品质量问题</option>
+            	</select>
+            </dt>
+          </dl>
+          <div class="clear"></div>
+          <dl class="hei_34 mar_t10">
+            <dd class="fl font_right wid_35 mar_r2 ">需退款的金额<i class="font_e3">※</i></dd>
+            <dt class="fl wid_55"><input class="input_3 wid_17 mar_r2" id="refundFreight" value="$!tradeReturnDto.refundGoods" readonly="readonly">元</dt>
+          </dl>
+          <div class="clear"></div>
+          <dl class="min-hei mar_t15">
+            <dd class="fl font_right hei_34 wid_35 mar_r2">退款说明<i class="font_e3">※</i></dd>
+            <dt class="fl wid_57"><textarea class="wid_87 hh_100" style="color: black" id="remark" placeholder="不能超过300字">$!tradeReturnDto.remark</textarea></dt>
+          </dl>
+           <div class="clear"></div>
+          <dl class="hei_34 mar_t15">
+            <dd class="fl font_right wid_35 mar_r2">上传凭证</dd>
+            <dt class="fl wid_57"><input type="file" name="file" id="fileInput" class="input_3 wid_95 mar_r2" onchange="startUpload()"/> </dt>
+          </dl>
+          <div class="clear"></div>
+	   
+		   <div class="">
+				<table id="imgtable" class="imgtable">
+					#foreach($picDTO in $!tradeReturnDto.picDTOList)
+					<tr id="trid1">
+						<td>
+							<img src="$!imageServerAddr$!picDTO.picUrl" style="width: 120px;height: 90px;">
+							<input hidden="hidden" value="$!picDTO.picUrl">
+						</td>
+						<td><a href="javascript:cancleimg('trid1')">删除</a></td>
+						<td width="150"></td>
+					</tr>
+					#end
+				</table>
+			</div>
+		
+	   <div class="clear"></div>
+          <div class="fr wid_65 font_7_5 mar_t10 lin_16 mar_b20">最多上传5张，单张大小不超过1M，格式为png、bmp、jpg或gif。</div>
+          <div class="clear"></div>
+          <div class="font_cen">
+             <button class="button_2 hei_34 pad_lr5" onclick="refundAgreementSubmit()">立即申请退款</button>
+<!--              <button class="button_2 hei_34 pad_lr5" onclick="complain()">申请仲裁</button> -->
+          </div>
+       </div>
+       </div>
+       #parse("common/footer.vm")
+</body>
+</html>

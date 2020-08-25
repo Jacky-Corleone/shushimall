@@ -1,0 +1,61 @@
+
+<script type="text/javascript">
+	$(function(){
+		//绑定卖家、买家的点击事件
+		$("#buyerLiEle").bind("click",function(){
+			$.cookie('clicked_menu', null, {path:'/'});
+			window.location.href = "$request.contextPath/buyercenter/loadBuyerCenter";
+		});
+		$("#sellerLiEle").bind("click",function(){
+			$.cookie('clicked_menu', null, {path:'/'});
+			window.location.href = "$request.contextPath/information/informationSeller/initLoad";
+		});
+		//高亮显示买家/卖家
+		selectMenu("sellerLiEle","buyerLiEle");
+		//搜索店铺/商品
+		$("#shopSearch").bind("click",function(){
+			var type = $("#searchType").val();
+			if(type=="g"){
+				//商品搜索
+				$("#shopSearchForm").attr("action", "$request.getContextPath()/searchController/searchItem");
+			}else if(type=="s"){
+				//店铺搜索
+				$("#shopSearchForm").attr("action", "$request.getContextPath()/searchController/searchShop");
+			}
+			$("#shopSearchForm").submit();
+		});
+	});
+
+	/**选中买家、卖家的菜单*/
+	function selectMenu(onMenuId, offMenuId){
+		$("#"+onMenuId).addClass("focus_mid");
+		$("#"+offMenuId).removeClass("focus_mid");
+		var ck = onMenuId + "," + offMenuId;
+		$.cookie('menu',ck,{expires: 7, path:"/"});
+	}
+</script>
+<div class="Center_head">
+   <div class="Center_head_min">
+     <div class="Center_head_midtab">
+		<span class="home_title" onclick="closeMenu()"><a href="$request.contextPath/">首页</a></span>
+     	<ul>
+        	<li id="buyerLiEle" onclick="closeMenu()">买家中心</li>
+        	<li id="sellerLiEle" onclick="closeMenu()">卖家中心</li>
+        </ul>
+     </div>
+     <!--Center_head_midtab end -->
+	  <!--Center_head_Search 
+     <form id="shopSearchForm" method="get">
+	     <div class="Center_head_Search">
+	       <select class="Center_Search_list" id="searchType">
+	        <option value="s">店  铺</option>
+	        <option value="g">宝  贝</option>
+	        </select>
+	       <span class="Center_Search_input_box"><input name="keyword" id="keyword" type="text" class="Center_Search_input" placeholder="搜索店铺/搜索产品" onpaste="return true;" autocomplete="off" style="color: rgb(153,153,153);outline: none;"></span>
+	       <span class="Center_Search_btn fa-search" id="shopSearch"></span>
+	     </div>
+     </form>
+     -->
+     <!--Center_head_Search end-->
+   </div><!--Center_head_min end-->
+ </div>

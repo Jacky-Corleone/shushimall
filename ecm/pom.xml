@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.camelot.openplatform.ecm</groupId>
+	<artifactId>ecm</artifactId>
+	<packaging>pom</packaging>
+	<version>shushi100-1.0.3.daily-SNAPSHOT</version>
+	<name>camelot-ecm</name>
+	<url>http://maven.apache.org</url>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- <sonar.jdbc.url>jdbc:mysql://10.135.7.56:3306/sonar?useUnicode=true&amp;characterEncoding=utf8&amp;autoReconnect=true</sonar.jdbc.url>
+		<sonar.jdbc.driver>com.mysql.jdbc.Driver</sonar.jdbc.driver>
+		<sonar.jdbc.username>sonar</sonar.jdbc.username>
+		<sonar.jdbc.password>sonar</sonar.jdbc.password>
+		<sonar.host.url>http://10.135.6.66:9000</sonar.host.url>
+		<sonar.scm.enabled>true</sonar.scm.enabled>
+		<sonar.core.codeCoveragePlugin>cobertura</sonar.core.codeCoveragePlugin>
+		<sonar.cobertura.maxmen>2048M</sonar.cobertura.maxmen>
+		<sonar.doxygen.generateDocumentation>true</sonar.doxygen.generateDocumentation> -->
+		<file.encoding>UTF-8</file.encoding>
+	</properties>
+	<modules>
+		<module>ecm-parent</module>
+		<module>ecm-export</module>
+		<module>ecm-rpc</module>
+		<module>ecm-common</module>
+		<module>ecm-domain</module>
+		<module>ecm-dao</module>
+		<module>ecm-service</module>
+		<module>ecm-web</module>
+	</modules>
+</project>

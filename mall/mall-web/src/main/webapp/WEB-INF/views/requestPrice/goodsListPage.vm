@@ -1,0 +1,171 @@
+#set($layout = "/none_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<link href="$staticPath/css/product.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$staticPath/js/tab.js"></script>
+<script type="text/javascript" src="$staticPath/js/all_classify.js"></script>
+<link type="text/css" href="$staticPath/css/basic.css" rel="stylesheet"/>
+<script type="text/javascript" src="$staticPath/js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="$staticPath/js/jquery.cookie.js"></script>
+<script type="text/javascript" src="$staticPath/js/xiaoguo.js"></script>
+<script type="text/javascript" src="$staticPath/js/js.js"></script>
+<style type="text/css">
+
+	.anniu{ z-index: 5;}
+	.left{ left: 10px;}
+	.right{ right: 10px;}
+</style>
+<script type="text/javascript">
+	function choseCategory(cid){
+		location.href="$request.contextPath/requestPriceController/ggoodsListPrice?cid="+cid
+	}
+	function topage(page){
+		var form = document.getElementById("categoryItemsForm");
+		form.page.value=page;
+		form.submit();
+	}
+	$(document).ready(function(){
+		var cid = "$!cid";
+		$("#categoryItemsForm").attr("action","$request.contextPath/requestPriceController/ggoodsListPrice?cid=" + cid );
+		
+		var ids = cid.split(":");
+		for(var i=0; i<ids.length; i++){
+			var id = ids[i];
+			if( i == 0 ){
+				$(".myTab0_Content"+id).show();
+				$("[cid='" + id + "']").addClass("active");
+			}else if( i== 2 || ids.length < 3 ){
+				$("[cid='" + id + "']").parent().find("li").removeClass("font_fe font_14b");
+				$("[cid='" + id + "']").addClass("font_fe font_14b");
+			}
+		}
+		
+		
+		
+		
+		var nTabWidth = $(".nTab").width();
+		var ulWidth = 0;
+		$("#myTab0 li").each(function(i,obj){
+			ulWidth += ( $(obj).width() + 6 );
+		});
+		if( ulWidth > nTabWidth ){
+			$(".fa-caret-left,.fa-caret-right").show();	
+		}else{
+			$(".fa-caret-left,.fa-caret-right").hide();	
+		}
+		
+    	var wid = $('#myTab0 li:first').outerWidth(true), step = 1, timer;
+    	$('.fa-caret-right').bind('click',function(){ play(true) });
+    	$('.fa-caret-left').bind('click',function(){ play(false) });
+    	
+        $('.TabTitle').hover(function(){
+        	clearInterval( timer );
+        }) 
+	
+    	function play( flag ){
+    		if(!$('#myTab0').is(':animated')){
+        		var dir = flag?-1:1, objli;
+        		if( flag ){ 
+            		objli= $('#myTab0 li').slice(0,step);
+            		objli.clone().appendTo($('#myTab0'));
+        		}else{
+          			objli = $('#myTab0 li').slice(-step);
+          			objli.clone().prependTo($('#myTab0'));
+          			$('#myTab0').css({marginLeft:-wid});
+        		}
+        		$('#myTab0').animate({marginLeft:'+='+wid*dir},500,function(){
+          			if(flag){
+            			$('#myTab0').css({marginLeft:0});
+          			}
+          			objli.remove();
+        		})
+      		}
+    	}
+		
+	});
+	
+	
+	 function onReturn(itemId, itemName, itemName2, itemName3){
+		window.opener.goodsDetailInfo(itemId, itemName, itemName2, itemName3);
+		window.close();
+		
+	}
+	
+</script>
+<!-- 中间内容 -->
+<div id="content">
+		<div class="nTab box-shadow1">
+			<!-- 标题开始 -->
+			<div class="TabTitle po_re">
+				<ul id="myTab0">
+					#foreach($category in $categoryes)
+						<li onclick="choseCategory('$category.categoryCid')" cid="$category.categoryCid">
+							$category.categoryCName
+						</li>
+					#end
+					<i class="fa-caret-left po_ab pa_00 font_18"></i>
+					<i class="fa-caret-right po_ab pa_01 font_18"></i> 
+		        </ul>
+	      	</div>
+	      	
+      		<div class="TabContent">
+      		#foreach($category in $categoryes)
+	      		<div class="myTab0_Content$!category.categoryCid" style="display: none; border-top: 1px solid #e8e8e8;">
+	            	#foreach($cate in $category.children)
+			            <div class="search_condition_box">
+			            	<div class="left_class bl cursor" onclick="choseCategory('$category.categoryCid:$cate.categoryCid')" cid="$cate.categoryCid">
+		            			$cate.categoryCName
+			            	</div>
+			              	<div class="right_list" style="min-height: 35px;">
+			                	<ul>
+			                		#foreach($c in $cate.children)
+			                  			<li onclick="choseCategory('$category.categoryCid:$cate.categoryCid:$c.categoryCid')" cid="$c.categoryCid">
+			                  				$c.categoryCName
+			                  			</li>
+			                		#end
+			                	</ul>
+			              	</div>
+			           	</div>
+	            	#end
+	            </div>
+      		#end
+			</div>
+			
+			<!--下面产品循环 start -->
+			<div class="Search_list">
+				#foreach( $item in $pager.records )
+					<!--每个产品的div开始-->
+			   		<div class="Product_box" style="height: 340px; margin-bottom: 20px;">
+						<div class="Product_box_1">
+							<div class="big_img">
+							<!--	<a href="$request.contextPath/productController/categoryItemDetail?itemId=$item.itemId">-->
+									<a href="javascript:void(0)" onclick="onReturn($item.itemId,'$item.itemName', '箱', '台');">
+									<img src="$!imageServerAddr$!item.pictureUrl" style="width: 210px;height: 260px; margin-top: 4px;"/>
+								</a>
+							</div>
+							<div class="n_font">
+							<!--	<a href="$request.contextPath/productController/categoryItemDetail?itemId=$item.itemId">-->
+									<a href="javascript:void(0)" onclick="onReturn($item.itemId,'$item.itemName', '箱', '台');">
+									$!item.itemName
+								</a>
+							</div>
+							<!--
+							<div class="jiaqian font_14b font_fe">$!item.marketPrice</div>
+							<div class="pingfen">
+								<span class="star sa5"></span>
+								<a href="#" style="float:left;color:#005AA0">已有2202人评价</a>
+							</div>
+							-->
+						</div>
+					</div>
+					<!--每个产品的div结束-->
+				#end
+			</div><!--Search_list end -->
+	
+			
+			<form id="categoryItemsForm"  method="post">
+				<input name="page" type="hidden">
+			</form>
+			<!-- 分页 -->
+			#pageVelocity($pager)
+	    </div>
+</div><!-- 中间内容 end -->

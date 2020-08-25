@@ -1,0 +1,91 @@
+@charset "utf-8";
+/* CSS Document */
+
+/******主体上部开始******/
+.main_flash,.focusPic{float:left;height:350px;width:680px; overflow:hidden}
+.main_flash{position:relative;display:inline;z-index:1;padding:10px 0 0 210px;}
+.num_bg1{position:absolute;height:18px;z-index:100;bottom:0px;right:0px;display: block;padding:5px 10px 0 0;}
+.num_bg1 ul{float:right;}
+.num_bg1 li{float:left;margin-left:4px;display: block;height:4px;width: 30px;}
+.num_bg1 li a{float:left;height:4px;width:30px;background:url(../images/basic_icon.png) no-repeat -34px -95px;text-indent:-9999px;}
+.num_bg1 .focus_num a,.centerList .num_bg1 .focus_num a{background:url(../images/basic_icon.png) no-repeat 0px -95px;}
+.main_right {float:right;width:300px;padding-top:10px;}
+.main_right .loginArea{width:298px;height:165px; background:url(../images/loginArea_bg.jpg) no-repeat;}
+.main_right .loginArea .head_photo,.main_right .loginArea .head_font{font-size:14px;font-family:Microsoft Yahei, Arial;line-height:26px;height:58px; float:left; display:block; margin:20px 0px 20px 20px;}
+.main_right .loginArea .head_photo{ width:58px;background:#f7f7f7;
+	text-align:center;
+	border:2px solid #fff;
+	-moz-border-radius: 58px;
+	-webkit-border-radius: 58px;
+	border-radius: 58px !important;
+   -moz-box-shadow:0 0 15px #666;-webkit-box-shadow:0 0 15px #666;box-shadow:0 0 15px #666;
+   overflow:hidden;
+}
+.main_right .loginArea .login_button{ font-family:Microsoft Yahei, Arial;height:26px; line-height:22px;color:#fff;border:none; filter:alpha(opacity=90); /*IE滤镜，透明度80%*/
+-moz-opacity:0.8; /*Firefox私有，透明度80%*/
+opacity:0.8;/*其他，透明度80%*/
+cursor:pointer;}
+.news{width:300px;height:185px;margin-top:10px;cursor:pointer;}
+.tit_style h2{height:35px;line-height:35px; border-bottom:2px solid #e22217;font-family:Microsoft Yahei, Arial; font-size:15px; }
+.tit_style h2 i,.r_brandTitle h3{font-family:"宋体"; font-size:12px; font-weight:normal}
+.tit_style p{ width:298px;height:138px;line-height:26px;overflow:hidden;text-indent:2px; border-top:none;}
+.tit_style p a{display:block;}
+
+.banner{ width:100%; margin:0 auto;}
+.banner h2{ height:40px; margin:10px auto;}
+
+<!--团购开始 --> 
+.group_list{ width:100%; margin:0 auto;}
+.group_list li{ height:280px; border:1px solid #d3d3d3; float:left; margin:5px;}
+.group_list li .P_name,.group_list li .P_rice{position:absolute; z-index:5;font-family:Microsoft Yahei, Arial; display:block;}
+.group_list li .P_name{left:20px; top:20px;font-weight:bold; }
+.group_list li .P_rice{right:20px; bottom:10px;}
+
+/******主体上部结束******/
+
+/******楼层样式开始******/
+.product,.mid_product{position:relative;width:1200px;}
+.mid_product{width:790px;}
+.c_listArrow{border-bottom:2px solid #E32C29;width:200px;height:7px;overflow: hidden;position: relative;text-align: center;top: 32px;z-index: 1;}
+.c_listArrow b{border-bottom: 10px solid #E4393C;border-left: 10px dashed transparent;border-right: 10px dashed transparent;border-top: 10px dashed transparent;display: inline-block;font-size: 0px;height: 0px;margin-top: -8px;overflow: hidden;width: 0px;}
+.cTitle{border-bottom:2px solid #777;height:30px;line-height: 30px;width:200px;text-align:center; cursor:default;display:inline-block;display:inline;}
+.cTitle h2{font-size:14px;}
+.c_listArrow,.cTitle{width:158px;font-family:Microsoft Yahei, Arial;}
+.p_hightlight{color:#d9251b;}
+
+.centerList{width:790px;height:361px;position:relative;z-index:1;border-bottom: 1px solid #ccc;}
+.centerList ul{float:left;}
+.centerList ul li{width:137px;height:175px;border-left:1px solid #ddd;border-bottom:1px solid #ddd;padding:5px 10px 0; float:left}
+.centerList ul li.lt{margin-right:474px;}
+.centerList ul li .pl_img{padding:5px 0 !important;width:137px;height:100px;text-align:center;position:relative;}
+.centerList ul li .pl_img img{max-height:100px;max-width:100px;_height:100px;_width:100px; vertical-align:middle; overflow:hidden}
+.pl_name,.pl_price{white-space:normal;word-wrap:normal;word-break:break-all;width:186px;}
+.centerList ul li .pl_name,.centerList ul li .pl_price{width:137px;}
+.catalogue{width:210px;}
+.catalogue .floor{position:relative;color:#fff;width:210px; height:30px;line-height:35px;font-size:16px;font-family:Microsoft Yahei, Arial; margin-top:9px; text-indent:10px;}
+.catalogue .floor_bg1{background:url(../images/basic_icon.png) no-repeat left -103px;}
+.catalogue .floor_bg2{background:url(../images/basic_icon.png) no-repeat left -143px;}
+.catalogue .catalogueList{border-bottom: 1px solid #ccc;height:361px;position:relative;}
+.catalogue .catalogueList .cList_par{width:198px; height:158px;padding:5px;position:absolute;left:0px;top:0px;z-index: 2; overflow:hidden;}
+.catalogue .catalogueList .cList_par li {width:99px;height:25px;line-height: 25px;overflow: hidden;vertical-align:bottom;float:left;}
+.catalogue .catalogueList .cList_pic{position:absolute;bottom:0px;left:0px;z-index: 1; height:190px; overflow:hidden;}
+.catalogue .catalogueList .cList_pic img{max-width:209px;max-height:145px;_width:209px;_height:145px;}
+.catalogue .catalogueList .cList_pic button{ width:180px; height:35px; line-height:32px; color:#fff; background:#E50011; margin:0 10px; border:none;font-family:Microsoft Yahei, Arial; cursor:pointer; border-radius:4px;}
+.catalogue .catalogueList .cList_pic button:hover{ background:#c11208}
+.r_brand{width:200px;margin-top:9px;}
+.r_brand .r_brandTitle{border-bottom: 2px solid #777;height:30px;line-height: 30px;}
+.r_brand .r_brandlist{border-left: 1px solid #ddd;height: 180px;padding: 0px;width: 199px;border-bottom:1px solid #ddd;}
+.r_brand .r_brandlist ul li {border-top: 1px dotted #ddd;text-align:center;width: 99px;height: 35px;
+overflow: hidden;float:left;}
+.r_brand .r_brandlist ul li.lt{border-top:none;}
+
+.r_adver{border-left:1px solid #ddd;border-bottom:1px solid #ddd;height:180px;width:199px;}
+.r_adver img{max-width:199px;max-height:180px;_width:199px;_height:180px;}
+.c_adver{width:473px;border-left:1px solid #ddd;border-bottom:1px solid #ddd;position:absolute;top:0;left:158px;height:180px;}
+.focusPic1{float:left;width:473px;height:180px;max-width:473px;max-height:180px;_width:473px;_height:180px;border-bottom:1px solid #ddd;}
+
+.centerList .num_bg{position: absolute;height:3px;width: 200px;z-index:10;top: 170px;left: 140px;display: block;}
+.centerList .num_bg li{float: left;height:3px;width: 30px;margin-left:4px;display: inline;line-height: 16px;border:none;padding:0;}
+.centerList .num_bg li a{float: left;height: 3px;width: 30px;background-color:#ddd;line-height: 3px; text-indent:-9999px;}
+.centerList .num_bg .fir_2 a {font-weight: bold;background-color: #d9251b;line-height:4px}
+/******楼层样式结束******/

@@ -1,0 +1,195 @@
+#set($layout = "common/order.vm")
+<div class="mar_lr5">
+    <!-- 发货商城 -->
+
+    <div class="border_2 shop_order pad_tb5">
+        <p class="fl shop_order_p" style="margin-left:0%;width: 100%">
+            <span style="font-weight:bold">协议状态：</span>
+            <span class="font_e5">$!statusMap.get($contract.status)</span>
+
+        </p>
+
+        <div class="clear"></div>
+        <p class="fl shop_order_p" style="margin-left:0%;width: 100%"><span style="font-weight:bold">协议序号：</span>
+            <span>$!contract.contractOrderNo</span>
+        </p>
+
+        <div class="clear"></div>
+        <p class="fl shop_order_p" style="margin-left:0%;width: 100%">
+            <span style="font-weight:bold">协议名称：</span>
+            <span>$!contract.contractName</span>
+
+        <p class="fl shop_order_p" style="margin-left:0%;width: 100%">
+            #if(1==$contract.status)
+                <span style="font-weight:bold">审批人：</span>
+                <span>$!approveBy.uname</span>
+            #end
+            #if(2==$contract.status||4==$contract.status)
+                <span style="font-weight:bold">驳回原因：</span>
+                <span>$!contract.refusalReason</span>
+            #end
+        </p>
+        #if(6==$contract.status)
+            <p class="fl shop_order_p" style="margin-left:0%;width: 100%">
+                <span style="font-weight:bold">发布方：</span>
+                <span>$!publishedBy.companyName</span>
+            </p>
+
+            <p class="fl shop_order_p" style="margin-left:0%;width: 100%">
+                <span style="font-weight:bold">发布人：</span>
+                <span>$!publishedBy.uname</span>
+            </p>
+        #end
+
+        <div class="clear"></div>
+    </div>
+    <!-- 发货商城 -->
+    <!-- 发货信息 -->
+    <div class="border_2 shop_order pad_tb5">
+        <p><span class="font_e5" style="font-size:15px">买方信息</span></p>
+
+        <p class="fl shop_order_p" style="margin-left:0%;width: 100%">
+            <span style="font-weight:bold">联系人：</span>
+            <span>$!buyer.uname</span>
+        </p>
+
+        <div class="clear"></div>
+        <p class="fl shop_order_p" style="margin-left:0%;width: 100%">
+            <span style="font-weight:bold">公司名称：</span>
+            <span>$!buyer.companyName</span>
+        </p>
+
+        <div class="clear"></div>
+        <p class="fl shop_order_p" style="margin-left:0%;width: 100%">
+            <span style="font-weight:bold">联系人电话：</span>
+            <span>$!buyer.umobile</span>
+        </p>
+
+        <p class="fl shop_order_p" style="margin-left:0%;width: 100%">
+            <span style="font-weight:bold">联系人邮箱：</span>
+            <span>$!buyer.userEmail</span>
+        </p>
+
+        <div class="clear"></div>
+    </div>
+
+    <div class="border_2 shop_order pad_tb5">
+        <p><span class="font_e5" style="font-size:15px">卖方信息</span></p>
+
+        <p class="fl shop_order_p" style="margin-left:0%;width: 100%">
+            <span style="font-weight:bold">联系人：</span>
+            <span>$!seller.uname</span>
+        </p>
+
+        <div class="clear"></div>
+        <p class="fl shop_order_p" style="margin-left:0%;width: 100%">
+            <span style="font-weight:bold">公司名称：</span>
+            <span>$!seller.companyName</span>
+        </p>
+
+        <div class="clear"></div>
+        <p class="fl shop_order_p" style="margin-left:0%;width: 100%">
+            <span style="font-weight:bold">联系人电话：</span>
+            <span>$!seller.umobile</span>
+        </p>
+
+        <p class="fl shop_order_p" style="margin-left:0%;width: 100%">
+            <span style="font-weight:bold">联系人邮箱：</span>
+            <span>$!seller.userEmail</span>
+        </p>
+
+        <div class="clear"></div>
+    </div>
+
+    <!-- 发货信息 -->
+   <div class="border_2 shop_order pad_tb5">
+
+        <div class="clear"></div>
+    </div>
+    <div class="border_2 shop_order pad_tb5">
+        <ul class="font_t" style="float:left;width:40%">
+            <li style="font-weight:bold;width: 100%">协议开始日期</li>
+            <li>$!date.format('yyyy-MM-dd',$contract.beginDate)</li>
+        </ul>
+        <ul class="font_t" style="float:right;width:40%">
+            <li style="float:right;font-weight:bold;width: 100%;text-align:right">协议结束日期</li>
+            <li style="float:right;width:100%;text-align:right">$!date.format('yyyy-MM-dd',$contract.endDate)</li>
+        </ul>
+        <div class="clear"></div>
+    </div>
+
+    <div class="border_2 shop_order pad_tb5">
+        <p class="wid_69 fl" style="font-weight:bold">账期</p>
+
+        <div class="fr lin_24">
+            #if($contractPayment.paymentType==1)
+                <p>$!contractPayment.paymentDays月</p>
+            #else
+                <p>$!contractPayment.paymentDays天</p>
+            #end
+        </div>
+        <div class="clear"></div>
+    </div>
+    
+     <div class="border_2 shop_order pad_tb5">
+    	 <p class="wid_69 fl" style="font-weight:bold">附件</p>
+    	 <div class="fr lin_24">
+    	 	#if($!contractUrlShowList)
+				 #foreach($contractUrlList in $contractUrlShowList)
+				 #set($str=$!contractUrlList.imgUrl)
+				 #set($str = $str.substring($str.lastIndexOf("-")))  
+				 #set($str = $str.substring(1))  
+				 <p >
+					 <a href='$!ftpServerDir$!contractUrlList.imgUrl'>$str</a>
+				 </p>
+           		 #end
+			#end
+    	 </div>
+       	<div class="clear"></div>
+    </div>
+     <div class="border_2 shop_order pad_tb5">
+    	 <p class="wid_69 fl" style="font-weight:bold">备注</p>
+    	 <div class="fr lin_24">
+			<p >$!contract.remark</p>
+    	 </div>
+       	<div class="clear"></div>
+    </div>
+
+    <div class="border_2 shop_order pad_tb5">
+        <p class="wid_69 fl" style="font-weight:bold">协议物品</p>
+
+        <div class="fr lin_24">
+            <p style="font-weight:bold"></p>
+        </div>
+        <div class="clear"></div>
+    </div>
+    #foreach($contractMat in $contract.contractMatDTOs)
+        <div class="border_2 shop_order pad_tb5">
+            <p class="wid_69 fl">产品编号：$!contractMat.get("skuId")</p>
+
+            <p class="wid_69 fl">销售属性：$!contractMat.get("salerAttr")</p>
+            
+             <p class="wid_69 fl">协议类型：
+             
+              #if("1"==$!contract.protocolType)
+                                      单价
+              #end
+              #if("2"==$!contract.protocolType)
+                                      数量 ：$!contractMat.get("number")
+              #end
+              #if("3"==$!contract.protocolType)
+                                         总价格：￥$!contractMat.get("cost")
+               #end
+             
+             
+             </p>
+
+            <p class="wid_69 fl">产品名称：$!contractMat.get("itemName")</p>
+
+            <p class="wid_69 fl">价格：￥$!contractMat.get("matPrice")</p>
+
+            <div class="clear"></div>
+        </div>
+
+    #end
+</div>

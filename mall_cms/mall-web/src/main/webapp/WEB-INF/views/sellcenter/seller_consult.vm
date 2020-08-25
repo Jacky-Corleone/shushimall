@@ -1,0 +1,156 @@
+
+#set($layout = "/seller_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<link href="$staticPath/css/manage_style.css" rel="stylesheet" type="text/css" />
+<link href="$staticPath/css/register.css" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript">
+	$("document").ready(function(){
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+	});
+	//到指定的分页页面
+	function topage(page){
+		var form = document.getElementById("consultForm");
+		form.page.value=page;
+		form.submit();
+	}
+	
+	function openWinConsult(id){
+		$("#winConsult").find("[name='id']").val(id);
+		$("#winConsult").show();
+	}
+	
+	function closeWinConsult(){
+		$("#winConsult").hide();
+	}
+	
+	function modifyConsult(){
+		var reply = $.trim($("#winConsult form").find("[name='reply']").val());
+		if( reply != "" && reply.length > 0 ){
+			$.ajax({
+				url: "$request.contextPath/sellercenter/modifyConsult",
+				data: $("#winConsult form").serialize(),
+				type: 'post',
+				dataType: 'json',
+				success: function(data){
+					if( data.success ){
+						location.href = "$request.contextPath/sellercenter/consult";
+					}else{
+						alert(data.result);
+					}
+				}
+			});
+		}else{
+			$("#consultMsg").html("请输入回复信息!");
+		}
+	}
+	
+	function delConsult(id){
+		var result = confirm("确认删除？");
+		if(result){
+			$.ajax({
+				url: "$request.contextPath/sellercenter/delConsult",
+				data: {"id": id},
+				type: 'post',
+				dataType: 'json',
+				success: function(data){
+					if( data.success ){
+						location.href = "$request.contextPath/sellercenter/consult";
+					}else{
+						alert(data.result);
+					}
+				}
+			});
+		}
+	}
+</script>
+
+<form id="consultForm" action="$request.contextPath/sellercenter/consult" method="post">
+	<input type="hidden" name="page">
+</form>
+<div id="main">
+	<div id="leftSeller">&nbsp;</div>
+	
+	<div id="right" class="bg_06">
+		<h3 class="pad_l10">客服咨询/回复</h3>
+		<div id="right_bot" class=" wid_950 mar">
+            <!-- 商品列表开头 -->
+            <ul class="list_top bg_08 font_14b">
+                <li class="wid_220" style="text-indent:18px;">商品信息</li>
+                <li class="wid_200">咨询内容</li>
+                <li class="wid_250">咨询回复</li>
+                <li class="wid_120">咨询时间</li>
+                <li class="wid_150 font_cen">操作</li>
+            </ul>
+            
+            #foreach( $consult in $pager.records )
+	           	<!-- 每一条评论订单 -->
+	           	<ul class="xunwen border-5">
+	           		
+	           		<li class="wid_220">
+	           			<dl class="shop_selsct wid_220 mar_lr10">
+	           				<dt>
+	           					<a href="$request.contextPath/productController/details?id=$!consult.itemId" target="_blank">
+	           					<img id="picUrl" class="mar_t10 mar_l10 " src="$!imageServerAddr$consult.picUrl" width="50" height="50">
+	           					</a>
+							</dt>
+							<dd id="itemName" class="wid_110 mar_t10 mar_l10">
+	           					<a href="$request.contextPath/productController/details?id=$!consult.itemId" target="_blank">$!consult.itemName</a>
+	           				</dd>
+						</dl>
+	           		</li>
+	           		<li class="wid_200 hei_60" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="$!consult.consulting">
+	           			$!consult.consulting
+	           		</li>
+	           		<li class="wid_250 hei_60" style="overflow:hidden; text-overflow:ellipsis;white-space:nowrap;" title="$!consult.reply">
+	           			$!consult.reply
+	           		</li>
+	           		<li class="wid_120 hei_60">$!date.format('yyyy-MM-dd HH:mm:ss ',$!consult.created)</li>
+	           		<li class="wid_150 font_cen hei_60">
+	           			#if(!$!consult.reply)
+	           				<a href="javascript:openWinConsult('$!consult.id');" class="font_7a">回复咨询</a>/
+	           			#end
+	           			<a href="javascript:delConsult('$!consult.id');" class="font_fe">删除咨询</a>
+	           		</li>
+	            </ul>
+            #end
+      	
+		<div class="clear"></div>
+    		
+   		#pageVelocity($pager)<!--分页结束 -->
+	</div><!--right_bot end -->
+</div> <!--right end -->
+</div><!--main end -->
+<div id="winConsult" class="po_fai" style="display: none;height: 0px; width: 0px;">
+    <div class="po_fai_bg"></div>
+    <div class="po_main pad_t10" >
+	    <div class=" hei_32 bg_05 pad_l10 font_14b">
+	    	<a href="javascript:closeWinConsult();">
+	    		<i class="demo-icons fa-times-circle font_16 fr mar_r10"></i>
+	    	</a>
+	    	回复咨询内容
+	    </div>
+	    <div class="clear"></div>   
+	    <div class="register_content" style="width:500px; height:360px; margin: 0  ">
+	    	<form>
+	        	<div class="register_box_mid" >
+	        		<input name="id" type="hidden">
+	             
+	                <!--如需增加可循环dl结束-->
+	                <dl>
+	                    <dt>回复内容：</dt>
+	                    <dd style="border:none">
+	                        <textarea name="reply" class="input_Style2  wid_300 min-hei" maxlength="300"></textarea><br>最多不能超过300字
+	                    </dd>
+	                </dl>
+	                <!--如需增加可循环dl结束-->
+	                <div class="font_cen">
+	                    <button type="button" style="margin:0 10px;" class="button_2 hei_40 font_16" onclick="modifyConsult()">提交</button>
+	                    <button type="button" style="margin:0 10px;" class="button_3 hei_40 font_16" onclick="closeWinConsult()">取消</button>
+	                </div>
+	                <div id="consultMsg" style="color: red; height: 40px; line-height: 40px; text-indent: 100px;"></div>
+	            </div><!--register_box-->
+	    	</form>
+	    </div>
+    </div>
+</div>

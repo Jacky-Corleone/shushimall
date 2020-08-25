@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.storecenter.dao.ShopCategorySellerDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	
+	<resultMap id="shopCategorySellerDTOMap" type="com.camelot.storecenter.dto.ShopCategorySellerDTO">
+				<result property="cid" column="cid"/>
+				<result property="parentCid" column="parent_cid"/>
+				<result property="sellerId" column="seller_id"/>
+				<result property="shopId" column="shop_id"/>
+				<result property="cname" column="cname"/>
+				<result property="status" column="status"/>
+				<result property="lev" column="lev"/>
+				<result property="hasLeaf" column="has_leaf"/>
+				<result property="sortNumber" column="sort_number"/>
+				<result property="homeShow" column="home_show"/>
+				<result property="expand" column="expand"/>
+				<result property="created" column="created"/>
+				<result property="modified" column="modified"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			cid
+ 			,parent_cid
+ 			,seller_id
+ 			,shop_id
+ 			,cname
+ 			,status
+ 			,lev
+ 			,has_leaf
+ 			,sort_number
+ 			,home_show
+ 			,expand
+ 			,created
+ 			,modified
+		FROM 
+		shop_category_seller shop_category_seller_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.cid != null  and entity.cid !=''">
+				<![CDATA[ and shop_category_seller_.cid = #{entity.cid} ]]>
+			</if>
+			<if test="entity.parentCid != null  and entity.parentCid !=''">
+				<![CDATA[ and shop_category_seller_.parent_cid = #{entity.parentCid} ]]>
+			</if>
+			<if test="entity.sellerId != null  and entity.sellerId !=''">
+				<![CDATA[ and shop_category_seller_.seller_id = #{entity.sellerId} ]]>
+			</if>
+			<if test="entity.shopId != null  and entity.shopId !=''">
+				<![CDATA[ and shop_category_seller_.shop_id  = #{entity.shopId}  ]]>
+			</if>
+			<if test="entity.cname != null  and entity.cname !=''">
+				<![CDATA[ and shop_category_seller_.cname  = #{entity.cname}  ]]>
+			</if>
+			<if test="entity.status != null  and entity.status !=''">
+				<![CDATA[ and shop_category_seller_.status = #{entity.status} ]]>
+			</if>
+			<if test="entity.lev != null  and entity.lev !=''">
+				<![CDATA[ and shop_category_seller_.lev = #{entity.lev}  ]]>
+			</if>
+			<if test="entity.hasLeaf != null  and entity.hasLeaf !=''">
+				<![CDATA[ and shop_category_seller_.has_leaf  = #{entity.hasLeaf} ]]>
+			</if>
+			<if test="entity.sortNumber != null  and entity.sortNumber !=''">
+				<![CDATA[ and shop_category_seller_.sort_number = #{entity.sortNumber} ]]>
+			</if>
+			<if test="entity.homeShow != null  and entity.homeShow !=''">
+				<![CDATA[ and shop_category_seller_.home_show = #{entity.homeShow} ]]>
+			</if>
+			<if test="entity.expand != null  and entity.expand !=''">
+				<![CDATA[ and shop_category_seller_.expand = #{entity.expand} ]]>
+			</if>
+			<if test="entity.created != null  and entity.created !=''">
+				<![CDATA[ and shop_category_seller_.created  = #{entity.created} ]]>
+			</if>
+			<if test="entity.modified != null  and entity.modified !=''">
+				<![CDATA[ and shop_category_seller_.modified = #{entity.modified} ]]>
+			</if>
+		</if>
+		and shop_category_seller_.status=1
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="selectById" resultMap="shopCategorySellerDTOMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where shop_category_seller_.cid = #{cid} and shop_category_seller_.status=1
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="selectListByCondition" resultMap="shopCategorySellerDTOMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectCountByCondition" resultType="long">
+		<include refid="count_Tail" />
+		shop_category_seller shop_category_seller_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="insertShopCategory" parameterType="com.camelot.storecenter.dto.ShopCategorySellerDTO">
+		<![CDATA[
+		insert into shop_category_seller (
+		    	 cid
+		    	 ,parent_cid
+		    	 ,seller_id
+		    	 ,shop_id
+		    	 ,cname
+		    	 ,status
+		    	 ,lev
+		    	 ,has_leaf
+		    	 ,sort_number
+		    	 ,home_show
+		    	 ,expand
+		    	 ,created
+		    	 ,modified
+		   )values(
+		    	#{cid}
+		    	,#{parentCid}
+		    	,#{sellerId}
+		    	,#{shopId}
+		    	,#{cname}
+		    	,#{status}
+		    	,#{lev}
+		    	,#{hasLeaf}
+		    	,#{sortNumber}
+		    	,#{homeShow}
+		    	,#{expand}
+		    	,#{created}
+		    	,#{modified}
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.storecenter.dto.ShopCategorySellerDTO">
+		<![CDATA[
+		update shop_category_seller set
+   			cid = #{cid}
+   			,parent_cid = #{parentCid}
+   			,seller_id = #{sellerId}
+   			,shop_id = #{shopId}
+   			,cname = #{cname}
+   			,status = #{status}
+   			,lev = #{lev}
+   			,has_leaf = #{hasLeaf}
+   			,sort_number = #{sortNumber}
+   			,home_show = #{homeShow}
+   			,expand = #{expand}
+   			,created = #{created}
+   			,modified = SYSDATE()
+		 where cid = #{cid}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from shop_category_seller where cid = #{cid}
+		]]>
+	</delete>
+	<delete id="deletes">
+		<![CDATA[
+		delete from shop_category_seller where cid in
+		]]>
+		<foreach collection="cids" item="item" index="index" open="(" separator="," close=")">
+	        #{item}
+	  	</foreach>	</delete>
+</mapper>

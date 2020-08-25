@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.maketcenter.dao.CentralPurchasingRefEnterpriseDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="centralPurchasingRefEnterprise" type="com.camelot.centralPurchasing.domain.CentralPurchasingRefEnterprise">
+		<result property="purchaseRefEnterpriseId" column="purchase_ref_enterprise_id"/>
+		<result property="enterpriseId" column="enterprise_id"/>
+		<result property="activitesDetailsId" column="activites_details_id"/>
+		<result property="enterpriseEstimateNum" column="enterprise_estimate_num"/>
+		<result property="enterpriseEstimatePrice" column="enterprise_estimate_price"/>
+		<result property="insertTime" column="insert_time"/>
+		<result property="insertBy" column="insert_by"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateBy" column="update_by"/>
+	</resultMap>
+	<resultMap id="querySignUpInfoDTO" type="com.camelot.maketcenter.dto.QuerySignUpInfoDTO">
+		<result property="activitesDetailsId" column="activites_details_id"/>
+		<result property="enterpriseEstimateNum" column="enterprise_estimate_num"/>
+		<result property="enterpriseEstimatePrice" column="enterprise_estimate_price"/>
+		<result property="enterpriseName" column="enterprise_name"/>
+		<result property="enterpriseLinkman" column="enterprise_linkman"/>
+		<result property="phoneNo" column="phone_no"/>
+		<result property="address" column="address"/>
+		<result property="activityNum" column="activity_num"/>
+		<result property="activityName" column="activity_name"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			purchase_ref_enterprise_id,
+			enterprise_id,
+			activites_details_id,
+			enterprise_estimate_num,
+			enterprise_estimate_price,
+			insert_time,
+			insert_by,
+			update_time,
+			update_by
+
+		FROM 
+		CENTRAL_PURCHASING_REF_ENTERPRISE ref_enterprise_
+		]]>
+	</sql>
+	<sql id="selectAllJoinColumns">
+		<![CDATA[
+		select
+			ref_enterprise_.activites_details_id,
+			ref_enterprise_.enterprise_estimate_num,
+			ref_enterprise_.enterprise_estimate_price,
+			enterprise_.enterprise_name,
+			enterprise_.enterprise_linkman,
+			enterprise_.address,
+			enterprise_.phone_no,
+			activites_.activity_num,
+			activites_.activity_name
+			
+		FROM 
+		CENTRAL_PURCHASING_REF_ENTERPRISE ref_enterprise_ 
+		join CENTRAL_PURCHASING_ACTIVITES_DETAILS details_ on ref_enterprise_.ACTIVITES_DETAILS_ID = details_.ACTIVITES_DETAILS_ID
+		join CENTRAL_PURCHASING_ACTIVITES activites_ on activites_.central_purchasing_id=details_.central_purchasing_id
+		join CENTRAL_PURCHASING_ENTERPRISE enterprise_ on ref_enterprise_.ENTERPRISE_ID=enterprise_.ENTERPRISE_ID
+		
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.purchaseRefEnterpriseId != null">
+				<![CDATA[ and ref_enterprise_.purchase_ref_enterprise_id = #{entity.purchaseRefEnterpriseId} ]]>
+			</if>
+			<if test="entity.enterpriseId != null">
+				<![CDATA[ and ref_enterprise_.enterprise_id = #{entity.enterpriseId} ]]>
+			</if>
+			<if test="entity.activitesDetailsId != null">
+				<![CDATA[ and ref_enterprise_.activites_details_id = #{entity.activitesDetailsId} ]]>
+			</if>
+			<if test="entity.enterpriseEstimateNum != null">
+				<![CDATA[ and ref_enterprise_.enterprise_estimate_num = #{entity.enterpriseEstimateNum} ]]>
+			</if>
+			<if test="entity.enterpriseEstimatePrice != null">
+				<![CDATA[ and ref_enterprise_.enterprise_estimate_price = #{entity.enterpriseEstimatePrice} ]]>
+			</if>
+			<if test="entity.insertTime != null">
+				<![CDATA[ and ref_enterprise_.insert_time = #{entity.insertTime} ]]>
+			</if>
+			<if test="entity.insertBy != null">
+				<![CDATA[ and ref_enterprise_.insert_by = #{entity.insertBy} ]]>
+			</if>
+			<if test="entity.updateTime != null">
+				<![CDATA[ and ref_enterprise_.update_time = #{entity.updateTime} ]]>
+			</if>
+			<if test="entity.updateBy != null">
+				<![CDATA[ and ref_enterprise_.update_by = #{entity.updateBy} ]]>
+			</if>
+
+		</if>
+	</sql>
+	
+	<sql id="where_join_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.activitesDetailsId != null">
+				<![CDATA[ and ref_enterprise_.activites_details_id = #{entity.activitesDetailsId} ]]>
+			</if>
+			<if test="entity.enterpriseEstimateNum != null">
+				<![CDATA[ and ref_enterprise_.enterprise_estimate_num = #{entity.enterpriseEstimateNum} ]]>
+			</if>
+			<if test="entity.enterpriseEstimatePrice != null">
+				<![CDATA[ and ref_enterprise_.enterprise_estimate_price = #{entity.enterpriseEstimatePrice} ]]>
+			</if>
+			<if test="entity.enterpriseName != null and entity.enterpriseName !=''">
+				<![CDATA[ and enterprise_.enterprise_name = #{entity.enterpriseName} ]]>
+			</if>
+			<if test="entity.enterpriseLinkman != null and entity.enterpriseLinkman !=''">
+				<![CDATA[ and enterprise_.enterprise_linkman = #{entity.enterpriseLinkman} ]]>
+			</if>
+			<if test="entity.address != null and entity.address !=''">
+				<![CDATA[ and enterprise_.address = #{entity.address} ]]>
+			</if>
+			<if test="entity.activityNum != null and entity.activityNum !=''">
+				<![CDATA[ and activites_.activity_num = #{entity.activityNum} ]]>
+			</if>
+			<if test="entity.activityName != null and entity.activityName !=''">
+				<![CDATA[ and activites_.activity_name = #{entity.activityName} ]]>
+			</if>
+		</if>
+	</sql>
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="centralPurchasingRefEnterprise" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where ref_enterprise_.purchase_ref_enterprise_id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="centralPurchasingRefEnterprise" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		CENTRAL_PURCHASING_REF_ENTERPRISE ref_enterprise_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="com.camelot.centralPurchasing.domain.CentralPurchasingRefEnterprise">
+		<![CDATA[
+		insert into CENTRAL_PURCHASING_REF_ENTERPRISE (
+				enterprise_id,
+				activites_details_id,
+				enterprise_estimate_num,
+				enterprise_estimate_price,
+				insert_time,
+				insert_by,
+				update_time,
+				update_by
+		   )values(
+				#{enterpriseId},
+				#{activitesDetailsId},
+				#{enterpriseEstimateNum},
+				#{enterpriseEstimatePrice},
+				now(),
+				#{insertBy},
+				now(),
+				#{updateBy}
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.centralPurchasing.domain.CentralPurchasingRefEnterprise">
+		<![CDATA[
+		update CENTRAL_PURCHASING_REF_ENTERPRISE set
+			enterprise_id = #{enterpriseId},
+			activites_details_id = #{activitesDetailsId},
+			enterprise_estimate_num = #{enterpriseEstimateNum},
+			enterprise_estimate_price = #{enterpriseEstimatePrice},
+			update_time = now(),
+			update_by = #{updateBy},
+
+		 where purchase_ref_enterprise_id = #{purchaseRefEnterpriseId}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from CENTRAL_PURCHASING_REF_ENTERPRISE where purchase_ref_enterprise_id = #{id}
+		]]>
+	</delete>
+	<!-- 分页查询 -->
+	<select id="querySignUpInfo" resultMap="querySignUpInfoDTO" >
+		<include refid="selectAllJoinColumns"/>
+		<include refid="where_join_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<!-- 查询数量 -->
+	<select id="querySignUpInfoCount" resultType="long">
+		<include refid="count_Tail" />
+		CENTRAL_PURCHASING_REF_ENTERPRISE ref_enterprise_ join CENTRAL_PURCHASING_ACTIVITES_DETAILS details_ 
+		on ref_enterprise_.ACTIVITES_DETAILS_ID = details_.ACTIVITES_DETAILS_ID join CENTRAL_PURCHASING_ACTIVITES activites_ 
+		on activites_.central_purchasing_id=details_.central_purchasing_id join CENTRAL_PURCHASING_ENTERPRISE enterprise_ 
+		on ref_enterprise_.ENTERPRISE_ID=enterprise_.ENTERPRISE_ID
+		<include refid="where_join_fragement" />
+	</select>
+</mapper>

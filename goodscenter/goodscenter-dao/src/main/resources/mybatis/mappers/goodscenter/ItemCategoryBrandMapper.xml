@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.goodscenter.dao.ItemCategoryBrandDAO">
+	<resultMap id="itemCategoryBrandMapper" type="com.camelot.goodscenter.domain.ItemCategoryBrand">
+			<result property="categoryBrandId" column="category_brand_id" />
+			<result property="secondLevCid" column="second_lev_cid" />
+			<result property="thirdLevCid" column="third_lev_cid" />
+			<result property="brandId" column="brand_id" />
+			<result property="sortNum" column="sort_num" />
+			<result property="cbrandStatus" column="cbrand_status" />
+			<result property="created" column="created" />
+			<result property="modified" column="modified" />
+	</resultMap>
+	
+	<select id="queryPage" resultType="map">
+		select * from item_category_brand
+	</select>
+	
+	<select id="findById" resultMap="itemCategoryBrandMapper" >
+		select * from item_category_brand
+		where id = #{id}
+	</select>
+	
+	<insert id="add">
+		insert into item_category_brand(
+				second_lev_cid,
+				third_lev_cid,
+				brand_id,
+				sort_num,
+				cbrand_status,
+				created,
+				modified
+		)values(
+				#{secondLevCid},
+				#{thirdLevCid},
+				#{brandId},
+				#{sortNum},
+				1,
+				now(),
+				now()
+		)
+		<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+			select @@IDENTITY
+		</selectKey>
+	</insert>
+	
+	<update id="update">
+		update item_category_brand set
+				category_brand_id = #{categoryBrandId},
+				second_lev_cid = #{secondLevCid},
+				third_lev_cid = #{thirdLevCid},
+				brand_id = #{brandId},
+				sort_num = #{sortNum},
+				created = now(),
+				modified = now()
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from item_category_brand
+		<if test=" codes != null and codes.size() > 0 ">
+			where id in
+			<foreach collection="codes" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test=" codes == null or codes.size() == 0 ">
+			where 1 = 3
+		</if>
+	</delete>
+	
+	<select id="findAll" resultType="map">
+		select * from item_category_brand
+	</select>
+	
+	<select id="queryICBByName" resultMap="itemCategoryBrandMapper">
+		SELECT 
+		  icb.*
+		FROM
+		  item_category_brand icb,
+		  item_brand b 
+		WHERE icb.brand_id = b.brand_id 
+		  AND icb.second_lev_cid = #{param.secondLevCid}
+		  AND icb.third_lev_cid = #{param.thirdLevCid}
+		  AND b.brand_name = #{param.brandName}
+	</select>
+	<select id="queryICBByBrandId" resultMap="itemCategoryBrandMapper">
+		SELECT 
+		  icb.*
+		FROM
+		  item_category_brand icb
+		WHERE icb.second_lev_cid = #{param.secondLevCid}
+		  AND icb.third_lev_cid = #{param.thirdLevCid}
+		  AND icb.brand_id = #{param.brandId}
+	</select>
+	<select id="queryCbByBrandId" resultType="long" >
+		select count(1) from item_category_brand  where brand_id=#{brandId} and cbrand_status=1
+	</select>
+	
+</mapper>

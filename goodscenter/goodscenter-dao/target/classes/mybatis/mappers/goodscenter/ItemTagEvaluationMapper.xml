@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.goodscenter.dao.ItemTagEvaluationDAO">
+	
+	<resultMap type="com.camelot.goodscenter.dto.EvalTag" id="bareTag">
+		<id column="tag_id" property="tagId"/>
+		<result column="tag_name" property="tagName"/>
+	</resultMap>
+	
+	<resultMap type="com.camelot.goodscenter.dto.EvalTagCountDTO" id="evalTagCount">
+		<id column="tag_id" property="evalTag.tagId"/>
+		<result column="count" property="count"/>
+		<result column="tag_name" property="evalTag.tagName"/>
+	</resultMap>
+	
+	<insert id="addTagsOfOneEvaluation">
+		INSERT INTO
+			item_evaluation_tag
+		(evaluation_id, tag_id, sku_id)
+		VALUES
+		<foreach collection="tagIds" item="tagId"
+			separator=",">
+		(#{evalId}, #{tagId}, #{skuId})
+		</foreach>
+	</insert>
+	
+	<select id="queryEvalTagsOfOneEvaluation" resultMap="bareTag">
+		SELECT
+			tag.tag_id,
+			tag.tag_name
+		FROM
+			item_evaluation_tag eval
+		LEFT JOIN
+			item_eval_tag tag on eval.tag_id = tag.tag_id
+		WHERE
+			eval.evaluation_id = #{evalId}
+	</select>
+	
+	<select id="queryTagEvalsCountOfSku" resultMap="evalTagCount">
+		SELECT
+			tag.tag_id,
+			tag.tag_name,
+			tag_count.num count
+		FROM
+			item_eval_tag tag
+		INNER JOIN (
+			SELECT
+				tag_id,
+				count(*) num
+			FROM
+				item_evaluation_tag
+			WHERE
+			<choose>
+				<when test="entity.skuId != null">
+					sku_id = #{entity.skuId}
+				</when>
+				<when test="entity.itemId != null">
+					sku_id IN (SELECT sku_id from item_sku WHERE item_id = #{entity.itemId})
+				</when>
+				<otherwise>
+					1=2
+				</otherwise>
+			</choose>
+			GROUP BY
+				tag_id
+		) tag_count ON tag.tag_id = tag_count.tag_id AND tag.deleted=0
+		ORDER BY
+			tag_count.num DESC
+	</select>
+	
+</mapper>

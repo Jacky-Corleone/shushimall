@@ -1,0 +1,227 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+<script type="text/javascript">
+	$(document).ready(function() {
+		//加载左侧菜单
+		$("#leftBuyer").load("$request.contextPath/leftBuyer");
+	})
+	
+	//到指定的分页页面
+	function topage(page){
+		$("#page").val(page);
+		$("#searchForm").submit();
+	}
+</script>
+<div id="main">
+<!--中间部分开始-->
+<div id="leftBuyer">&nbsp;</div><!--left end -->
+<!--右边部分开始-->
+<div id="right">
+    <div id="right_top" class="right_top border-4 bg_06">
+    <form method="post" id="searchForm" action="$request.contextPath/sellcenter/vipCard">
+    	<input type="hidden" name="page" id="page" />
+    	<!-- <div class="right_top_l">
+			<ul class="list">
+				<li>
+					<span class="font_wid">是否有效：</span>
+					<select class="input_Style2 wid_190 mar_r10 hei_35" id="status" name="status">
+						<option value="1">有效</option>
+						<option value="2">无效</option>
+					</select>
+				</li>
+			</ul>
+		</div> -->
+    </form>
+    <!-- <div class="right_top_r ">
+			<button type="button" class="button_4 but_cx1" onclick="topage(1)">
+				<a class="font_1c hei_24" >查 询</a>
+			</button>
+		</div>
+    </div> -->
+    <div class="right_top_l font_fe font_wei">
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;尊敬的用户，您好！平台系统升级，您的VIP卡已替换为等价优惠券，感谢您对舒适100的支持与信任！如有疑问请致电400-9987-466。
+	</div>
+	<!-- right结束 -->
+	<div id="right_bot" class="right_bot border-4 mar_t10 bg_06">
+		<div class="right_xinxi mar_l14">
+			<ul class="list_top bg_08 font_14b">
+				<li class="wid_120 font_cen hei_35 ">序号</li>
+				<li class="wid_150 font_cen hei_35">VIP卡号</li>
+				<li class="wid_120 font_cen hei_35">VIP卡名称</li>
+				<li class="wid_120  hei_35 font_cen">余额</li>
+				<li class="wid_130 font_cen hei_35">生效时间</li>
+				<li class="wid_120 font_cen hei_35">失效时间</li>
+				<li class="wid_100 font_cen hei_35">状态</li>
+				<li class="wid_80 font_cen hei_35">剩余天数</li>
+			</ul>
+      <!-- vip卡信息 -->
+      <table class="information" id="information">
+		#foreach($vipCard in $pager.records)
+		<tr>
+          <td class="wid_110 hei_10 font_cen border-1">
+            $!velocityCount
+          </td>
+          <td class="wid_150 font_cen border-1">$!vipCard.vip_id</td>
+          <td class="wid_120 border-1 font_cen">$!vipCard.discount_type</td>
+          <td class="wid_120 border-1 font_cen">$!vipCard.residual_amount</td>
+          <td class="wid_120 border-1 font_cen">
+          	$!date.format('yyyy-MM-dd',$!vipCard.start_date)
+          </td>
+          <td class="wid_120 border-1 font_cen">
+          		$!date.format('yyyy-MM-dd',$!vipCard.end_data)
+          </td>
+          <td class="wid_110 border-1 font_cen">
+          		#if($!vipCard.status==1)
+          			有效
+          		#elseif($!vipCard.status==2)
+          			无效
+          		#elseif($!vipCard.status==3)
+          			未启用
+          		#end	
+          </td>
+          <td class="wid_80 border-1 font_cen " >
+          	$!vipCard.effective_time
+          </td>
+		</tr>
+		#end
+      </table>
+       #pageVelocity($pager)
+      <div class="clear"></div>
+	  </div>
+	</div>
+
+</div> <!--id="right" end-->
+<!--右边部分结束-->
+</div><!--#main end -->
+
+<!-- 弹出层 设置广告词 -->
+<div class="po_fai" id="adDiv" style="display:none">
+    <div class="po_fai_bg"></div>
+    <div class="po_main2 pad_t10" >
+      <div class=" hei_32 bg_05 pad_l10 font_14b"><i class="demo-icons fa-times-circle font_16 fr mar_r10" onclick="hideDiv('adDiv')"></i>设置广告词</div>
+        <div class="shop_xinxi mar_t10">
+          <ul class="add_xx mar_l10">
+            <li class="wid_300 mar_l8 mar_tb10">设置广告语 : <input type="text" id="adAll" class="border-4 wid_180 mar_l10 input_Style2 hei_30" /></li>
+            <li class="wid_260 mar_l8 mar_tb10">
+                <button type="button" class="button_2 hei_35" onclick="useAll('adAll')">
+                  <a  class="font_ff" >应用到所有</a>
+                </button>
+              </li>
+            </ul>
+        </div>
+        <div class="clear"></div>
+      <div class="list mar_t10">
+        <!-- 商品列表开头 -->
+        <ul class="list_top bg_08 font_14b">
+          <li class="wid_440 font_cen hei_35">商品名称</li>
+          <li class="wid_80 font_cen hei_35">商品编码</li>
+          <li class="wid_440 font_cen hei_35">广告词</li>
+        </ul>
+        <div class="clear"></div>
+        <!-- 商品信息 -->
+        <table class="information" id="information_advertisement">
+        </table>
+        <div class="wid_260 mar_cen">
+          <button type="button" class="button_2 but_cx mar_r20 hei_30" onclick="itemAdvertisementEdit()"><a class="font_ff">确定</a></button>
+          <button type="button" class="button_3 but_cx hei_30" onclick="hideDiv('adDiv')"><a class="font_82">取消</a>  </button>
+        </div>
+        <div class="clear"></div>
+      </div>
+    </div>
+</div>
+<!-- 设置广告词 end -->
+
+<!-- 弹出层 迁移类目 -->
+<div class="po_fai" style="display:none;" id="shopCategoryItemDiv">
+    <div class="po_fai_bg"></div>
+    <div class="po_main0 pad_t10" >
+      <div class=" hei_32 bg_05 pad_l10 font_14b"><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor" onclick="hideDiv('shopCategoryItemDiv')"></i>迁移类目</div>
+        <div class="clear"></div>
+      <div class="list mar_t10">
+        <!-- 商品列表开头 -->
+        <ul class="list_top bg_08 font_14b fl">
+          <li class="wid_270 font_cen hei_35">商品名称</li>
+          <li class="wid_120 font_cen hei_35">商品编码</li>
+          <li class="wid_270 font_cen hei_35">当前店铺类目</li>
+        </ul>
+        <div class="clear"></div>
+        <!-- 商品信息 -->
+        <div class="add_qynm">
+        <table class="information" id="information_shopCategory">
+        </table>
+        </div>
+        <div class="mar_t20">
+        <h3 class="hei_35">
+        迁移至：<select class="input_Style2 wid_90 mar_r10 hei_35" id="changeShopLevelOne">
+			<option value="">一级分类</option>
+			#foreach( $shopCategorySellerDTO in $shopCategorySellerDTOList)
+                  	 <option #if($!shopLevelOneId == $shopCategorySellerDTO.cid) selected="selected" #end value="$!shopCategorySellerDTO.cid"> $!shopCategorySellerDTO.cname </option>
+			#end
+		</select>
+        <select class="input_Style2 wid_90 mar_r10 hei_35" id="changeShopLevelTwo">
+			<option value="">二级分类</option>
+		</select></h3>
+        </div>
+        <div class="wid_260 mar_cen">
+          <button type="button" class="button_2 but_cx mar_r20 hei_30 " onclick="itemShopCategoryEdit()"><a class="font_ff">确定</a></button>
+          <button type="button" class="button_3 but_cx hei_30" onclick="hideDiv('shopCategoryItemDiv')"><a class="font_82">取消</a>  </button>
+        </div>
+        <div class="clear"></div>
+      </div>
+    </div>
+</div>
+<!-- 迁移类目 end -->
+
+<!--以下为弹出层-->
+<div class="po_fai" id="showErrorMsg" style="display:none">
+    <div class="po_fai_bg"></div>
+    <div class="po_main1">
+      <div class="tit bg_05 hei_30 pad_l10">提示</div>
+    <ul>
+        <li>请选择需要设置的商品！</li>
+        <li><a href="#"><button type="button" class="button_1 hei_35" onclick="hideDiv('showErrorMsg')" id="showMsgBtn">确定</button></a></li>
+    </ul>
+  </div>
+</div>
+
+
+<div class="po_fai" id="showSuccessMsg" style="display:none">
+    <div class="po_fai_bg"></div>
+    <div class="po_main1">
+      <div class="tit bg_05 hei_30 pad_l10">提示</div>
+    <ul>
+        <li>广告词设置成功</li>
+        <li><a href="#"><button type="button" class="button_1 hei_35" onclick="hideDiv('showSuccessMsg')">确定</button></a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="po_fai" id="showCateErrorMsg" style="display:none">
+    <div class="po_fai_bg"></div>
+    <div class="po_main1">
+      <div class="tit bg_05 hei_30 pad_l10">提示</div>
+    <ul>
+        <li>请选择要设置的店铺分类！</li>
+        <li><a href="#"><button type="button" class="button_1 hei_35" onclick="hideDiv('showCateErrorMsg')" id="showMsgBtn">确定</button></a></li>
+    </ul>
+  </div>
+</div>
+
+<!--以上为弹出层-->
+<!-- 弹出层  -->
+<div class="po_fai" style="display:none;" id="shopNewsDiv">
+    <div class="po_fai_bg"></div>
+    <div class="po_main0 pad_t10" >
+      <div class=" hei_32 bg_05 pad_l10 font_14b"><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor" onclick="hideDiv('shopNewsDiv')"></i>驳回原因</div>
+        <div class="clear"></div>
+        <div class="add_qynm">
+			<span class="list_top font_14b fl" id="contentId"></span>
+        </div>
+        <div class="mar_cen" style="width:100px">
+          <button type="button" class="button_1 hei_35 font_14b " onclick="hideDiv('shopNewsDiv')"><a class="font_82">关闭</a></button>
+        </div>
+        <div class="clear"></div>
+      </div>
+</div>
+
+

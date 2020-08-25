@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>购物车</title>
+ <link rel="stylesheet" type="text/css" href="css/detail.css">
+<script src="js/zepto.js"></script>
+<script src='js/style.js'></script>
+</head>
+<body>
+    <!-- 右侧 -->
+<div class="right font_ff">
+<header class="hei_50"></header>
+<p class="hei_50 font_ff font_1_0 font_cen mar_t20">欢迎使用科印采购小管家</p>
+<div class="pad_lr5 mar_t10">
+    <p class="po_re"><i class="fa-user fa-user  po_ab"></i><input type="text" class="hei_34 wid_87  " placeholder="请输入小管家用户名"/></p>
+    <p class="po_re"><i class="fa-unlock-alt  po_ab"></i><input type="password" class="hei_34 wid_87 " placeholder="请输入登录"/></p>
+    <p class="hei_50">
+        <span class="font_ff fl"><input type="checkbox" checked/>账户绑定</span><span><a href="#" class="font_ff fr">忘记密码</a></span>
+    </p>
+    <p class="font_cen"><button class="wid_87 hei_34 login">登录</button></p>
+    <p class="font_cen mar_t15"><button class="wid_87 hei_34 enroll">自动注册</button></p>
+</div>
+</div><!-- 右侧 end-->
+<div id="main" class="po_ab">
+    <!-- 中间内容 -->
+    <div id="LIST_nav" class="on" >
+        <div class="ld">
+            <h2><span class="fl"><i class="fa fa-list-ul"></i>全部商品分类</span><i class="fa fa-times-circle fr mar_r2"></i></h2>
+        </div>
+        <div id="allsort">
+            <div class="item" onMouseOver="this.className='item on'" onmouseleave="this.className='item'">
+                <span><h3><a href="#">图书</a>、<a href="#">音像</a>、<a href="#">数字商品</a></h3></span>
+            </div>
+            <div class="item" onMouseOver="this.className='item on'" onmouseleave="this.className='item'">
+                <span><h3><a href="#">家用电器</a></h3></span>
+            </div>
+            <div class="item" onMouseOver="this.className='item on'" onmouseleave="this.className='item'">
+                <span><h3><a href="#">手机</a>、<a href="#">数码</a>、<a href="#">京东通信</a></h3></span>
+            </div>
+            <div class="item" onMouseOver="this.className='item on'" onmouseleave="this.className='item'">
+                <span><h3><a href="#">电脑</a>、<a href="#">办公</a></h3></span>
+            </div>
+            <div class="item" onMouseOver="this.className='item on'" onmouseleave="this.className='item'">
+                <span><h3><a href="#">家居</a>、<a href="#">家具</a>、<a href="#">家装</a></h3></span>
+            </div>
+            <div class="item" onMouseOver="this.className='item on'" onmouseleave="this.className='item'">
+                <span><h3><a href="#">男装</a>、<a href="#">女装</a>、<a href="#">内衣</a>、<a href="#">珠宝</a></h3></span>
+            </div>
+            <div class="item" onMouseOver="this.className='item on'" onmouseleave="this.className='item'">
+                <span><h3><a href="#">鞋袜</a>、<a href="#">箱包</a>、<a href="#">钟表</a>、<a href="#">奢侈品</a></h3></span>
+            </div>
+            <div class="item" onMouseOver="this.className='item on'" onmouseleave="this.className='item'">
+                <span><h3><a href="#">个护化妆</a></h3></span>
+            </div>
+            <div class="item" onMouseOver="this.className='item on'" onmouseleave="this.className='item'">
+                <span><h3><a href="#">运动户外</a></h3></span>
+            </div>
+            <div class="item" onMouseOver="this.className='item on'" onmouseleave="this.className='item'">
+                <span><h3><a href="#">汽车</a>、<a href="#">汽车用品</a></h3></span>
+            </div>
+            <div class="item" onMouseOver="this.className='item on'" onmouseleave="this.className='item'">
+                <span><h3><a href="#">女婴</a>、<a href="#">玩具乐器</a></h3></span>
+            </div>
+            <div class="item" onMouseOver="this.className='item on'" onmouseleave="this.className='item'">
+                <span><h3><a href="#">食品饮料</a>、<a href="#">酒类</a>、<a href="#">生鲜</a></h3></span>
+            </div>
+            <div class="item" onMouseOver="this.className='item on'" onmouseleave="this.className='item'">
+                <span><h3><a href="#">营养保健</a></h3></span>
+            </div>
+        </div>
+    </div>
+    <!-- 中间内容 end-->
+    <!-- 底部 -->
+    <div class="foot bg_02">
+        <footer>
+            <dl class="fl">
+                <dt><i class="fa-search"></i></dt>
+                <dd>搜索</dd>
+            </dl>
+            <dl class="fl">
+                <dt><i class="fa-shopping-cart"></i></dt>
+                <dd>购物车</dd>
+            </dl>
+            <dl class="fl">
+                <dt><i class="fa-user-md"></i></dt>
+                <dd>卖家中心</dd>
+            </dl>
+            <dl class="fl">
+                <dt><i class="fa-heart-o"></i></dt>
+                <dd>买家中心</dd>
+            </dl>
+        </footer>
+     </div> 
+</div>
+</body>
+</html>

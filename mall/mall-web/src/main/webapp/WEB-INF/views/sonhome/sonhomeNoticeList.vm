@@ -1,0 +1,78 @@
+#set($assetsPath="$request.contextPath/assets")
+<link href="$assetsPath/css/Details.css" rel="stylesheet" type="text/css"/>
+<link href="$assetsPath/css/index.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">
+	//到指定的分页页面
+	function topage(page){
+		var form = document.getElementById("noticeForm");
+		form.page.value=page;
+		form.submit();
+	}
+</script>
+
+ 
+<!--内容开始-->
+<div id="content">
+<!-- 	<div class="wid_10"> -->
+		<!--右边部分开始-->
+<!--  		<div id="right" class="hei_600"> -->
+	  		<div class="breadcrumb" style="margin-bottom: 0px;">
+        		<i class="fa-th-large demo-icons fl mar_r10 font_14"></i>
+            	<span class="fl"><a class="level" href="$request.contextPath/sonHome/index?cid=$!cid&lev=2">$!cname频道首页</a></span>
+            	<i class="demo-icons fa-angle-right fl mar_lr20 font_20"></i>
+             	<span class="fl"><a class="level" href="$request.contextPath/notice/sonhomeList?themId=$!themId&cid=$!cid"> $!cname频道公告 </a></span>
+        	</div><!--breadcrumb end-->
+			
+			
+			<div class="mar_b10 index_Notice_search" style="margin-bottom: 0px;">
+			
+				<form id="noticeForm" action="$request.getContextPath()/notice/sonhomeList?themId=$!themId&cid=$!cid" method="post">
+				    <input type="hidden" name="page" value="$!pager.page" />
+				    <button type="button" class="button_3 wid_80  pa_01  fr mar_r10 hei_30" onclick="topage(1)">搜 索</button>
+		            <input name="noticeTitle" type="text" class="input_Style2 wid_200 mar_l10 fr" value="$!notice.noticeTitle"/>
+		            <p class="fr hei_30 ">公告搜索:</p>
+				</form>
+	        </div>
+	        
+			
+			<div class="index_Notice border-4" style="padding: 0px; width: 100%;">
+     			<!--标题开始 -->
+			    <ul class="font_14b font_cen bg_08" style="margin-bottom:10px;">
+			    	<!--<li class="wid_50 font_cen">编号</li>  -->
+			    	<li class="wid_770" style="text-indent: 50px !important; text-align: left !important; ">标题</li>
+			    	<li class="wid_150 font_cen">发表时间</li>
+			    </ul>
+       			<!--标题 end -->
+       
+       			#foreach($entity in $pager.records)
+					<ul #if($!velocityCount % 2 != 0 ) class="bg_05" #end>
+		        		<!--<li class="wid_50 font_cen">$!entity.noticeId</li>-->
+		        		<li class="wid_770" style="text-indent: 50px !important;">
+		        	   #if($entity.noticeType == 2 && $entity.url)
+	                       <a href="$!entity.url" target="_blank">
+                    		$entity.noticeTitle
+                    	   </a>
+                    	#else
+                    	<a href="$request.contextPath/notice/toSonHomeView/$entity.noticeId?cid=$!cid">
+                    		$entity.noticeTitle
+                    	</a>
+                    	#end
+		        		</li>
+		        		<li class="wid_150 font_cen">
+		        			#if($!entity.noticeStatus == 1)
+		        				$!date.format('yyyy-MM-dd HH:mm:ss ',$!entity.modified)
+		        			#end
+		        		</li>
+		      		</ul>
+    				<!--内容1行 end -->
+				#end
+    		</div>
+    		<!--Notice end-->
+    		
+    		#pageVelocity($pager)
+			<!--又底边图标开始-->
+			<div class="clear"></div>
+<!-- 		</div> id="right" end  -->
+		<!--右边部分结束-->
+<!-- 	</div> -->
+</div>

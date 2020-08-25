@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.basecenter.dao.AddressBaseDAO">
+	<resultMap id="AddressbaseMapper" type="com.camelot.basecenter.domain.AddressBase">
+	        <result property="id" column="id" />
+			<result property="code" column="code" />
+			<result property="parentcode" column="parentCode" />
+			<result property="yn" column="yn" />
+			<result property="name" column="name" />
+			<result property="level" column="level" />
+			<result property="createtime" column="createTime" />
+			<result property="updatetime" column="updateTime" />
+	</resultMap>
+	
+	<resultMap id="AddressbaseDTOMapper" type="com.camelot.basecenter.dto.AddressBaseDTO">
+	       
+			<result property="code" column="code" />
+			<result property="parentcode" column="parentCode" />
+			<result property="name" column="name" />
+			<result property="yn" column="yn" />
+			<result property="level" column="level" />
+			<result property="createtime" column="createTime" />
+			<result property="updatetime" column="updateTime" />
+	</resultMap>
+	
+	<select id="queryAddressBase" resultMap="AddressbaseDTOMapper">
+	  select * from delivery_addressbase
+		where yn='1' and parentCode = #{parentcode}
+	</select>
+	<select id="queryNameById" resultMap="AddressbaseDTOMapper">
+	 select name from delivery_addressbase where yn=1 and code=#{id}
+	</select>
+ 	<select id="queryNameByCode" resultMap="AddressbaseDTOMapper">
+		 <![CDATA[ select * from delivery_addressbase where yn=1 ]]>
+		 <if test=" code!= null and code !='' ">
+			  <![CDATA[ and code in]]>
+			  <foreach collection="code" item="it" index="index" open="(" separator="," close=")">
+			   	<![CDATA[   #{it} ]]>
+			  </foreach>
+		</if>
+	</select>
+	
+	<select id="getQualifiedName" parameterType="int" resultType="string">
+		SELECT
+			CONCAT(level1.name, level2.name)
+		FROM
+			delivery_addressbase level2
+		LEFT JOIN
+			delivery_addressbase level1 on level2.parentCode = level1.code
+		WHERE
+			level2.code = #{areaCode}
+	</select>
+	
+	<select id="getAddressesByLevel" parameterType="int" resultMap="AddressbaseDTOMapper">
+		SELECT * FROM delivery_addressbase WHERE level = #{level}
+	</select>
+</mapper>

@@ -1,0 +1,208 @@
+#set($layout="common/order.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>地址管理</title> 
+#parse("common/scriptAndCss.vm")
+<script type="text/javascript">
+$(document).ready(function(){
+	if("buyers"=='$!{cus}'){
+		changeIconToRed(2);
+	}else{
+		changeIconToRed(3);
+	}
+});
+$(document).ready(function(){
+	if("$!{address}"){
+		reDisplay($!{address});
+	}else{
+		getAddress(0, "province");
+	}
+	$("#province").change( function() {
+		$('#city option:first').siblings().remove();
+		$('#area option:first').siblings().remove();
+		getAddress($("#province").val(), "city");		
+	});
+	//获取区/县
+	$("#city").change( function() {
+		$('#area option:first').siblings().remove();
+		getAddress($("#city").val(), "area");		
+	});
+});
+
+function reDisplay(id){
+	$.ajax({
+	     type: "POST",
+	     dataType: "json",
+	     url:"$request.contextPath/orderWx/getAddress",
+	     data:{ "id":id },
+	     success: function(result){
+	     	//返回提示信息       
+         	$("#address").val("").val(result.id);
+         	$("#contactName").val("").val(result.contactperson);
+         	$("#contactMobile").val("").val(result.contactphone);
+         	$("#contacttel").val("").val(result.contacttel);
+         	
+         	getAddress(0, "province");
+			getAddress(result.provicecode, "city");
+			getAddress(result.citycode, "area");
+         	
+         	$("#fulladdress").val("").val(result.fulladdress);
+         	if(result.isdefault == 1){
+         		$("[name = fn]:checkbox").attr("checked", true);
+         	}
+         	setTimeout(function(){
+         		$("#province").val("").val(result.provicecode);
+         		$("#city").val("").val(result.citycode);
+         		$("#area").val("").val(result.countrycode);
+         	},800);
+         	
+			$("#province").change( function() {
+				$('#city option:first').siblings().remove();
+				$('#area option:first').siblings().remove();
+				getAddress($("#province").val(), "city");		
+			});
+			//获取区/县
+			$("#city").change( function() {
+				$('#area option:first').siblings().remove();
+				getAddress($("#city").val(), "area");		
+			});
+		},
+		error: function(XMLHttpRequest, textStatus, errorThrown){
+			alert("系统繁忙,稍后再试...............");
+		}
+	});
+}
+
+function getAddress(addressId, domId){
+	$.ajax({
+	   type: "POST",
+	   dataType: "json",
+	   url: "$request.contextPath/orderWx/query",
+	   data: {
+			id: addressId
+	   },
+	   success: function(data){
+		   $(data).each(function(i,obj){
+				$("#"+domId).append('<option value="'+obj.code+'">'+obj.name+'</option>');
+		   });
+	   }
+	});
+}
+//确认地址
+function submitAddress(){
+	var addressId = $("#address").val();
+	var contactperson = $('#contactName').val().trim();//收获人
+	if(contactperson==null || contactperson==""){
+		$("#errorMsg").html("请填写收货人信息");
+		return;
+	}
+	var mobile = /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/; 
+	var contactphone = $('#contactMobile').val();//手机号码
+	if(!mobile.test(contactphone)){
+		$("#errorMsg").html("请正确填写您的手机号码");
+		return;
+	}
+	var provicecode = $('#province').val();
+	var citycode = $('#city').val();
+	var countrycode = $('#area').val();
+	if(provicecode==null || citycode==null || countrycode==null || provicecode=="" || citycode=="" || countrycode==""){
+		$("#errorMsg").html("请选择您的收货地址");
+		return;
+	}
+	var fulladdress = $('#fulladdress').val().trim();//详细地址
+	if(fulladdress==null || fulladdress==""){
+		$("#errorMsg").html("请填写详细地址");
+		return;
+	}
+	var telephone = $('#contacttel').val();
+	var regTelNum = /^[0-9]*]*$/;
+	var regTel = /^(0[0-9]{2,3}\-)?([2-9][0-9]{6,7})+(\-[0-9]{1,4})?$/;
+	if( telephone != null && telephone != "" ){
+		if(  !regTelNum.test(telephone) && !regTel.test(telephone)  ){
+			$("#errorMsg").html("固定电话格式有误！");
+			return;
+		}
+	}
+	var isdefault = $('#fn').is(":checked") ? 1 : 2;//默认地址
+	$("#errorMsg").html("");
+	
+	$.ajax({
+	   type: "POST",
+	   dataType: "json",
+	   url: "$request.contextPath/orderWx/submitAddress",
+	   data: {
+			provicecode: provicecode,
+			citycode: citycode,
+			countrycode: countrycode,
+			fulladdress: fulladdress,
+			isdefault: '1',
+			contactperson: contactperson,
+			contactphone: contactphone,
+			contacttel: telephone,
+			id: addressId,
+			
+			
+			address : addressId,
+	   },
+	   success: function(data){
+		   if(data.errorMessages.length>0){
+			   alert("系统繁忙,稍后再试......");
+		   }else{
+			   window.location.href = "$request.contextPath/user/queryUserInfoById?uid=$!{uid}";
+		   }
+	   },
+	   error: function(XMLHttpRequest, textStatus, errorThrown){
+		   alert("系统繁忙,稍后再试再试......");
+	   }
+	});
+}
+</script>
+</head>
+<body>
+	<div id="main" class="po_re">
+		<!-- 中间内容 -->
+		<div class="content" id="wrapper">
+			<div class="news bg_01">
+				<form action="" id="form" method="post">
+		
+					<!-- 	页面必须的其他数据     start	 -->
+					<input id="address" name="address" value="$!{address}" type="hidden" />
+	<!-- 						<input id="invoiceType" name="invoiceType" value="$!{invoiceType}" type="hidden" />  -->
+	<!-- 						<input id="invoiceTitle" name="invoiceTitle" value="$!{invoiceTitle}" type="hidden" /> -->
+	<!-- 						<input id="contractFlag" name="contractFlag" value="$!{contractFlag}" type="hidden" /> -->
+					<!-- 	页面必须的其他数据     end	 -->
+					<ul class="pass mar_t10">
+						<li><p class="wid_15 fl font_right pad_r5">收货人</p><b class="font_e5">*</b> <input
+							id="contactName" type="text" class="wid_60 input_3"
+							name="contactName" placeholder="姓名" maxlength="20" /></li>
+						<li><p class="wid_15 fl font_right pad_r5">手机</p><b class="font_e5">*</b> <input
+							id="contactMobile" type="text" class="wid_60 input_3"
+							name="contactMobile" placeholder="请输入手机号码" maxlength="11" /></li>
+						<li><p class="wid_15 fl font_right pad_r5">固定电话</p> &nbsp; <input
+							id="contacttel" type="text" class="wid_60 input_3"
+							name="contactMobile" placeholder="固定电话" maxlength="18" /></li>
+						<li><p class="wid_15 fl font_right pad_r5">省</p><b class="font_e5">*</b> <select
+							id="province" class="wid_63 input_3" name="province"><option>请选择</option></select></li>
+						<li><p class="wid_15 fl font_right pad_r5">市</p><b class="font_e5">*</b> <select
+							id="city" class="wid_63 input_3" name="city"><option>请选择</option></select></li>
+						<li><p class="wid_15 fl font_right pad_r5">区</p><b class="font_e5">*</b> <select
+							id="area" class="wid_63 input_3" name="area"><option>请选择</option></select></li>
+						<li><p class="wid_15 fl font_right pad_r5">详细地址</p><b class="font_e5">*</b> <input
+							id="fulladdress" type="text" class="wid_60 input_3"
+							name="fulladdress" placeholder="街道" maxlength="35" /></li>
+					</ul>
+				</form>
+				<div class='font_cen'>
+					<button class="button_1 pad_lr10 hei_34 wid_87"
+						onclick="submitAddress()">确认</button>
+				</div>
+				<dd style="color:red;" id="errorMsg"></dd>
+			</div>
+		</div>
+		<!-- 中间内容 end-->
+	</div>
+	#parse("common/footer.vm")
+</body>
+</html>

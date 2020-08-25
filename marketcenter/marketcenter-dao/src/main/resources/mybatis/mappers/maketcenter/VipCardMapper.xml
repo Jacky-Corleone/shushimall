@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.maketcenter.dao.VipCardDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="vipCardMap" type="vipCard">
+				<result property="id" column="id"/>
+				<result property="vip_id" column="vip_id"/>
+				<result property="buyer_id" column="buyer_id"/>
+				<result property="discount_type" column="discount_type"/>
+				<result property="discount_percent" column="discount_percent"/>
+				<result property="residual_amount" column="residual_amount"/>
+				<result property="start_date" column="start_date"/>
+				<result property="end_data" column="end_data"/>
+				<result property="create_time" column="create_time"/>
+				<result property="status" column="status"/>
+				<result property="memo" column="memo"/>
+				<result property="ignore_type" column="ignore_type"/>
+				<result property="obligate1" column="obligate1"/>
+				<result property="obligate2" column="obligate2"/>
+				<result property="obligate3" column="obligate3"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	<!-- 查询vip卡编号 -->
+	<sql id="selectAllColumns">
+		SELECT
+ 			t.id,
+			t.vip_id,
+			t.buyer_id,
+			t.discount_type,
+			t.discount_percent,
+			t.residual_amount,
+			t.start_date,
+			t.end_data,
+			t.create_time,
+			t.status,
+			t.memo,
+			t.ignore_type,
+			t.obligate1,
+			t.obligate2,
+			t.obligate3
+	</sql>
+	
+	<sql id="where_fragement">
+	 		temp_vip_card t
+	 		where 1 = 1 
+		<if test="entity!=null">
+			<if test="entity.vip_id != null">
+				<![CDATA[ and t.vip_id = #{entity.vip_id}]]>
+			</if>
+			<if test="entity.buyer_id != null">
+				<![CDATA[ and t.buyer_id =#{entity.buyer_id}]]>
+			</if>
+			<if test="entity.status != null">
+				<![CDATA[ and t.status = #{entity.status}]]>
+			</if>
+		</if>
+		order by t.create_time DESC
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本查询方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+	<select id="queryList" resultMap="vipCardMap">
+		<include refid="selectAllColumns"/>
+		from 
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail"/>
+		<include refid="where_fragement" />
+	</select>
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="vipCard">
+		<![CDATA[
+		update temp_vip_card set
+   			 vip_id = #{vip_id}
+   			,buyer_id = #{buyer_id}
+   			,discount_type = #{discount_type}
+   			,discount_percent = #{discount_percent}
+   			,residual_amount=#{residual_amount}
+   			,end_data = #{end_data}
+   			,start_date = #{start_date}
+   			,create_time = #{create_time}
+   			,status = #{status}
+   			,memo = #{memo}
+   			,ignore_type = #{ignore_type}
+   			,obligate1 = #{obligate1}
+   			,obligate2 = #{obligate2}
+   			,obligate3 = #{obligate3}
+		 where id = #{id}
+		]]>
+	</update>
+</mapper>

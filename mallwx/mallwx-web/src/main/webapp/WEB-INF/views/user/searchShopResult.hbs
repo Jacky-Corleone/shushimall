@@ -1,0 +1,14 @@
+{{#each records}}
+<dl >
+    <dt class="fl" onclick="window.location='shopBaseInfoController/toView?shopId={{shopId}}'">
+       <img src="{{imgGix logoUrl}}" >
+    </dt>
+    <dd class="fr" style="position: relative;">
+        <p onclick="window.location='shopBaseInfoController/toView?shopId={{shopId}}'">{{shopName}}</p>
+        <span class="po_ab pa_05">
+	        <i class=" demo-icons  font_14 fa-trash"></i>
+	           <a href="javascript:delShopFavouritedp({{id}});">删除</a>
+	     </span>    
+    </dd>
+</dl>
+{{/each}}

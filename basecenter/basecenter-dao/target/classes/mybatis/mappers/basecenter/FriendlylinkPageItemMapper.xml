@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.basecenter.dao.FriendlylinkPageItemDAO">
+	<resultMap id="BaseFriendlylinkPageItemMapper" type="com.camelot.basecenter.dto.FriendlylinkPageItemDTO">
+	        <result property="id" column="id" />
+			<result property="pageId" column="pageId" />
+			<result property="itemId" column="itemId" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		id, pageId, itemId
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseFriendlylinkPageItemMapper" parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List" />
+		from friendlylink_page_item
+		where id = #{id,jdbcType=BIGINT}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		delete from friendlylink_page_item
+		where id = #{id,jdbcType=BIGINT}
+	</delete>
+	
+	<delete id="deleteByDTO" parameterType="com.camelot.basecenter.dto.FriendlylinkPageItemDTO">
+		delete from friendlylink_page_item
+		where pageId = #{pageId,jdbcType=BIGINT}
+		and   itemId = #{itemId,jdbcType=BIGINT}
+	</delete>
+	
+	
+	<!-- thinking -->
+	<sql id="tabName">
+		friendlylink_page_item
+	</sql>
+	
+	<insert id="addFriendlylinkPage" keyProperty="id" useGeneratedKeys="true">
+		insert into <include refid="tabName"/>(
+							id,
+							pageId,
+							itemId
+						   )values(
+						    #{id},
+						    #{pageId},
+						    #{itemId}
+						   )
+	
+	</insert>
+	
+	<insert id="addFriendlylinkPageItemBatch" useGeneratedKeys="true" parameterType="java.util.List">  
+    <selectKey resultType="long" keyProperty="id" order="AFTER">  
+        SELECT  
+        LAST_INSERT_ID()  
+    </selectKey>  
+    insert into friendlylink_page_item (pageId,itemId)   
+    values  
+    <foreach collection="list" item="item" index="index" separator="," >  
+        (#{item.pageId},#{item.itemId})  
+    </foreach>  
+	</insert>  
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.camelot.basecenter.dto.FriendlylinkPageItemDTO">
+		update friendlylink_page_item
+		<set>
+			<if test="pageId != null">
+				pageId = #{pageId,jdbcType=BIGINT},
+			</if>
+			<if test="itemId != null">
+				itemId = #{itemId,jdbcType=BIGINT},
+			</if>
+		</set>
+		where id = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<delete id = "delete" parameterType = "java.lang.Long">  
+    <![CDATA[  
+       delete from friendlylink_page_item where id = #{id}  
+    ]]>  
+	</delete> 
+	
+	<delete id = "deleteByPageId" parameterType = "java.lang.Long">  
+    <![CDATA[  
+       delete from friendlylink_page_item where pageId = #{pageId}  
+    ]]>  
+	</delete> 
+	
+	<delete id = "deleteBatch" parameterType = "java.util.List">  
+    <![CDATA[  
+       delete from friendlylink_page_item where id in  
+    ]]>  
+    <foreach collection="list" item = "model" open="(" separator="," close=")">#{ model.id}  
+    
+    
+  
+    </foreach>  
+	</delete>  
+	
+	
+</mapper>

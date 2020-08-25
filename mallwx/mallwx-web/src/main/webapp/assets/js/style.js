@@ -1,0 +1,10 @@
+ Zepto(function($){
+    $(".top_r").on("touchmove",function(){
+        $(".right").addClass("cur");
+        $("#main").addClass("cc");
+    })
+    $(".right").on("touchmove",function(){
+        $(".right").removeClass("cur");
+        $("#main").removeClass("cc");
+    })
+})

@@ -1,0 +1,406 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+<link href="$staticPath/css/register.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$staticPath/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$staticPath/js/jquery.blockUI.js"></script>
+<script type="text/javascript" src="$staticPath/js/jquery-migrate-1.1.0.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/fancyzoom/jquery.shadow.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/fancyzoom/jquery.ifixpng.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/fancyzoom/jquery.fancyzoom.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+
+<script type="text/javascript">
+$(function(){
+	/*加载左侧菜单*/
+	$("#leftBuyer").load("$request.contextPath/leftBuyer");
+	
+	/*评分功能*/
+	$(".starbigImg").click(function(){
+		var prevAll =  $(this).prevAll();
+		$(this).attr("src","$staticPath/images/star-on-big.png");
+		$.each(prevAll, function (n,prev) {
+			$(prev).attr("src","$staticPath/images/star-on-big.png");
+		});
+		var score = $(this).parent().next();
+		score.val(prevAll.length+1);
+	});
+	$(".starbigImg").mousemove(function(){
+		var prevAll = $(this).prevAll();
+		$(this).attr("src","$staticPath/images/star-on-big.png");
+		$.each(prevAll, function (n,prev) {
+			$(prev).attr("src","$staticPath/images/star-on-big.png");
+		});
+		var nextAll = $(this).nextAll();
+		$.each(nextAll, function (n,next) {
+			$(next).attr("src","$staticPath/images/star-off-big.png");
+		});
+	});
+	$(".starbigSpan").mouseout(function(){
+		var score = $(this).next().val();
+		var childrenAll =  $(this).children();
+		$.each(childrenAll, function (n,children) {
+			if(score <= n){
+				$(children).attr("src","$staticPath/images/star-off-big.png");
+			}
+			if(score > n){
+				$(children).attr("src","$staticPath/images/star-on-big.png");
+			}
+		});
+	});
+	
+	/*提交：商品评价/店铺评价*/
+	$("#submitBtn").click(function(){
+		var imgurls ="";
+		var td_ids =  $("#td_ids").val();
+		if(td_ids){
+			var skuids = td_ids.split(';');
+			for(var i = 0; i < skuids.length ; i++){
+				if(skuids[i]){
+					$("#"+skuids[i]).find("img").each(function(){
+						imgurls += skuids[i] + "_" +$(this)[0].id + ";";
+					});
+				}
+			}
+		}
+		
+		$("#imgurls").val(imgurls);
+		//校验必填
+		var valid = initValid();
+		if(valid!="true"){
+			alert(valid);
+			return;
+		}
+		
+		// 获取评价标签的id
+		$("[name=tagIdsGroup]").each(function() {
+			var selectedTags = $(this).prev().children('.selected-tag');
+			if (selectedTags.length == 0) return;
+			var tagIdsStr = '';
+			for (var i = 0; i < selectedTags.length; i++) {
+				var tagId = selectedTags[i].id.slice(4);
+				tagIdsStr += tagId + '_';
+			}
+			$(this).val(tagIdsStr.replace(/_$/, ''));
+		});
+		
+		//防止重复提交
+		$("#submitBtn").loadingMsg();
+		//提交操作
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			url:"$request.contextPath/buyerEvaluation/submitTrading",
+			data:$("#tradingForm").serializeArray(),
+			success: function(data){
+				alert(data.errorMessages);
+				$("#submitBtn").hideMsg();
+				window.location.href="$request.contextPath/order/queryBuyer";
+			},
+			error:function(result){
+				$("#submitBtn").hideMsg();
+			}
+		});
+	});
+	
+	/*取消*/
+	$("#cancelBtn").click(function(){
+		//window.location.href="$request.contextPath/order/queryBuyer";
+		history.back();
+	});
+	
+	// 评价标签绑定点击事件
+	$(".comm-tag").click(function() {
+		if ($(this).hasClass('selected-tag')) {
+			$(this).removeClass('selected-tag');
+		}
+		else {
+			$(this).addClass('selected-tag');
+		}
+	});
+});
+//校验必填
+function initValid(){
+	//对商品评分：必填
+	var skuScopeAll = $("input[name='skuScope']");
+	for(var i=0; i<skuScopeAll.length; i++){
+		var skuScope = skuScopeAll[i].defaultValue; 
+		if(skuScope==null || skuScope=="" || skuScope==undefined){
+			if(skuScopeAll.length==1){
+				return "商品评分不能为空值!";
+			}else{
+				return "第“"+(i+1)+"”个商品评分不能为空值!";
+			}
+		}
+	}
+	//对商家评分：必填
+	var shopDescriptionScope = $("#shopDescriptionScope").val();
+	var shopServiceScope = $("#shopServiceScope").val();
+	var shopArrivalScope = $("#shopArrivalScope").val();
+	if(shopDescriptionScope==null || shopDescriptionScope=="" || shopDescriptionScope==undefined){
+		return "描述相符不能为空值!";
+	}
+	if(shopServiceScope==null || shopServiceScope=="" || shopServiceScope==undefined){
+		return "服务态度不能为空值!";
+	}
+	if(shopArrivalScope==null || shopArrivalScope=="" || shopArrivalScope==undefined){
+		return "到货速度不能为空值!";
+	}
+	return "true";
+}
+
+function startUpload(skuid){
+	//id的字符串
+	var td_ids =  $("#td_ids").val();
+	if(td_ids.indexOf(skuid) == -1){
+		td_ids += skuid + ";";
+		$("#td_ids").val(td_ids);
+	}
+	
+	var id = "b_" + skuid;
+    //判断图片格式
+    var fileInput = $("#"+id).val();
+    var extStart = fileInput.lastIndexOf(".");
+    var ext = fileInput.substring(extStart,fileInput.length).toUpperCase();
+    if(ext!=".JPG" && ext!=".jpg" && ext!=".BMP"&&ext!=".bmp"&& ext!=".PNG"&&ext!=".PNG"&& ext!=".JPEG" && ext!=".jpeg"){
+        alert("上传图片仅支持png、bmp、jpg、jpeg格式！");
+        return false;
+    }
+    $.ajaxFileUpload({
+        url: '$request.getContextPath()/fileUpload/uploadzise?size=1024000', //用于文件上传的服务器端请求地址
+        secureuri: false, //是否需要安全协议，一般设置为false
+        fileElementId: id, //文件上传域的ID
+        dataType: 'json', //返回值类型 一般设置为json
+        type:"post",
+        success: function (data, status){  //服务器成功响应处理函数
+            if(data.success){
+                appendImg(data.url , skuid);
+              //图片查看
+            	$("img[fancy_zoom='view_img']").fancyzoom({
+            		Speed:400,
+            		showoverlay:false,
+            		imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+            	});
+            }
+        },
+        error: function (data, status, e){//服务器响应失败处理函数
+            alert("亲系统繁忙，请稍后再试");
+        }
+    });
+}
+var count = 0;
+function appendImg(url , skuid){
+	var imgId_TD = "TD" + skuid + "_"+count;
+	var imageServerAddr = $("#imageServerAddr").val();
+	var img = "<td id='"+imgId_TD+"'><img src='" + imageServerAddr + url +"' id='" + url+"'"
+	  		+ "style='width: 120px; height: 90px; cursor: pointer; opacity: 1;' fancy_zoom='view_img' title='点击查看大图'></td>";
+	$("#"+ skuid).append(img);
+	var td = "<td><button class='button_4 font_12 border-1 button_small hei_30' onclick='deleteTd(this)' id='"+skuid+ "_"+count +"' type='button'>删除</button></td>";
+	
+	$("#delete_"+skuid).append(td);
+	var sccount = $("#"+ skuid).find("img").length;
+	if(sccount > 2){
+		$("#b_"+skuid).attr("disabled","disabled");
+		alert("上传图片已经达到最大数量（三张）");
+	}
+	count++;
+}
+
+function deleteTd(obj){
+	$(obj.parentNode).remove();
+	$("#TD"+obj.id).remove();
+	var loid = 'b_' +obj.id.split('_')[0];
+	$("#"+loid).removeAttr("disabled");
+}
+
+</script>
+<style >
+.comm-tag{
+  display: inline-block;
+  height: 18px;
+  line-height: 18px;
+  padding: 2px 8px 3px;
+  margin: 0 10px 0 0;
+  vertical-align: middle;
+  font-size: 12px;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #999;
+  max-width: 90px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+}
+.selected-tag {
+  padding: 1px 7px 2px;
+  background: #f5f5f5;
+  border: 2px solid #e4393c;
+  color: #e4393c;
+}
+</style>
+
+<div id="main">
+<!-- left start -->
+<div id="leftBuyer"></div>
+<!-- left end -->
+
+<!-- right start-->
+<div class="register_content box-shadow1 bg_06 border-4">
+	<div id="right_bot" class="right_bot">
+		<div class="wid_950 border-4 mar" >
+			<p class="hei_40 bg_08 wid_950 ">
+				<i class="fl mar_lr10 font_14b">| 交易评价</i>
+			</p>
+			<form id="tradingForm" method="post">
+				<!-- 评价隐藏字段：start -->
+				<!-- 说明：订单ID/评价人/被评价人/被评价店铺id/商品id/商品sku -->
+				<input type="hidden" name="token" value="$token">
+				<input name="orderId" type="hidden" value="$!tradeOrdersDTO.orderId"/>
+				<input name="userId" type="hidden" value="$!tradeOrdersDTO.buyerId"/>
+				<input name="byUserId" type="hidden" value="$!tradeOrdersDTO.sellerId"/>
+				<input name="byShopId" type="hidden" value="$!tradeOrdersDTO.shopId"/>
+				<input id="imageServerAddr" type="hidden" value="$!imageServerAddr"/>
+				<input id="imgurls" name="imgurls" type="hidden" value=""/>
+				<input id="td_ids" type="hidden" value=""/>
+				<!-- 评价隐藏字段：end -->
+				<!-- 对商品展示 -->
+				#foreach($tradeOrderItemsDTO in $tradeOrdersDTO.items)
+				#set ($itemIndex = $foreach.index)
+				<div id="right_bot" class="mar_t10">
+					<ul class="list_top bg_05 font_14b wid_950 mar_t10">
+						<li class="wid_440 font_cen hei_35">商品信息</li>
+						<li class="wid_200 font_cen hei_35">商品属性</li>
+						<li class="wid_200 font_cen hei_35">购买时间</li>
+						<li class="wid_100 font_cen hei_35">购买数量</li>
+					</ul>
+					<div class="wid_950 mar_cen border-6" >
+						<ul class="list_top hei_60 font_14b">
+							<li class="wid_440 font_cen">
+							#foreach($itemShopCartDTO in $itemShopCartDTOList)
+								#if($!itemShopCartDTO.skuId == $!tradeOrderItemsDTO.skuId)
+								<a href="$request.getContextPath()/productController/details?id=$!itemShopCartDTO.itemId&skuId=$!itemShopCartDTO.skuId" target="_blank">
+									<img src="$!imageServerAddr$!itemShopCartDTO.skuPicUrl" width="65" height="40"/>
+                                </a>
+								#end
+							#end
+							#foreach($itemDTO in $itemDTOList)
+								#if($!itemDTO.itemId == $!tradeOrderItemsDTO.itemId && $itemIndex==$foreach.index)
+								<a href="$request.getContextPath()/productController/details?id=$!tradeOrderItemsDTO.itemId&skuId=$!tradeOrderItemsDTO.skuId" target="_blank">
+									##截取字符串长度防止布局变形
+									#set($strSkuName=$!{itemDTO.itemName})
+									#if($strSkuName.length()>10)
+										#set($strSkuName=$strSkuName.substring(0,10))
+										<span title="$!itemDTO.itemName" class="cursor">$!strSkuName ...</span>
+									#else
+										<span title="$!itemDTO.itemName" class="cursor">$!strSkuName</span>
+									#end
+                                </a>
+								#end
+							#end
+							</li>
+							#set($length = $tradeOrderItemsDTO.skuName.length() - 1)
+							<li class="wid_200 font_cen" style="text-overflow: ellipsis;white-space: nowrap;"
+								title="$!tradeOrderItemsDTO.skuName.substring(0,$length)"
+								>$!tradeOrderItemsDTO.skuName.substring(0,$length)</li>
+							<li class="wid_200 font_cen">$!date.format('yyyy-MM-dd HH:mm:ss',$!tradeOrderItemsDTO.updateTime)</li>
+							<li class="wid_100 font_cen">$!tradeOrderItemsDTO.num</li>
+							<input name="itemId" type="hidden" value="$!tradeOrderItemsDTO.itemId"/>
+							<input name="skuId" type="hidden" value="$!tradeOrderItemsDTO.skuId"/>
+						</ul>
+					</div>
+				</div>
+				<div class="list_top font_14b" style="height: auto;">
+					<p class="hei_35 mar_l10">
+						商品评分：
+						<span id="star" class="starbigSpan">
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+						</span>
+						<input name="skuScope" type="hidden"/>
+					</p>
+					<p class="mar_l10">
+						选择标签：
+						#foreach($evalTag in $evalTagsOfItems.get($tradeOrderItemsDTO.itemId))
+                            <span class="comm-tag" id="tag_$evalTag.tagId">$evalTag.tagName</span>
+						#end
+					</p>
+					<input type="hidden" name="tagIdsGroup"/>
+					<p class="mar_l10 mar_t10" >
+						商品评价：
+						<span>
+							<textarea name="content" cols="" rows="" style="resize:none;height:100px" class="input_Style2 wid_400 hei_100"  placeholder="请输入评论,最多输入300个字...." maxlength="300"></textarea>
+						</span>
+					</p>
+				</div>
+					
+				<div class="mar_t10">
+				<ul class="list_top font_14b" style="min-height:140px;">
+					<li class="wid_95 over_ell font_cen">
+						晒单：
+					</li>
+					<li class="wid_120 over_ell font_cen">
+						<p class="hei_35 mar_l10 z-upload" >
+							 <button class="button_4 font_12 border-1 button_small hei_30"  type="button">选择上传文件</button>
+	                         <input type="file" id="b_$!tradeOrderItemsDTO.skuId" class="file-img" name="file" onchange="startUpload('$!tradeOrderItemsDTO.skuId');" />
+						</p>
+					</li>
+					<li class="over_ell font_cen" style="width:450">
+						<table>
+							<tr id="$!tradeOrderItemsDTO.skuId"></tr>
+							<tr id="delete_$!tradeOrderItemsDTO.skuId"></tr>
+						</table>
+					</li>
+				</ul>
+                </div>
+				#end
+				
+				<!-- 对商家评分 -->
+				<ul class="list_top bg_05 font_14b wid_950 mar_t10">
+					<li class="wid_460 hei_35"><i class="mar_l10">对商家评分</i></li>
+				</ul>
+				<ul class="list_top hei_150 font_14b pad_tb20">
+					<p class="hei_30 mar_l10">
+						描述相符：
+						<span id="star1" class="starbigSpan">
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+						</span>
+						<input id="shopDescriptionScope" name="shopDescriptionScope" type="hidden"/>
+					</p>
+					<p class="hei_30 mar_l10">
+						服务态度：
+						<span id="star2" class="starbigSpan">
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+						</span>
+						<input id="shopServiceScope" name="shopServiceScope" type="hidden"/>
+					</p>
+					<p class="hei_30 mar_l10">
+						到货速度：
+						<span id="star3" class="starbigSpan">
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+							<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+						</span>
+						<input id="shopArrivalScope" name="shopArrivalScope" type="hidden"/>
+					</p>
+					<button class="button_2 hei_35 font_14b business_class_hide" id="submitBtn" type="button" loadMsg="正在提交...">提 交</button>
+					<button class="button_3 hei_35 font_14b business_class_hide mar_r30" id="cancelBtn" type="button" >取 消</button>
+				</ul>
+			</form>
+		</div>
+	</div>
+</div>
+<!-- right end-->
+</div>

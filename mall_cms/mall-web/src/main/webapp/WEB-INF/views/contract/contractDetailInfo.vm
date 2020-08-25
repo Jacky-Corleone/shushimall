@@ -1,0 +1,193 @@
+#set($layout = "/none_layout.vm")
+<div class="mar_lr10 pad_tb20">
+    <p class="font_16 hei_32 pad_l10 bg_05">协议状态：<span class="font_e5">$!statusMap.get($contract.status)</span>
+        #if(1==$contract.status||7==$contract.status)
+            审批人：<span>$!approveBy.uname</span>
+        #end
+        #if(2==$contract.status||4==$contract.status)
+            拒绝原因：<span>$!contract.refusalReason</span>
+        #end
+        #if(6==$contract.status)
+            发布方：<span>$!publishedBy.companyName</span>
+            发布人：<span>$!publishedBy.uname</span>
+        #end
+    </p>
+    <ul class="list mar_t10 mar_l10 ">
+        <li class="wid_460 mar_tb10 ">
+            <span class="font_wid mar_r10"> 协议编号 : </span>
+            <span>$!contract.contractOrderNo</span>
+        </li>
+        <li class="wid_460 mar_tb10">
+            <span class="font_wid mar_r10"> 协议名称 : </span>
+            <span>$!contract.contractName</span>
+        </li>
+    </ul>
+    <div class="clear"></div>
+    <!-- 联系方式 开始 -->
+    <p class="font_16 hei_32 pad_l10 bg_05">联系方式</p>
+    <!-- 印刷厂信息start -->
+    <div style="float:left;width:460px">
+        <ul class="list mar_t10 mar_l10 ">
+            <li class="wid_460 mar_tb10 ">
+                <span class="font_wid mar_r10">买方 : </span>
+                <span>$!buyer.companyName</span>
+            </li>
+            <li class="wid_460 mar_tb10">
+                <span class="font_wid mar_r10">联系人: </span>
+                <span>$!buyer.uname</span>
+            </li>
+            <li class="wid_460 mar_tb10 ">
+                <span class="font_wid mar_r10">联系电话 : </span>
+                <span>$!buyer.umobile</span>
+            </li>
+            <li class="wid_460 mar_20 mar_tb10">
+                <span class="font_wid mar_r10">电子邮箱 : </span>
+                <span>$!buyer.userEmail</span>
+            </li>
+        </ul>
+    </div>
+    <!-- 印刷厂信息end -->
+    <!-- 供货商信息start -->
+    <div style="float:left;width:460px">
+        <ul class="list mar_t10 mar_l10 ">
+            <li class="wid_460 mar_tb10">
+                <span class="font_wid mar_r10">卖方 : </span>
+                <span>$!seller.companyName</span>
+            </li>
+            <li class="wid_460 mar_20 mar_tb10">
+                <span class="font_wid mar_r10">联系人 : </span>
+                <span>$!seller.uname</span>
+            </li>
+            <li class="wid_460 mar_tb10 ">
+                <span class="font_wid mar_r10">联系电话 : </span>
+                <span>$!seller.umobile</span>
+            </li>
+            <li class="wid_460 mar_20 mar_tb10">
+                <span class="font_wid mar_r10">电子邮箱 : </span>
+                <span>$!seller.userEmail</span>
+            </li>
+        </ul>
+    </div>
+    <!--  供货商信息end -->
+    <!-- 联系方式 end -->
+    <div class="clear"></div>
+    <!-- 合同条件 开始 -->
+    <p class="font_16 hei_32 pad_l10 bg_05 mar_t20">合同条件</p>
+    <ul class="list mar_t10 mar_l10 ">
+        <li class="wid_920 mar_20 mar_tb10">
+             <span class="font_wid mar_r10"><i class="font_fe mar_l2"></i>协议类型: </span>
+			 #if("1"==$contract.protocolType) 
+				&nbsp;&nbsp;单价
+			 #end 
+			 #if("2"==$contract.protocolType) 
+			   &nbsp;&nbsp; 数量
+			 #end 
+			 #if("3"==$contract.protocolType) 
+			   &nbsp;&nbsp;总价值
+			 #end 
+         </li>
+        <!--合同有效期 开始-->
+        <li class="wid_920 mar_tb10">
+            <span class="font_wid mar_r10">协议有效期 : </span>
+            <span>$!date.format('yyyy-MM-dd',$contract.beginDate)</span>
+            <i class=" mar_lr10">至</i>
+            <span>$!date.format('yyyy-MM-dd',$contract.endDate)</span>
+        </li>
+        <!--合同有效期 end-->
+        <li class="wid_920 mar_tb10">
+            <p>
+                <span class="font_wid mar_r10">协议账期 : </span>
+                #if($contractPayment.paymentType==1)
+                    $!contractPayment.paymentDays月
+                #else
+                    $!contractPayment.paymentDays天
+                #end
+            </p>
+        </li>
+            <input type="hidden" id="annex" name="annex" value="$contract.annex"/>
+            <li id="uploadLi" class="wid_920 mar_20 mar_tb10">
+                        <span class="font_wid mar_r10">附件 : </span>
+
+                     
+                            <span class="wid_30 over_ell"><a href="$gix$contract.annex" target="view_window">$!fileName</a></span>
+                           
+           </li>
+        <li class="wid_920 mar_20 mar_tb10">
+            <span class="font_wid mar_r10">备注 : </span>
+                        <textarea cols="" rows="" readonly="true"
+                                  class="wid_500 input_Style2 hei_100">$!contract.remark</textarea>
+        </li>
+    </ul>
+    <!-- 合同条件 end -->
+    <div class="clear"></div>
+    <!-- 合同物品 开始 -->
+    <p class="font_16 hei_32 pad_l10 bg_05 mar_t20">合同物品</p>
+    <div class=" mar_t20 mar_cen" id="itemList">
+        <!-- 合同物品 开头 -->
+         #if("1"==$contract.protocolType)  
+	        <ul class="list_top bg_08 font_cen font_14b">
+	                 <li class="wid_150">产品编号</li>
+                    <li class="wid_150">所属类目</li>
+                    <li class="wid_230">物品名称</li>
+                    <li class="wid_110">销售属性</li>
+                    <li class="wid_200">单价</li>
+	                 
+	        </ul>
+          #end 
+             #if("2"==$contract.protocolType)  
+	        <ul class="list_top bg_08 font_cen font_14b">
+	                      <li class="wid_120">产品编号</li>
+                    <li class="wid_160">所属类目</li>
+                    <li class="wid_150">物品名称</li>
+                    <li class="wid_150">销售属性</li>
+                    <li class="wid_140">单价</li>
+                    <li class="wid_140">总数量</li>
+	                 
+	        </ul>
+          #end 
+             #if("3"==$contract.protocolType)  
+	        <ul class="list_top bg_08 font_cen font_14b">
+	                <li class="wid_120">产品编号</li>
+                    <li class="wid_160">所属类目</li>
+                    <li class="wid_150">物品名称</li>
+                    <li class="wid_150">销售属性</li>
+                    <li class="wid_140">单价</li>
+                    <li class="wid_140">总价值</li>
+	        </ul>
+          #end 
+        #foreach($contractMat in $contract.contractMatDTOs)
+          #if("1"==$!contractMat.contractType)  
+            <ul class="list_top">
+     			<li class="wid_150 over_ell font_cen cursor" title='$!contractMat.get("skuId")'>$!contractMat.get("skuId")&nbsp;</li>            
+                <li class="wid_150 over_ell font_cen cursor" title='$!contractMat.get("cName")'>$!contractMat.get("cName")&nbsp;</li>
+                <li class="wid_230 over_ell font_cen cursor" title='$!contractMat.get("itemName")'>$!contractMat.get("itemName")&nbsp;</li>
+                <li class="wid_110 over_ell font_cen cursor" title='$!contractMat.get("salerAttr")'>$!contractMat.get("salerAttr")&nbsp;</li>
+                <li class="wid_200 over_ell font_cen cursor" title='$!contractMat.get("matPrice")'>￥$!contractMat.get("matPrice")&nbsp;</li>
+               
+            </ul>
+          #end
+           #if("2"==$!contractMat.contractType)  
+            <ul class="list_top">
+     			<li class="wid_120 over_ell font_cen cursor" title='$!contractMat.get("skuId")'>$!contractMat.get("skuId")&nbsp;</li>            
+                <li class="wid_160 over_ell font_cen cursor" title='$!contractMat.get("cName")'>$!contractMat.get("cName")&nbsp;</li>
+                <li class="wid_160 over_ell font_cen cursor" title='$!contractMat.get("itemName")'>$!contractMat.get("itemName")&nbsp;</li>
+                <li class="wid_150 over_ell font_cen cursor" title='$!contractMat.get("salerAttr")'>$!contractMat.get("salerAttr")&nbsp;</li>
+                <li class="wid_140 over_ell font_cen cursor" title='$!contractMat.get("matPrice")'>￥$!contractMat.get("matPrice")&nbsp;</li>
+                <li class="wid_140 over_ell font_cen cursor" title='$!contractMat.get("number")'>$!contractMat.get("number")&nbsp;</li>
+            </ul>
+          #end
+           #if("3"==$!contractMat.contractType)  
+            <ul class="list_top">
+     			<li class="wid_120 over_ell font_cen cursor" title='$!contractMat.get("skuId")'>$!contractMat.get("skuId")&nbsp;</li>            
+                <li class="wid_160 over_ell font_cen cursor" title='$!contractMat.get("cName")'>$!contractMat.get("cName")&nbsp;</li>
+                <li class="wid_150 over_ell font_cen cursor" title='$!contractMat.get("itemName")'>$!contractMat.get("itemName")&nbsp;</li>
+                <li class="wid_150 over_ell font_cen cursor" title='$!contractMat.get("salerAttr")'>$!contractMat.get("salerAttr")&nbsp;</li>
+                <li class="wid_140 over_ell font_cen cursor" title='$!contractMat.get("matPrice")'>￥$!contractMat.get("matPrice")&nbsp;</li>
+                <li class="wid_140 over_ell font_cen cursor" title='$!contractMat.get("cost")'>￥$!contractMat.get("cost")&nbsp;</li>
+            </ul>
+          #end
+        #end
+    </div>
+    <!--right_xinxi end-->
+    <div class="clear"></div>
+</div>

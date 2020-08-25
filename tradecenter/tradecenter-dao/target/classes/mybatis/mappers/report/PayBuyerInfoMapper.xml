@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.report.dao.PayBuyerInfoDao">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="payBuyerInfoMap" type="com.camelot.report.dto.PayBuyerInfo">
+		<result property="id" column="id"/>
+		<result property="userName" column="username"/>
+		<result property="umobile" column="mobile"/>
+		<result property="userType" column="type"/>
+		<result property="parentId" column="parent_id"/>
+		<result property="userEmail" column="email"/>
+		<result property="createTime" column="created_time"/>
+		<result property="deleted" column="deleted"/>
+		<result property="payPriceTotal" column="payPriceTotal"/>
+		<result property="orderNum" column="orderNum"/>
+		<result property="shopNum" column="shopNum"/>
+	</resultMap>
+	
+	<sql id="count_Tail">
+		select count(1) from report_pay_buyer
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select	id
+	 			,username
+	 			,mobile
+	 			,type
+	 			,parent_id
+	 			,email
+	 			,created_time
+	 			,deleted
+	 			,payPriceTotal
+	 			,orderNum
+	 			,shopNum
+		FROM 
+		report_pay_buyer
+        ]]>
+	</sql>
+	
+	<sql id="where_fragement">
+        where deleted=0
+        <if test="entity!=null">
+            <if test="entity.userName != null  and entity.userName !=''">
+                <![CDATA[ and username  LIKE CONCAT('%',#{entity.userName},'%')]]>
+            </if>
+            <if test="entity.createTimeStart != null  and entity.createTimeStart !=''">
+                <![CDATA[ and DATE_FORMAT(created_time,'%Y%m%d')  >= #{entity.createTimeStart} ]]>
+            </if>
+            <if test="entity.createTimeEnd != null  and entity.createTimeEnd !=''">
+                <![CDATA[ and DATE_FORMAT(created_time,'%Y%m%d')  <= #{entity.createTimeEnd} ]]>
+            </if>
+        </if>
+    </sql>
+    
+    <sql id="order_fragement">
+        order by created_time
+    </sql>
+    
+    <!-- mysql 分页 -->
+    <sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	
+	 <!-- 分页查询 -->
+    <select id="queryList" resultMap="payBuyerInfoMap">
+        <include refid="selectAllColumns"/>
+        <include refid="where_fragement"/>
+        <include refid="order_fragement"/>
+        <if test="page!=null">
+            <include refid="pagination_tail"/>
+        </if>
+    </select>
+    
+    <!-- 查询总数 -->
+    <select id="queryCount" resultType="long">
+        <include refid="count_Tail"/>
+        <include refid="where_fragement"/>
+    </select>
+</mapper>

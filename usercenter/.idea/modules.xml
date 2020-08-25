@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/usercenter.iml" filepath="$PROJECT_DIR$/usercenter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usercenter-common/usercenter-common.iml" filepath="$PROJECT_DIR$/usercenter-common/usercenter-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usercenter-dao/usercenter-dao.iml" filepath="$PROJECT_DIR$/usercenter-dao/usercenter-dao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usercenter-domain/usercenter-domain.iml" filepath="$PROJECT_DIR$/usercenter-domain/usercenter-domain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usercenter-export/usercenter-export.iml" filepath="$PROJECT_DIR$/usercenter-export/usercenter-export.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usercenter-parent/usercenter-parent.iml" filepath="$PROJECT_DIR$/usercenter-parent/usercenter-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usercenter-rpc/usercenter-rpc.iml" filepath="$PROJECT_DIR$/usercenter-rpc/usercenter-rpc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usercenter-service/usercenter-service.iml" filepath="$PROJECT_DIR$/usercenter-service/usercenter-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usercenter-web/usercenter-web.iml" filepath="$PROJECT_DIR$/usercenter-web/usercenter-web.iml" />
+    </modules>
+  </component>
+</project>

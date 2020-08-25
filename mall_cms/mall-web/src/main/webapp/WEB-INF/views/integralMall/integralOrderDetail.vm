@@ -1,0 +1,563 @@
+#set($layout = "/none_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<script type="text/javascript" src="$staticPath/js/common.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		if($("#flag").val()=='2'||$("#flag").val()=='3'){
+			$("#approveOrderId").show();
+		}
+		var width = $("#sortlist").width();
+		var ulWidth = 0;
+		$(".width li").each(function(i,obj){
+			ulWidth += ( $(obj).width() + 6 );
+		});
+		if( ulWidth > width ){
+			$("#bt-r,#bt-l").show();
+			$("#bt-r").css("color","blue");
+		}else{
+			$("#bt-r,#bt-l").css("color","").hide();	
+		}
+		
+		var next = 1;
+		var hideWidth = 0;
+		$("#bt-r").click(function(){
+			if( ulWidth - hideWidth > width ){
+				var obj = $(".f1 li:nth-child("+next+")");
+				hideWidth += obj.width();
+				obj.fadeOut("fast");
+				$("#bt-l").css("color","blue");
+				next++;
+			}
+			
+			if( ulWidth - hideWidth < width ){
+				$("#bt-r").css("color","");
+			}
+		});
+		
+		$("#bt-l").click(function(){
+			if( next > 1 ){
+				next--;
+				var obj = $(".f1 li:nth-child("+next+")");
+				hideWidth -= obj.width();
+				obj.fadeIn("slow");
+				$("#bt-r").css("color","blue");
+			}
+			if( next <= 1 ){
+				$("#bt-l").css("color","");
+			}
+		});
+		
+		
+		$(".po_re").mouseenter(function(){
+			$(this).find(".addrBottom").show();
+		});
+		$(".po_re").mouseleave(function(){
+			$(this).find(".addrBottom").hide();
+		});
+	});
+	function setDefAddress(id){
+		var reCount = $("#count").val();
+		var reSkuId = $("#skuId").val();
+		var reIntegralType = $!integralType;
+		var reId = $!id;
+		url = "$request.contextPath/integralMall/integralOrderDetail?count="+reCount+"&integralType="+reIntegralType+"&skuId="+reSkuId+"&id="+reId;
+		$.ajax({
+			url: "$request.contextPath/address/setDefAddress",
+			type: "post",
+			data: { "id": id },
+			dataType: 'json',
+			success: function(data){
+				if(data.success){
+				   location.href = url;
+				}else{
+					alert("操作失败！");
+				}
+			}
+		});
+	}
+	
+	function modifyAddress(id){
+		$("#addressId").val("");
+		$("#contactName").val("");
+		$("#contactMobile").val("");
+		$("#address").val("");
+		$("#telephone").val("");
+		$("#province").val("");
+		$("#city").val("");
+		$("#area").val("");
+		$("[name = fn]:checkbox").attr("checked", false);
+		
+    	$.ajax({
+		     type: "post",
+		     dataType: "json",
+		     url:"$request.contextPath/buyer/getAddress",
+		     data:{ "id":id },
+		     success: function(result){
+		     	//返回提示信息       
+	           	$("#addressId").val("").val(result.id);
+	           	$("#contactName").val("").val(result.contactperson);
+	           	$("#contactMobile").val("").val(result.contactphone);
+	           	
+	           	getAddress(0, "province");
+				getAddress(result.provicecode, "city");
+				getAddress(result.citycode, "area");
+	           	
+	           	$("#address").val("").val(result.fulladdress);
+	           	$("#telephone").val("").val(result.contacttel);
+	           	if(result.isdefault == 1){
+	           		$("[name = fn]:checkbox").attr("checked", true);
+	           	}
+	           	setTimeout(function(){
+	           		$("#province").val("").val(result.provicecode);
+	           		$("#city").val("").val(result.citycode);
+	           		$("#area").val("").val(result.countrycode);
+	           	},800);
+	           	
+				$("#province").change( function() {
+					$('#city option:first').siblings().remove();
+					$('#area option:first').siblings().remove();
+					getAddress($("#province").val(), "city");		
+				});
+				//获取区/县
+				$("#city").change( function() {
+					$('#area option:first').siblings().remove();
+					getAddress($("#city").val(), "area");		
+				});
+				
+				
+				$(".cle_con1_add").show();
+	           	
+			}
+		});
+	}
+	function delAddress(id){
+		var orderType = $("#orderType").val();
+		var contractNo = $("#contractNo").val();
+		if(orderType==2){
+			url = "$request.contextPath/shopCart/toOrderView?orderType=2";
+		}else if(orderType==0 || orderType==1){
+			url = "$request.contextPath/shopCart/toOrderView?orderType="+orderType+"&contractNo="+contractNo;
+		}
+		$.ajax({
+			url: "$request.contextPath/address/delAddress",
+			type: "post",
+			data: { "id": id },
+			dataType: 'json',
+			success: function(data){
+				if(data.success){
+				   location.href = url;
+				}else{
+					alert("操作失败！");
+				}
+			}
+		});
+	}
+	
+function closeVip(){
+	$("#promoCodeId").val("");
+	$("#vipCardId").val("");
+	$(".Check_order").append("<div id='ke-loading' class='cart-loading' ></div>");
+	$.ajax({
+		url:"$request.contextPath/shopCart/toOrderDetail",
+		type:"post",
+		data: $("#orderForm").serialize(),
+		type: "post",
+		dataType: "html",
+		success:function(data){
+			$(".Check_order").html(data);
+		},
+		error:function(data){
+			 alert("请求超时!");
+			 $("#checkvipId").attr("disabled",false);
+			 $("#closeId").attr("disabled",true);
+		}
+	});
+	
+}	
+//输入字符显示
+function numInput(obj,length){
+	if(obj.value==obj.value2)
+		return;
+	if(length == 0 && obj.value.search(/^\d*$/)==-1)
+		obj.value=(obj.value2)?obj.value2:'';
+	else if(obj.value.search(/^\d*(?:\.\d{0,2})?$/)==-1)
+		obj.value=(obj.value2)?obj.value2:'';
+	else obj.value2=obj.value;
+}
+
+//跳转商品详情页
+function openDetail(id,skuId,integralItemType){
+	var url = "/mall-web/integralMall/integralItemDetail?id="+id+"&skuId="+skuId+"&integralType="+integralItemType;
+	window.open(url);
+};
+
+
+</script>
+<style type="text/css">
+
+	#sortlist ul li {
+		cursor: pointer;
+		float: left;
+		width: 240px;
+		height: 130px;
+		font-size: 12px;
+		margin-left: 10px;
+		_margin-left: 5px;
+		margin-top: 10px;
+		margin-bottom: 10px;
+	}
+	
+	.yuanxin {
+		border: 2px solid #eeeeee;
+	}
+	
+	.add_address {
+		line-height: 130px;
+		text-align: center;
+	}
+	
+	.active {
+		border: 2px solid #E50011;
+	}
+	
+	.active b {
+		width: 10px;
+		height: 10px;
+		background: url($staticPath/images/basic_icon.png) no-repeat 0px -267px;
+	}
+	
+	#sortlist ul {
+		width: 1020px;
+		height: 150px;
+		overflow: hidden;
+		margin: auto;
+		float: left;
+	}
+	
+	.left_2, .right_2 {
+		width: 80px;
+		height: 150px;
+		text-align: center;
+		line-height: 150px;
+		cursor: pointer;
+	}
+	
+	.width {
+		width: 1020px; 
+		height: 170px; 
+		float: left;
+		overflow: hidden;
+	}
+	.addrBottom{
+		position: absolute; 
+		bottom: 0px; 
+		height: 30px; 
+		line-height: 30px; 
+		width: 240px;
+		text-align: right;
+	}
+	.addrBottom a{
+		margin-right: 10px;
+	}
+	#addAddress{
+		float: right; 
+		height: 32px; 
+		line-height: 32px; 
+		width: 90px; 
+		border: 1px solid #EEEEEE; 
+		font-weight: bold;
+		text-align: center; 
+		cursor: pointer;
+	}
+	#addAddress:hover{
+		float: right; 
+		height: 32px; 
+		line-height: 32px; 
+		width: 90px; 
+		border: 1px solid #EEEEEE; 
+		color: red; 
+		font-weight: bold;
+		text-align: center; 
+		cursor: pointer;
+	}
+	.tab-nav .tab-nav-item {
+    	width:60px;
+        list-style:none;
+        display:inline;
+		position: relative;
+		margin-right: 10px;
+        border: 1px solid #EBEBEB;
+        padding: 6px 24px;
+        cursor: pointer;
+    }
+	.tab-nav .tab-item-selected {
+        border: 2px solid #E4393C;
+        padding: 5px 23px;
+        cursor: default;
+    }
+	.tab-nav .tab-item-selected b {
+        display: block;
+        position: absolute;
+        right: 0px;
+        bottom: 0px;
+        width: 12px;
+        height: 12px;
+        overflow: hidden;
+        background: transparent url("$staticPath/images/selected-icon.png") no-repeat scroll 0% 0%;
+    }
+	.select{
+		height:26px; 
+		line-height:26px; 
+		border:1px solid #e8e8e8; 
+		text-align:left; 
+		padding-left:8px; 
+		margin-left:5px; 
+		color:#999; 
+		overflow:hidden; 
+		outline:none;
+	}
+</style>
+<form id="orderForm" action="$request.contextPath/shopCart/orderSubmitByIntegral" method="post" class="list_main">
+    <input type="hidden" id="orderType" name="orderType" value="$!orderType" />
+    <input type="hidden" id="flag" value="$!userType"/>
+    <input type="hidden" id="contractNo" name="contractNo" value="$!contractNo" />
+    <input type="hidden" id="paymentMethod" name="paymentMethod" value="3" />
+    <input type="hidden" id="count" name="count" value="$!count" />
+    <input type="hidden" id="skuId" name="skuId" value="$!skuId" />
+	<h1>
+		收货人信息
+	</h1>
+	<!--收货人信息信息-->
+	<div id="sortlist" style="overflow: hidden;">
+		<div style="height: 34px; margin: 5px;">
+			<div id="addAddress" onclick="addAddress()">新增收货地址</div>
+		</div>
+		<p id="bt-l" class="left_2 fl bg_06" style="background-color: white;"><i class="fa fa-caret-left font_24 "></i></p>
+		<div class="width" >
+           	<ul class="f1">
+                #if( $defAddress )
+	                <li class="po_re active">
+	                	<div class="addrInfo" style="width: 240px; height: 100px;">
+		                    <p class="wid_170 mar_l10 hei_30">
+		                    	$!defAddress.contactperson
+		                    	<span style="margin-left: 6px;">收</span>
+		                    </p>
+		                    <p class="wid_170 mar_l10 hei_30" style="width: 220px;overflow: hidden;white-space:nowrap; text-overflow:ellipsis">
+		                    	$!defAddress.contactphone
+		                    	<span style="margin-left: 8px;">$!defAddress.contacttel</span>
+		                    </p>
+		                    <p class="wid_170 mar_l10 hei_30" style="width: 200px; overflow: hidden;white-space:nowrap; text-overflow:ellipsis">
+		                    	$!defAddress.provicename $!defAddress.cityname $!defAddress.countryname $!defAddress.fulladdress
+		                    </p>
+		                    <b class="po_ab pa_04">
+								<input type="hidden" name="proviceId" value="$!defAddress.provicecode">
+								<input type="hidden" name="cityId" value="$!defAddress.citycode">
+								<input type="hidden" name="countryId" value="$!defAddress.countrycode">
+								<input type="hidden" name="detailAddress" value="$!defAddress.fulladdress">
+								<input type="hidden" name="fullAddress" value="$!defAddress.provicename $!defAddress.cityname $!defAddress.countryname $!defAddress.fulladdress">
+								<input type="hidden" name="name" value="$!defAddress.contactperson">
+								<input type="hidden" name="mobile" value="$!defAddress.contactphone">
+								<input type="hidden" name="phone" value="$!defAddress.contacttel">
+		                    </b>
+		                </div>
+	                    <div class="addrBottom" style="display: none; z-index: 999; ">
+	                    	<a href="javascript:setDefAddress('$!defAddress.id');">设为默认</a>
+		                    <a href="javascript:modifyAddress('$!defAddress.id');">修改</a>
+	                    	<a href="javascript:delAddress('$!defAddress.id');">删除</a>
+	                    </div>
+	                    #if( $defAddress.isdefault == 1 )
+		                    <div style="position: absolute; top: 5px; right: 5px;">当前默认</div>
+		                #end
+	                </li>
+                #end
+                
+				#foreach( $address in $addresses )
+					#if( "$address.id" != "$defAddress.id" )
+		                <li class="po_re yuanxin">
+		                	<div class="addrInfo" style="width: 240px; height: 100px;" onclick="reCalculateFee($address.id)">
+			                    <p class="wid_170 mar_l10 hei_30">
+			                    	$!address.contactperson
+		                    		<span style="margin-left: 6px;">收</span>
+			                    </p>
+			                    <p class="wid_170 mar_l10 hei_30" style="width: 200px;overflow: hidden;white-space:nowrap; text-overflow:ellipsis">
+			                    	$!address.contactphone
+			                    	<span style="margin-left: 8px;">$!address.contacttel</span>
+			                    </p>
+			                    <p class="wid_170 mar_l10 hei_30" style="width: 200px; overflow: hidden;white-space:nowrap; text-overflow:ellipsis">
+			                    	$!address.provicename $!address.cityname $!address.countryname $!address.fulladdress
+			                    </p>
+			                    <b class="po_ab pa_04"></b>
+		                	</div>
+		                    <div class="addrBottom" style="display: none; z-index: 999; ">
+		                    	<a href="javascript:setDefAddress('$!address.id');">设为默认</a>
+		                    	<a href="javascript:modifyAddress('$!address.id');">修改</a>
+		                    	<a href="javascript:delAddress('$!address.id');">删除</a>
+		                    </div>
+		                    #if( $address.isdefault == 1 )
+		                    	<div style="position: absolute; top: 5px; right: 5px;">当前默认</div>
+		                    #end
+		                </li>
+					#end
+				#end
+			</ul>
+		</div>
+		<p id="bt-r" class="right_2 fr bg_06"><i class="fa fa-caret-right font_24 "></i></p>
+		<input name="address" type="hidden" value="$defAddress.id"/>
+		<input type="hidden" name="token" value="$token">
+		<!--address end -->
+		
+		<!--展开填写收货信息 start -->
+		<div class="clear"></div>
+		<div class="cle_con1_add">
+			<span>使用新地址：</span>
+			<dl>
+				<dt>
+					<i class="demo-icons font_fs">*</i>收&nbsp;货&nbsp;人：
+				</dt>
+				<dd class="wid_180">
+					<input id="addressId" name="id" type="hidden"/>
+					<input id="contactName" name="contactName" type="text" maxlength="20"/>
+				</dd>
+				<dd class="wid_80 font_right">
+					<i class="demo-icons font_fs">*</i>手机号码
+				</dd>
+				<dd class="wid_180">
+					<input id="contactMobile" name="contactMobile" type="text" maxlength="11" />
+				</dd>
+			</dl>
+			<dl>
+				<dt class="cle_con1_star">
+					<i class="demo-icons font_fs">*</i>收货地址：
+				</dt>
+				<dd class="cle_con1_address">
+					<select id="province" name="province">
+						<option value="">请选择</option>
+					</select>
+				</dd>
+				<dd class="cle_con1_address">
+					<select id="city" name="city">
+						<option value="">请选择</option>
+					</select>
+				</dd>
+				<dd class="cle_con1_address">
+					<select id="area" name="area">
+						<option value="">请选择</option>
+					</select>
+				</dd>
+			</dl>
+			
+			<dl>
+				<dt class="cle_con1_star">
+					<i class="demo-icons font_fs">*</i>详细地址：
+				</dt>
+				<dd class="cle_con1_det">
+					<input id="address" name="addr" type="text" maxlength="256"/>
+				</dd>
+			</dl>
+			
+			<dl>
+				<dt class="cle_con1_star">固定电话：</dt>
+				<dd class="wid_180">
+					<input id="telephone" name="telephone" type="text" maxlength="16" size="20" placeholder="区号-座机号码-分机号"/>
+				</dd>
+			</dl>
+			
+			<dl class="cle_con1_but">
+				<dt>
+					<input id="fn" name="fn" type="checkbox" value="" style="border: 0px;" />
+				</dt>
+				<dd><label for="fn">设为常用地址</label></dd>
+				<dd>
+					<button type="button" class="button_1 mar_lr10 hei_35" onclick="saveAddress();">保存收货地址</button>
+				</dd>
+				<dd style="color:red;" id="errorMsg"></dd>
+			</dl>
+		</div>
+		<!--cle_con1_add -->
+	</div>
+<div class="clear"></div>
+<!--以下为商品清单-->
+<div class="cle_cle_con2 cle_cle_con6">
+	<h1>
+		<span>商品清单</span>
+	</h1>
+	<!--头条栏目标题-->
+	<div class="list_top" style="background-color: white !important;">
+	    <ul>
+	        <li class="shop_name" style="color: black; font-weight: normal; text-indent: 30px;">商品</li>
+	        <li class="shop_pri" style="color: black; font-weight: normal;">积分</li>
+	        <li class="shop_pri" style="color: black; font-weight: normal;">数量</li>
+	        <li class="shop_pri" style="color: black; font-weight: normal;">合计</li>
+	    </ul>
+	</div>
+	
+    <div class="content_list">
+    	<div class="clear"></div>
+		<div class="man1_con" style="margin: 10px auto 5px 20px;overflow: hidden; height:auto;">
+           	<ul>
+                 <li class="man1_pro" style="margin-left:0;">
+                 	<a href="javascript:openDetail($!id,$!skuId,$!integralType)" target="_blank">
+                 		<img src="$!imageServerAddr$!itemDTO.picUrls[0]"/>
+                 	</a>
+                 </li>
+                 <li class="man1_n" style="vertical-align: middle; width: 400px;">
+                 	<p class="man1_name" style="line-height: 32px;">
+	                 	<a href="$request.contextPath/integralMall/integralItemDetail?id=$!id&skuId=$!skuId&integralType=$!integralType" target="_blank">
+	                 		$itemDTO.itemName<br>
+        					<!--<div style="height: 30px;width: 180px; white-space:nowrap; overflow: hidden; text-overflow: ellipsis;">
+        						#foreach( $attr in $itemDTO.attrSale )
+                                    $attr.name：
+                                    #foreach( $attrValue in $attr.values )
+                                    	$attrValue.name &nbsp;
+                                    #end
+                                #end
+        					</div>-->
+	                    </a>
+                 	</p>
+				 </li>
+                 <li class="main1_p" style="text-align: center; width: 140px; margin: 10px auto auto 10px;">$!integral积分</li>
+				 <li class="main1_p" style="text-align: center; width: 140px; margin: 10px auto auto 10px;;">$!count</li>
+				 <li class="main1_p" style="text-align: center; width: 140px; margin: 10px auto auto 10px;;">$!integralSum积分</li>
+        	</ul>
+    	</div>
+    	<div class="clear"></div>
+	</div>
+	<div class="clear"></div>
+</div>
+<!--以上为商品清单-->
+<!--以下为：结算提交-->
+<div class="ove box-shadow1">
+	<div class="ove_top" >
+		<span>
+			<input type="hidden" id="quantity" value="$!count">
+			<i class="mar_lr10">共计 $!{count} 件商品</i>
+			<i class="mar_lr10">商品总积分：$!integralSum</i>
+		</span>
+        <span >
+            <i class="mar_lr10">补充说明：<input type="text" name="memo" placeholder="选填，可告诉卖家您的特殊要求" class="wid_200 hei_24 border-1" value="$!memo"></i>
+        </span>
+	</div>
+    <div class="ove_con">
+    <dl >
+        <dt>运费金额：</dt>
+        <dd class="font_fe font_14b">包邮</dd>
+    </dl>
+    <dl >
+        #set( $total = $!{myCart.payTotal} + $!{myCart.totalFare} )
+        <dt>支付总积分：</dt>
+        <dd class="font_fe font_14b" id="totalId">$!integralSum积分</dd>
+        <input type="hidden" name="integral" id="integral" value="$!integralSum"/>
+    </dl>
+    </div>
+    <input type="hidden" value="$!discount" id="disId"/>
+	<input type="hidden" value="$!total" id="toId"/>
+	<dl class="ove_con2">
+		<dd>
+			<button type="button" class="font_18 button_1 hei_45" onclick="orderSubmit()">
+				<i class="demo-icons fa-jpy"></i>提交订单
+			</button>
+		</dd>
+	</dl>
+</div>
+</form>
+<!--以上为：结算提交-->

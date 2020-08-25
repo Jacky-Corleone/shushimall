@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.basecenter.dao.MallClassifyDAO">
+	<resultMap id="mallClassifyMapper" type="com.camelot.basecenter.domain.MallClassify">
+			<result property="id" column="id" />
+			<result property="title" column="title" />
+			<result property="status" column="STATUS" />
+			<result property="type" column="TYPE" />
+			<result property="created" column="created" />
+			<result property="modified" column="modified" />
+			<result property="platformId" column="platform_id" />
+			<result property="isDeleted" column="is_deleted" />
+			<result property="startTime" column="start_time" />
+			<result property="endTime" column="end_time" />
+	</resultMap>
+	<resultMap id="mallClassifyDtoMapper" type="com.camelot.basecenter.dto.MallClassifyDTO">
+			<result property="id" column="id" />
+			<result property="title" column="title" />
+			<result property="status" column="STATUS" />
+			<result property="type" column="TYPE" />
+			<result property="created" column="created" />
+			<result property="modified" column="modified" />
+			<result property="platformId" column="platform_id" />
+			<result property="isDeleted" column="is_deleted" />
+			<result property="startTime" column="start_time" />
+			<result property="endTime" column="end_time" />
+	</resultMap>
+	
+	
+	
+	<select id="queryPage" resultType="map">
+		select * from mall_help_classify
+	</select>
+	
+	<sql id="where_fragement">
+	   <if test="mallClassifyDTO.type!=null and mallClassifyDTO.type!=''">
+	     and TYPE = #{mallClassifyDTO.type}
+	   </if>
+	   <if test="mallClassifyDTO.startTime!=null and mallClassifyDTO.startTime!=''">
+	    and created &gt;= #{mallClassifyDTO.startTime}
+	   </if>
+	   <if test="mallClassifyDTO.endTime!=null and mallClassifyDTO.endTime!=''">
+	    and created &lt;= #{mallClassifyDTO.endTime}
+	   </if>
+	</sql>
+	
+	<!-- mysql 分页尾 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	
+	<!-- 查询总数 -->
+	<select id="queryMallCassifyCount" resultType="java.lang.Long">
+		select count(1) from mall_help_classify where is_deleted=1 
+		<include refid="where_fragement" />
+	</select>
+	<select id="queryMallCassifyList" resultMap="mallClassifyDtoMapper">
+	    select id,TYPE,created,title,STATUS  from mall_help_classify
+	     where is_deleted=1 
+	    <include refid="where_fragement" />
+		<include refid="pagination_tail"/>
+	</select>
+	
+	<insert id="addMallCassify">
+		insert into mall_help_classify(
+				title,
+				STATUS,
+				TYPE,
+	    		is_deleted,
+				created,
+				modified,
+				platform_id,
+				start_time,
+				end_time
+		)values(
+				#{title},
+				1,
+				#{type},
+				1,
+				#{created},
+				#{modified},
+				#{platformId},
+				#{startTime},
+				#{endTime}
+		)
+	</insert>
+	
+	<update id="update">
+		update mall_help_classify set
+				
+				title = #{title},
+			    modified=#{modified},
+				TYPE = #{type}
+				
+		where id = #{id}
+	</update>
+	
+	<update id="modifyStatusById">
+		update mall_help_classify set
+				STATUS = #{status}
+		where id = #{id}
+	</update>
+</mapper>

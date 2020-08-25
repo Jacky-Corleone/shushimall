@@ -1,0 +1,69 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+<!-- <link href="$staticPath/css/manage_style.css" rel="stylesheet" type="text/css" />
+<link href="$staticPath/css/basic.css" rel="stylesheet" type="text/css" />
+<link href="$staticPath/css/register.css" rel="stylesheet" type="text/css" /> -->
+<script type="text/javascript" src="$staticPath/js/ajaxfileupload.js"></script>
+<script language="javascript">
+$(function(){
+	//加载左侧菜单
+	$("#leftBuyer").load("$request.getContextPath()/leftBuyer");
+});
+</script>
+<style>
+    p.over{
+        border-bottom: 1px solid #ddd;
+        color: #ed4447;
+        font-weight: 600;
+        font-size: 14px;
+    }.hang{
+             padding: 10px 0;
+             line-height: 24px;
+         }
+</style>
+<!--导航菜单end-->
+<input type="hidden" value='$!jsonRefundItem' id="jsonRefundItem"/>
+<div id="main">
+	<!--中间部分开始-->
+	<!--左边部分开始-->
+	<div id="leftBuyer" class="border-4"></div>
+    <div id="right" style="display: block">
+        <div id="right_bot" class="right_bot border-4 mar_t10 bg_06">
+            <!-- 商品列表开头 -->
+            <div class="right_xinxi mar_l14">
+                <h3>投诉查看</h3>
+                <ul class="list_top bg_08 font_cen font_14b">
+                    <li class="wid_260">涉及订单:$!{orderId}</li>
+                    <li class="wid_260">类型:$!typeName</li>
+                    <li class="wid_160" id="zcstace">状态:$!zcstace</li>
+                    <li class="wid_160" id="tousuren">$!tusuFlag方:$!tusufang</li>
+                </ul>
+                <!-- 类型选择 -->
+                <!-- 商品信息 -->
+                <table class="information mar_cen wid_770" id="information"><!--单双行变色加bg_05这个样式-->
+                    <tr>
+                        <td id="tishimsgid" class="font_left font_16">
+                                <p class="over hang">$!zcjgms</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="wid_770 font_left font_16" style="padding-left:85px;" id="tousunr1">$!tusuFlag原因:$!complainresion</td>
+                    </tr>
+                    <tr>
+                        <td class="wid_770 font_left font_16" style="padding-left:85px;" id="tousunr2">$!tusuFlag内容:$!remark</td>
+                    </tr>
+                    <tr>
+                        <td class="wid_770 font_left font_16" style="padding-left:85px;" id="tousunr3">处理结果:$!stacetext</td>
+                    </tr>
+                    <tr>
+                        <td class="wid_770 font_left font_16" style="padding-left:85px;" id="tousunr4">处理意见:$!comment</td>
+                    </tr>
+                    <tr>
+                        <td class="wid_770 font_left" id="tjtime">提交时间:$!createdate</td>
+                    </tr>
+                </table>
+            </div><!--right_xinxi end -->
+
+        </div><!--right_bot end -->
+    </div>
+</div>

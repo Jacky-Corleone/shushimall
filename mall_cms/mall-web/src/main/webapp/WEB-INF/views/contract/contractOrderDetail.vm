@@ -1,0 +1,11 @@
+#set($layout = "/none_layout.vm")
+#foreach($order in $pager.records)
+<tr>
+    <td class="border-1 wid_110 font_cen">$!contract</td>
+    <td class="border-1 wid_110 font_cen">$!order.orderId</td>
+    <td class="border-1 wid_110 font_cen">$!orderStateMap.get($order.state)</td>
+    <td class="border-1 wid_80 font_cen">#set($price=${order.totalPrice} + ${order.freight})$!price</td>
+    <td class="border-1 wid_80 font_cen"><a class="font_1c cursor" href="/mall-web/order/#if($sourcePage=='seller')queryOrderInfoSeller#elseif($sourcePage=='buyer')queryOrderInfoBuyer#end
+		?orderId=$!order.orderId&passKey=$!order.passKey" target="_blank">订单详情</a></td>
+</tr>
+#end

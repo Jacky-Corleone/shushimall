@@ -1,0 +1,33 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/configuration_layout.vm")
+
+<script type="text/javascript">
+	$(function(){
+		$("#uname_id").html(" 恭喜您，" + "$!loginname");
+		$(".information").html("注册完成");
+	});
+</script>
+
+<div class="register_content">
+	<div class="register">
+		<div class="register_box_mid">
+			<p class="font_24" style="width: 460px;"><i class="fa-check-circle mar_r10 font_7a"></i><b id="uname_id"></b></p>
+            #if("$!userType"=="personal")
+                <div class="register_state font_14b" style="margin:40px auto">您已完成普通用户注册，可点击<a href="$!siteDomain" class="font_fe"> 首页 </a>浏览商城！
+	                <div style="width:550px; margin-left:-25px;">
+		                <a href="$request.getContextPath()/information/register/initRegister?type=buyer"><span id="buyers_span" class="button_2 hei_35 font_16" style="width: 140px;"><i class="fa-check-square-o demo-icons"></i>买家认证</span></a>
+		                <a href="$request.getContextPath()/information/registerSeller/initSeller"><span id="seller_span" class="button_2 hei_35 font_16" style="width: 140px;"><i class="fa-check-square-o demo-icons"></i>卖家认证</span></a>
+		                <a href="$!siteDomain"><span id="home_span" class="button_2 hei_35 font_16" style="width: 140px;"><i class="fa-check-square-o demo-icons"></i>以后再说</span></a>
+	                </div>
+                </div>
+            #elseif("$!userType"=="enterprise")
+                <!-- <div class="register_state font_14b" style="margin:40px auto">您已完成普通用户注册并提交买家认证申请，请您耐心等待平台工作人员审核。
+                    <div align='center' style="width:550px; margin-left:-25px;">
+                        <span id="home_span" class="button_2 hei_35 font_16" style="width: 140px;"><i class="fa-check-square-o demo-icons"></i><a href="$!siteDomain">去逛逛</a></span>
+                    </div>
+                </div> -->
+            #end
+		</div>
+	</div>
+</div>
+

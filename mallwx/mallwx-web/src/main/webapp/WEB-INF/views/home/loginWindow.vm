@@ -1,0 +1,150 @@
+<script src="${request.getContextPath()}/assets/js/jqm/jquery.mobile.custom.min.js" type="text/javascript"></script>
+<link href="${request.getContextPath()}/assets/js/jqm/jquery.mobile.custom.structure.min.css" rel="stylesheet" type="text/css"/>
+<link href="${request.getContextPath()}/assets/css/animotion.css" rel="stylesheet" type="text/css"/>
+
+
+
+<script>
+
+
+// window.addEventListener('orientationchange', function(event){
+//     if ( window.orientation == 180 || window.orientation==0 ) {
+//        // alert("竖屏");
+//     }
+//     if( window.orientation == 90 || window.orientation == -90 ) {
+//         $("#loginDiv2").css({"height":$(window).height()});
+
+//         //alert("横屏");
+//     	$("#loginDiv").addClass('overflowauto');
+    	
+//     }
+// });
+
+
+	
+	function showLogin(){
+    	//var stateObj = { "id": "loginwindow" };
+        //window.history.pushState(stateObj, "login", window.location.pathname+"#loginwindow");
+		toggleLogin(0);
+		var param={};
+		param.key="homelogin";
+        param.selector="#_bg_gr";
+		param.event='click';
+		param.callback=function(){
+			//alert('haha');
+            toggleLogin(1);
+		}
+        registerGoBack(param);
+	}
+
+	function hideLogin(){
+		//history.back();
+        toggleLogin(1);
+	}
+	function toggleLogin(flag){
+        $("#loginDiv").show();
+    	if(flag==0){
+    		//$("#loginDiv").removeClass("out").addClass("reverse in");
+
+            //$("#loginDiv2").animate({left:"0%"},300);
+            $("#loginDiv").addClass("slide reverse in");
+			$("#usernamep").addClass("homeinputshake");
+			$("#passwordp").addClass("homeinputshake1");
+    	 }
+		 if(flag==1){
+    		//$("#loginDiv").removeClass("reverse in").addClass(" out");
+             //$("#loginDiv2").animate({left:"-76%"},300,function(){$("#loginDiv").hide();});
+             $("#loginDiv").removeClass("reverse in").addClass("out");
+             setTimeout(function(){$("#loginDiv").hide()},350);
+    	 }
+    }
+	var erroePsdCount = 0;
+    function login(){
+		if($("#username").val()=="" || $("#password").val()=="" ){
+			alert("请输入用户名和密码");
+			return ;
+		}
+		
+    	$.ajax({
+    		url:"$request.contextPath/user/login",
+    		data:{"userName":$("#username").val(),"password":$("#password").val(),"targetUrl":$("#targetUrl").val(),"pic_captcha_id":$("#pic_captcha_id").val()},
+    		type:"post",
+    		dataType:"json",
+    		success:function(res){
+    			if(res.errmsg){
+    				if(erroePsdCount > 1){
+    					alert(res.errmsg);
+    					p_chage();
+    					$("#yzm").show();
+    				}else{    					
+    					alert(res.errmsg);
+    				}
+    				erroePsdCount++;
+    				
+    			}else{
+    				var _targetUrl=encodeURI($("#targetUrl").val()); 
+    				//$("#targetUrl").val("");
+					var urlType=window.__urlType__;
+					//window.__urlType__=null;
+					if((res.usertype!=3)&&(urlType==3)){
+						alert("您不是卖家，即将进入买家中心",function(){
+							window.location='$request.contextPath/buyers';
+						});
+						return;
+					}
+    				if(!(_targetUrl == "" || _targetUrl==undefined || _targetUrl==null)){
+    					window.location=_targetUrl;
+    				}else{
+    					if(erroePsdCount > 1){
+    						var pic_captcha_id=$("#pic_captcha_id").val();
+    	 			         if(pic_captcha_id == '' || pic_captcha_id == null || pic_captcha_id == undefined){
+    	 						alert("请输入验证码");
+    	 						return ;
+    	 					}  
+    					}   
+    					window.location="./";
+    				}
+    			}
+    		}
+    	});
+
+    }
+	function namechange(){
+		$("#password").val('');
+	}
+	
+	 function p_chage(){
+	 	$("#p_vc").attr("src","$request.contextPath/user/acquire?a=" + new Date().getTime()+"&type=p_register");
+     }
+</script>
+<div id="loginDiv" class="loginwindow">
+	<div id="_bg_gr"  onclick="hideLogin();return false;" class="loginmask"></div>
+    <div id="loginDiv2" class="loginmain">
+    	<div style="overflow-y: auto; padding-bottom: 20px; height:100%;">
+	        <p class="hei_50 font_ff font_1_5 font_cen mar_t70">欢迎使用印刷家</p>
+	        <div class="pad_lr5 mar_t10">
+            <p id="usernamep" class="po_re mar_t10"><i class="fa-user fa-user1 po_ab"></i><input id="username" onkeydown="namechange();" type="text" name="userName" class="hei_34 wid_87  " placeholder="请输入用户名"/></p>
+            <p id="passwordp" class="po_re mar_t10"><i class="fa-unlock-alt po_ab"></i><input id="password" type="password" name="password" class="hei_34 wid_87 " placeholder="请输入密码"/></p>
+            <div style="display: none;" id="yzm">
+             <p id="usernamep" class="po_re mar_t10">
+                    <input id="personalPicCaptchaKey" type="hidden"/>
+                    <input type="tel" id="pic_captcha_id" name="captcha"
+                           class="wid_40 input_3 fl mar_r2" placeholder="输入验证码" maxlength="4" style="-webkit-appearance:none"/>
+                    <a href="javascript:p_chage();"> <img id="p_vc" src="$request.contextPath/user/acquire?type=p_register" /></a>
+<!--                    <span  class="wid_100 hei_34 login">换一张</span> -->
+             </p>
+            </div>
+            
+            
+            <p class="hei_50">
+                <span class="font_ff fl wid_50"><input class="mar_r2" type="checkbox" checked/>自动登录</span><span><a href="person/modifyPwd" class="font_ff fr">忘记密码</a></span>
+            </p>
+            <p class="font_cen">
+				<button class="wid_100 hei_34 login" onclick="login();return false;">登录</button>
+			</p>
+				<input id="targetUrl" type="hidden" />
+            <p class="font_cen mar_t15"><button class="wid_100 hei_34 enroll" onclick="window.location='person/quickRegist';return false;">快速注册</button></p>
+        </div>
+    	</div>
+    </div><!-- 右侧 end-->
+</div>

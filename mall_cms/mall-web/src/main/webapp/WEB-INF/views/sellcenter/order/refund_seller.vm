@@ -1,0 +1,135 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<script language="javascript" type="text/javascript" src="$staticPath/js/js.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript">
+$(function(){
+	//加载左侧菜单
+	$("#leftSeller").load("$request.contextPath/leftSeller");
+});
+//条件查询
+function submitGoodsForm(){
+	$("queryForm").submit();
+};
+//到指定的分页页面
+function topage(page){
+	$("input[name='page']").val(page);
+	$("#queryForm").submit();
+}
+</script>
+<div id="main">
+            <!--中间部分开始-->
+            <!--左边部分开始-->
+            <div id="leftSeller" class="border-4"></div>
+            <!--样式冲突，在这再引入一次-->
+            <!--右边部分开始-->
+            <div id="right">
+                <div id="right_top" class="right_top border-4 bg_06">
+					<form id="queryForm" action="$request.contextPath/order/refundSeller" method="post">
+					<div class="right_top_l">
+                        <ul class="list">
+                            <li class="wid_220">
+                                <span class="font_wid">订单编号：</span>
+                                <input class="input_Style2 wid_120 hei_30" type="text" name="orderId" onkeyup="this.value=this.value.replace(/\D/g,'')" value="$!orderId" />
+                            </li>
+                            <li class="wid_400">
+                                <span class="font_wid">申请日期：</span>
+								<input name="startTime" id="createStart" readonly="readonly" type="text" value="$!date.format('yyyy-MM-dd ',$!startTime )"
+									class="input_Style2 wid_120 hei_30" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/>
+                                <i class="demo-icons">-</i>
+								<input name="endTime" type="text" readonly="readonly" value="$!date.format('yyyy-MM-dd ',$!endTime )"
+									class="input_Style2 wid_120 hei_30" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});" />
+                            </li>
+                            <li class="wid_220">
+                                <span class="font_wid mar_l">退款状态：</span>
+                                <select name="state" class="input_Style2 wid_120 mar_r10 hei_35">
+                                    <option value="">所有</option>
+                                    <option value="1" #if($!state==1) selected="selected" #end>待确认</option><!-- 退款申请，等待卖家确认中 -->
+                                    <option value="2" #if($!state==2) selected="selected" #end>拒绝退款/退货</option><!-- 卖家不同意协议，等待买家修改 -->
+                                    <option value="3" #if($!state==3) selected="selected" #end>等待买家发货</option><!-- 退款申请达成，等待买家发货 -->
+									<option value="7" #if($!state==7) selected="selected" #end>等待买家收款</option>
+                                    <option value="4" #if($!state==4) selected="selected" #end>待收货</option><!-- 买家已退货，等待卖家确认收货 -->
+                                    <option value="5" #if($!state==5) selected="selected" #end>已关闭</option><!-- 退款关闭 -->
+                                    <option value="6" #if($!state==6) selected="selected" #end>退款成功</option><!-- 退款成功 -->
+                                    <option value="8" #if($!state==8) selected="selected" #end>待平台处理退款</option><!-- 待平台处理退款 -->
+                                    <option value="9" #if($!state==9) selected="selected" #end>平台处理退款中</option><!-- 平台处理退款中 -->
+                                    <option value="10" #if($!state==10) selected="selected" #end>退款失败</option><!-- 退款失败 -->
+                                    <option value="11" #if($!state==11) selected="selected" #end>退款申请成功，支付宝处理中</option><!-- 退款申请成功,等待同意退款 -->
+                                    <option value="12" #if($!state==12) selected="selected" #end>退款申请成功，银联处理中</option><!-- 退款申请成功,等待同意退款 -->
+                                    <option value="13" #if($!state==13) selected="selected" #end>待买家确认收款</option><!-- 退款申请成功,等待同意退款 -->
+                                </select>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="right_top_r">
+						<input type="hidden" name="page" value="$!pager.page">
+                        <button type="button" onclick="topage(1);" class="button_4 but_cx3">
+                            <a class="font_1c hei_24">查 询</a>
+                        </button>
+                    </div>
+					</form>
+                </div>
+                <!-- right结束 -->
+                <div id="right_bot" class="right_bot border-4 mar_t10 bg_06">
+                    <!-- 商品列表开头 -->
+                    <div class="right_xinxi mar_l14">
+                        <ul class="list_top bg_08 font_cen font_14b">
+                            <li class="wid_150">退款编号</li>
+                            <li class="wid_130">订单编号</li>
+                            <li class="wid_130">买家</li>
+                            <li class="wid_90">订单实付金额</li>
+                            <li class="wid_110">申请退款金额</li>
+                            <li class="wid_90">申请时间</li>
+                            <li class="wid_160">退款状态</li>
+                            <li class="wid_50">操作</li>
+                        </ul>
+                        <!-- 类型选择 -->
+                        <!-- 商品信息 -->
+                        <table class="information mar_t10" id="information">
+                            #foreach($entity in $pager.records)
+							<tr>
+                                <td class="wid_150 font_cen">$!entity.codeNo</td>
+                                <td class="wid_130 font_cen">$!entity.orderId</td>
+                                <td class="wid_130 font_cen">$!entity.buyerName</td>
+                                
+                            	#if($entity.orderPayBank == 7)
+                            		<td class="wid_70 font_cen">$!number.integer($!entity.orderPrice)积分</td>
+                            		<td class="wid_110 font_cen">$!number.integer($!entity.refundGoods)积分</td>
+								#else
+									<td class="wid_70 font_cen">￥$!entity.orderPrice</td>
+									<td class="wid_110 font_cen">￥$!entity.refundGoods</td>
+								#end  
+                                <td class="wid_120 font_cen">$!date.format('yyyy-MM-dd HH:mm:ss ', $!entity.applyDt)</td>
+                                <td class="wid_120 font_cen">
+                                    <i class="font_1c">
+									#if($!entity.state == 1)待确认				<!-- 退款申请，等待卖家确认中 -->
+									#elseif ($entity.state == 2 )拒绝退款/退货			<!-- 卖家不同意协议，等待买家修改 -->
+									#elseif ($entity.state == 3 )等待买家发货	<!-- 退款申请达成，等待买家发货 -->
+									#elseif ($entity.state == 4 )待收货			<!-- 买家已退货，等待卖家确认收货 -->
+									#elseif ($entity.state == 7 )等待买家收款
+									#elseif ($entity.state == 5 )已关闭			<!-- 退款关闭 -->
+									#elseif ($entity.state == 6 )退款成功		<!-- 退款成功 -->
+									#elseif ($entity.state == 8 )待平台处理退款	<!-- 待平台处理退款 -->
+									#elseif ($entity.state == 9 )平台处理退款中	<!-- 平台处理中 -->
+									#elseif ($entity.state == 10 )退款失败	<!-- 退款失败 -->
+									#elseif ($entity.state == 11 )退款申请成功<br/>支付宝处理中	<!-- 退款申请成功,等待同意退款 -->
+									#elseif ($entity.state == 12 )退款申请成功<br/>银联处理中	<!-- 退款申请成功,等待同意退款 -->
+									#elseif ($entity.state == 13 )待买家确认收款<!-- 退款申请成功,等待同意退款 -->
+									#end
+									</i>
+                                </td>
+                                <td class="wid_80 font_cen">
+                                    <a class="font_1c" href="$request.contextPath/order/refundInfoSeller?returnGoodId=$!entity.id&passKey=$!entity.passKey" target="_blank">查看详情</a>
+                                </td>
+                            </tr>
+							#end
+                        </table>
+                        #pageVelocity($pager)
+                    </div>
+					
+                </div>
+            </div>
+            <!--id="right" end-->
+            <!--右边部分结束-->
+        </div>
+        <!--#main end -->

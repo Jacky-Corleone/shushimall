@@ -1,0 +1,21 @@
+#set($layout = "/mini_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<link href="$staticPath/css/Details.css" rel="stylesheet" type="text/css"/>
+<style type="text/css">
+    .jd{width: 680px; margin: 0 auto;}
+</style>
+<div id="header">
+	<div class="left_img">
+		<a href="$!siteDomain">
+			<img src="$!imageServerAddr$!{logoDTO.picUrl}" />
+		</a>
+	</div>
+
+	<div class="tree tree_2"></div>
+</div>
+<div class="wid">
+    <div class="jd mar_b20">
+        <img src="$staticPath/images/jd.jpg">
+        <p class="font_cen hei_60 font_16">亲爱的用户，短时间内订单不能多次提交，您可以去<span class="font_65"><a href="$!siteDomain" class="selected2">首页</a></span>逛逛</p>
+    </div>
+</div>

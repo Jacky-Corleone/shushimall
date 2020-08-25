@@ -1,0 +1,4 @@
+<title>$!{baseTDKConfigDTO2.title}</title>
+<link rel="icon" href="$request.contextPath/assets/images/favicon.ico" mce_href="$request.contextPath/assets/images/favicon.ico" type="image/x-icon">
+<meta name="description" content="$!{baseTDKConfigDTO2.description}">
+<meta name="Keywords" content="$!{baseTDKConfigDTO2.keywords}">

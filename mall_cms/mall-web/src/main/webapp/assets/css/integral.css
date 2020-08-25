@@ -1,0 +1,40 @@
+@charset "utf-8";
+/* CSS Document */
+/*int-content*/
+.int-content{ width:100%; height:auto; overflow:hidden;}
+.wrap{ width:1000px;}
+/*banner 开始了*/
+.banner { width: 1000px; height: 400px;  overflow:hidden; }
+.banner ul { width: 5000px; }
+.bannerIn { width: 1000px; height: 400px; overflow:hidden; }
+.bannerIn ul li { width: 1000px; height: 400px; }
+.banner ol { bottom:20px; left:50%; margin-left:-50px; }
+.banner ol li { width:12px; height:12px; text-align:center; background:url(../images/round.png) no-repeat 0 0; opacity:0.8; cursor:pointer;}
+.banner ol .current { background-position:0 -12px; }
+/*wrap-pic*/
+.wrap-pic{ width:1000px;}
+/*积分活动部分*/
+.wrap-pic-t ul{ width:1000px; overflow:hidden; }
+.wrap-pic-t ul li{ width:198px; height:198px;}
+.wrap-pic-b{ width:1000px; height:330px;position:relative;}
+/*淘新品部分*/
+.wrap-pic-b-l{ width:668px; height:auto;}
+.wrap-pic-b-l h1{ border-bottom:2px solid #E50011; color:#E50011; font-weight:normal; padding-left:15px;}
+.wrap-pic-b-l ul li{ width:190px; height:234px; padding:15px;}
+.wrap-pic-b-l ul li img{ margin:0 0 0 15px;}
+/*li:hover 效果*/
+.wrap-pic-b-l ul li:hover{ width:190px; height:234px; box-shadow:0px 3px 8px #ededed; -moz-box-shadow:1px 1px 8px #ededed; -webkit-box-shadow:1px 1px 8px #ededed;}
+.wrap-pic-b-l ul li p{height:18px; line-height:18px;}
+.wrap-pic-b-l ul li .tit{ height:36px;}
+.wrap-pic-b-l ul li .jif span,.wrap-pic-b-r ul li p span{ color:#e32529; font-weight:bold; font-family:arial,"microsoft yahei"; font-size:14px;}
+/*兑你喜欢部分*/
+.wrap-pic-b-r{ width:314px; height:auto; }
+.wrap-pic-b-r h2{ color:#333; padding-left:15px; font-weight:normal;}
+.wrap-pic-b-r ul li{ width:172px; height:55px; padding:17px 5px 7px 120px;}
+.wrap-pic-b-r ul li .sp01{ display:inline-block; width:22px; height:22px; line-height:22px; text-align:center; background:#1DA302; border-radius:50%; color:#fff; left:18px; top:30px;}
+.wrap-pic-b-r ul li .sp02{ background:#A6A6A6;}
+.wrap-pic-b-r ul li img{ width:60px; height:60px; vertical-align:middle; left:50px; top:10px;}
+.wrap-pic-b-r ul li p a,.wrap-pic-b-l ul li p a{ color:#747474;}
+.wrap-pic-b-r ul li p a:hover,.wrap-pic-b-l ul li p a:hover{ color:#E50011;}
+
+

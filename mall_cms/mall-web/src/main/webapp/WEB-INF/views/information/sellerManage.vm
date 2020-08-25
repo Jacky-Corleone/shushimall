@@ -1,0 +1,192 @@
+<script type="text/javascript">
+$(function(){
+	//初始化验证
+	initValidPluginManage();
+	//初始化页面
+	initManage();
+
+	/*暂存：经营信息*/
+	$("#manageBtn").click(function(){
+		//同类电商网店经验
+		$("#isHaveEBusiness").val($("input[name='isHaveEBusiness']:checked").val());
+
+		//暂存操作
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			url:"$request.contextPath/information/registerSeller/stagingInformation",
+			data:$("#manageForm").serializeArray(),
+			success: function(data){
+				alert(data.result);
+			}
+		});
+	});
+});
+
+/*初始化页面*/
+function initManage(){
+	//公司类型
+	if("$!userManageDTO.dealerType" != null && "$!userManageDTO.dealerType" != ""){
+		$("#dealerType").val("$!userManageDTO.dealerType");
+		if($("#dealerType option:selected").val() == '0'){
+		 	$("#dealerType_view").html();
+		}else{
+			$("#dealerType_view").html($("#dealerType option:selected").text());
+		}
+	}
+	//同类电商网店经验
+	if("$!userManageDTO.isHaveEbusiness" != ""){
+		$("input[name='isHaveEBusiness'][value="+"$!userManageDTO.isHaveEbusiness"+"]").attr("checked","true");
+	}
+	//ERP类型
+	if("$!userManageDTO.erpType" != null && "$!userManageDTO.erpType" != ""){
+		$("#erpType").val("$!userManageDTO.erpType");
+		if($("#erpType option:selected").val() == '0'){
+		 	$("#erpType_view").html();
+		}else{
+			$("#erpType_view").html($("#erpType option:selected").text());
+		}
+	}
+}
+
+/*初始化校验控件*/
+function initValidPluginManage(){
+
+
+	$("#manageForm").validate({
+		rules: {
+			"dealerType":{
+				required: true
+			},
+            "userManageDTO.homePage":{
+                homePage:true
+            },
+            "userManageDTO.saleNum":{
+                digits:true,
+                saleNum:true
+            },
+			"userManageDTO.isHaveEbusiness":{
+				required: true,
+				number: true
+			},
+			"userManageDTO.webOperaPeo":{
+                digits:true,
+                webOperaPeo:true
+			}
+		},excludeValidator:['userManageDTO.isHaveEbusiness']
+	});
+
+
+
+    jQuery.validator.addMethod("homePage", function(value, element) {
+        var chrnum = /^(http(s)?:\/\/).*$/;
+        return this.optional(element) || (chrnum.test(value));
+    }, "请输入有效的网址，例如:http://www.shushi100.com");
+
+    jQuery.validator.addMethod("saleNum", function(value, element) {
+        var chrnum = /^[0-9|\w]{1,9}$/;
+        return this.optional(element) || (chrnum.test(value));
+    }, "最近一年销售额为不超过9位数的正整数");
+
+    jQuery.validator.addMethod("webOperaPeo", function(value, element) {
+        var chrnum = /^[0-9|\w]{1,9}$/;
+        return this.optional(element) || (chrnum.test(value));
+    }, "网站运营人数不超过9位数的正整数");
+}
+function changHaveEBusiness(thiz){
+//    var boolCheck=$('input:radio[name="isHaveEBusiness"]').is(":checked");
+ //  alert($('input:radio[name="isHaveEBusiness"]:checked').val());
+    $("#isHaveEBusinessIds").val($('input:radio[name="isHaveEBusiness"]:checked').val());
+    if($('input:radio[name="isHaveEBusiness"]:checked').val() == '1'){
+    	$("#webOperaPeo").attr("required","required");
+    }else{
+    	$("#webOperaPeo").removeAttr("required");
+    }
+ // $("#requiredSpan").hide();
+}
+</script>
+
+<!--经营信息 start -->
+<form id="manageForm" method="post">
+<div class="bg_07 border-6">
+<div class="approve_buyer" id="approve_buyer">
+	<h1 class="font_18 mar_20">公司经营信息：</h1>
+	<input name="stagingType" type="hidden" value="5"/>
+	<ul>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>公司类型：</span>
+			<span id="dealerType_view" class="userInfo_class_show"></span>
+			<div class="userInfo_class_hide">
+				<select id="dealerType" name="dealerType" class="input_Style1 wid_260">
+					<option value="" selected="selected"> 请选择 </option>
+					#foreach($dealerType in $dealerTypes)
+						<option value="$!dealerType"> $!dealerType.label </option>
+					#end
+				</select>
+			</div>
+		</li>
+		<li>
+			<span class="font_span">公司官网地址：</span>
+			<span class="userInfo_class_show">$!userManageDTO.homePage</span>
+			<div class="userInfo_class_hide">
+				<input id="homePage" name="userManageDTO.homePage" value="$!userManageDTO.homePage"
+					type="text" class="input_Style1 wid_250" placeholder="输入公司官网地址..."/>
+			</div>
+		</li>
+		<li>
+			<span class="font_span">最近一年销售额：</span>
+			<span class="userInfo_class_show">$!userManageDTO.saleNum 万元</span>
+			<div class="userInfo_class_hide">
+				<input id="saleNum" name="userManageDTO.saleNum" value="$!userManageDTO.saleNum"
+					type="text" class="input_Style1 wid_250" placeholder="输入最近一年销售额..."/> 万元
+			</div>
+		</li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>同类电商网店经验：</span>
+			<span class="userInfo_class_show">
+                #if($!userManageDTO.isHaveEbusiness==1)
+                    是
+                #else
+                    否
+                #end
+			</span>
+
+			<div class="userInfo_class_hide">
+				<i class="mar_r10">
+					<input name="isHaveEBusiness" value="1" type="radio" onchange="changHaveEBusiness(this)" />有
+					<input name="isHaveEBusiness" value="0" type="radio" onchange="changHaveEBusiness(this)"/>无
+                    <input id="isHaveEBusinessIds" name="userManageDTO.isHaveEbusiness" type="text" class="messageInput" value="$!userManageDTO.isHaveEbusiness" />
+                    <!--
+                    <span id="requiredSpan" style="display:none;" ><font color = 'red'> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    *此项为必填</font></span>
+                    -->
+                </i>
+            </div>
+
+		</li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>网站运营人数：</span>
+			<span class="userInfo_class_show">$!userManageDTO.webOperaPeo 人</span>
+			<div class="userInfo_class_hide">
+				<input id="webOperaPeo" name="userManageDTO.webOperaPeo" value="$!userManageDTO.webOperaPeo"
+					type="text" class="input_Style1 wid_250" placeholder="输入网站运营人数..." required="required"/> 人
+			</div>
+		</li>
+		<li>
+			<span class="font_span">ERP类型：</span>
+			<span id="erpType_view" class="userInfo_class_show"></span>
+			<div class="userInfo_class_hide">
+				<select id="erpType" name="erpType" class="input_Style1 wid_260">
+					<option value="" selected="selected"> 请选择 </option>
+					#foreach($erpType in $!erpTypes)
+						<option value="$!erpType"> $!erpType.label </option>
+					#end
+				</select>
+			</div>
+		</li>
+	</ul>
+	#if("$!pageState"=="register")
+	<div class="button_2 hei_40 font_14b" style="margin:20px auto" id="manageBtn">暂 存</div>
+	#end
+</div></div>
+</form>
+<!--经营信息end-->

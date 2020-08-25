@@ -1,0 +1,93 @@
+#set($layout="common/order.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>物流信息</title>
+#parse("common/scriptAndCss.vm")
+<script type="text/javascript">
+$(document).ready(function(){
+	if("2"==$!{flag}){
+		$("#logisticsNo").attr("readonly","readonly");
+		$("#logisticsCompany").attr("readonly","readonly");
+	}
+	//添加物流信息
+	$("#needConfirm").click(function(){
+		var orderId = $("#logistics_orderId").val();
+		var logisticsNo = $("#logisticsNo").val();
+		var logisticsCompany = $("#logisticsCompany").val();
+		if($.trim(logisticsNo) == ""){alert("请填写物流编号"); return;}
+		var patrn=/^[0-9A-Za-z]*$/;
+		if(!patrn.exec($.trim(logisticsNo))){
+			alert("物流号只能输入数字或字母！！！");
+			return false;
+		}
+		if($.trim(logisticsCompany) == ""){alert("请填写备注"); return;}
+		if($.trim(logisticsCompany).length>100){
+			alert("备注不能多于100字符！！");
+			return false;
+		}
+		$.ajax({
+			type: "POST",
+			dataType: "text",
+			url: "$request.getContextPath()/orderWx/modifyLogistics",
+			data: {
+				orderId: orderId,
+				logisticsNo: logisticsNo,
+				logisticsCompany: logisticsCompany
+			},
+			success: function(data){
+				var data = eval("("+data+")");
+				if(data.success){
+					var orderSource = "buyers";
+					if("1"==$!{flag}){
+						orderSource = "saler";
+					}
+					window.location.href="$request.getContextPath()/orderWx/toOrderSubmit?orderSource="+orderSource;
+				}else{
+					alert("物流信息添加失败："+data.errorMessages);
+				}
+			}
+		});
+	});
+	//添加物流信息 弹框取消
+	$("#needCancle").click(function(){
+		var orderSource = "buyers";
+		if("1"==$!{flag}){
+			orderSource = "saler";
+		}
+		window.location.href="$request.getContextPath()/orderWx/toOrderSubmit?orderSource="+orderSource;
+	});
+});
+</script>
+</head>
+<body>
+<div id="main" class="po_re">
+    <!-- 中间内容 -->
+    <div class="content" id="wrapper">
+	    <div class="pad_tb5 pad_lr5">
+	         	物流号：<input type="text" class="wid_50 input_3 mar_l2" value="$!{logisticsNo}" id="logisticsNo"/>
+        	<input type="hidden" id="logistics_orderId" value="$!{orderId}"/>
+	    </div>
+	    <div class="bg_01 mar_t10">
+	        <ul class="individual mar_lr5">
+	            <li class="border_2" style="height: 100px"><span class=" fl">备&nbsp;&nbsp;注:</span>
+<!-- 	 	            <input id="logisticsCompany" type="text" class="wid_50 input_3 mar_l2" value="$!{logisticsCompany}">  -->
+	            	<textarea class="wid_50 input_3 mar_l2" id="logisticsCompany" placeholder="不能超过100字">$!{logisticsCompany}</textarea>
+	            </li>
+	        </ul>
+	        <div class="clear"></div>
+	    </div>
+	    #if("1"==$!{flag})
+		    <div class="font_cen">
+		    	<button class="button_1 wid_30 hei_34" id="needConfirm">确定</button>
+		    	<button class="button_2 wid_30 hei_34" id="needCancle">取消</button>
+	    	</div>
+	    #end
+    </div><!-- 中间内容 end-->
+</div>
+</body>
+</html>

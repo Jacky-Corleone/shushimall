@@ -1,0 +1,421 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+<script language="javascript" type="text/javascript" src="$staticPath/js/tab.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="$staticPath/js/order/order_buyer.js"></script>
+<script type="text/javascript">
+    function openCustomerWin() {
+        if( '$!userId' ==  ''){
+            alert("你目前处于非登陆状态，请先登录再联系客服！");
+            this.location.href="$request.contextPath/user/login";
+            return false;
+        }
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            url:"$request.contextPath/shopCart/ifLogin_shopCustomer",
+            success: function(data){
+                if(data.ifLogin_shopCustomer == false){
+                    alert("你目前处于非登陆状态，请先登录再联系客服！");
+                    this.location.href="$request.contextPath/user/login";
+                    return false;
+                }
+            }
+        });
+    }
+    //审核通过
+    function approveSubmit(orderId,status,parentId){
+    if(window.confirm("您确定要审核通过吗？")){
+    	$.ajax({
+			url:"$request.contextPath/order/approveSubmit",
+			type:"post",
+			data:{
+				orderId:orderId,
+				status:status,
+				parentId:parentId
+			},
+			dataType: "json",
+			success:function(data){
+				alert(data.msg);
+				$("input[name='approveStatus']").val(0);
+				$("#queryForm").submit();
+			},
+			error:function(data){
+				alert(data.msg);
+				$("input[name='approveStatus']").val(0);
+				$("#queryForm").submit();
+			}
+		});
+    };
+  }
+    //审核驳回
+    function approveReject(orderId,status){
+    	$("#rejectDiv").show();
+    	$("#orderId").val(orderId);
+    	$("#status").val(status);
+ }
+    function hideSetDiv(){
+    	$("#rejectDiv").hide();
+    }
+    
+    function actionSet(){
+    	var orderId=$("#orderId").val();
+    	var status=$("#status").val();
+    	var reason=$("#reasonId").val();
+    	if($.trim(reason)==""){
+    		alert("请填写驳回原因！");
+    	}else{
+    		$.ajax({
+    			url:"$request.contextPath/order/approveReject",
+    			type:"post",
+    			data:{
+    				orderId:orderId,
+    				status:status,
+    				reason:reason
+    			},
+    			dataType: "json",
+    			success:function(data){
+    				$("#rejectDiv").hide();
+    				alert(data.msg);
+    				$("input[name='approveStatus']").val(0);
+    				$("#queryForm").submit();
+    			},
+    			error:function(data){
+    				$("#rejectDiv").hide();
+    				alert(data.msg);
+    				$("input[name='approveStatus']").val(0);
+    				$("#queryForm").submit();
+    			}
+    		});
+    	}
+    }
+    function showDiv(id,content){
+	     $("#contentId").html(content);
+		$("#"+id).show();
+	}
+    function hideDiv(){
+    	$("#rejectReasonId").hide();
+    }
+</script>
+<style>
+.wid_165{width:165px;}
+</style>
+<input type="hidden" id="contextPath" value="$request.contextPath" />
+<div id="main">
+<!--left start -->
+<div id="leftBuyer" class="border-4" style="width: 198px; float: left;"></div>
+<!--left end -->
+
+<!--右边部分开始-->
+<div id="right">
+      <div class="nTab">
+            <!-- 标题开始 -->
+            <div class="TabTitle">
+				#set($pageState = $pageState)
+				<ul id="myTab0">
+				    <li #if(!$approveStatus) class="active" #else class="normal" #end onclick="changeTabs1(this);">由我提交</li>
+					<li #if($approveStatus == 0) class="active" #else class="normal" #end onclick="changeTabs1(this,0);">待我审核</li>
+				</ul>
+            </div>
+            <!-- 内容开始 -->
+            <div class="TabContent">
+               <!-- 全部订单 下的内容开始 -->
+                <div id="myTab0_Content0">
+                <!--每一个下面的内容复制开始-------------------------------- -->
+                <!--搜索条件 开始-->
+			<form id="queryForm" action="$request.getContextPath()/order/queryBuyer?approve=loadApprove" method="post">
+                <div id="right_top" class="right_top border-5">
+                    <div class="right_top_l">
+                        <ul class="list">
+                            <li class="wid_260">
+                                <span class="font_wid">店铺：</span>
+								<input class="wid_135 hei_30 input_Style2" name="shopName" type="text" value="$!tradeOrdersQueryInDTO.shopName"/>
+                            </li>
+                            <li class="wid_260">
+                                <span class="font_wid">订 单 号：</span>
+								<input class="wid_135 hei_30 input_Style2" name="orderId" type="text" onkeyup="this.value=this.value.replace(/\D/g,'')" value="$!tradeOrdersQueryInDTO.orderId"  />
+                            </li>
+                            <div class="clear"></div>
+							<li class="wid_260">
+                                <span class="font_wid" >查看：</span>
+								<select id="select_time" name="selectTime"  class="wid_165 hei_30 input_Style2" onchange="getLastMonthYestdy()" >
+									<option value="0" #if($!selectTime==0) selected="selected" #end>请选择</option>
+									<option value="1" #if($!selectTime==1) selected="selected" #end>一个月以内订单</option>
+									<option value="2" #if($!selectTime==2) selected="selected" #end>三个月以内订单</option>
+									<option value="3" #if($!selectTime==3) selected="selected" #end>一年以内订单</option>
+								</select>
+                            </li>
+							<li class="wid_500">
+                                <span class="font_wid">下单时间：</span>
+								<input name="createStart" id="createStart" readonly="readonly"  type="text"
+									value="$!date.format('yyyy-MM-dd ',$!tradeOrdersQueryInDTO.createStart )"
+									class="wid_135 hei_30 input_Style2" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/>
+								<i class="demo-icons">-</i>
+							    <input name="createEnd"  type="text" readonly="readonly"   id="createEnd"
+									value="$!date.format('yyyy-MM-dd ',$!tradeOrdersQueryInDTO.createEnd )"
+									class="wid_135 hei_30 input_Style2" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});" />
+                            </li>
+							<li class="wid_260" style="display:none;" >
+                                <span class="font_wid">订单状态：</span>
+                                <input type="text" class="input_Style2 wid_160" name="state" id="state" value="$!pageState" />
+                                <input type="text" class="input_Style2 wid_160" name="approveStatus" value="$!approveStatus" />
+								<input type="hidden" name="page" value="$!pager.page">
+								<input type="hidden" name="shipmentType" id="shipmentType" value="">
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="right_top_r">
+                        <button type="button" onclick="submitGoodsForm();" class="button_4 but_cx2">
+                            <a class="font_1c hei_24">搜  索</a>
+                        </button>
+                    </div>
+                </div>
+               </form>
+					<!-- 搜索条件end -->
+
+                <div id="right_bot" class="right_bot">
+					<!-- 商品列表开头 -->
+					<div class="right_xinxi mar_l14">
+						<ul class="list_top bg_08 font_14b mar_b10">
+							<li class="wid_300 font_cen hei_40">商品信息</li>
+							<li class="wid_90 font_cen hei_40">单价</li>
+							<li class="wid_110 font_cen hei_40">数量</li>
+							<li class="wid_80 font_cen hei_40">售后服务</li>
+							<li class="wid_60 font_cen hei_40">总金额</li>
+							<li class="wid_110 font_cen hei_40">审核状态</li>
+							<li class="wid_80 font_cen hei_40">收货人</li>
+							<li class="wid_120 font_cen hei_40">操作</li>
+						</ul>
+						#if($!pager.records.size() == 0)
+								<p class="hei_40 mar_20 font_cen" >没有搜索到该信息&nbsp;</p>
+						#end
+						#foreach($entity in $pager.records)
+						<div class="mar_b10">
+							<ul class="list_top bg_08 font_14b mar_b10 border">
+								<li class="wid_300 hei_40 mar_20">
+									<a href="$request.getContextPath()/order/queryOrderInfoBuyer?orderId=$!entity.orderId&&approve=true&passKey=$!entity.passKey" target="_blank">订单号： $!entity.orderId</a>
+								</li>
+								<li class="wid_220 hei_40">下单时间：$!date.format('yyyy-MM-dd HH:mm:ss ',$!entity.createTime )</li>
+								<li class="wid_180 hei_40 over_ell">
+								#foreach($json in $!jsonArray)
+									#if($!entity.orderId == $!json.orderId)
+										<a href="$request.getContextPath()/shopItemListIndexController/toIndex?shopId=$!json.shopId" target="_blank" title="$!json.shopName">$!json.shopName</a>
+
+									#end
+								#end
+								</li>
+							</ul>
+
+							<table class="information" id="information">
+								<tr>
+									<td class="wid_410 border-1 orderItems_js">
+										#set($count=0)    
+										#foreach($entityItem in $!entity.items)
+											#set($count=$count+1)
+											#foreach($json in $!jsonArray)
+												#if($!entity.orderId == $!json.orderId)
+													#foreach($jsonItem in $!json.items)
+														#if($!entityItem.skuId == $!jsonItem.skuId)
+										<ul class="Refund_one #if($count<$!entity.items.size()) border-6 #end" style="width:580px">
+											<li class="wid_300">
+												<a href="$request.getContextPath()/productController/details?id=$!entityItem.itemId&skuId=$!entityItem.skuId" target="_blank">
+													<img class="fl mar_l10 skuPicUrl_js" src="$!imageServerAddr$!jsonItem.skuPicUrl" name="" width="82" height="82" />
+												</a>
+												<div class="fl wid_200 baobei_container">
+                                                   <div class="fl wid_200 baobei_name">
+    													<p class="mar_l10 itemName_js" title="$!jsonItem.itemName">
+															<a href="$request.getContextPath()/productController/details?id=$!entityItem.itemId&skuId=$!entityItem.skuId" target="_blank">
+    														#set($str=$!jsonItem.itemName)
+                                                               #if($str.length()>40)
+                                                                   #set($str=$str.substring(0,40))
+                                                                   $str ...
+                                                               #else
+                                                                 $!jsonItem.itemName
+															   #end
+                                                            </a>
+    														<br/>
+    													</p>
+    												</div>
+													<div class="fl wid_200 baobei_spec">
+    													<p class="mar_l10 itemName_js" title="$!jsonItem.itemAttrTitle">
+    														#foreach($itemAttrName in $!jsonItem.itemAttr)
+                                                        		<span style="margin-right:5px">
+                                                				    $itemAttrName.name :
+                                                				#foreach($itemAttrValue in $itemAttrName.values)
+                                                					$itemAttrValue.name 
+    															#end
+    															</span>
+                                                			#end
+    													</p>
+    												</div>
+##													<p class="mar_l10 itemName_js" title="$!jsonItem.itemName">
+##														<a href="$request.getContextPath()/productController/details?id=$!entityItem.itemId&skuId=$!entityItem.skuId" target="_blank">
+##															#set($str=$!jsonItem.itemName)
+##															#if($str.length()>10)
+##																#set($str=$str.substring(0,10))
+##																$str ...
+##															#else
+##																$!jsonItem.itemName
+##															#end
+##
+##														</a>
+##													</p>
+												</div>
+											</li>
+											<li class="wid_90 font_cen font_e3 hei_80 payPrice_js">￥$!jsonItem.payPrice</li>
+											<li class="wid_100 font_cen font_e3 hei_80 num_js">$!jsonItem.num</li>
+											<li class="wid_80 font_cen font_e3 hei_80 payPrice_js" style="overflow:hidden">
+		        								#if($jsonItem.afterService == '1'||!$jsonItem.afterService )无
+	        									#elseif ($jsonItem.afterService == '2' )是
+	        									#elseif ($jsonItem.afterService == '3' )完成
+	        									#else &nbsp;
+		        								#end
+											</li>
+											</ul>
+														#end
+													#end
+												#end
+											#end
+										#end
+									</td>
+									<td class="wid_60 border-1 font_cen">
+										<span class="hei_30 font_e3">￥$entity.paymentPrice</span>
+									</td>
+									<td class="wid_110 border-1 font_cen">
+									#if($entity.approveStatus=='0')
+										待审核
+									#elseif
+										($entity.approveStatus=='1')
+										审核通过
+									#elseif 
+										($entity.approveStatus=='2')
+										<font  class="cursor" color="#F00"  title="点击此处查看驳回原因" onclick="showDiv('rejectReasonId','$!entity.rejectReason')">审核驳回</font>
+										#end
+									</td>
+									<td class="wid_90 border-1 font_cen">
+										$!entity.name
+									</td>
+									<td class="wid_130 border-1 font_cen">
+									#if($!entity.locked == 1)
+										<a class="font_1c cursor" href="$request.getContextPath()/order/queryOrderInfoBuyer?orderId=$!entity.orderId&&approve=true&passKey=$!entity.passKey" target="_blank">订单详情</a><br/>
+										#if("$!{status}"!="")  <!-- 待审核 -->
+										<a class="font_1c cursor" onclick="approveSubmit('$entity.orderId','1','$entity.parentOrderId');">审核通过</a><br/>
+										<a class="font_1c cursor" onclick="approveReject('$entity.orderId','2')">审核驳回</a><br/>
+										#end
+									#else
+										<span>订单已被冻结</span><br/>
+									#end
+									</td>
+								</tr>
+							</table>
+						</div>
+						#end
+						<div class="clear"></div>
+						<!--分页开始 -->
+			            #pageVelocity($pager)<!--分页结束 -->
+					</div>
+				</div>
+
+				<!--循环列表end-->
+					</div>
+				</div>
+			</div><!-- tab页签开始 -->
+<div class="clear"></div>
+</div>
+<!--id="right" end-->
+</div>
+<!--输入支付密码   开始-->
+<div id="addCartBomb" class="po_fai" style="display: none;">
+    <div class="po_fai_bg"></div>
+    <div class="po_main" style="width:420px;margin-left: -210px; margin-top: -100px;">
+		<ul>
+	    	<li class="font_18">
+	    		<span class="title">支付密码：</span>
+				<input type="hidden" id="refund" value="" />
+				<input type="hidden" id="orderId_pay" value="" />
+				<input type="password" name="paypwd" id="paypwd" class="input_Style2 wid_180" value="" />
+	    	</li>
+	    	<li class="font_fe font_14b">请收到货后，再确认收货！否则您可能钱货两空！</li>
+	        <li class="msg font_14" id="payerror" style="color: red;"></li>
+	        <li>
+        		<button type="button" style="width: 85px; margin-right: 20px;" class="button_1 hei_40" onclick="confirmReceipt();">
+					提交
+        		</button>
+				<button type="button" style="width: 85px;" class="button_3 hei_40" onclick="closeBomb();" style="margin-right: 10px;">
+        			取消
+        		</button>
+        		#if($!isHavePayPassword == 0)
+        			<span class="font_12" style="margin-right: -50px;">尚未设置密码？<a style="color: blue;" href="$request.contextPath/security/setpaypwdpage?backUrl=/order/queryBuyer">去设置</a></span>
+        		#else
+        			<span class="font_12" style="margin-right: -50px;">忘记支付密码？<a style="color: blue;" href="$request.contextPath/security/findpaypwdpage?backUrl=/order/queryBuyer">去设置</a></span>
+        		#end
+	        </li>
+    	</ul>
+	</div>
+</div>
+<!--输入支付密码   结束-->
+<!--选择商品，申请退款   开始 -->
+<div class="po_fai js_choice" style="display:none">
+	<div class="po_fai_bg"></div>
+	<div class="po_main0 pad_t10" id="boxContent">
+
+	</div>
+</div>
+<!--选择商品，申请退款   结束-->
+<!-- 物流信息 开始-->
+<div class="po_fai moban js_logistics" style="display:none">
+    <div class="po_fai_bg"></div>
+    <div class="po_main">
+    	<div class="hei_32 bg_05 pad_l10 "><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor js_logistics_cancle"></i>物流信息</div>
+        <input type="hidden" id="logistics_orderId" value=""/>
+		<dl class="wid_500 hei_40 mar_t20 po_re" >
+			<dt class="fl hei_30 wid_90 font_right">物流编号：</dt>
+			<dd class="fl">
+				<input type="text" class="input_Style2 hei_30 mar_l10" readonly="readonly" id="logisticsNo" onkeyup="this.value=this.value.replace(/\D/g,'')"/>
+			</dd>
+		</dl>
+		<dl  class="wid_500 hei_100 mar_t20  po_re">
+			<dt class="fl hei_30 wid_90 font_right" >备注：</dt>
+			<dd class="fl">
+				<textarea  class="input_Style2 wid_350 hei_60 mar_l10" readonly="readonly"  id="logisticsCompany" maxlength="300" 
+					rows="4" /></textarea>
+			</dd>				
+		</dl>
+		<div class=" mar_tb10 mar_r20 font_cen">
+			<button class="button_5 hei_30 mar_l10 demo-icons js_logistics_cancle"><a href="#">关闭</a></button>
+		</div>
+    </div>
+</div>
+<!-- 物流信息 end -->
+<!-- 弹出层  -->
+<div class="po_fai moban" style="display:none" id = "rejectDiv" >
+<div class="po_fai_bg"></div>
+<div class="po_main">
+	<dl  class="wid_500 hei_100 mar_t20  po_re">
+		<dt class="fl wid_90 add_sell font_7a font_right cursor">驳回原因：</dt>
+		<dd class="fl"><textarea  class="input_Style2 wid_350 hei_90 mar_l10" style="resize: none;" maxlength="150" id="reasonId"/></textarea></dd>				
+		<input type="hidden"  id="orderId" />
+		<input type="hidden"  id="status" />
+	</dl>
+	<div class=" mar_tb10 mar_r20 font_cen">
+		<button id="submitActionButton" type="button" class="button_1 hei_35 mar_t10" onclick="actionSet()">确定</button>
+		<button type="button" class="button_1 hei_35 mar_t10" onclick="hideSetDiv()">取消</button>
+	</div>
+  	</div>
+</div>
+
+<!-- 弹出层  -->
+<div class="po_fai moban" style="display:none" id = "rejectReasonId" >
+<div class="po_fai_bg"></div>
+<div class="po_main">
+	<dl  class="wid_500 hei_100 mar_t20  po_re">
+		<dt class="fl wid_90 add_sell font_7a font_right cursor">驳回原因：</dt>
+		<dd class="fl"><textarea  class="input_Style2 wid_350 hei_90 mar_l10" style="resize: none;" readonly="readonly"  id="contentId"/></textarea></dd>				
+		<input type="hidden"  id="orderId" />
+		<input type="hidden"  id="status" />
+	</dl>
+	<div class=" mar_tb10 mar_r20 font_cen">
+	<button type="button" class="button_1 hei_35 mar_t10" onclick="hideDiv()">取消</button>
+</div>
+  	</div>
+</div>

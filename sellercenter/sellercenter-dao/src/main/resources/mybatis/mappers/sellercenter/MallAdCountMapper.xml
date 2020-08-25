@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.sellercenter.dao.MallAdCountDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="mallAdCountMap" type="com.camelot.sellercenter.malladvertise.dto.MallAdCountDTO">
+		<result property="id" column="id"/>
+		<result property="mallAdId" column="mall_ad_id"/>
+		<result property="tableType" column="table_type"/>
+		<result property="adCount" column="ad_count"/>
+		<result property="clickDate" column="click_date"/>
+	</resultMap>
+	
+	<resultMap id="mallAdReportMap" type="com.camelot.sellercenter.malladvertise.dto.AdReportOutDto">
+		<result property="id" column="id"/>
+		<result property="mallAdId" column="mall_ad_id"/>
+		<result property="adCount"  column="ad_count"/>
+		<result property="clickDate" column="dated"/>
+		<result property="mallAdName" column="title"/>
+		<result property="mallAdType" column="ad_type"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,mall_ad_id
+ 			,table_type
+ 			,ad_count
+ 			,click_date
+		FROM 
+		mall_ad_count mall_ad_count_
+		]]>
+	</sql>
+	<!-- 分页查询广告点击量报表 -->
+	<select id="queryReportList" resultMap="mallAdReportMap" >
+		SELECT 
+			  t.dated,
+			  t.ad_title title,
+			  t.ad_type,
+			  IFNULL(c.ad_count, 0) ad_count 
+			FROM
+			  (SELECT 
+			    d.dated,
+			    a.id,
+			    a.ad_type,
+			    a.ad_title 
+			  FROM
+			    (SELECT 
+			      dated 
+			    FROM
+			      date_dic 
+			    WHERE 1=1
+			    <if test="entity.clickDateBegin != null  and entity.clickDateBegin !=''">
+					<![CDATA[ AND dated>=#{entity.clickDateBegin} ]]>
+				</if>
+				<if test="entity.clickDateEnd != null  and entity.clickDateEnd !=''">
+					<![CDATA[ AND dated<=#{entity.clickDateEnd} ]]>
+				</if>
+				<if test="entity.clickDate != null  and entity.clickDate !=''">
+					<![CDATA[ AND dated=#{entity.clickDate} ]]>
+				</if>
+			    ) d,
+			    (SELECT 
+			      id,
+			      ad_type,
+			      ad_title 
+			    FROM
+			      mall_advertise
+			      where 1=1
+			      <if test="entity.mallAdName != null  and entity.mallAdName !=''">
+					<![CDATA[ AND ad_title LIKE CONCAT('%',#{entity.mallAdName},'%') ]]>
+				 </if>
+				  <if test="entity.mallAdType != null  and entity.mallAdType !=''">
+					<![CDATA[ AND ad_type LIKE CONCAT('%',#{entity.mallAdType},'%') ]]>
+				 </if>
+			      ) a) t 
+			  LEFT JOIN 
+			    (SELECT 
+			      mall_ad_id,
+			      ad_count,
+			      DATE_FORMAT(click_date, '%Y%m%d') dated 
+			    FROM
+			      mall_ad_count 
+			    WHERE table_type = 1 
+			    	<if test="entity.clickDateBegin != null  and entity.clickDateBegin !=''">
+						<![CDATA[ AND DATE_FORMAT(click_date, '%Y%m%d')>=#{entity.clickDateBegin} ]]>
+					</if>
+					<if test="entity.clickDateEnd != null  and entity.clickDateEnd !=''">
+						<![CDATA[ AND DATE_FORMAT(click_date, '%Y%m%d')<=#{entity.clickDateEnd} ]]>
+					</if>
+					<if test="entity.clickDate != null  and entity.clickDate !=''">
+						<![CDATA[ AND DATE_FORMAT(click_date, '%Y%m%d')=#{entity.clickDate} ]]>
+					</if>
+			     ) c 
+			    ON t.dated = c.dated 
+			    AND t.id = c.mall_ad_id 
+			ORDER BY t.dated DESC,
+			  t.ad_type,
+			  ad_count DESC 
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	<sql id="where_fragement">
+		where 1=1 
+		<if test="entity!=null">
+			<if test="entity.ids != null">
+				<![CDATA[ and mall_ad_count_.id  in ]]>
+				<foreach collection="entity.ids" item="id" index="index"  open="(" close=")">  
+					#{id}
+				</foreach>
+			</if>
+			<if test="entity.mallAdId != null">
+				<![CDATA[ and mall_ad_count_.mall_ad_id =#{entity.mallAdId} ]]>
+			</if>
+			<if test="entity.tableType != null">
+				<![CDATA[ and mall_ad_count_.table_type =#{entity.tableType} ]]>
+			</if>
+			<if test="entity.adCountMin != null">
+				<![CDATA[ and mall_ad_count_.ad_count >=#{entity.adCountMin} ]]>
+			</if>
+			<if test="entity.adCountMax != null">
+				<![CDATA[ and mall_ad_count_.ad_count<=#{entity.adCountMax} ]]>
+			</if>
+			<if test="entity.clickDateBegin != null  and entity.clickDateBegin !=''">
+				<![CDATA[ and mall_ad_count_.click_date >DATE_FORMAT(#{entity.clickDateBegin},'%Y-%m-%d') ]]>
+			</if>
+			<if test="entity.clickDateEnd != null  and entity.clickDateEnd !=''">
+				<![CDATA[ and mall_ad_count_.click_date <DATE_FORMAT(#{entity.clickDateEnd},'%Y-%m-%d')]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+	<select id="queryById" resultMap="mallAdCountMap" >
+		<include refid="selectAllColumns"/> where mall_ad_count_.id=#{id} 
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="mallAdCountMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		mall_ad_count mall_ad_count_
+		<include refid="where_fragement" />
+	</select>
+	
+	<select id="queryReportCount" resultType="long">
+		SELECT count(1)
+			  FROM
+			    (SELECT 
+			      dated 
+			    FROM
+			      date_dic 
+			    WHERE 1=1
+			    <if test="entity.clickDateBegin != null  and entity.clickDateBegin !=''">
+					<![CDATA[ AND dated>=#{entity.clickDateBegin} ]]>
+				</if>
+				<if test="entity.clickDateEnd != null  and entity.clickDateEnd !=''">
+					<![CDATA[ AND dated<=#{entity.clickDateEnd} ]]>
+				</if>
+				<if test="entity.clickDate != null  and entity.clickDate !=''">
+					<![CDATA[ AND dated=#{entity.clickDate} ]]>
+				</if>
+			    ) d,
+			    (SELECT 
+			      id,
+			      ad_type,
+			      ad_title 
+			    FROM
+			      mall_advertise
+			      where 1=1
+			      <if test="entity.mallAdName != null  and entity.mallAdName !=''">
+					<![CDATA[ AND ad_title LIKE CONCAT('%',#{entity.mallAdName},'%') ]]>
+				 </if>
+				  <if test="entity.mallAdType != null  and entity.mallAdType !=''">
+					<![CDATA[ AND ad_type LIKE CONCAT('%',#{entity.mallAdType},'%') ]]>
+				 </if>
+			      ) a
+	</select>
+	
+	<!-- 分页查询轮播图点击量报表 -->
+	<select id="queryBannerReportList" resultMap="mallAdReportMap" >
+			SELECT 
+			  t.dated,
+			  t.title,
+			  IFNULL(c.ad_count, 0) ad_count 
+			FROM
+			  (SELECT 
+			    d.dated,
+			    a.id,
+			    a.title 
+			  FROM
+			    (SELECT 
+			      dated 
+			    FROM
+			      date_dic 
+			    WHERE 1=1
+			    <if test="entity.clickDateBegin != null  and entity.clickDateBegin !=''">
+					<![CDATA[ AND dated>=#{entity.clickDateBegin} ]]>
+				</if>
+				<if test="entity.clickDateEnd != null  and entity.clickDateEnd !=''">
+					<![CDATA[ AND dated<=#{entity.clickDateEnd} ]]>
+				</if>
+				<if test="entity.clickDate != null  and entity.clickDate !=''">
+					<![CDATA[ AND dated=#{entity.clickDate} ]]>
+				</if>
+			    ) d,
+			    (SELECT 
+			      id,
+			      title 
+			    FROM
+			      mall_banner
+			      where 1=1
+			      <if test="entity.mallAdName != null  and entity.mallAdName !=''">
+					<![CDATA[ AND title LIKE CONCAT('%',#{entity.mallAdName},'%') ]]>
+				 </if>
+			      ) a) t 
+			  LEFT JOIN 
+			    (SELECT 
+			      mall_ad_id,
+			      ad_count,
+			      DATE_FORMAT(click_date, '%Y%m%d') dated 
+			    FROM
+			      mall_ad_count 
+			    WHERE table_type = 2 
+			      <if test="entity.clickDateBegin != null  and entity.clickDateBegin !=''">
+						<![CDATA[ AND DATE_FORMAT(click_date, '%Y%m%d')>=#{entity.clickDateBegin} ]]>
+					</if>
+					<if test="entity.clickDateEnd != null  and entity.clickDateEnd !=''">
+						<![CDATA[ AND DATE_FORMAT(click_date, '%Y%m%d')<=#{entity.clickDateEnd} ]]>
+					</if>
+					<if test="entity.clickDate != null  and entity.clickDate !=''">
+						<![CDATA[ AND DATE_FORMAT(click_date, '%Y%m%d')=#{entity.clickDate} ]]>
+					</if>
+			      ) c 
+			    ON t.dated = c.dated 
+			    AND t.id = c.mall_ad_id 
+			ORDER BY t.dated DESC,
+			  ad_count DESC 
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryBannerReportCount" resultType="long">
+		SELECT count(1) 
+			  FROM
+			    (SELECT 
+			      dated 
+			    FROM
+			      date_dic 
+			    WHERE 1=1
+			    <if test="entity.clickDateBegin != null  and entity.clickDateBegin !=''">
+					<![CDATA[ AND dated>=#{entity.clickDateBegin} ]]>
+				</if>
+				<if test="entity.clickDateEnd != null  and entity.clickDateEnd !=''">
+					<![CDATA[ AND dated<=#{entity.clickDateEnd} ]]>
+				</if>
+				<if test="entity.clickDate != null  and entity.clickDate !=''">
+					<![CDATA[ AND dated=#{entity.clickDate} ]]>
+				</if>
+			    ) d,
+			    (SELECT 
+			      id,
+			      title 
+			    FROM
+			      mall_banner
+			      where 1=1
+			      <if test="entity.mallAdName != null  and entity.mallAdName !=''">
+					<![CDATA[ AND title LIKE CONCAT('%',#{entity.mallAdName},'%') ]]>
+				 </if>
+			      ) a
+	</select>
+	
+	
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="mallAdCount" useGeneratedKeys="true" keyProperty="id">
+		<![CDATA[
+		insert into mall_ad_count (
+		    	 mall_ad_id
+		    	 ,table_type
+		    	 ,click_date
+		   )values(
+		    	#{mallAdId}
+		    	,#{tableType}
+		    	,now()
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="mallAdCount">
+		<![CDATA[
+		update mall_ad_count set
+   			ad_count = ad_count+1
+   			,click_date =now()
+		 where id = #{id}
+		]]>
+	</update>
+</mapper>

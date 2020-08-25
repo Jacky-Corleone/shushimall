@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context-3.2.xsd"
+	default-lazy-init="true">
+	<bean id="freemarkerConfigurer"  name="freemarkerConfigurer" 
+     class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">  
+        <property name="templateLoaderPath" value="/" />  
+        <property name="defaultEncoding" value="UTF-8" />  
+        <property name="freemarkerSettings">  
+            <props>  
+                <prop key="template_update_delay">10</prop>  
+                <prop key="locale">zh_CN</prop>  
+                <prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop>  
+                <prop key="date_format">yyyy-MM-dd</prop>  
+                <prop key="number_format">#.##</prop>  
+                <prop key="tag_syntax">auto_detect</prop>  
+            </props>  
+        </property>  
+        <property name="freemarkerVariables">  
+          <map>  
+          	<!-- 文章列表标签 -->
+  			<entry key="cmsArticleListTag" value-ref="cmsArticleListTag" />  
+  			<!-- 相关文章标签 -->
+  			<entry key="cmsRelaArticleListTag" value-ref="cmsRelaArticleListTag" />
+  			<!-- 栏目列表标签 -->  
+  			<entry key="cmsCategoryListTag" value-ref="cmsCategoryListTag" />
+  			<!-- 图片列表标签 -->
+  			<entry key="cmsImageListTag" value-ref="cmsImageListTag" />
+  			<!-- 专题列表标签 -->
+  			<entry key="cmsSpecialListTag" value-ref="cmsSpecialListTag" />
+  			<!-- 站点详情标签 -->
+  			<entry key="cmsSiteDetail" value-ref="cmsSiteDetail" />
+  			   <!-- 文章列表标签 -->
+            <entry key="cmsArticleTagListTag" value-ref="cmsArticleTagListTag" />
+  			 
+  			    
+          </map>  
+        </property>  
+	</bean>  
+    <bean id="cmsArticleListTag" class="com.camelot.cms.tag.CmsArticleListTag" />  
+    <bean id="cmsRelaArticleListTag" class="com.camelot.cms.tag.CmsRelaArticleListTag" />  
+    <bean id="cmsCategoryListTag" class="com.camelot.cms.tag.CmsCategoryListTag" />  
+    <bean id="cmsImageListTag" class="com.camelot.cms.tag.CmsImageListTag" />  
+    <bean id="cmsSpecialListTag" class=" com.camelot.cms.tag.CmsSpecialListTag" />  
+    <bean id="cmsSiteDetail" class=" com.camelot.cms.tag.CmsSiteDetailTag" />  
+	<bean id="cmsArticleTagListTag" class="com.camelot.cms.tag.CmsArticleTagTag" />
+</beans>

@@ -1,0 +1,43 @@
+@charset "utf-8";
+
+
+/******商品搜索页面：筛选条件开始******/
+.search_condition {
+	margin-top: 10px;
+}
+/******商品搜索页面：筛选条件选中效果******/
+.search_condition_box .right_list .focusbg {
+	background-color:#e4261c;
+	color:#FFF;
+	width: auto;
+	height:22px;
+	line-height:22px;
+	cursor: pointer;
+	margin-top:7px;
+	padding:0px 2px;
+	text-align:center;
+}
+.search_condition_box .right_list li {
+	padding: 0 15px;
+	width:auto;
+}
+
+/******核对订单页面：配送方式-商城自提：选择城市下拉框******/
+
+.cle_con2 .cle_con2_dis2 .dis2_1 .city {
+    float: left;
+    width: 500px;
+    position: static;
+}
+
+/******商品详情页：购买商品列表******/
+.mid_font2 li, .mid_font3 li {
+    float: left;
+    height: 28px;
+    line-height: 28px;
+    min-width: 95px;
+    overflow: hidden;
+    padding-left: 5px;
+    text-align: left;
+    white-space: nowrap;
+}

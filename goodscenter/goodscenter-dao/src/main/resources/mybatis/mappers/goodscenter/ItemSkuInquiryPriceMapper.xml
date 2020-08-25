@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.goodscenter.dao.ItemSkuInquiryPriceDAO">
+	<resultMap id="itemSkuInquiryPriceMapper" type="com.camelot.goodscenter.dto.ItemSkuInquiryPriceDTO">
+			<result property="id" column="id" />
+			<result property="buyerId" column="buyer_id" />
+			<result property="sellerId" column="seller_id" />
+			<result property="shopId" column="shop_id" />
+			<result property="itemId" column="item_id" />
+			<result property="itemName" column="item_name" />
+			<result property="pictureUrl" column="picture_url" />
+			<result property="skuId" column="sku_id" />
+			<result property="inquiryQty" column="inquiry_qty" />
+			<result property="inquiryPrice" column="inquiry_price" />
+			<result property="inquiryRemark" column="inquiry_remark" />
+			<result property="startTime" column="start_time" />
+			<result property="endTime" column="end_time" />
+			<result property="comment" column="comment" />
+			<result property="created" column="created" />
+			<result property="modified" column="modified" />
+			<result property="email" column="email" />
+			<result property="cellphone" column="cellphone" />
+	</resultMap>
+	<sql id="where_all">
+	    item_sku_inquiry_price s
+		INNER JOIN item i ON i.item_id=s.item_id 
+	  where  1=1
+	   <if test="entity!=null">
+	      <if test="entity.id != null and entity.id != 0">
+	         and s.id=#{entity.id}
+	      </if>
+	      <if test="entity.sellerId != null and entity.sellerId != 0">
+	         and s.seller_id=#{entity.sellerId}
+	      </if>
+	      <if test="entity.buyerId != null and entity.buyerId != 0">
+	         and s.buyer_id=#{entity.buyerId}
+	      </if>
+	      <if test="entity.shopId != null and entity.shopId != 0">
+	         and s.shop_id=#{entity.shopId}
+	      </if>
+	      <if test="entity.itemId != null and entity.itemId != 0">
+	         and s.item_id=#{entity.itemId}
+	      </if>
+	      <if test="entity.itemName != null and entity.itemName != ''">
+	        and i.item_name=#{entity.itemName}
+	      </if>
+	      <if test="entity.skuId != null and entity.skuId != 0">
+	         and s.sku_id=#{entity.skuId}
+	      </if>
+	      <if test="entity.inquiryPrice != null and entity.inquiryPrice != 0">
+	         and s.inquiry_price=#{entity.inquiryPrice}
+	      </if>
+	      <if test="entity.inquiryRemark != null and entity.inquiryRemark != 0">
+	         and s.inquiry_remark=#{entity.inquiryRemark}
+	      </if>
+	      <if test="entity.startTime != null">
+	     	 <![CDATA[
+	     	 and DATE_FORMAT(s.created, '%Y-%m-%d') >=  DATE_FORMAT(#{entity.startTime}, '%Y-%m-%d')
+	      	]]>
+	      </if>
+	      <if test="entity.endTime != null">
+	      	<![CDATA[
+	      	and DATE_FORMAT(s.created, '%Y-%m-%d') <=  DATE_FORMAT(#{entity.endTime}, '%Y-%m-%d')	
+	      	]]>
+	      </if>
+	   </if>
+	</sql>
+	
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	
+	<select id="queryList" resultMap="itemSkuInquiryPriceMapper" >
+		SELECT s.* , i.item_name FROM 
+		<include refid="where_all"></include>
+		<include refid="pagination_tail"></include>
+		
+	</select>
+	<select id="queryCount" resultType="Long">
+	   select count(*) from 
+	   <include refid="where_all"></include>
+	</select>
+	
+	<select id="queryById" resultMap="itemSkuInquiryPriceMapper" >
+		select * from item_sku_inquiry_price
+		where id = #{id}
+	
+	</select>
+	
+	<select id="selectByIdsAndNumber" resultMap="itemSkuInquiryPriceMapper">
+	 <![CDATA[ 
+	  select * from item_sku_inquiry_price
+	  where buyer_id=#{dto.buyerId}
+	    and seller_id=#{dto.sellerId}
+	    and item_id=#{dto.itemId}
+	    and sku_id=#{dto.skuId}
+	    and DATE_FORMAT(start_time, '%Y-%m-%d') <=  DATE_FORMAT(NOW(), '%Y-%m-%d')
+	    and DATE_FORMAT(end_time, '%Y-%m-%d') >=  DATE_FORMAT(NOW(), '%Y-%m-%d')
+	  ]]>
+	</select>
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id">
+		insert into item_sku_inquiry_price(
+				buyer_id,
+				seller_id,
+				shop_id,
+				item_id,
+				sku_id,
+				inquiry_qty,
+				inquiry_price,
+				inquiry_remark,
+				start_time,
+				end_time,
+				comment,
+				created,
+				modified,
+				email,
+				cellphone
+		)values(
+				#{buyerId},
+				#{sellerId},
+				#{shopId},
+				#{itemId},
+				#{skuId},
+				#{inquiryQty},
+				#{inquiryPrice},
+				#{inquiryRemark},
+				#{startTime},
+				#{endTime},
+				#{comment},
+				now(),
+				now(),
+				#{email},
+			    #{cellphone}
+		)
+	</insert>
+	
+	<update id="updateBySelect" parameterType="com.camelot.goodscenter.dto.ItemSkuInquiryPriceDTO" >
+		update item_sku_inquiry_price set
+				inquiry_price = #{inquiryPrice},
+				inquiry_remark = #{inquiryRemark},
+				start_time = #{startTime},
+				end_time = #{endTime},
+				modified = now()
+		where id = #{id}
+	</update>
+
+</mapper>

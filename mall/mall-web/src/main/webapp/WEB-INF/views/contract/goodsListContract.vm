@@ -1,0 +1,292 @@
+#set($layout = "/none_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<link href="$staticPath/css/product.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$staticPath/js/tab.js"></script>
+<script type="text/javascript" src="$staticPath/js/all_classify.js"></script>
+<link type="text/css" href="$staticPath/css/basic.css" rel="stylesheet"/>
+<script type="text/javascript" src="$staticPath/js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="$staticPath/js/jquery.cookie.js"></script>
+<script type="text/javascript" src="$staticPath/js/xiaoguo.js"></script>
+<script type="text/javascript" src="$staticPath/js/js.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        // 搜索类型切换  宝贝/店铺
+        $(".mid_search .big_class span").click(function(){
+            $(".mid_search .big_class span").removeClass("focus_class font_ff");
+            $(this).addClass("focus_class font_ff");
+        });
+
+        // 搜索按钮事件添加
+        $(".mid_search .button_search").click(function(){
+            var flag = "$!flag";//标识位，区分是否是二手市场
+            if(flag && flag=='used'){
+                usedSearch();
+            }else{
+                wholeNewSearch();
+            }
+        });
+
+        $("#keyword_searchForm").keydown(function(e){
+            if(e.keyCode==13){
+                $(".mid_search .button_search").trigger("click");
+            }
+        });
+
+        $(".Nav_classify").load("$request.contextPath/allCategory");
+
+        $("[module='$!module']").addClass("first_current");
+
+        $.getJSON("$request.contextPath/mallWord",function(data){
+            $(data).each(function(i,obj){
+                $(".mid_search .Tag").append('<a href="#"><span class="mall_word">'+obj.word+'</span></a>');
+            });
+
+            $(".mall_word").bind("click",function(){
+                var word = $(this).html();
+                $("#keyword_searchForm").val(word);
+                wholeNewSearch();
+            });
+        });
+
+    });
+    function top_banner(){
+        $("#top_banner").slideUp("slow");
+    }
+
+    // 搜索全新商品
+    function wholeNewSearch(){
+        var type = $(".mid_search .big_class").find(".focus_class").attr("type");
+        var keyword = $.trim($("#keyword_searchForm").val());
+        if( keyword != null && keyword != "" ){
+            if(type=="g"){
+                //商品搜索
+                location.href="$request.getContextPath()/contractController/searchItem?keyword="+keyword;
+            }else if(type=="s"){
+                //店铺搜索
+                location.href="$request.getContextPath()/contractController/searchItem?keyword="+keyword;
+            }
+            $("#searchForm").submit();
+        }
+    }
+
+    // 搜索二手商品
+    function usedSearch(){
+        var keyword = $.trim($("#keyword_searchForm").val());
+        if( keyword != null && keyword != "" ){
+            location.href="$request.getContextPath()/usedMarket?keyword="+keyword;
+        }
+    }
+</script>
+<style type="text/css">
+
+    .anniu{ z-index: 5;}
+    .left{ left: 10px;}
+    .right{ right: 10px;}
+</style>
+<script type="text/javascript">
+    function choseCategory(cid){
+        location.href="$request.contextPath/goodsListContract?cid="+cid
+    }
+    function topage(page){
+        var form = document.getElementById("categoryItemsForm");
+        form.page.value=page;
+        form.submit();
+    }
+    $(document).ready(function(){
+        var cid = "$!cid";
+        $("#categoryItemsForm").attr("action","$request.contextPath/goodsListContract?cid=" + cid );
+
+        var ids = cid.split(":");
+        for(var i=0; i<ids.length; i++){
+            var id = ids[i];
+            if( i == 0 ){
+                $(".myTab0_Content"+id).show();
+                $("[cid='" + id + "']").addClass("active");
+            }else if( i== 2 || ids.length < 3 ){
+                $("[cid='" + id + "']").parent().find("li").removeClass("font_fe font_14b");
+                $("[cid='" + id + "']").addClass("font_fe font_14b");
+            }
+        }
+
+
+
+
+        var nTabWidth = $(".nTab").width();
+        var ulWidth = 0;
+        $("#myTab0 li").each(function(i,obj){
+            ulWidth += ( $(obj).width() + 6 );
+        });
+        if( ulWidth > nTabWidth ){
+            $(".fa-caret-left,.fa-caret-right").show();
+        }else{
+            $(".fa-caret-left,.fa-caret-right").hide();
+        }
+
+        var wid = $('#myTab0 li:first').outerWidth(true), step = 1, timer;
+        $('.fa-caret-right').bind('click',function(){ play(true) });
+        $('.fa-caret-left').bind('click',function(){ play(false) });
+
+        $('.TabTitle').hover(function(){
+            clearInterval( timer );
+        })
+
+        function play( flag ){
+            if(!$('#myTab0').is(':animated')){
+                var dir = flag?-1:1, objli;
+                if( flag ){
+                    objli= $('#myTab0 li').slice(0,step);
+                    objli.clone().appendTo($('#myTab0'));
+                }else{
+                    objli = $('#myTab0 li').slice(-step);
+                    objli.clone().prependTo($('#myTab0'));
+                    $('#myTab0').css({marginLeft:-wid});
+                }
+                $('#myTab0').animate({marginLeft:'+='+wid*dir},500,function(){
+                    if(flag){
+                        $('#myTab0').css({marginLeft:0});
+                    }
+                    objli.remove();
+                })
+            }
+        }
+
+    });
+
+
+    function onReturn(itemId, itemName, itemName2, itemName3){
+        window.opener.goodsDetailInfo(itemId, itemName, itemName2, itemName3);
+        window.close();
+
+    }
+
+</script>
+<div id="top_banner" class="top_banner" style="display: none;">
+    <div class="top_img  po_re">
+        <a class="adVisitCount" href="javascript:void(0);" target="_blank">
+            <img src="" width="1200" height="80"/>
+        </a>
+        <i class="fa-times-circle po_ab font_ff font_16 cancel" style="cursor: pointer;" onclick="top_banner()"></i>
+    </div>
+</div>
+<div class="clear"></div>
+<div id="header">
+    <div class="left_img">
+        <a href="$request.contextPath/">
+            <img id="logo" src="$!imageServerAddr$!{logoDTO.picUrl}" style="width:227px; height: 90px;"/>
+        </a>
+    </div>
+
+    <div class="mid_search">
+        <div class="big_class">
+                <span type="g" class="focus_class font_ff pointer">宝贝</span>
+        </div>
+        <!--(输入框和搜索按钮)-->
+        <div class="search po_re">
+            <input name="keyword" id="keyword_searchForm" type="text" class="search_input wid_460" placeholder="请输入要搜索的信息"/>
+            <button type="button" class="button_search wid_80 po_ab pa_01 pointer js_search" style="outline: none;">
+                #if(!$flag || $flag != 'used')
+                    搜 索
+                #else
+                    搜 二 手
+                #end
+            </button>
+        </div>
+        <!--search po_re end (输入框和搜索按钮)-->
+
+        <!--（中间搜索框下的标签）-->
+        <div class="Tag"></div>
+        <!--Tag（中间搜索框下的标签） end-->
+
+    </div>
+    <!--mid_search (包着中间搜索的框)end-->
+
+    <div class="right_img">
+        <!-- 每一个所占div-->
+        <div class="per_one">
+            <span class="Service"></span>诚信保障
+        </div>
+        <!-- 每一个所占div-->
+        <div class="per_one">
+            <span class="approve"></span>企业认证
+        </div>
+        <!-- 每一个所占div-->
+        <div class="per_one">
+            <span class="safety"></span>安全交易
+        </div><!--header end -->
+    </div><!--right_img end-->
+</div>
+<!--头部结束-->
+
+<!-- 中间内容 -->
+<div id="content">
+    <div class="nTab box-shadow1">
+        <!-- 标题开始 -->
+        <div class="TabTitle po_re">
+            <ul id="myTab0">
+                <i class="fa-caret-left po_ab pa_00 font_18"></i>
+                <i class="fa-caret-right po_ab pa_01 font_18"></i>
+            </ul>
+        </div>
+
+        <div class="TabContent">
+			#foreach($category in $categories)
+                <div class="myTab0_Content$!category.categoryCid" style="display: none; border-top: 1px solid #e8e8e8;">
+					#foreach($cate in $category.children)
+                        <div class="search_condition_box">
+                            <div class="left_class bl cursor" onclick="choseCategory('$category.categoryCid:$cate.categoryCid')" cid="$cate.categoryCid">
+								$cate.categoryCName
+                            </div>
+                            <div class="right_list" style="min-height: 35px;">
+                                <ul>
+									#foreach($c in $cate.children)
+                                        <li onclick="choseCategory('$category.categoryCid:$cate.categoryCid:$c.categoryCid')" cid="$c.categoryCid">
+											$c.categoryCName
+                                        </li>
+									#end
+                                </ul>
+                            </div>
+                        </div>
+					#end
+                </div>
+			#end
+        </div>
+
+        <!--下面产品循环 start -->
+        <div class="Search_list">
+			#foreach( $item in $itemSkus )
+                <!--每个产品的div开始-->
+                <div class="Product_box" style="height: 340px; margin-bottom: 20px;">
+                    <div class="Product_box_1">
+                        <div class="big_img">
+                            <!--	<a href="$request.contextPath/productController/categoryItemDetail?itemId=$item.itemId">-->
+                            <a href="javascript:void(0)" onclick="onReturn($item.itemId,'$item.itemName', '箱', '台');">
+                                <img src="$!imageServerAddr$!item.pictureUrl" style="width: 210px;height: 260px; margin-top: 4px;"/>
+                            </a>
+                        </div>
+                        <div class="n_font">
+                            <!--	<a href="$request.contextPath/productController/categoryItemDetail?itemId=$item.itemId">-->
+                            <a href="javascript:void(0)" onclick="onReturn($item.itemId,'$item.itemName', '箱', '台');">
+								$!item.itemName
+                            </a>
+                        </div>
+                        <!--
+							<div class="jiaqian font_14b font_fe">$!item.marketPrice</div>
+							<div class="pingfen">
+								<span class="star sa5"></span>
+								<a href="#" style="float:left;color:#005AA0">已有2202人评价</a>
+							</div>
+							-->
+                    </div>
+                </div>
+                <!--每个产品的div结束-->
+			#end
+        </div><!--Search_list end -->
+
+
+        <form id="categoryItemsForm"  method="post">
+            <input name="page" type="hidden">
+        </form>
+        <!-- 分页 -->
+        #pageVelocity($pager)
+    </div>
+</div><!-- 中间内容 end -->

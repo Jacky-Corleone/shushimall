@@ -1,0 +1,96 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<style type="text/css"> 
+</style>
+<script type="text/javascript">
+//到指定的分页页面
+	function topage(page){
+		$("input[name='page']").val(page);
+		$("#queryForm").submit();
+	}
+$(function(){
+//加载左侧导航
+	$("#leftSeller").load("$request.contextPath/leftSeller");
+	$("#applyNew").css('display','none');
+});
+//退出保障
+function outProtectPlan(id){
+	if(confirm("确定退出服务保障？")){
+    	$("#outProtect").css('display','none');
+    	$("#out").append("<button  type='button' id='applyProtect' class='button_1 hei_35' onclick='applyProtect();'>点击申请</button>");
+		$.ajax({
+			url:'$request.contextPath/sellcenter/service/applicationHandle',
+			type:'post',
+			dataType:'json',
+			data:{
+				"ruleId":id
+			},
+			success:function(result){
+				alert(result.messager);
+				window.location.reload(true);
+//				window.location.href="$request.contextPath/sellcenter/service/initProtecList";
+			}
+		});
+	}
+}
+//点击申请
+function applyProtect(id){
+	if(confirm("确定要申请该服务规则？")){
+		window.location.href="$request.contextPath/sellcenter/service/applyService?ruleId="+id;
+	}
+}
+</script>
+
+<!--头部开始-->
+<div id="main">
+<!--中间部分开始-->
+<div id="leftSeller" class="border-4"></div>
+<!--右边部分开始-->
+<div id="right">
+      <div class="Info border-4">
+      <h3 class="pad_l10">服务认证</h3>
+      <ul id="tab">
+      <!--每一块信息 开始 -->
+	  <form action="$request.contextPath/sellcenter/service/initProtecList" method="post" id="queryForm">
+	   <input type="hidden" name="page" id="page" value="$!pager.page" />
+      </form>
+	  #foreach($platformServiceRuleDTO in $pager.records)
+		#set ($obj = '1')
+		#foreach($userPlatformServiceRuleDTO in $userPlatformServiceRuleDTO)
+			#if(${platformServiceRuleDTO.ruleId} == ${userPlatformServiceRuleDTO.ruleId})
+				#set($obj=$userPlatformServiceRuleDTO)
+			#end
+		#end	
+          	<li class="border-5">
+                <div class="Info-left">
+                  <img src="$!imageServerAddr${platformServiceRuleDTO.iconImageSrc}" width="77" height="77"/>
+    			  ##如果该用户下有该服务规则，设置状态为已加入
+					<ul >
+                        <li class="Info-conent font_14b">$!{platformServiceRuleDTO.ruleName}</li>
+                        <li class="Info-conent">状态：#if($obj == '1') 未加入 #else 已加入 | 加入时间：$!date.format('yyyy-MM-dd HH:mm:ss',$obj.createTime)  #end</li>
+						<li class="Info-conent">简介：$!{platformServiceRuleDTO.simpleIntro}</li>	
+                      </ul> 
+                  </div><!--team-2 end-->
+                 <!-- 右侧按钮 start-->
+                  <div class="Info-right" id="out">
+					#if($obj == '1')
+					<button  type="button" id="applyProtect" class="button_1 hei_35" onclick="applyProtect('${platformServiceRuleDTO.ruleId}');">点击申请</button>
+    				#else
+                    <button  type="button" id="outProtect" class="button_3 hei_35 " style="padding:0px 20px;" onclick="outProtectPlan('${platformServiceRuleDTO.ruleId}');">退出保障计划</button>
+					#end
+				  </div> 
+                <!-- 右侧按钮 end-->
+            </li>
+			
+		  #end
+      <!--每一块信息 结束-->
+      </ul>
+	  
+   <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->
+ #pageVelocity($pager)
+</div>
+</div>
+
+

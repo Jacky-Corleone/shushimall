@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.storecenter.dao.ShopFreightTemplateDAO">
+  <resultMap id="shopFreightTemplateDTO" type="com.camelot.storecenter.dto.ShopFreightTemplateDTO">
+    <id column="id"  property="id" />
+    <result column="template_name"  property="templateName" />
+    <result column="province_id"  property="provinceId" />
+    <result column="city_id"  property="cityId" />
+    <result column="county_id"  property="countyId" />
+    <result column="address_details"  property="addressDetails" />
+    <result column="delivery_time"  property="deliveryTime" />
+    <result column="postage_free"  property="postageFree" />
+    <result column="delivery_type"  property="deliveryType" />
+    <result column="valuation_way"  property="valuationWay" />
+    <result column="shop_id"  property="shopId" />
+    <result column="seller_id"  property="sellerId" />
+    <result column="create_time"  property="createTime" />
+    <result column="update_time"  property="updateTime" />
+    <result column="del_state"  property="delState"/>
+  </resultMap>
+  <!-- =========================================================== -->
+  <!-- 一些公共变量设置                                                                                                                                                                             -->
+  <!-- =========================================================== -->
+  <!-- mysql 分页 -->
+  <sql id="pagination_tail">
+    limit #{page.pageOffset} , #{page.rows}
+  </sql>
+
+  <!-- mysql 查询总数 -->
+  <sql id="count_Tail">
+    select count(1) from
+  </sql>
+  <!--where条件-->
+  <sql id="where_shopFerightTemplateAll">
+    where 1=1
+    <if test="entity!=null">
+      <if test="entity.id != null  and entity.id !=''">
+        <![CDATA[ and id  = #{entity.id} ]]>
+      </if>
+      <if test="entity.templateName != null  and entity.templateName !=''">
+        <![CDATA[ and template_name  like CONCAT('%','${entity.templateName}','%' ) ]]>
+      </if>
+       <if test="entity.deliveryTime != null  and entity.deliveryTime !=''">
+      <![CDATA[ and delivery_time  = #{entity.deliveryTime} ]]>
+    </if>
+      <if test="entity.postageFree != null  and entity.postageFree !=''">
+      <![CDATA[ and postage_free  = #{entity.postageFree} ]]>
+    </if>
+      <if test="entity.deliveryType != null  and entity.deliveryType !=''">
+      <![CDATA[ and delivery_type  = #{entity.deliveryType} ]]>
+    </if>
+      <if test="entity.valuationWay != null  and entity.valuationWay !=''">
+      <![CDATA[ and valuation_way  = #{entity.valuationWay} ]]>
+    </if>
+      <if test="entity.shopId != null  and entity.shopId !=''">
+        <![CDATA[ and shop_id  = #{entity.shopId} ]]>
+      </if>
+      <if test="entity.sellerId != null  and entity.sellerId !=''">
+        <![CDATA[ and seller_id  = #{entity.sellerId} ]]>
+      </if>
+      <if test="entity.createTime != null  and entity.createTime !=''">
+        <![CDATA[ and create_time  = #{entity.createTime} ]]>
+      </if>
+      <if test="entity.updateTime != null  and entity.updateTime !=''">
+        <![CDATA[ and update_time  = #{entity.updateTime} ]]>
+      </if>
+      <if test="entity.delState != null  and entity.delState !=''">
+        <![CDATA[ and del_state  = #{entity.delState} ]]>
+      </if>
+    </if>
+    ORDER BY id DESC
+  </sql>
+
+  <sql id="Base_Column_List">
+    select id, template_name, province_id, city_id, county_id, address_details, delivery_time,
+    postage_free,del_state, delivery_type, valuation_way, shop_id, seller_id, create_time, update_time from shop_freight_template
+  </sql>
+
+  <select id="selectById" parameterType="java.lang.Long" resultMap="shopFreightTemplateDTO">
+    <include refid="Base_Column_List" />
+    where id = #{id}
+  </select>
+
+  <select id="selectListByCondition" resultMap="shopFreightTemplateDTO">
+    <include refid="Base_Column_List" />
+    <include refid="where_shopFerightTemplateAll"/>
+    <if test="page!=null">
+      <include refid="pagination_tail"/>
+    </if>
+  </select>
+
+  <select id="selectCountByCondition" resultType="long">
+    <include refid="count_Tail" />
+    shop_freight_template
+    <include refid="where_shopFerightTemplateAll" />
+  </select>
+
+  <delete id="delete">
+    delete from shop_freight_template
+    where id = #{id}
+  </delete>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    insert into shop_freight_template (template_name, province_id,
+      city_id, county_id, address_details, 
+      delivery_time, postage_free, delivery_type, 
+      valuation_way, shop_id, seller_id, 
+      create_time, update_time,del_state)
+    values (#{templateName}, #{provinceId},
+      #{cityId}, #{countyId}, #{addressDetails}, 
+      #{deliveryTime}, #{postageFree}, #{deliveryType}, 
+      #{valuationWay}, #{shopId}, #{sellerId}, 
+      now(), #{updateTime},#{delState})
+  </insert>
+
+  <update id="update">
+    update shop_freight_template
+    <set>
+      <if test="templateName != null">
+        template_name = #{templateName},
+      </if>
+      <if test="provinceId != null">
+        province_id = #{provinceId},
+      </if>
+      <if test="cityId != null">
+        city_id = #{cityId},
+      </if>
+      <if test="countyId != null">
+        county_id = #{countyId},
+      </if>
+      <if test="addressDetails != null">
+        address_details = #{addressDetails},
+      </if>
+      <if test="deliveryTime != null">
+        delivery_time = #{deliveryTime},
+      </if>
+      <if test="postageFree != null">
+        postage_free = #{postageFree},
+      </if>
+      <if test="deliveryType != null">
+        delivery_type = #{deliveryType},
+      </if>
+      <if test="valuationWay != null">
+        valuation_way = #{valuationWay},
+      </if>
+      <if test="shopId != null">
+        shop_id = #{shopId},
+      </if>
+      <if test="sellerId != null">
+        seller_id = #{sellerId},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime},
+      </if>
+      <if test="delState != null">
+        del_state = #{delState},
+      </if>
+    </set>
+    where id = #{id}
+  </update>
+</mapper>

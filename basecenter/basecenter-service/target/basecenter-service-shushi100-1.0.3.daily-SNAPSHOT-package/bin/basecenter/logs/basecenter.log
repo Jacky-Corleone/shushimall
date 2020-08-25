@@ -1,0 +1,417 @@
+2016-04-02 03:21:01,274 INFO  org.apache.zookeeper.ClientCnxn.run:1083 - Client session timed out, have not heard from server in 21611804ms for sessionid 0x153b7da133d01ad, closing socket connection and attempting reconnect
+2016-04-02 03:21:16,664 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 03:21:37,670 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 03:21:38,847 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 03:21:59,842 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 03:22:01,605 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 03:22:22,605 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 03:22:24,152 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 07:59:47,506 INFO  org.apache.zookeeper.ClientCnxn.run:1083 - Client session timed out, have not heard from server in 16644801ms for sessionid 0x153b7da133d01ad, closing socket connection and attempting reconnect
+2016-04-02 07:59:51,191 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:00:12,188 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:00:19,752 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:00:40,843 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:00:42,085 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:01:03,083 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:01:04,212 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:01:25,211 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:01:26,704 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:01:47,707 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:01:49,207 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:02:10,210 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:02:11,362 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:02:32,362 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:02:33,510 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:02:54,518 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:02:56,082 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:03:17,086 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:03:18,422 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:03:39,442 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:03:41,189 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:04:02,190 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:04:03,706 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:04:24,705 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:04:26,375 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:04:47,375 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:04:48,926 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:05:09,934 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:05:11,938 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:05:32,945 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:05:34,302 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:05:55,305 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:05:56,818 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:06:17,826 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:06:19,204 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:06:40,202 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:06:42,136 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:07:03,133 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:07:05,121 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:07:26,126 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:07:27,395 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:07:48,393 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:07:50,067 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:08:11,065 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:08:12,792 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:08:33,792 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:08:35,033 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:08:56,041 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:08:57,976 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:09:18,975 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:09:20,566 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:09:41,567 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:09:43,639 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:10:04,640 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:10:06,559 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:10:27,556 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:10:29,517 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:10:50,587 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:10:51,819 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:11:12,824 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:11:14,054 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:11:35,055 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:11:36,325 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:11:57,319 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:11:58,779 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:12:19,780 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:12:21,813 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:12:42,814 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:12:43,971 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:13:04,972 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:13:06,522 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:13:27,529 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:13:28,978 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:13:49,974 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:13:51,269 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:14:12,269 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:14:13,571 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:14:34,639 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:14:36,561 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:14:57,554 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:14:59,461 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:15:20,461 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:15:21,740 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:15:42,744 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:15:44,309 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:16:05,328 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:16:07,233 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:16:28,240 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:16:30,027 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:16:51,029 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:16:52,788 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:17:13,793 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:17:15,745 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:17:36,748 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:17:38,356 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:17:59,370 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:18:00,799 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:18:21,808 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:18:23,346 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:18:44,342 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:18:46,412 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:19:07,420 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:19:09,152 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:19:30,161 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:19:32,209 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:19:53,203 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:19:54,322 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:20:15,323 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:20:17,273 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:20:38,282 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:20:39,844 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)
+2016-04-02 08:21:00,856 WARN  org.apache.zookeeper.ClientCnxn.run:1089 - Session 0x153b7da133d01ad for server null, unexpected error, closing socket connection and attempting reconnect
+java.net.ConnectException: Connection timed out: no further information
+	at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+	at sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source)
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350)
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1068)
+2016-04-02 08:21:02,231 INFO  org.apache.zookeeper.ClientCnxn.logStartConnect:966 - Opening socket connection to server 172.21.102.53/172.21.102.53:2181. Will not attempt to authenticate using SASL (unknown error)

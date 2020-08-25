@@ -1,0 +1,122 @@
+﻿#set($layout = "/none_layout.vm")
+<script type="text/javascript">
+//到指定的分页页面
+function topage(page){
+	$("#consultContent").load($("#contextPath").val()+"/productController/consult", {itemId: $("#itemId").val(),page: page});
+}
+//创建咨询
+function addConsult(obj){
+	$(obj).attr("disabled","disabled");
+	var consulting = $("#consulting").val();
+	if($.trim(consulting)==""){
+		$("#consult_error").html("");
+		$("#consult_error").html("咨询内容不能为空");
+		$(obj).removeAttr("disabled");
+		return;
+	}
+	$(obj).html("正在提交...");
+	var itemId = $("#itemId").val();
+	var sellerId = $("#sellerId").val();
+	$.ajax({
+	   type: "POST",
+	   dataType: "json",
+	   url: $("#contextPath").val()+"/productController/addConsult",
+	   data: {
+			itemId: itemId,
+			sellerId: sellerId,
+			consulting: consulting
+	   },
+	   success: function(data){
+			$("#consultContent").load($("#contextPath").val()+"/productController/consult", {itemId: $("#itemId").val()});
+	   }
+	});
+}
+function addConsulting(){
+	$("#publishConsult").show();
+}
+function hideConsulting(){
+	$("#publishConsult").hide();
+}
+</script>
+<div class="nTab">
+	<!-- 标题开始 -->
+	<div class="TabTitle" style="border:none;">
+	  <ul id="consult" style="width:100%;">
+		<li class="active" onclick="nTabs(this,0);">全部购买咨询</li>
+		<span class="button_small fr cursor" onclick="addConsulting();"><label for="consulting" class="cursor">发表咨询</label></span>
+	  </ul>
+	</div><!--TabTitle end -->
+	<!-- 内容开始 -->
+	<div class="TabContent">
+		<!-- 全部购买咨询 的内容开始 -->
+		<div id="consult_Content0">
+		  <!-- 每一行 循环dl 开始-->
+			<ul>
+				<!--每一组提问就一个LI 开始 -->
+				#foreach($entity in $consults)
+				<li class="border-5 mar_tb10">
+					<dl >
+						<dt >网　　友：</dt>
+						<dd >$!entity.buyerName</dd>
+					</dl>
+					<!-- 每一行 循环dl end-->
+					<!-- 每一行 循环dl 开始-->
+					<dl>
+						<dt >咨询内容：</dt>
+						<dd >$!entity.consulting</dd>
+					</dl>
+					<!-- 每一行 循环dl end-->
+					<!-- 每一行 循环dl 开始-->
+					#if($entity.reply)
+					<dl class="font_65">
+						<dt >商家回复：</dt>
+						<dd >
+							$!entity.reply
+							<span class="fr font_c7">$!date.format('yyyy-MM-dd HH:mm:ss ',$!entity.modified)</span>
+					   </dd>
+					</dl>
+					#end
+			  </li>
+			  #end
+			  <!--每一组提问就一个LI end -->
+			</ul>
+			<p><b>温馨提示</b>：因厂家更改产品包装、产地或者更换随机附件等没有任何提前通知，且每位咨询者购买情况、提问时间等不同，为此以下回复仅供参考！若由此给您带来不便请多多谅解，谢谢！</p>
+		</div>
+	 </div>
+</div>
+<!--分页-->
+#pageVelocity($pager)
+<!--分页end-->
+<!--咨询框开始----
+<div class="clear"></div>
+<div class="consult" id="consulting_content" style="display:none;">
+	<ul>
+		<li>
+			<strong class="fl" style="line-height:156px;">咨询内容：</strong>
+			<textarea style="resize: none; height:150px;" name="consulting" id="consulting" maxlength="500" class="input_Style2 fl wid_460"></textarea>
+		</li>
+		<div class="clear"></div>
+		<li>
+			<div style="width:470px;margin-left:60px;height:60px;">
+				<div class="fl" style="color:red;line-height:46px;" id="consult_error">最多输入300字</div>
+				<button type="button" class="fr button_2 hei_30 mar_tb10" onclick="addConsult(this);">提 交</button>
+            </div>
+		</li>
+	</ul>
+</div>
+ -->
+<!--以下为弹出层-->
+<div id="publishConsult" class="po_fai" style="display: none;">
+    <div class="po_fai_bg"></div>
+    <div class="po_main" style="width:400px; margin-left:-200px;z-index:100">
+		<div class="hei_32 bg_05 pad_l10 "><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor" onclick="hideConsulting();"></i>咨询内容</div>
+		<div class="mar_t10">
+			<textarea style="resize: none; height:150px;" name="consulting" id="consulting" maxlength="500" class="input_Style2 fl wid_390"></textarea>
+        </div>
+    	<div>
+			<div class="fl" style="color:red;line-height:46px;" id="consult_error">最多输入300字</div>
+			<button type="button" class="fr button_2 hei_30 mar_tb10" onclick="addConsult(this);">提 交</button>
+        </div>
+	</div>
+</div>
+<!--以上为弹出层-->

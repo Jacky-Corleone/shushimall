@@ -1,0 +1,39 @@
+#set($layout="common/order.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>审核订单提交</title>
+#parse("common/scriptAndCss.vm")
+<script type="text/javascript">
+</script>
+</head>
+<body>
+   <div  style="height: 80px;" class="bg_02 po_re">
+        
+    </div>
+	<!--包住整个页面的DIV id="content" start -->
+	<div id="main" class="bg_02 po_re">
+	
+	    <!--中间内容开始 -->
+	    <div class="content" id="wrapper">
+	        <div class="font_cen">
+		        #if( $executeResult.success )
+		            <p class="font_2_0">订单$!executeResult.result提交成功，需审核人员审核通过之后再付款！</p>
+		        #else
+		        	<p class="font_2_0">订单提交失败</p>
+		        	<span>
+						#foreach($msg in $executeResult.errorMessages)
+							<span style="margin-right: 8px;">$!msg</span>
+						#end
+					</span>
+		        #end
+	        </div>
+	        <div class="font_cen mar_t120">
+	          <a href="$request.contextPath/orderWx/queryApprove?approve=loadApprove">查看订单</a><span> | </span><a href="$request.contextPath/">继续购物</a>
+	        </div>
+	    </div> <!--中间内容 end -->
+	</div>
+	<!--包住整个页面的DIV id="content" end -->
+</body>
+</html>

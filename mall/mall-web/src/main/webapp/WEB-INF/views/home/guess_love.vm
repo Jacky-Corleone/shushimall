@@ -1,0 +1,21 @@
+#set($layout = "/none_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+#if($guessLovePage.records && $guessLovePage.records.size() > 0 )
+	<div class="recommended_service web_tran">
+		<ul class="clearfix">
+		 	#foreach($ad in $guessLovePage.records )
+		 		#if($velocityCount<4)
+			    	#if($velocityCount<3)
+				    	<li class="fl">
+				    		<a onclick="return adVisit('$!ad.id',1)" target="_blank" href="#if($!ad.adURL.indexOf('http://')==-1)http://#end$!ad.adURL"><img class="fadeInDown animated1s" width="392px" height="300px" src="$!imageServerAddr$!ad.adSrc"></a>
+				     	</li>
+			     	#else
+			     		<li class="fl" style="margin-right:0px">
+				    		<a onclick="return adVisit('$!ad.id',1)" target="_blank" href="#if($!ad.adURL.indexOf('http://')==-1)http://#end$!ad.adURL" ><img class="fadeInDown animated1s" width="392px" height="300px" src="$!imageServerAddr$!ad.adSrc"></a>
+				     	</li>
+			     	#end
+		     	#end
+		 	 #end
+		</ul>
+	</div>
+#end

@@ -1,0 +1,867 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" readonly="true" id="db531774-368f-4fb2-a9e6-aa38151ed8ca" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../camelot-common/common-core/common-core.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/compiler.xml" afterPath="$PROJECT_DIR$/.idea/compiler.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/encodings.xml" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__aopalliance_aopalliance_1_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__aopalliance_aopalliance_1_0.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__asm_asm_3_3_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__asm_asm_3_3_1.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__cglib_cglib_2_2_2.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__cglib_cglib_2_2_2.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_alibaba_dubbo_2_4_9.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_alibaba_dubbo_2_4_9.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_alibaba_fastjson_1_1_20.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_alibaba_fastjson_1_1_20.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_github_sgroschupf_zkclient_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_github_sgroschupf_zkclient_0_1.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_sun_mail_javax_mail_1_4_4.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_sun_mail_javax_mail_1_4_4.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_thoughtworks_xstream_xstream_1_4_2.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_thoughtworks_xstream_xstream_1_4_2.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_beanutils_commons_beanutils_1_8_3.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_beanutils_commons_beanutils_1_8_3.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_chain_commons_chain_1_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_chain_commons_chain_1_1.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_codec_commons_codec_1_2.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_codec_commons_codec_1_2.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_codec_commons_codec_1_5.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_codec_commons_codec_1_5.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_collections_commons_collections_3_2_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_collections_commons_collections_3_2_1.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_dbcp_commons_dbcp_1_3.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_dbcp_commons_dbcp_1_3.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_digester_commons_digester_1_8.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_digester_commons_digester_1_8.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_httpclient_commons_httpclient_3_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_httpclient_commons_httpclient_3_1.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_io_commons_io_2_4.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_io_commons_io_2_4.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_lang_commons_lang_2_6.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_lang_commons_lang_2_6.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_logging_commons_logging_1_0_4.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_logging_commons_logging_1_0_4.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_logging_commons_logging_1_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_logging_commons_logging_1_1.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_logging_commons_logging_1_1_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_logging_commons_logging_1_1_1.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_pool_commons_pool_1_5_4.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_pool_commons_pool_1_5_4.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_validator_commons_validator_1_3_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_validator_commons_validator_1_3_1.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__dom4j_dom4j_1_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__dom4j_dom4j_1_1.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__dom4j_dom4j_1_6_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__dom4j_dom4j_1_6_1.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__javax_activation_activation_1_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__javax_activation_activation_1_1.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__javax_servlet_servlet_api_2_5.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__javax_servlet_servlet_api_2_5.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__jline_jline_0_9_94.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__jline_jline_0_9_94.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__junit_junit_4_11.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__junit_junit_4_11.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__log4j_log4j_1_2_17.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__log4j_log4j_1_2_17.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__mysql_mysql_connector_java_5_1_25.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__mysql_mysql_connector_java_5_1_25.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_commons_commons_lang3_3_3.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_commons_commons_lang3_3_3.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_commons_commons_pool2_2_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_commons_commons_pool2_2_0.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_poi_poi_3_8.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_poi_poi_3_8.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_poi_poi_ooxml_3_8.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_poi_poi_ooxml_3_8.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_poi_poi_ooxml_schemas_3_8.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_poi_poi_ooxml_schemas_3_8.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_velocity_velocity_1_7.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_velocity_velocity_1_7.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_velocity_velocity_tools_2_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_velocity_velocity_tools_2_0.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_xmlbeans_xmlbeans_2_3_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_xmlbeans_xmlbeans_2_3_0.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_zookeeper_zookeeper_3_4_5.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_zookeeper_zookeeper_3_4_5.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_aspectj_aspectjweaver_1_7_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_aspectj_aspectjweaver_1_7_1.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_javassist_javassist_3_15_0_GA.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_javassist_javassist_3_15_0_GA.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jboss_netty_netty_3_2_5_Final.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_jboss_netty_netty_3_2_5_Final.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_mybatis_mybatis_3_1_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_mybatis_mybatis_3_1_1.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_mybatis_mybatis_spring_1_1_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_mybatis_mybatis_spring_1_1_1.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_slf4j_slf4j_api_1_7_2.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_slf4j_slf4j_api_1_7_2.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_slf4j_slf4j_log4j12_1_6_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_slf4j_slf4j_log4j12_1_6_1.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_aop_3_2_1_RELEASE.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_aop_3_2_1_RELEASE.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_beans_3_2_1_RELEASE.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_beans_3_2_1_RELEASE.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_context_3_2_1_RELEASE.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_context_3_2_1_RELEASE.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_context_support_3_2_1_RELEASE.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_context_support_3_2_1_RELEASE.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_core_3_2_1_RELEASE.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_core_3_2_1_RELEASE.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_expression_3_2_1_RELEASE.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_expression_3_2_1_RELEASE.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_jdbc_3_1_1_RELEASE.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_jdbc_3_1_1_RELEASE.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_tx_3_2_1_RELEASE.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_tx_3_2_1_RELEASE.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_web_3_2_1_RELEASE.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_web_3_2_1_RELEASE.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_webmvc_3_2_1_RELEASE.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_webmvc_3_2_1_RELEASE.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__oro_oro_2_0_8.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__oro_oro_2_0_8.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__redis_clients_jedis_2_5_2.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__redis_clients_jedis_2_5_2.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__xmlpull_xmlpull_1_1_3_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__xmlpull_xmlpull_1_1_3_1.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__xpp3_xpp3_min_1_1_4c.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__xpp3_xpp3_min_1_1_4c.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/basecenter-common/basecenter-common.iml" afterPath="$PROJECT_DIR$/basecenter-common/basecenter-common.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/basecenter-common/pom.xml" afterPath="$PROJECT_DIR$/basecenter-common/pom.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/basecenter-dao/basecenter-dao.iml" afterPath="$PROJECT_DIR$/basecenter-dao/basecenter-dao.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/basecenter-domain/basecenter-domain.iml" afterPath="$PROJECT_DIR$/basecenter-domain/basecenter-domain.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/basecenter-export/basecenter-export.iml" afterPath="$PROJECT_DIR$/basecenter-export/basecenter-export.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/basecenter-parent/basecenter-parent.iml" afterPath="$PROJECT_DIR$/basecenter-parent/basecenter-parent.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/basecenter-parent/pom.xml" afterPath="$PROJECT_DIR$/basecenter-parent/pom.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/basecenter-rpc/basecenter-rpc.iml" afterPath="$PROJECT_DIR$/basecenter-rpc/basecenter-rpc.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/basecenter-service/basecenter-service.iml" afterPath="$PROJECT_DIR$/basecenter-service/basecenter-service.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/basecenter-service/pom.xml" afterPath="$PROJECT_DIR$/basecenter-service/pom.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/basecenter-service/src/main/resources/spring_service/basecenter/spring-basecenter-provider.xml" afterPath="$PROJECT_DIR$/basecenter-service/src/main/resources/spring_service/basecenter/spring-basecenter-provider.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/basecenter-web/basecenter-web.iml" afterPath="$PROJECT_DIR$/basecenter-web/basecenter-web.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/basecenter.iml" afterPath="$PROJECT_DIR$/basecenter.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../goodscenter/goodscenter-common/goodscenter-common.iml" afterPath="$PROJECT_DIR$/../goodscenter/goodscenter-common/goodscenter-common.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../goodscenter/goodscenter-dao/.classpath" afterPath="$PROJECT_DIR$/../goodscenter/goodscenter-dao/.classpath" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../goodscenter/goodscenter-dao/goodscenter-dao.iml" afterPath="$PROJECT_DIR$/../goodscenter/goodscenter-dao/goodscenter-dao.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../goodscenter/goodscenter-domain/.classpath" afterPath="$PROJECT_DIR$/../goodscenter/goodscenter-domain/.classpath" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../goodscenter/goodscenter-domain/goodscenter-domain.iml" afterPath="$PROJECT_DIR$/../goodscenter/goodscenter-domain/goodscenter-domain.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../goodscenter/goodscenter-export/.classpath" afterPath="$PROJECT_DIR$/../goodscenter/goodscenter-export/.classpath" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../goodscenter/goodscenter-export/goodscenter-export.iml" afterPath="$PROJECT_DIR$/../goodscenter/goodscenter-export/goodscenter-export.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../goodscenter/goodscenter-parent/goodscenter-parent.iml" afterPath="$PROJECT_DIR$/../goodscenter/goodscenter-parent/goodscenter-parent.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../goodscenter/goodscenter-rpc/.classpath" afterPath="$PROJECT_DIR$/../goodscenter/goodscenter-rpc/.classpath" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../goodscenter/goodscenter-rpc/goodscenter-rpc.iml" afterPath="$PROJECT_DIR$/../goodscenter/goodscenter-rpc/goodscenter-rpc.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../goodscenter/goodscenter-service/.classpath" afterPath="$PROJECT_DIR$/../goodscenter/goodscenter-service/.classpath" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../goodscenter/goodscenter-service/goodscenter-service.iml" afterPath="$PROJECT_DIR$/../goodscenter/goodscenter-service/goodscenter-service.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../goodscenter/goodscenter-web/.classpath" afterPath="$PROJECT_DIR$/../goodscenter/goodscenter-web/.classpath" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../goodscenter/goodscenter-web/.settings/org.eclipse.core.resources.prefs" afterPath="$PROJECT_DIR$/../goodscenter/goodscenter-web/.settings/org.eclipse.core.resources.prefs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../goodscenter/goodscenter-web/goodscenter-web.iml" afterPath="$PROJECT_DIR$/../goodscenter/goodscenter-web/goodscenter-web.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../goodscenter/goodscenter.iml" afterPath="$PROJECT_DIR$/../goodscenter/goodscenter.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../mallwx/mallwx-web/mallwx-web.iml" afterPath="$PROJECT_DIR$/../mallwx/mallwx-web/mallwx-web.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../mallwx/mallwx.iml" afterPath="$PROJECT_DIR$/../mallwx/mallwx.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../tradecenter/tradecenter-common/tradecenter-common.iml" afterPath="$PROJECT_DIR$/../tradecenter/tradecenter-common/tradecenter-common.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../tradecenter/tradecenter-dao/tradecenter-dao.iml" afterPath="$PROJECT_DIR$/../tradecenter/tradecenter-dao/tradecenter-dao.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../tradecenter/tradecenter-domain/tradecenter-domain.iml" afterPath="$PROJECT_DIR$/../tradecenter/tradecenter-domain/tradecenter-domain.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../tradecenter/tradecenter-parent/tradecenter-parent.iml" afterPath="$PROJECT_DIR$/../tradecenter/tradecenter-parent/tradecenter-parent.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../tradecenter/tradecenter-rpc/tradecenter-rpc.iml" afterPath="$PROJECT_DIR$/../tradecenter/tradecenter-rpc/tradecenter-rpc.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../tradecenter/tradecenter-service/tradecenter-service.iml" afterPath="$PROJECT_DIR$/../tradecenter/tradecenter-service/tradecenter-service.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../tradecenter/tradecenter-web/tradecenter-web.iml" afterPath="$PROJECT_DIR$/../tradecenter/tradecenter-web/tradecenter-web.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../tradecenter/tradecenter.iml" afterPath="$PROJECT_DIR$/../tradecenter/tradecenter.iml" />
+    </list>
+    <ignored path="$PROJECT_DIR$/basecenter-domain/target/" />
+    <ignored path="$PROJECT_DIR$/basecenter-web/target/" />
+    <ignored path="$PROJECT_DIR$/target/" />
+    <ignored path="$PROJECT_DIR$/../camelot-common/common-core/target/" />
+    <ignored path="$PROJECT_DIR$/basecenter-common/target/" />
+    <ignored path="$PROJECT_DIR$/basecenter-parent/target/" />
+    <ignored path="$PROJECT_DIR$/basecenter-rpc/target/" />
+    <ignored path="$PROJECT_DIR$/../camelot-common/target/" />
+    <ignored path="$PROJECT_DIR$/basecenter-dao/target/" />
+    <ignored path="$PROJECT_DIR$/basecenter-service/target/" />
+    <ignored path="$PROJECT_DIR$/basecenter-export/target/" />
+    <ignored path="$PROJECT_DIR$/../goodscenter/goodscenter-web/target/" />
+    <ignored path="$PROJECT_DIR$/../goodscenter/goodscenter-rpc/target/" />
+    <ignored path="$PROJECT_DIR$/../goodscenter/goodscenter-export/target/" />
+    <ignored path="$PROJECT_DIR$/../goodscenter/goodscenter-common/target/" />
+    <ignored path="$PROJECT_DIR$/../goodscenter/goodscenter-service/target/" />
+    <ignored path="$PROJECT_DIR$/../goodscenter/goodscenter-domain/target/" />
+    <ignored path="$PROJECT_DIR$/../goodscenter/goodscenter-dao/target/" />
+    <ignored path="$PROJECT_DIR$/../goodscenter/goodscenter-parent/target/" />
+    <ignored path="$PROJECT_DIR$/../goodscenter/target/" />
+    <ignored path="$PROJECT_DIR$/../tradecenter/tradecenter-domain/target/" />
+    <ignored path="$PROJECT_DIR$/../tradecenter/tradecenter-dao/target/" />
+    <ignored path="$PROJECT_DIR$/../tradecenter/target/" />
+    <ignored path="$PROJECT_DIR$/../tradecenter/tradecenter-rpc/target/" />
+    <ignored path="$PROJECT_DIR$/../tradecenter/tradecenter-web/target/" />
+    <ignored path="$PROJECT_DIR$/../tradecenter/tradecenter-service/target/" />
+    <ignored path="$PROJECT_DIR$/../tradecenter/tradecenter-export/target/" />
+    <ignored path="$PROJECT_DIR$/../tradecenter/tradecenter-parent/target/" />
+    <ignored path="$PROJECT_DIR$/../tradecenter/tradecenter-common/target/" />
+    <ignored path="$PROJECT_DIR$/../mallwx/mallwx-dao/target/" />
+    <ignored path="$PROJECT_DIR$/../mallwx/mallwx-domain/target/" />
+    <ignored path="$PROJECT_DIR$/../mallwx/mallwx-web/target/" />
+    <ignored path="$PROJECT_DIR$/../mallwx/mallwx-export/target/" />
+    <ignored path="$PROJECT_DIR$/../mallwx/mallwx-parent/target/" />
+    <ignored path="$PROJECT_DIR$/../mallwx/mallwx-rpc/target/" />
+    <ignored path="$PROJECT_DIR$/../mallwx/mallwx-common/target/" />
+    <ignored path="$PROJECT_DIR$/../mallwx/mallwx-service/target/" />
+    <ignored path="$PROJECT_DIR$/../mallwx/target/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="OrderWxController.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../mallwx/mallwx-web/src/main/java/com/camelot/mall/controller/OrderWxController.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="98054">
+              <caret line="4585" column="82" lean-forward="false" selection-start-line="4585" selection-start-column="82" selection-end-line="4585" selection-end-column="82" />
+              <folding>
+                <element signature="imports" expanded="false" />
+                <element signature="e#230293#230294#0" expanded="false" />
+                <element signature="e#230325#230326#0" expanded="false" />
+                <element signature="e#230578#230579#0" expanded="false" />
+                <element signature="e#230608#230609#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TradeOrderExportServiceImpl.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../tradecenter/tradecenter-service/src/main/java/com/camelot/tradecenter/service/impl/TradeOrderExportServiceImpl.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="10340">
+              <caret line="551" column="54" lean-forward="false" selection-start-line="551" selection-start-column="54" selection-end-line="551" selection-end-column="54" />
+              <folding>
+                <element signature="imports" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TradeOrdersDAO.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../tradecenter/tradecenter-dao/src/main/java/com/camelot/tradecenter/dao/TradeOrdersDAO.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="203">
+              <caret line="44" column="0" lean-forward="false" selection-start-line="44" selection-start-column="0" selection-end-line="44" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="tradeOrdersMapper.xml" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../tradecenter/tradecenter-dao/src/main/resources/mybatis/mappers/tradecenter/tradeOrdersMapper.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="93">
+              <caret line="639" column="4" lean-forward="true" selection-start-line="639" selection-start-column="4" selection-end-line="639" selection-end-column="4" />
+              <folding>
+                <marker date="1459137561667" expanded="true" signature="7916:7936" ph="select count... " />
+                <marker date="1459137561667" expanded="true" signature="7991:8040" ph="select * FRO... trade_orders" />
+                <marker date="1459137561667" expanded="true" signature="15420:15532" ph="DELETE FROM " />
+                <marker date="1459137561667" expanded="true" signature="15658:18137" ph="insert into trade_orders... " />
+                <marker date="1459137561667" expanded="true" signature="18264:21829" ph="update trade... " />
+                <marker date="1459137561667" expanded="true" signature="21909:21937" ph="SELECT get_o... " />
+                <marker date="1459137561667" expanded="true" signature="22047:22078" ph="select disti... " />
+                <marker date="1459137561667" expanded="true" signature="22285:22418" ph="select count... *" />
+                <marker date="1459137561667" expanded="true" signature="22312:22343" ph="select disti... " />
+                <marker date="1459137561667" expanded="true" signature="22520:22611" ph="select * fro... trade_orders" />
+                <marker date="1459137561667" expanded="true" signature="22668:23165" ph="update trade... " />
+                <marker date="1459137561667" expanded="true" signature="23238:23398" ph="update trade... " />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>退款</find>
+    </findStrings>
+  </component>
+  <component name="GradleLocalSettings">
+    <option name="externalProjectsViewState">
+      <projects_view />
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="E:/apache-maven-3.3.9" />
+        <option name="userSettingsFile" value="E:\apache-maven-3.3.9\conf\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="MavenProjectNavigator">
+    <treeState />
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="width" value="1366" />
+    <option name="height" value="728" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+          <State>
+            <id>Checkstyle</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>CheckStyle</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
+  </component>
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="PackagesPane" />
+      <pane id="Scratches" />
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="basecenter" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mallwx" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="basecenter" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mallwx" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mallwx-web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="basecenter" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mallwx" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mallwx-web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="basecenter" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mallwx" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mallwx-web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="basecenter" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mallwx" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mallwx-web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="basecenter" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mallwx" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mallwx-web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="controller" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="settings.editor.selected.configurable" value="vcs.Git" />
+    <property name="last_opened_file_path" value="E:/sofeware/Git/bin/git.exe" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
+      <module name="" />
+      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
+      <option name="PROGRAM_PARAMETERS" />
+      <predefined_log_file id="idea.log" enabled="true" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <module />
+      <method />
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <envs />
+      <patterns />
+      <method />
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+      <method />
+    </configuration>
+    <configuration default="true" type="TestNG" factoryName="TestNG">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SUITE_NAME" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="GROUP_NAME" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="OUTPUT_DIRECTORY" />
+      <option name="ANNOTATION_TYPE" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <option name="USE_DEFAULT_REPORTERS" value="false" />
+      <option name="PROPERTIES_FILE" />
+      <envs />
+      <properties />
+      <listeners />
+      <method />
+    </configuration>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false">
+    <option name="remove_strategy" value="false" />
+  </component>
+  <component name="SvnConfiguration" cleanupOnStartRun="true">
+    <configuration>C:\Users\jacky\AppData\Roaming\Subversion</configuration>
+    <supportedVersion>125</supportedVersion>
+  </component>
+  <component name="SvnFileUrlMappingImpl">
+    <option name="myMappingRoots">
+      <list>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\basecenter" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\basecenter" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\basecenter\.idea" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\basecenter\.idea" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\basecenter\basecenter-common" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\basecenter\basecenter-common" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\basecenter\basecenter-dao" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\basecenter\basecenter-dao" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\basecenter\basecenter-domain" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\basecenter\basecenter-domain" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\basecenter\basecenter-export" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\basecenter\basecenter-export" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\basecenter\basecenter-parent" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\basecenter\basecenter-parent" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\basecenter\basecenter-rpc" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\basecenter\basecenter-rpc" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\basecenter\basecenter-service" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\basecenter\basecenter-service" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\basecenter\basecenter-web" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\basecenter\basecenter-web" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\camelot-common" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\camelot-common" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\camelot-common\common-core" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\camelot-common\common-core" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\goodscenter" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\goodscenter" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\goodscenter\goodscenter-common" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\goodscenter\goodscenter-common" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\goodscenter\goodscenter-dao" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\goodscenter\goodscenter-dao" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\goodscenter\goodscenter-domain" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\goodscenter\goodscenter-domain" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\goodscenter\goodscenter-export" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\goodscenter\goodscenter-export" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\goodscenter\goodscenter-parent" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\goodscenter\goodscenter-parent" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\goodscenter\goodscenter-rpc" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\goodscenter\goodscenter-rpc" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\goodscenter\goodscenter-service" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\goodscenter\goodscenter-service" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\goodscenter\goodscenter-web" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\goodscenter\goodscenter-web" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\mallwx" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\mallwx" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\mallwx\mallwx-common" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\mallwx\mallwx-common" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\mallwx\mallwx-dao" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\mallwx\mallwx-dao" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\mallwx\mallwx-domain" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\mallwx\mallwx-domain" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\mallwx\mallwx-export" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\mallwx\mallwx-export" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\mallwx\mallwx-parent" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\mallwx\mallwx-parent" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\mallwx\mallwx-rpc" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\mallwx\mallwx-rpc" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\mallwx\mallwx-service" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\mallwx\mallwx-service" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\mallwx\mallwx-web" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\mallwx\mallwx-web" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\tradecenter" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\tradecenter" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\tradecenter\tradecenter-common" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\tradecenter\tradecenter-common" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\tradecenter\tradecenter-dao" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\tradecenter\tradecenter-dao" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\tradecenter\tradecenter-domain" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\tradecenter\tradecenter-domain" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\tradecenter\tradecenter-export" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\tradecenter\tradecenter-export" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\tradecenter\tradecenter-parent" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\tradecenter\tradecenter-parent" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\tradecenter\tradecenter-rpc" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\tradecenter\tradecenter-rpc" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\tradecenter\tradecenter-service" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\tradecenter\tradecenter-service" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\tradecenter\tradecenter-web" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\tradecenter\tradecenter-web" />
+        </SvnCopyRootSimple>
+      </list>
+    </option>
+    <option name="myMoreRealMappingRoots">
+      <list>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\basecenter" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\basecenter" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\camelot-common" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\camelot-common" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\goodscenter" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\goodscenter" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\mallwx" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\mallwx" />
+        </SvnCopyRootSimple>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\shuShi100DevCodeSvn\tradecenter" />
+          <option name="myCopyRoot" value="D:\shuShi100DevCodeSvn\tradecenter" />
+        </SvnCopyRootSimple>
+      </list>
+    </option>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="db531774-368f-4fb2-a9e6-aa38151ed8ca" name="Default" comment="" />
+      <created>1597372283752</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1597372283752</updated>
+      <workItem from="1597372289057" duration="1408000" />
+      <workItem from="1597374302112" duration="5212000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="6620000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="0" y="0" width="1366" height="728" extended-state="0" />
+    <layout>
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32864675" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32924962" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Spring" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="CheckStyle" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26110262" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="processedProjectFiles" value="true" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+    <watches-manager />
+  </component>
+  <component name="antWorkspaceConfiguration">
+    <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
+    <option name="FILTER_TARGETS" value="false" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/../mallwx/mallwx-web/src/main/java/com/camelot/mall/controller/OrderWxController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="100870">
+          <caret line="4585" column="82" lean-forward="false" selection-start-line="4585" selection-start-column="82" selection-end-line="4585" selection-end-column="82" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#230293#230294#0" expanded="false" />
+            <element signature="e#230325#230326#0" expanded="false" />
+            <element signature="e#230578#230579#0" expanded="false" />
+            <element signature="e#230608#230609#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../tradecenter/tradecenter-service/src/main/java/com/camelot/tradecenter/service/impl/TradeOrderExportServiceImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="12122">
+          <caret line="551" column="54" lean-forward="true" selection-start-line="551" selection-start-column="54" selection-end-line="551" selection-end-column="54" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../tradecenter/tradecenter-dao/src/main/java/com/camelot/tradecenter/dao/TradeOrdersDAO.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="792">
+          <caret line="44" column="0" lean-forward="true" selection-start-line="44" selection-start-column="0" selection-end-line="44" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../mallwx/mallwx-web/src/main/java/com/camelot/mall/controller/OrderWxController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="98054">
+          <caret line="4585" column="82" lean-forward="false" selection-start-line="4585" selection-start-column="82" selection-end-line="4585" selection-end-column="82" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#230293#230294#0" expanded="false" />
+            <element signature="e#230325#230326#0" expanded="false" />
+            <element signature="e#230578#230579#0" expanded="false" />
+            <element signature="e#230608#230609#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../tradecenter/tradecenter-service/src/main/java/com/camelot/tradecenter/service/impl/TradeOrderExportServiceImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="10340">
+          <caret line="551" column="54" lean-forward="false" selection-start-line="551" selection-start-column="54" selection-end-line="551" selection-end-column="54" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../tradecenter/tradecenter-dao/src/main/java/com/camelot/tradecenter/dao/TradeOrdersDAO.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="203">
+          <caret line="44" column="0" lean-forward="false" selection-start-line="44" selection-start-column="0" selection-end-line="44" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../tradecenter/tradecenter-dao/src/main/resources/mybatis/mappers/tradecenter/tradeOrdersMapper.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="93">
+          <caret line="639" column="4" lean-forward="true" selection-start-line="639" selection-start-column="4" selection-end-line="639" selection-end-column="4" />
+          <folding>
+            <marker date="1459137561667" expanded="true" signature="7916:7936" ph="select count... " />
+            <marker date="1459137561667" expanded="true" signature="7991:8040" ph="select * FRO... trade_orders" />
+            <marker date="1459137561667" expanded="true" signature="15420:15532" ph="DELETE FROM " />
+            <marker date="1459137561667" expanded="true" signature="15658:18137" ph="insert into trade_orders... " />
+            <marker date="1459137561667" expanded="true" signature="18264:21829" ph="update trade... " />
+            <marker date="1459137561667" expanded="true" signature="21909:21937" ph="SELECT get_o... " />
+            <marker date="1459137561667" expanded="true" signature="22047:22078" ph="select disti... " />
+            <marker date="1459137561667" expanded="true" signature="22285:22418" ph="select count... *" />
+            <marker date="1459137561667" expanded="true" signature="22312:22343" ph="select disti... " />
+            <marker date="1459137561667" expanded="true" signature="22520:22611" ph="select * fro... trade_orders" />
+            <marker date="1459137561667" expanded="true" signature="22668:23165" ph="update trade... " />
+            <marker date="1459137561667" expanded="true" signature="23238:23398" ph="update trade... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

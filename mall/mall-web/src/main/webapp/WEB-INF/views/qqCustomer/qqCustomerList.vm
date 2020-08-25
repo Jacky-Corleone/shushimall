@@ -1,0 +1,303 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<script type="text/javascript" src="$staticPath/js/common.js"></script>
+<!--头部开始-->
+<script type="text/javascript">
+    $(document).ready(function () {
+    	//加载左侧菜单
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+    });
+    
+  //复选框事件
+  //全选、取消全选的事件
+  function selectAll() {
+      if ($("#all_select").is(":checked")) {
+          $("input:checkbox[id='subCheck']").prop("checked", true);
+      } else {
+          $("input:checkbox[id='subCheck']").prop("checked", false);
+      }
+  }
+  
+  function modifyQQCustomer() {
+	    var a = $("input:checkbox[name='contractId']:checked");
+	    if (a.length == 0) {
+	        alert("请选择一个QQ客服进行修改");
+	        return;
+	    }
+	    if (a.length > 1) {
+	        alert("只能选择一个QQ客服进行修改");
+	        return;
+	    }
+	    var id = $(a[0]).val();
+	    var customerQqNumber = $(a).parent().parent().find("[name='customerQqNumber']")[0].title;
+	    var isDefault =$(a).parent().parent().find("[name='isDefault']")[0].title;
+	    $("#qq_cus").val(customerQqNumber);
+	    $("#qq_def").val(isDefault);
+	    
+	    $("#add_modify").find("[name='add_modify']").val('modify');
+	    $("#add_modify").find("[name='id']").val(id);
+	    //显示界面
+	    createLoadMask();
+        $("#modify_num_div").show();
+        document.body.style.overflow = "hidden";
+	}
+  
+  function deleteCoupons(){
+	  var a = $("input:checkbox[name='contractId']:checked");
+	  if (a.length == 0) {
+	        alert("请选择至少一个QQ客服");
+	        return;
+	  }
+	  
+ 	  if(confirm("确定删除所选QQ客服？")){
+ 		 var ids = '';
+ 		  $(a).each(function () {
+ 			  ids += $(this).val()+";";
+ 		  });
+ 		  window.location = $("#contextPath").val() + "/qqCustomer/qqCustomerDelete?ids=" + ids;
+	  }
+  }
+  
+  //子复选框的事件
+  function setSelectAll() {
+      //当没有选中某个子复选框时，SelectAll取消选中
+      if (!$("#subcheck").checked) {
+          $("#all_select").prop("checked", false);
+      }
+      var chsub = $("input:checkbox[id='subCheck']").length; //获取subcheck的个数
+      var checkedsub = $("input:checkbox[id='subCheck']:checked").length; //获取选中的subcheck的个数
+      if (checkedsub == chsub) {
+          $("#all_select").prop("checked", true);
+      }
+  }
+  
+    //分页
+    function topage(page) {
+        searchContractInfo(0,page);
+    }
+    
+    function searchContractInfo(e, page) {
+        var contractInfo = {};
+        contractInfo['customerQqNumber'] = $("#customerQqNumber").val();
+        if(!page){
+            page=1;
+        }
+        var contractSearchModel = JSON.stringify(contractInfo);
+        $.ajax({
+            url: $("#contextPath").val() + "/qqCustomer/qqCustomerList",
+            data: {
+                "contractSearchModel": contractSearchModel,
+                "sourcePage": $("#sourcePage").val(),
+                "page": page,
+            },
+            type: 'post',
+            dataType: 'html',
+            success: function (data) {
+                $("#contractList").html(data);
+            },
+        });
+    }
+    
+    
+    function createLoadMask() {
+        $("#loadMask").show();
+    }
+
+    function closeLoadMask() {
+        $("#loadMask").hide();
+    }
+    
+    function addQQCustomer(){
+    	$("#qq_cus").val('');
+	    $("#qq_def").val('0');
+	    $("#add_modify").find("[name='add_modify']").val('add');
+	    $("#add_modify").find("[name='id']").val('');
+    	createLoadMask();
+        $("#modify_num_div").show();
+        document.body.style.overflow = "hidden";
+    }
+    
+    function closeModifyNumDiv() {
+    	closeLoadMask();
+        $("#modify_num_div").hide();
+        document.body.style.overflow = "auto"; // 恢复页面滚动条
+        $("#qq_cus").val('');
+	    $("#qq_def").val('');
+	    $("#add_modify").find("[name='add_modify']").val('');
+	    $("#add_modify").find("[name='id']").val('');
+    }
+    
+    
+    
+    function modifyNum(){
+    	//设置按钮失效防止多次点击
+    	$(this).attr("disabled", true);
+    	
+    	var customerQqNumber = $("#qq_cus").val();
+    	var qqTest = /^[0-9]{5,10}$/;
+    	if(qqTest.test(customerQqNumber)){
+    		 var isDefault = $("#qq_def").val();
+		    var add_modify = $("#add_modify").find("[name='add_modify']").val();
+		    var id = $("#add_modify").find("[name='id']").val();
+	   		$.ajax({
+	   			type: "POST",
+	   			dataType: "json",
+	   			url: "$request.contextPath/qqCustomer/qqCustomerSave",
+	   			data: {
+	   				customerQqNumber: customerQqNumber,
+	   				isDefault : isDefault,
+	   				add_modify : add_modify,
+	   				id : id
+	   			},
+	   			success: function(data){
+	   				if(data.resultMessage == "修改成功" || data.resultMessage == "新增成功"){
+	   					alert(data.resultMessage);
+	   					closeModifyNumDiv();
+	   					window.location.href=window.location.href;
+	   				}else{
+	   					alert(data.resultMessage);
+	   				}
+	   			}
+	   		});
+    	}else{
+    		alert("客服账号只允许为数字组成.");
+    	}
+    }
+</script>
+<div id="main">
+	<!--left start -->
+	<div id="leftSeller">
+	</div>
+	<!--left end -->
+
+	<input id="contextPath" type="hidden" value="$request.contextPath">
+    <!--右边部分开始-->
+    <div id="right">
+        <div id="right_top" class="right_top border-4 bg_06">
+            <div class="right_top_l">
+                <ul class="list">
+                    <li class="wid_270">
+                        <span class="font_wid">客服QQ账号：</span>
+                        <input id="customerQqNumber" class="input_Style2 wid_150 hei_30" type="text"/>
+                    </li>
+                </ul>
+            </div>
+            <div class="right_top_r ">
+                <button type="button" class="button_4 but_cx3" onclick="searchContractInfo(0)">查 询</button>
+            </div>
+        </div>
+        <!-- 查询 结束 -->
+
+        <div class="right_bot border-4 mar_t10 bg_06">
+            <!-- 商品列表开头 -->
+            <div class="right_xinxi mar_l14">
+                <ul class="list_top bg_08 font_cen font_14b">
+                    <li class="wid_30 font_cen">
+                        <input type="checkbox" class="mar_l10 hei_22" id="all_select" onclick="selectAll()"/>
+                    </li>
+                    <li class="wid_160">客服QQ帐号</li>
+                    <li class="wid_160">默认客服</li>
+                    <li class="wid_250">创建时间</li>
+                    <li class="wid_250">最后修改时间</li>
+                </ul>
+                <ul class="right_select">
+                	<li>
+                        <button type="button" class="button_4 mar_l10 hei_24" onclick="addQQCustomer()">
+                        	新增
+                        </button>
+                    </li>
+                	<li>
+                        <button type="button" class="button_4 mar_l10 hei_24" onclick="modifyQQCustomer()">
+                                                        修改
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="button_4 mar_l10 hei_24" onclick="deleteCoupons()">
+                        	删除
+                        </button>
+                        <input type="hidden" id="isDef" value="$isDef"/>
+                    </li>
+                </ul>
+                <!-- 内容开始 -->
+                <div id="contractList">
+                #foreach($couponsInfo in $pager.records)
+                    <ul class="list_top hei_40">
+                        <li class="wid_30 over_ell font_cen">
+                        	<input type="checkbox" id="subCheck" onclick="setSelectAll()" name="contractId" value="$couponsInfo.id"/>
+                        </li>
+                        <li class="wid_160 over_ell font_cen" name="customerQqNumber" title="$!couponsInfo.customerQqNumber"><!-- 客服QQ帐号-->
+                        	$!couponsInfo.customerQqNumber
+                        </li>
+                        <!-- 是否为默认客服 -->
+                        <li class="wid_160 over_ell font_cen" name="isDefault" title="$!couponsInfo.isDefault">
+                        	#if($!couponsInfo.isDefault == '0')
+                              	  否
+                            #elseif($!couponsInfo.isDefault == '1')
+                           		  是
+                            #end
+                        </li>
+                        <li class="wid_250 over_ell font_cen" title="$!date.format('yyyy-MM-dd HH:mm:ss',$!couponsInfo.createDate)"><!-- 有效时间 -->
+                        	$!date.format('yyyy-MM-dd HH:mm:ss',$!couponsInfo.createDate)
+                        </li>
+                        <li class="wid_250 over_ell font_cen" title="$!date.format('yyyy-MM-dd HH:mm:ss',$!couponsInfo.lastUpdateDate)"><!-- 有效时间 -->
+                        	$!date.format('yyyy-MM-dd HH:mm:ss',$!couponsInfo.lastUpdateDate)
+                        </li>
+                    </ul>
+                       #end
+                        <!-- 分页 -->
+                    #pageVelocity($pager)
+                </div><!-- 内容结束 -->
+            </div>
+        </div>
+    </div><!-- 右侧内容结束 -->
+    
+    
+<!-- 新增或者修改客服隐藏页面 -->
+<div id="modify_num_div" class="po_fai" style="display:none;">
+    <!--弹出蒙版背景-->
+    <div class="po_main_Mess pad_t10" style="width:500px;overflow-y: auto;height:50%;">
+        <ul class="list_top hei_40" style="margin-top: 15%;">
+             <li class="wid_200 over_ell font_cen"><!-- 客服QQ帐号 -->
+             	客服QQ帐号
+             </li>
+             <li class="wid_200 over_ell font_cen" ><!-- 客服QQ帐号 -->
+             	<input type="text" id="qq_cus" class="wid_180 input_Style2 hei_30" value=""/>
+             </li>
+             <li class="wid_200 over_ell font_cen"><!-- 默认客服 -->
+             	默认客服
+             </li>
+             <li class="wid_200 over_ell font_cen"><!-- 默认客服 -->
+             	 <select id="qq_def" class="input_Style2 wid_180 mar_r10 hei_30">
+                     <option value="0">否</option>
+                     <option value="1">是</option>
+                 </select>
+             </li>
+             <li class="wid_180 over_ell font_cen">
+             	<form action="" id="add_modify">
+             		<input type="hidden" name="id" value=""/>
+             		<input type="hidden" name="add_modify" value=""/>
+             	</form>
+             </li>
+        </ul>
+        <div class="wid_200 mar_cen" style="padding-top:40px">
+      		客服QQ请点击 <a style="color:red" href="http://shang.qq.com/v3/widget.html " >立刻开通推广QQ</a>,进行开通QQ客服组件功能.
+        </div>
+        <div class="wid_200 mar_cen" style="position: absolute;bottom: 0;left:0;right:0;">
+            <button class="button_2 hei_35 " onclick="modifyNum(this)">
+                保存
+            </button>
+            <button class="button_3  hei_35" onclick="closeModifyNumDiv()">
+                关闭
+            </button>
+        </div>
+        <!-- 确认 取消 结束 -->
+    </div>
+    <!--po_main_Mess end-->
+</div>
+
+<!-- 背景蒙板 -->
+<div class="po_fai" id="loadMask" style="display: none">
+    <div class="po_fai_bg"></div>
+</div>
+    
+</div>

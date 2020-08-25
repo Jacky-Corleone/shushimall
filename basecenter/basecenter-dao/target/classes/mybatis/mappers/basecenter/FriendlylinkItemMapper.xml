@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.basecenter.dao.FriendlylinkItemDAO">
+	<resultMap id="BaseFriendlylinkItemMapper" type="com.camelot.basecenter.dto.FriendlylinkItemDTO">
+	        <result property="id" column="id" />
+			<result property="linkName" column="linkName" />
+			<result property="linkUrl" column="linkUrl" />
+			<result property="createTime" column="createTime"/>
+			<result property="updateTime" column="updateTime"/>
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		id, linkName, linkUrl ,createTime,updateTime  
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseFriendlylinkItemMapper" parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List" />
+		from friendlylink_item
+		where id = #{id,jdbcType=BIGINT}
+	</select>
+	
+	<select id="findByLinkUrl" resultMap="BaseFriendlylinkItemMapper" parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from friendlylink_item
+		ORDER BY updateTime DESC
+		where linkUrl = #{linkUrl,jdbcType=VARCHAR}
+	</select>
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		delete from friendlylink_item
+		where id = #{id,jdbcType=BIGINT}
+	</delete>
+	
+	<delete id="findByPrimaryKey" parameterType="java.lang.Long">
+		delete from friendlylink_item
+		where id = #{id,jdbcType=BIGINT}
+	</delete>
+	<select id="queryCount" resultType="long">
+		SELECT
+		  count(1)
+		from friendlylink_item
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- thinking -->
+	<sql id="tabName">
+		friendlylink_item
+	</sql>
+	<sql id="selectAllColumns">
+		SELECT
+		  id,
+		  linkUrl,
+		  linkName,
+		  createTime,
+		  updateTime 
+	</sql>
+	<insert id="addFriendlylinkItem">
+		insert into friendlylink_item(
+							linkName,
+							linkUrl,
+							createTime,
+							updateTime
+						   )values(
+						    #{linkName},
+						    #{linkUrl},
+						    now(),
+						    now()
+						   )
+	
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective">
+		update friendlylink_item
+		<set>
+			<if test="linkName != null">
+				linkName = #{linkName,jdbcType=VARCHAR},
+			</if>
+			<if test="linkUrl != null">
+				linkUrl = #{linkUrl,jdbcType=VARCHAR},
+			</if>
+			updateTime = now()
+		</set>
+		where id = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<sql id="where_fragement">
+		where 1 = 1
+	   <if test="entity.linkName!=null and entity.linkName!=''">
+	     and linkName = #{entity.linkName}
+	   </if>
+	   <if test="entity.linkUrl!=null and entity.linkUrl!=''">
+	     and linkUrl = #{entity.linkUrl}
+	   </if>
+	</sql>
+	
+	<!-- mysql 分页尾 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	
+	<!-- 查询 -->
+	
+	<select id="questyBaseFriendlylinkItemList" resultMap="BaseFriendlylinkItemMapper">
+		<include refid="selectAllColumns" />
+		from friendlylink_item
+		<include refid="where_fragement" />
+		ORDER BY updateTime DESC
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	<delete id="delete">
+	   <if test="entity != null">
+	      delete from friendlylink_item
+		  <include refid="where_fragement" />
+	   </if>
+	   and id = #{entity.id}
+	</delete>
+	
+	<select id="getUnSelectedItems" resultMap="BaseFriendlylinkItemMapper" parameterType="Long">
+		
+SELECT friendlylink_item.id,friendlylink_item.linkName,friendlylink_item.linkUrl
+		FROM 
+		friendlylink_item WHERE friendlylink_item.id NOT IN 
+		(SELECT friendlylink_page_item.`itemId` FROM friendlylink_page_item WHERE friendlylink_page_item.pageId =#{pageId})
+		ORDER BY updateTime DESC
+		<if test=" page != null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="getSelectedItems" resultMap="BaseFriendlylinkItemMapper" parameterType="Long">
+		SELECT friendlylink_item.id,friendlylink_item.linkName,friendlylink_item.linkUrl
+		FROM 
+		friendlylink_item JOIN friendlylink_page_item ON friendlylink_page_item.itemId = friendlylink_item.id 
+		AND friendlylink_page_item.pageId =#{pageId}
+		ORDER BY updateTime DESC
+		<if test=" page != null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+</mapper>

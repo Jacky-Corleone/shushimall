@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+
+	<!-- 积分配置 -->
+	<dubbo:reference id="integralConfigService" registry="qingdaoRegistry"
+			owner="camlot" interface="com.camelot.maketcenter.service.IntegralConfigExportService"
+			version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<!-- 优惠券 -->
+	<dubbo:reference id="couponsExportService" registry="qingdaoRegistry"
+			owner="camlot" interface="com.camelot.maketcenter.service.CouponsExportService"
+			version="1.0" protocol="dubbo" timeout="100000" init="true" />	
+	<!--集采-->
+	<dubbo:reference id="centralPurchasingExportServiceImpl" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.maketcenter.service.CentralPurchasingExportService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />	
+	<!--集采订单-->
+	<dubbo:reference id="centralPurchasingRefOrderExportService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.maketcenter.service.CentralPurchasingRefOrderExportService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+</beans>

@@ -1,0 +1,34 @@
+#set($assetsPath="$request.contextPath/assets")
+<link href="$assetsPath/css/Details.css" rel="stylesheet" type="text/css"/>
+ 
+<!--内容开始-->
+<div id="content">
+<!-- 	<div class="wid_10"> -->
+	 	<!-- 右侧开始-->
+<!-- 	 	<div id="right" class="hei_600"> -->
+	 		<!--搜索面包屑开始开始-->
+		  	<div class="breadcrumb">
+		  		<i class="fa-th-large demo-icons fl mar_r10 font_14"></i>
+	            <span class="fl"><a class="level" href="$request.contextPath/">首页</a></span>
+	            <i class="demo-icons fa-angle-right fl mar_lr20 font_20"></i>
+	            <span class="fl"><a class="level" href="$request.contextPath/notice/list"> 商城公告 </a></span>
+	        </div>
+	  		<!--搜索面包屑开始开始-->
+	  		
+	      	<!--文档内容开始-->
+	      	<div class="mar hei_600">
+	      		<!--标题start-->
+	         	<h3 class="font_cen font_16 border-5 hei_40 mar_b10">$notice.noticeTitle</h3>
+	         	#set($addr = 'src="' + $!imageServerAddr +"/")
+	         	#if($!notice.noticeContent)
+				#set($noticeContent = $!notice.noticeContent.replaceAll('src=&quot;/', $addr))
+				#end
+	         	<input id="contentxx" type="hidden" value='$!noticeContent'>
+	         	<script type="text/javascript">
+         			$("#contentxx").parent().append($("#contentxx").val());
+	         	</script>
+	      	</div>
+<!-- 	 	</div> -->
+	 	<!-- 右侧right结束-->
+<!-- 	</div> -->
+</div>

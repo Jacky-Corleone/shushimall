@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.settlecenter.dao.StatementDetailDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="settlementDetailMap" type="com.camelot.settlecenter.dto.SettlementDetailDTO">
+				<result property="id" column="id"/>
+				<result property="sellerId" column="seller_id"/>
+				<result property="shopId" column="shop_id"/>
+				<result property="settlementId" column="settlement_id"/>
+				<result property="paymentId" column="payment_id"/>
+				<result property="orderId" column="order_id"/>
+				<result property="refundId" column="refund_id"/>
+				<result property="orderPrice" column="order_price"/>
+				<result property="refundMoney" column="refund_money"/>
+				<result property="platformIncome" column="platform_income"/>
+				<result property="platformExpenditure" column="platform_expenditure"/>
+				<result property="sellerIncome" column="seller_income"/>
+				<result property="sellerExpenditure" column="seller_expenditure"/>
+				<result property="buyerIncome" column="buyer_income"/>
+				<result property="buyerExpenditure" column="buyer_expenditure"/>
+				<result property="commission" column="commission"/>
+				<result property="factorage" column="factorage"/>
+				<result property="sellerCashAccountIncome" column="seller_cash_account_income"/>
+				<result property="platformAccount" column="platform_account"/>
+				<result property="platformCommissionAccount" column="platform_commission_account"/>
+				<result property="sellerCashAccount" column="seller_cash_account"/>
+				<result property="sellerFrozenAccount" column="seller_frozen_account"/>
+				<result property="buyerPaymentAccount" column="buyer_payment_account"/>
+				<result property="paymentMethod" column="payment_method"/>
+				<result property="paymentResult" column="payment_result"/>
+				<result property="type" column="type"/>
+				<result property="status" column="status"/>
+				<result property="remark" column="remark"/>
+				<result property="created" column="created"/>
+				<result property="modified" column="modified"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,seller_id
+ 			,shop_id
+ 			,settlement_id
+ 			,payment_id
+ 			,order_id
+ 			,refund_id
+ 			,order_price
+ 			,refund_money
+ 			,platform_income
+ 			,platform_expenditure
+ 			,seller_income
+ 			,seller_expenditure
+ 			,buyer_income
+ 			,buyer_expenditure
+ 			,commission
+ 			,factorage
+ 			,seller_cash_account_income
+ 			,platform_account
+ 			,platform_commission_account
+ 			,seller_cash_account
+ 			,seller_frozen_account
+ 			,buyer_payment_account
+ 			,payment_method
+ 			,payment_result
+ 			,type
+ 			,status
+ 			,remark
+ 			,created
+ 			,modified
+		FROM 
+		settlement_detail settlement_detail_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.sellerId != null  and entity.sellerId !=''">
+				<![CDATA[ and settlement_detail_.seller_id  = #{entity.sellerId}]]>
+			</if>
+			<if test="entity.shopId != null  and entity.shopId !=''">
+				<![CDATA[ and settlement_detail_.shop_id  = #{entity.shopId}]]>
+			</if>
+			<if test="entity.settlementId != null">
+				<![CDATA[ and settlement_detail_.settlement_id  = #{entity.settlementId}]]>
+			</if>
+			<if test="entity.paymentId != null  and entity.paymentId !=''">
+				<![CDATA[ and settlement_detail_.payment_id  = #{entity.paymentId}]]>
+			</if>
+			<if test="entity.orderId != null  and entity.orderId !=''">
+				<![CDATA[ and settlement_detail_.order_id  = #{entity.orderId}]]>
+			</if>
+			<if test="entity.refundId != null  and entity.refundId !=''">
+				<![CDATA[ and settlement_detail_.refund_id  = #{entity.refundId}]]>
+			</if>
+			<if test="entity.platformAccount != null  and entity.platformAccount !=''">
+				<![CDATA[ and settlement_detail_.platform_account  = #{entity.platformAccount}]]>
+			</if>
+			<if test="entity.platformCommissionAccount != null  and entity.platformCommissionAccount !=''">
+				<![CDATA[ and settlement_detail_.platform_commission_account  = #{entity.platformCommissionAccount}]]>
+			</if>
+			<if test="entity.sellerCashAccount != null  and entity.sellerCashAccount !=''">
+				<![CDATA[ and settlement_detail_.seller_cash_account  = #{entity.sellerCashAccount}]]>
+			</if>
+			<if test="entity.sellerFrozenAccount != null  and entity.sellerFrozenAccount !=''">
+				<![CDATA[ and settlement_detail_.seller_frozen_account  = #{entity.sellerFrozenAccount}]]>
+			</if>
+			<if test="entity.buyerPaymentAccount != null  and entity.buyerPaymentAccount !=''">
+				<![CDATA[ and settlement_detail_.buyer_payment_account  = #{entity.buyerPaymentAccount}]]>
+			</if>
+			<if test="entity.paymentMethod != null  and entity.paymentMethod !=''">
+				<![CDATA[ and settlement_detail_.payment_method  = #{entity.paymentMethod}]]>
+			</if>
+			<if test="entity.type != null  and entity.type !=''">
+				<![CDATA[ and settlement_detail_.type  = #{entity.type}]]>
+			</if>
+			<if test="entity.status != null  and entity.status !=''">
+				<![CDATA[ and settlement_detail_.status  = #{entity.status}]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="settlementDetailMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where settlement_detail_.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="settlementDetailMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		settlement_detail settlement_detail_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="com.camelot.settlecenter.dto.SettlementDetailDTO">
+		<![CDATA[
+		insert into settlement_detail (
+		    	 seller_id
+		    	 ,shop_id
+		    	 ,settlement_id
+		    	 ,payment_id
+		    	 ,order_id
+		    	 ,refund_id
+		    	 ,order_price
+		    	 ,refund_money
+		    	 ,platform_income
+		    	 ,platform_expenditure
+		    	 ,seller_income
+		    	 ,seller_expenditure
+		    	 ,buyer_income
+		    	 ,buyer_expenditure
+		    	 ,commission
+		    	 ,factorage
+		    	 ,seller_cash_account_income
+		    	 ,platform_account
+		    	 ,platform_commission_account
+		    	 ,seller_cash_account
+		    	 ,seller_frozen_account
+		    	 ,buyer_payment_account
+		    	 ,payment_method
+		    	 ,payment_result
+		    	 ,type
+		    	 ,status
+		    	 ,remark
+		    	 ,created
+		   )values(
+		    	#{sellerId}
+		    	,#{shopId}
+		    	,#{settlementId}
+		    	,#{paymentId}
+		    	,#{orderId}
+		    	,#{refundId}
+		    	,#{orderPrice}
+		    	,#{refundMoney}
+		    	,#{platformIncome}
+		    	,#{platformExpenditure}
+		    	,#{sellerIncome}
+		    	,#{sellerExpenditure}
+		    	,#{buyerIncome}
+		    	,#{buyerExpenditure}
+		    	,#{commission}
+		    	,#{factorage}
+		    	,#{sellerCashAccountIncome}
+		    	,#{platformAccount}
+		    	,#{platformCommissionAccount}
+		    	,#{sellerCashAccount}
+		    	,#{sellerFrozenAccount}
+		    	,#{buyerPaymentAccount}
+		    	,#{paymentMethod}
+		    	,#{paymentResult}
+		    	,#{type}
+		    	,#{status}
+		    	,#{remark}
+		    	,now()
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.settlecenter.dto.SettlementDetailDTO">
+		update settlement_detail set modified = now()
+ 		<if test="settlementId != null">
+   			,settlement_id = #{settlementId}
+   		</if>
+ 		<if test="paymentId != null">
+   			,payment_id = #{paymentId}
+   		</if>
+ 		<if test="paymentResult != null and paymentResult !=''">
+   			,payment_result = #{paymentResult}
+   		</if>
+ 		<if test="factorage != null">
+   			,factorage = #{factorage}
+   		</if>
+ 		<if test="commission != null">
+   			,commission = #{commission}
+   		</if>
+ 		<if test="refundMoney != null">
+   			,refund_money = #{refundMoney}
+   		</if>
+ 		<if test="platformIncome != null">
+   			,platform_income = #{platformIncome}
+   		</if>
+ 		<if test="platformExpenditure != null">
+   			,platform_expenditure = #{platformExpenditure}
+   		</if>
+ 		<if test="sellerIncome != null">
+   			,seller_income = #{sellerIncome}
+   		</if>
+ 		<if test="sellerExpenditure != null">
+   			,seller_expenditure = #{sellerExpenditure}
+   		</if>
+ 		<if test="buyerIncome != null">
+   			,buyer_income = #{buyerIncome}
+   		</if>
+ 		<if test="buyerExpenditure != null">
+   			,buyer_expenditure = #{buyerExpenditure}
+   		</if>
+ 		<if test="sellerCashAccountIncome != null">
+   			,seller_cash_account_income = #{sellerCashAccountIncome}
+   		</if>
+   		
+ 		<if test="remark != null and remark !=''">
+   			,remark = #{remark}
+  		</if>
+		 where id = #{id}
+	</update>
+	
+	<update id="updateStatuBySettleId" parameterType="com.camelot.settlecenter.dto.SettlementDetailDTO">
+		update settlement_detail set modified = now()
+		<if test="type != null">
+   			,type = #{type}
+ 		</if>
+ 		<if test="status != null">
+ 			,status = #{status}
+ 		</if>
+		 where settlement_id = #{settlementId}
+	</update>
+	
+	<update id="updateByOrderId" parameterType="com.camelot.settlecenter.dto.SettlementDetailDTO">
+		update settlement_detail set modified = now()
+		<if test="status != null">
+			,status = #{status}
+		</if>
+		<if test="factorage != null">
+			,factorage = #{factorage}
+		</if>
+		<if test="sellerCashAccountIncome != null">
+			,seller_cash_account_income = #{sellerCashAccountIncome}
+		</if>
+		<if test="sellerIncome != null">
+			,seller_income = #{sellerIncome}
+		</if>
+		<if test="sellerExpenditure != null">
+			,seller_expenditure = #{sellerExpenditure}
+		</if>
+		<if test="paymentMethod != null  and paymentMethod !=''">
+			,payment_method  = #{paymentMethod}
+		</if>
+		 where order_id=#{orderId}
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from settlement_detail where id = #{id}
+		]]>
+	</delete>
+</mapper>

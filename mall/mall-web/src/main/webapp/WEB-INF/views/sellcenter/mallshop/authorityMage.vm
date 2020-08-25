@@ -1,0 +1,441 @@
+#set($layout = "/none_layout.vm")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>权限管理</title>
+<link href="$request.contextPath/assets/css/manage_style.css"
+	rel="stylesheet" type="text/css" />
+<link href="$request.contextPath/assets/css/basic.css" rel="stylesheet"
+	type="text/css" />
+
+<script language="javascript" type="text/javascript"
+	src="$request.getContextPath()/assets/js/jquery-1.9.1.js"></script>
+<style type="text/css">
+#fullbg {
+	background-color: #0B0B0B;
+	left: 0;
+	opacity: 0.5;
+	position: absolute;
+	top: 0;
+	z-index: 3;
+	filter: alpha(opacity = 50);
+	-moz-opacity: 0.5;
+	-khtml-opacity: 0.5;
+}
+
+#dialog {
+	background-color: #fff;
+	border: 5px solid rgba(0, 0, 0, 0.4);
+	height: 500px;
+	left: 40%;
+	margin: -200px 0 0 -200px;
+	padding: 1px;
+	position: fixed !important; /* 浮动对话框 */
+	position: absolute;
+	top: 50%;
+	width: 700px;
+	z-index: 10;
+	border-radius: 5px;
+	display: none;
+}
+
+#dialog p {
+	margin: 0 0 12px;
+	height: 24px;
+	line-height: 24px;
+	background: #CCCCCC;
+}
+
+#dialog p.close {
+	text-align: right;
+	padding-right: 10px;
+}
+
+#dialog p.close a {
+	color: #fff;
+	text-decoration: none;
+}
+
+.width {
+	width: 150px;
+}
+
+.height {
+	height: 25px;
+}
+
+.btn-confirm {
+	background-position: 0 -50px;
+	background-position-x: 0px;
+	background-position-y: -50px;
+	color: #FFF;
+}
+
+.btn-confirm, .btn-cancel {
+	display: inline-block;
+	width: 151px;
+	height: 30px;
+	text-align: center;
+	line-height: 30px;
+	font-size: 14px;
+	font-weight: 700;
+	background: url(../images/icon-seller.png) no-repeat;
+}
+</style>
+<script type="text/javascript">
+	function editShopInfo() {
+		window.location.href = "$request.contextPath/shop/toEdit";
+	}
+	//查看权限详情
+
+	//显示灰色 jQuery 遮罩层 
+	function showDetail() {
+		var bh = $("body").height();
+		var bw = $("body").width();
+		$("#fullbg").css({
+			height : bh,
+			width : bw,
+			display : "block"
+		});
+		$("#dialog").show();
+	}
+	//关闭灰色 jQuery 遮罩 
+	function closeBg() {
+		$("#fullbg,#dialog").hide();
+	}
+</script>
+</head>
+
+<body>
+	<!--头部开始-->
+	<div class="header_top" style="border: none">
+		<div class="top_mid">
+			<div class="top_mid_l">
+				<i class="demo-icons fa-map-marker font_20 font_82"></i><b
+					class="font_14 mar_r10">北京市</b>查看省份<i
+					class="demo-icons fa-sort-desc font_14"></i> <i
+					class="demo-icons fa-weibo font_16 mar_lr10"></i> <i
+					class="demo-icons  fa-wechat font_16"></i>
+			</div>
+			<!--top_mid_l end-->
+			<div class="top_mid_r">
+				<a href="#">商城首页</a><i class="mar_lr10 font_ec">|</i> <i
+					class="demo-icons fa-star font_82"></i><a href="#">收藏夹</a><i
+					class="demo-icons fa-sort-desc font_14 font_c7"></i> <i
+					class="mar_lr10 font_ec">|</i> <i class="fa-cart"></i><a href="#">购物车</a><i
+					class="demo-icons fa-sort-desc font_14 font_c7"></i>
+			</div>
+			<!--top_mid_r end-->
+		</div>
+		<!--top_mid end-->
+	</div>
+	<!--header_top end-->
+	<div class="clear"></div>
+	<!--导航菜单start-->
+	<div class="Center_head">
+		<div class="Center_head_min">
+			<div class="Center_head_Logo">
+				<a href="#"><img src="$request.contextPath/assets/images/logo.png" alt=""></a>
+			</div>
+			<!--Center_head_Logo end-->
+			<div class="Center_head_midtab">
+				<ul>
+					<li>个人中心</li>
+					<li class="focus_mid">卖家中心</li>
+				</ul>
+			</div>
+			<!--Center_head_midtab end -->
+			<div class="Center_head_Search">
+				<span class="Center_Search_list">
+					<ul>
+						<li><a href="#">店 铺</a></li>
+						<li><a href="#">全部</a></li>
+						<li><a href="#">知识库</a></li>
+						<li><a href="#">专家</a></li>
+						<li><a href="#">知识社区</a></li>
+						<li><a href="#">部门群落</a></li>
+					</ul> <i class="Center_Search_chose fa-sort-desc"></i>
+				</span> <span class="Center_Search_input_box"><input name="wwaq"
+					type="text" class="Center_Search_input"
+					onBlur="if(this.value=='') {this.value='搜索店铺/搜索产品';this.style.color='#999'}"
+					onFocus="if(this.value=='搜索店铺/搜索产品') this.value='';this.style.color='#222'"
+					onpaste="return false;" autocomplete="off" value="搜索店铺/搜索产品"
+					style="color: rgb(153, 153, 153);"></span> <span
+					class="Center_Search_btn fa-search"></span>
+				<!--搜索按钮-->
+			</div>
+			<!--Center_head_Search end-->
+		</div>
+		<!--Center_head_min end-->
+	</div>
+	<!--Center_head end-->
+	<!--导航菜单end-->
+
+	<div id="main">
+		<!--中间部分开始-->
+
+		<div id="leftSeller" class="border-4">
+			<div class="head-pic">
+				<img src="$request.contextPath/assets/images/pic.png" />
+			</div>
+			<dl>
+				<dt>
+					<i class="demo-icons fa-unlock-alt font_16 mar_r10"></i>卖家中心
+				</dt>
+				<dd>
+					商品管理<i class="fa-sort-up fr mar_r10"></i>
+					<!--向上class="fa-sort-up" 向下class="fa-sort-desc"的箭头-->
+				</dd>
+				<ul>
+					<li>商品列表</li>
+					<li>添加商品</li>
+					<li>库存管理</li>
+					<li>代售商品管理</li>
+					<li>销售属性管理</li>
+					<li>商品评价管理</li>
+				</ul>
+				<dd>
+					店铺管理<i class="fa-sort-desc fr mar_r10"></i>
+				</dd>
+				<ul>
+					<li>基本设置</li>
+					<li>店铺设置管理</li>
+					<li>权限管理</li>
+					<li>公告管理</li>
+					<li>类目管理</li>
+					<li>店铺信誉</li>
+					<li>店铺装修</li>
+					<li>消息中心</li>
+				</ul>
+				<dd>
+					订单中心<i class="fa-sort-desc fr mar_r10"></i>
+				</dd>
+				<ul>
+					<li>全部订单</li>
+					<li>等待买家付款</li>
+					<li>等待我发货</li>
+					<li>等待买家收货</li>
+					<li>需要评价</li>
+					<li>交易完成</li>
+					<li>交易取消</li>
+					<li>我收到的转单</li>
+				</ul>
+				<dd>
+					信息设置<i class="fa-sort-desc fr mar_r10"></i>
+				</dd>
+				<ul>
+					<li>基本信息设置</li>
+					<li>安全信息设置</li>
+					<li>审核进度查看</li>
+				</ul>
+				<dd>
+					售后管理<i class="fa-sort-desc fr mar_r10"></i>
+				</dd>
+				<ul>
+					<li>退款处理</li>
+					<li>售后服务处理</li>
+					<li>地址管理</li>
+				</ul>
+				<dd>
+					运营分析<i class="fa-sort-desc fr mar_r10"></i>
+				</dd>
+				<ul>
+					<li>经营状况</li>
+					<li>销售分析</li>
+				</ul>
+				<dd>
+					会员管理<i class="fa-sort-desc fr mar_r10"></i>
+				</dd>
+				<ul>
+					<li>会员管理</li>
+				</ul>
+				<dd>
+					服务认证<i class="fa-sort-desc fr mar_r10"></i>
+				</dd>
+				<ul>
+					<li>实地认证管理</li>
+					<li>服务保障管理</li>
+				</ul>
+				<dd>
+					促销管理<i class="fa-sort-desc fr mar_r10"></i>
+				</dd>
+				<ul>
+					<li>促销管理</li>
+				</ul>
+				<dd>
+					财务管理<i class="fa-sort-desc fr mar_r10"></i>
+				</dd>
+				<ul>
+					<li>提现管理</li>
+				</ul>
+				<dd>
+					结算中心<i class="fa-sort-desc fr mar_r10"></i>
+				</dd>
+				<ul>
+					<li>结算单管理</li>
+					<li>账务核对</li>
+				</ul>
+				<dd>
+					价格管理<i class="fa-sort-desc fr mar_r10"></i>
+				</dd>
+				<ul>
+					<li>协议价管理</li>
+					<li>询价管理</li>
+				</ul>
+				<dd>
+					物流管理<i class="fa-sort-desc fr mar_r10"></i>
+				</dd>
+				<ul>
+					<li>运费模板设置</li>
+			</dl>
+		</div>
+		<!--left end -->
+
+		<!--右边部分开始-->
+		<div id="right">
+			<div class="Notice border-4 bg_06 box-shadow1">
+				<!--标题开始 -->
+				<ul class="bg_08 font_14b border-3">
+					<li class="wid_40">编号</li>
+					<li class="wid_160">用户名</li>
+					<li class="wid_80">归属店铺</li>
+					<li class="wid_180">拥有权限</li>
+					<li class="wid_180">员工备注</li>
+					<li class="wid_150">修改时间</li>
+					<li class="wid_110">操作</li>
+				</ul>
+				<!--标题 end -->
+				##--获取列表 ##-- end --
+				<!--内容1行 单双行变背景色 加class="bg_05"开始 -->
+				<ul>
+					<li class="wid_40">1</li>
+					<li class="wid_160">lily001</li>
+					<li class="wid_80">RL旗舰店</li>
+					<li class="wid_180">售后管理，订单管理，在线客服
+						</button>
+					</li>
+					<li class="wid_180">员工备注员工备注</li>
+					<li class="wid_150">2013-6-02 10：29：44</li>
+					<li class="wid_110 font_1c" onclick="showDetail();"><a
+						class="font_1c">查看详情</a></li>
+				</ul>
+				<!--标题 end -->
+
+				<!--内容1行 单双行变背景色 加class="bg_05"开始 -->
+				<ul class="bg_05">
+					<li class="wid_40">2</li>
+					<li class="wid_160">李玲玉</li>
+					<li class="wid_80">RL旗舰店</li>
+					<li class="wid_180">订单管理</li>
+					<li class="wid_180">员工备注员工备注</li>
+					<li class="wid_150">2013-6-02 10：29：44</li>
+					<li class="wid_110 font_1c">编辑 下架</li>
+				</ul>
+				<!--标题 end -->
+
+				<!--标题开始 -->
+				<ul>
+					<li class="wid_40">3</li>
+					<li class="wid_160">dingo</li>
+					<li class="wid_80">RL旗舰店</li>
+					<li class="wid_180">店铺管理</li>
+					<li class="wid_180">员工备注员工备注</li>
+					<li class="wid_150">2013-6-02 10：29：44</li>
+					<li class="wid_110 font_1c">编辑 下架</li>
+				</ul>
+				<!--标题 end -->
+
+				<!--标题开始 -->
+				<ul class="bg_05">
+					<li class="wid_40">4</li>
+					<li class="wid_160">李玲玉</li>
+					<li class="wid_80">RL旗舰店</li>
+					<li class="wid_180">订单管理</li>
+					<li class="wid_180">员工备注员工备注</li>
+					<li class="wid_150">2013-6-02 10：29：44</li>
+					<li class="wid_110 font_1c">编辑 下架</li>
+				</ul>
+				<!--标题 end -->
+
+				<!--标题开始 -->
+				<ul>
+					<li class="wid_40">5</li>
+					<li class="wid_160">dingo</li>
+					<li class="wid_80">RL旗舰店</li>
+					<li class="wid_180">店铺管理</li>
+					<li class="wid_180">员工备注员工备注</li>
+					<li class="wid_150">2013-6-02 10：29：44</li>
+					<li class="wid_110 font_1c">编辑 下架</li>
+				</ul>
+				<!--标题 end -->
+
+				<!--标题开始 -->
+				<ul class="bg_05">
+					<li class="wid_40">6</li>
+					<li class="wid_160">李玲玉</li>
+					<li class="wid_80">RL旗舰店</li>
+					<li class="wid_180">订单管理</li>
+					<li class="wid_180">员工备注员工备注</li>
+					<li class="wid_150">2013-6-02 10：29：44</li>
+					<li class="wid_110 font_1c">编辑 下架</li>
+				</ul>
+				<!--标题 end -->
+
+				<!--标题开始 -->
+				<ul>
+					<li class="wid_40">7</li>
+					<li class="wid_160">dingo</li>
+					<li class="wid_80">RL旗舰店</li>
+					<li class="wid_180">店铺管理</li>
+					<li class="wid_180">员工备注员工备注</li>
+					<li class="wid_150">2013-6-02 10：29：44</li>
+					<li class="wid_110 font_1c">编辑 下架</li>
+				</ul>
+				<!--标题 end -->
+			</div>
+			<!--Notice end-->
+		</div>
+		<!--id="right" end-->
+		<!--右边部分结束-->
+	</div>
+	<!--#main end -->
+	<!--详情页-->
+	<div>
+		<div id="fullbg"></div>
+		<div id="dialog">
+			<p class="close" style="font-size: 15px">
+				<span style="text-align: left; float: left">查看详情</span><a href="#"
+					onclick="closeBg();">关闭</a>
+			</p>
+
+			<div>
+				<dl>
+					<dt>
+						<i class="demo-icons font_fs">&nbsp;&nbsp;&nbsp;&nbsp;*</i>&nbsp;员工账号名：
+						<input name="" type="text" id="" value="$!{dddd}"
+							class="input_Style2 width height" disabled="disabled"
+							placeholder="输入文本..." />
+					</dt>
+				</dl>
+				<dl>
+					<dt>
+						<i class="demo-icons font_fs">&nbsp;&nbsp;&nbsp;&nbsp;*</i>&nbsp;权限设置：
+						&nbsp;&nbsp;&nbsp;&nbsp;
+					</dt>
+				</dl>
+				<dl>
+					<dt></dt>
+					<dd class="mt10">
+						<span class="mr10"><a class="btn-confirm"
+							href="javascript:;" onclick="createSubAccountCommit(1);">确定</a></span> <span><a
+							class="btn-cancel" href="javascript:;" onclick="closeBg();">取消</a></span>
+					</dd>
+				</dl>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
+
+

@@ -1,0 +1,821 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+
+<link href="$staticPath/css/manage_style.css" rel="stylesheet" type="text/css" />
+<link href="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/jquery-validation/1.11.1/messages_zh.js"></script>
+<script type="text/javascript" src="$staticPath/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/jquery-migrate-1.1.0.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.shadow.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.ifixpng.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.fancyzoom.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/ueditor/ueditor.all.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/ueditor/lang/zh-cn/zh-cn.js"></script>
+
+<script type="text/javascript">
+var isView = "$!releaseState"=="view" //是否是查看功能
+var editor;
+var detailEditor;
+$(function(){
+	//加载左侧菜单
+	$("#leftBuyer").load("$request.contextPath/leftBuyer");
+	initPage();
+	//平台分类 （一级）
+	$("#first_assortment").change(function(){
+		$("#second_assortment").empty().append($("<option>").text("二级分类").val(""));
+		$("#third_assortment").empty().append($("<option>").text("三级分类").val(""));
+		optionItems("$request.getContextPath()/shopManageCategoryController/getCategoryByParentId",$(this).val(),"second_assortment","","categoryCName","categoryCid");
+	});
+	//平台分类（二级）
+	$("#second_assortment").change(function(){
+		//清空三级类目
+		$("#third_assortment").empty().append($("<option>").text("三级分类").val(""));
+		optionItems("$request.getContextPath()/shopManageCategoryController/getCategoryByParentId",$(this).val(),"third_assortment","","categoryCName","categoryCid");
+	});
+	//退换货省市区下拉菜单改变事件绑定
+	$("#dp_provinces").change(function(){
+		optionItems("$request.contextPath/shopBaseInfoController/queryAddress",$("#dp_provinces").val(),"dp_city","");
+		//清空区域信息
+		$("#dp_area").empty().append($("<option>").text("请选择").val(""));
+	});
+	$("#dp_city").change(function(){
+		optionItems("$request.contextPath/shopBaseInfoController/queryAddress",$("#dp_city").val(),"dp_area","");
+	});
+	/*发布：二手商品*/
+	$("#releaseBtn").click(function(){
+		$("#cid").val($("#third_assortment").val());
+		$("#provinceName").val($("#dp_provinces option:selected").text());
+		$("#cityName").val($("#dp_city option:selected").text());
+		$("#districtName").val($("#dp_area option:selected").text());
+		//商品描述
+		$("#describeUr").val(UE.getEditor('content').getContent());
+		
+        if(UE.getEditor('content').getContentLength(true) > 220){
+            alert("商品描述输入的字符过长！最多输入220个字符");
+            return;
+        }
+		
+		//商品详情
+		$("#describeDetail").val(UE.getEditor('contentDetail').getContent());
+
+		//对图片进行校验
+		var pictureUrl_bl= false;
+		var pictureUrlAll = $("input[name='pictureUrl']");
+		for(var i=0; i<pictureUrlAll.length; i++){
+			var pictureUrl = $(pictureUrlAll).eq(i).val();
+			if(pictureUrl){
+				pictureUrl_bl = true;
+				break;
+			}
+		}
+		if(!pictureUrl_bl){
+			alert("最少上传一张图片!");
+			return false;
+		}
+
+		//数据校验-框架校验
+		var isValid = $("#releaseForm").valid();
+		if( !isValid ){
+			return false;
+		}
+		$("#releaseBtn").loadingMsg();
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			url:"$request.contextPath/secondGoods/storageSecondGoods",
+			data:$("#releaseForm").serializeArray(),
+			success: function(data){
+				$("#releaseBtn").hideMsg();
+				$("#returnPage").show();
+			},
+			error:function(result){
+				$("#releaseBtn").hideMsg();
+			}
+		});
+	});
+	$("#cancelBtn").click(function(){
+		window.location.href="$request.contextPath/usedMarket/usedGoodsList";
+	});
+	//新旧程度
+	$("#tab2 .border-1").click(function(){
+	
+		if('$!releaseState' == 'view'){
+			return ;	
+		}
+		$("#recency").val($(this).attr("title"));
+		$("#tab2 .bg_08").attr("class","border-1");
+		$(this).attr("class","bg_08 border-1");
+		
+		
+	});
+	
+	//图片查看
+	$(".po_re_over").mouseover(function(){
+		$(this).find(".c-upload-spe").show();
+	})
+	$(".po_re_over").mouseout(function(){
+		$(this).find(".c-upload-spe").hide();
+	});
+	$('.po_re_img').fancyzoom({
+		Speed:400,
+		showoverlay:false,
+		imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+	});
+	//查询
+	$("#queryBtn").click(function(){
+		$("#queryForm").submit();
+	});
+
+	//卖家联系电话格式校验
+	/*$('#sellerTel').blur(function()
+	{
+		chekcTelNo($(this).val());
+	});*/
+
+	// IE8兼容
+	$('.po_re_img').each(function(){
+		$(this).hide();
+	})
+});
+
+function chekcTelNo(val)
+{
+  	var myreg = /^(1\d{10})$/;
+     if(!myreg.test(val))
+     {
+   	  $('#telError').html("请输入正确的联系电话！");
+         return false;
+     }else
+   	{
+   	 	$('#telError').html("");
+     	return true;
+   	}
+}
+
+/* 初始化方法 */
+function initPage(){
+	//初始化验证
+	initValidPlugin();
+	if("$!pageState"=="release"){
+		$("#release").attr("class","active");
+		if("$!releaseState"=="view"){
+			changeShow('release_show','release_hide');
+			var contentView = UE.getEditor('contentView',{
+				serverUrl:'$request.contextPath/ueditor/exec',
+				imageUrlPrefix:"$!imageServerAddr",
+				maximumWords:220,
+				toolbars: [[
+                    'fullscreen','|', 'undo', 'redo', '|',
+                    'bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'superscript', 'subscript', 'removeformat', 'formatmatch', 'autotypeset', 'blockquote', 'pasteplain', '|', 'forecolor', 'backcolor', 'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc', '|',
+                    'touppercase', 'tolowercase', '|','date', 'time', 'spechars', '|','print', 'preview', 'searchreplace', 'help', 'drafts'
+                ]]
+			});
+			contentView.addListener('ready',function(){
+				contentView.setContent($("#contentView1").val());
+				var imgObjs = $("#ueditor_0").contents().find("img");
+				imgObjs.each(function () {
+		           if($(this).attr("src") != "" && $(this).attr("src").indexOf("http://") < 0){
+		        	   $(this).attr("src","$!imageServerAddr"+$(this).attr("src"));
+		           }
+		           if($(this).attr("_src") != "" && $(this).attr("_src").indexOf("http://") < 0){
+		        	   $(this).attr("_src","$!imageServerAddr"+$(this).attr("_src"));
+		           }
+		        });
+				
+				contentView.setDisabled('fullscreen');
+				
+			});
+			var contentDetailView = UE.getEditor('contentDetailView',{
+				serverUrl:'$request.contextPath/ueditor/exec',
+				imageUrlPrefix:"$!imageServerAddr"
+			});
+			contentDetailView.addListener('ready',function(){
+				contentDetailView.setContent($("#contentDetailView1").val());
+				var imgObjs = $("#ueditor_1").contents().find("img");
+				imgObjs.each(function () {
+		           if($(this).attr("src") != "" && $(this).attr("src").indexOf("http://") < 0){
+		        	   $(this).attr("src","$!imageServerAddr"+$(this).attr("src"));
+		           }
+		           if($(this).attr("_src") != "" && $(this).attr("_src").indexOf("http://") < 0){
+		        	   $(this).attr("_src","$!imageServerAddr"+$(this).attr("_src"));
+		           }
+		        });
+		        
+				contentDetailView.setDisabled('fullscreen');
+			});
+		} else {
+			var content = UE.getEditor('content',{
+				serverUrl:'$request.contextPath/ueditor/exec',
+				imageUrlPrefix:"$!imageServerAddr",
+				maximumWords:220,
+				toolbars: [[
+                    'fullscreen','|', 'undo', 'redo', '|',
+                    'bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'superscript', 'subscript', 'removeformat', 'formatmatch', 'autotypeset', 'blockquote', 'pasteplain', '|', 'forecolor', 'backcolor', 'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc', '|',
+                    'touppercase', 'tolowercase', '|','date', 'time', 'spechars', '|','print', 'preview', 'searchreplace', 'help', 'drafts'
+                ]]
+			});
+			content.addListener('ready',function(){
+				content.setContent($("#content1").val());
+				var imgObjs = $("#ueditor_0").contents().find("img");
+				imgObjs.each(function () {
+		           if($(this).attr("src") != "" && $(this).attr("src").indexOf("http://") < 0){
+		        	   $(this).attr("src","$!imageServerAddr"+$(this).attr("src"));
+		           }
+		           if($(this).attr("_src") != "" && $(this).attr("_src").indexOf("http://") < 0){
+		        	   $(this).attr("_src","$!imageServerAddr"+$(this).attr("_src"));
+		           }
+		        });
+			});
+			var contentDetail = UE.getEditor('contentDetail',{
+				serverUrl:'$request.contextPath/ueditor/exec',
+				imageUrlPrefix:"$!imageServerAddr"
+			});
+			contentDetail.addListener('ready',function(){
+				content.setContent($("#contentDetail1").val());
+				var imgObjs = $("#ueditor_1").contents().find("img");
+				imgObjs.each(function () {
+		           if($(this).attr("src") != "" && $(this).attr("src").indexOf("http://") < 0){
+		        	   $(this).attr("src","$!imageServerAddr"+$(this).attr("src"));
+		           }
+		           if($(this).attr("_src") != "" && $(this).attr("_src").indexOf("http://") < 0){
+		        	   $(this).attr("_src","$!imageServerAddr"+$(this).attr("_src"));
+		           }
+		        });
+			});
+			changeShow('release_hide','release_show');
+		}
+		//商品类目
+		if("$!itemOldDTO.cid"!=""){
+			$("#first_assortment").val("$!firstAssortment");
+			optionItems("$request.getContextPath()/shopManageCategoryController/getCategoryByParentId","$!firstAssortment","second_assortment","$!secondAssortment","categoryCName","categoryCid");
+			optionItems("$request.getContextPath()/shopManageCategoryController/getCategoryByParentId","$!secondAssortment","third_assortment","$!itemOldDTO.cid","categoryCName","categoryCid");
+		}
+		//所在地
+		optionItems("$request.contextPath/shopBaseInfoController/queryAddress",0,"dp_provinces","$itemOldDTO.provinceCode");//加载省份数据
+		optionItems("$request.contextPath/shopBaseInfoController/queryAddress","$itemOldDTO.provinceCode","dp_city","$itemOldDTO.cityCode");//加载市数据
+		optionItems("$request.contextPath/shopBaseInfoController/queryAddress","$itemOldDTO.cityCode","dp_area","$itemOldDTO.districtCode");//加载县(区)数据
+		//新旧
+		if("10"=="$!itemOldDTO.recency"){
+			$("#recency").val("10");
+			$("#newRecency").attr("class","bg_08 border-1");
+		} else {
+			$("#recency").val($!itemOldDTO.recency);
+			$("#old$!{itemOldDTO.recency}Recency").attr("class","bg_08 border-1");
+		}
+	}else if("$!pageState"=="resell"){
+		$("#resell").attr("class","active");
+	}
+}
+/*更改编辑样式*/
+function changeShow(showClass,hideClass){
+    $("."+showClass).show();
+	$("."+hideClass).hide();
+}
+//Form表单提交
+function topage(page){
+	$("#page").val(page);
+	$("#queryForm").submit();
+}
+/**
+ * url 链接地址
+ * parentCode 父级编码
+ * opitonId 需要填充数据的下拉列表框的id
+ * selectVal 默认选中的值
+ * name 服务器返回的数据中，作为下拉框option的text的字段名，默认为"name"
+ * code 服务器返回的数据中，作为下拉框option的value的字段名，默认为"code"
+ */
+function optionItems(url, parentCode, optionId, selectVal, name, code){
+	$.ajax({
+		url:url,
+		type:"post",
+		data:{
+			parentCode:parentCode
+		},
+		dataType: "json",
+		success:function(data){
+			var optionItem = $("#"+optionId);
+			optionItem.empty();
+			optionItem.append($("<option>").text("请选择").val(""));
+			$.each(data, function (n, itemObj) {
+				if(!name){
+					name = "name";
+				}
+				if(!code){
+					code = "code";
+				}
+				var option = $("<option>").text(itemObj[name]).val(itemObj[code]);
+				if(itemObj.code==selectVal || itemObj.categoryCid==selectVal){
+					option.attr("selected",true);
+				}
+				optionItem.append(option);
+			});
+		}
+	});
+}
+/*工具方法：上传图片*/
+function startUpload(fileElementId, showImg, urlInput){
+	//判断图片格式
+	var fileInput = $("#"+fileElementId).val();
+	var extStart = fileInput.lastIndexOf(".");
+	var ext = fileInput.substring(extStart,fileInput.length).toUpperCase();
+	if(ext!=".JPG" && ext!=".jpg" && ext!=".JPEG" && ext!=".jpeg" && ext!=".PNG" && ext!=".png" && ext!=".BMP" && ext!=".bmp"){
+		alert("图片限于jpg,jpeg,png,bmp格式");
+		return false;
+	}
+	$.ajaxFileUpload({
+		url: '$request.getContextPath()/fileUpload/fixedUpload?size=1048576&date='+new Date(), //用于文件上传的服务器端请求地址
+		secureuri: false, //是否需要安全协议，一般设置为false
+		fileElementId: fileElementId, //文件上传域的ID
+		dataType: 'json', //返回值类型 一般设置为json
+		type:"post",
+		success: function (data, status){  //服务器成功响应处理函数
+			if(!data.success){
+				alert(data.msg);
+				return false;
+			}
+			$("#"+showImg).attr("src","$!imageServerAddr"+data.url);
+			$("#"+urlInput).val(data.url);
+			$("#"+fileElementId).val("");
+
+			//图片查看
+			$('.po_re_img').fancyzoom({
+				Speed:400,
+				showoverlay:false,
+				imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+			});
+			$("#"+showImg).show();
+		},
+		error: function (data, status, e){//服务器响应失败处理函数
+		}
+	});
+};
+//初始化校验控件
+function initValidPlugin(){
+	$("#releaseForm").validate({
+		rules: {
+			itemName:{
+				required: true
+			},
+			first_assortment:{
+				required: true
+			},
+			second_assortment:{
+				required: true
+			},
+			third_assortment:{
+				required: true
+			},
+			price:{
+				required: true,
+				number:true
+			},
+			priceOld:{
+				number:true
+			},
+			freight:{
+				number:true
+			},
+			sellerName:{
+				required: true
+			},
+			sellerTel:{
+				required: true,
+				validatorPhone:true
+			},
+			provinceCode:{
+				required: true
+			},
+			cityCode:{
+				required: true
+			},
+			districtCode:{
+				required: true
+			}
+		}
+	});
+}
+
+jQuery.validator.addMethod("validatorPhone", function(value, element) {
+    var myreg = /^[0-9\-]*$/;
+    return this.optional(element) || (myreg.test(value));
+}, "联系电话只允许输入数字和- ");
+
+function showMsg(auditRemark){
+	$("#auditRemark").val(auditRemark);
+	$("#po_fai").show();
+}
+function closePo(){
+	$("#po_fai").hide();
+}
+function returnLocal(){
+	$("#returnPage").hide();
+	window.location.href="$request.contextPath/secondGoods/initRelease";
+}
+function returnList(){
+	window.location.href="$request.contextPath/usedMarket/usedGoodsList";
+}
+</script>
+
+<div id="main">
+<!-- left start -->
+#if($!releaseState == 'view' || $!releaseState == 'edit')
+<div id="leftBuyer"></div>
+#end
+<!-- left end -->
+
+<!--右边部分开始-->
+<div id="right" class="Release_leave">
+<div class="nTab">
+	#if($!releaseState != 'view' && $!releaseState != 'edit')
+	<div class="TabTitle">
+		<ul id="myTab0">
+			<a href="$request.contextPath/secondGoods/initRelease">
+				<li id="release" class="normal">发布闲置</li>
+			</a>
+			<a href="$request.contextPath/secondGoods/initResell">
+				<li id="resell" class="normal">一键转卖</li>
+			</a>
+		</ul>
+	</div>
+	#end
+	#if("$!pageState"=="release")
+	<!-- 发布页面 -->
+	<div class="TabContent">
+		<div id="myTab0_Content0">
+		<form id="releaseForm" method="post" >
+			<input id="id" name="id" type="hidden" value="$!itemOldDTO.id"/>
+			<input id="itemId" name="itemId" type="hidden" value="$!itemOldDTO.itemId"/>
+			<ul class="leave">
+				<li class="wid_110 font_right">标题：</li>
+				<li class="wid_820">
+					<div class="release_show">
+						<span class="hei_30 wid_300">$!itemOldDTO.itemName &nbsp</span>
+						#if($!itemOldDTO.status == 20)
+						<button type="button" class="border-1 bg_05 button_1 hei_30 fr" onclick="showMsg('$!itemOldDTO.comment');">查看驳回原因</button>
+						#end
+					</div>
+					<div class="release_hide">
+						<input name="itemName" type="text" class="input_Style2 hei_30 wid_300" placeholder="输入标题..." value="$!itemOldDTO.itemName"/>
+						<i class="font_fs">*</i>
+						#if($!itemOldDTO.status == 20)
+						<button type="button" class="border-1 bg_05 button_1 hei_30 fr" onclick="showMsg('$!itemOldDTO.comment');">查看驳回原因</button>
+						#end
+					</div>
+				</li>
+				<li class="wid_110 font_right">商品类目：</li>
+				<li class="wid_820">
+					<input id="cid" name="cid" type="hidden" />
+					<div class="release_show">$!firstAssortmentName; $!secondAssortmentName; $!itemOldDTO.cName &nbsp</div>
+					<div class="release_hide">
+						<select id="first_assortment" name="first_assortment" class="input_Style2 wid_150 mar_r10 hei_35">
+							<option value="" selected="selected">一级分类</option>
+							#foreach($firstAssortment in $firstAssortmentList)
+			                	<option value="$!firstAssortment.categoryCid">$!firstAssortment.categoryCName</option>
+							#end
+						</select>
+						<select id="second_assortment" name="second_assortment" class="input_Style2 wid_150 mar_r10 hei_35">
+							<option value="" selected="selected">二级分类</option>
+						</select>
+						<select id="third_assortment" name="third_assortment" class="input_Style2 wid_150 mar_r10 hei_35">
+							<option value="" selected="selected">三级分类</option>
+						</select>
+						<i class="font_fs">*</i>
+					</div>
+				</li>
+				<li class="wid_110 font_right">新旧：</li>
+				<input id="recency" name="recency" type="hidden" value="$!itemOldDTO.recency"/>
+				<li class="wid_820" id="tab2">
+					<span id="newRecency" title="10" class="border-1"> 全 新 </span>
+					<span id="old9Recency" title="9" class="border-1">9成新</span>
+					<span id="old8Recency" title="8" class="border-1">8成新</span>
+					<span id="old7Recency" title="7" class="border-1">7成新</span>
+					<span id="old6Recency" title="6" class="border-1">6成新</span>
+					<span id="old5Recency" title="5" class="border-1">5成新</span>
+				</li>
+				<li class="wid_110 font_right">价格：</li>
+				<li class="wid_820">
+					<div class="release_show">$!itemOldDTO.price &nbsp</div>
+					<div class="release_hide">
+						<input name="price" type="text" class="input_Style2 hei_24 wid_110" placeholder="输入价格..." value="$!itemOldDTO.price"/>
+						<i class="demo-icons">元</i>
+						<i class="font_fs">*</i>
+					</div>
+				</li>
+				<li class="wid_110 font_right">原价：</li>
+				<li class="wid_820">
+					<div class="release_show">$!itemOldDTO.priceOld &nbsp</div>
+					<div class="release_hide">
+						<input name="priceOld" type="text" class="input_Style2 hei_24 wid_110" placeholder="输入原价..." value="$!itemOldDTO.priceOld"/>
+						<i class="demo-icons">元</i>
+					</div>
+				</li>
+				<li class="wid_110 font_right">运费：</li>
+				<li class="wid_820">
+					<div class="release_show">$!itemOldDTO.freight &nbsp</div>
+					<div class="release_hide">
+						<input name="freight" type="text" class="input_Style2 hei_24 wid_110" placeholder="输入运费..." value="$!itemOldDTO.freight"/>
+						<i class="demo-icons">元</i>
+					</div>
+				</li>
+				<li class="wid_110 font_right">联系人 ：</li>
+				<li class="wid_820">
+					<div class="release_show">$!itemOldDTO.sellerName &nbsp</div>
+					<div class="release_hide">
+						<input name="sellerName" type="text" class="input_Style2 hei_24 wid_160" placeholder="输入联系人..." value="$!itemOldDTO.sellerName"/>
+						<i class="font_fs">*</i>
+					</div>
+				</li>
+				<li class="wid_110 font_right">联系电话 ：</li>
+				<li class="wid_820">
+					<div class="release_show">$!itemOldDTO.sellerTel &nbsp</div>
+					<div class="release_hide">
+						<input name="sellerTel" type="text" id="sellerTel" class="input_Style2 hei_24 wid_160" placeholder="输入联系电话..." value="$!itemOldDTO.sellerTel"/>
+						<i class="font_fs">*</i>
+						<span id="telError" class="font_fe"></span>
+					</div>
+				</li>
+				<li class="wid_110 font_right">所在地：</li>
+				<li class="wid_820">
+					<div class="release_show">$!itemOldDTO.provinceName; $!itemOldDTO.cityName; $!itemOldDTO.districtName &nbsp</div>
+					<div class="release_hide">
+						<select name="provinceCode" id="dp_provinces" class="input_Style1 wid_120">
+							<option value="" selected="selected"> 请选择 </option>
+						</select>
+						<input type="hidden" id="provinceName" name="provinceName" />
+						<i class="demo-icons">-</i>
+						<select name="cityCode" id="dp_city" class="input_Style1 wid_120">
+							<option value="" selected="selected"> 请选择 </option>
+						</select>
+						<input type="hidden" id="cityName" name="cityName" />
+						<i class="demo-icons">-</i>
+						<select name="districtCode" id="dp_area" class="input_Style1 wid_120">
+							<option value="" selected="selected"> 请选择 </option>
+						</select>
+						<input type="hidden" id="districtName" name="districtName" />
+						<!-- <i class="demo-icons">-</i>
+						<input name="streetName" type="text" class="input_Style2 wid_300 hei_32" placeholder="输入详细地址..." value="$!itemOldDTO.streetName" /> -->
+						<i class="font_fs">*</i>
+					</div>
+				</li>
+				<li class="wid_110 font_right">商品图片：</li>
+				<li class="wid_820">
+						<div class="leave_box_small po_re border-4 po_re_over">
+						<img id="pictureUrl01Img" src="$!imageServerAddr$!pictureUrl01"
+							alt="" title="点击查看大图" width="120" height="120" class="po_re_img"/>
+						#if("$!releaseState"!="view")
+							<div class="c-upload-spe none">
+    							<span class="font_span">上传图片</span>
+    							<input type="file" id="pictureUrl01File" class="file-img" name="file"
+    								onchange="startUpload('pictureUrl01File','pictureUrl01Img','pictureUrl01Src')">
+    						</div>
+						<input id="pictureUrl01Src" name="pictureUrl" type="hidden" value="$!pictureUrl01" />
+						#end
+						</div>
+
+						<div class="leave_box_small po_re border-4 po_re_over">
+						<img id="pictureUrl02Img" src="$!imageServerAddr$!pictureUrl02"
+							alt="" title="点击查看大图" width="120" height="120" class="po_re_img"/>
+						#if("$!releaseState"!="view")
+						<div class="c-upload-spe none">
+							<span class="font_span">上传图片</span>
+							<input type="file" id="pictureUrl02File" class="file-img" name="file"
+							onchange="startUpload('pictureUrl02File','pictureUrl02Img','pictureUrl02Src')">
+						</div>
+						<input id="pictureUrl02Src" name="pictureUrl" type="hidden" value="$!pictureUrl02" />
+						#end
+						</div>
+
+						<div class="leave_box_small po_re border-4 po_re_over">
+						<img id="pictureUrl03Img" src="$!imageServerAddr$!pictureUrl03"
+							alt="" title="点击查看大图" width="120" height="120" class="po_re_img"/>
+						#if("$!releaseState"!="view")
+						<div class="c-upload-spe none">
+							<span class="font_span">上传图片</span>
+							<input type="file" id="pictureUrl03File" class="file-img" name="file"
+							onchange="startUpload('pictureUrl03File','pictureUrl03Img','pictureUrl03Src')">
+						</div>
+						<input id="pictureUrl03Src" name="pictureUrl" type="hidden" value="$!pictureUrl03" />
+						#end
+						</div>
+
+						<div class="leave_box_small po_re border-4 po_re_over">
+						<img id="pictureUrl04Img" src="$!imageServerAddr$!pictureUrl04"
+							alt="" title="点击查看大图" width="120" height="120" class="po_re_img"/>
+						#if("$!releaseState"!="view")
+						<div class="c-upload-spe none">
+							<span class="font_span">上传图片</span>
+							<input type="file" id="pictureUrl04File" class="file-img" name="file"
+							onchange="startUpload('pictureUrl04File','pictureUrl04Img','pictureUrl04Src')">
+						</div>
+						<input id="pictureUrl04Src" name="pictureUrl" type="hidden" value="$!pictureUrl04" />
+						#end
+						</div>
+
+						<div class="leave_box_small po_re border-4 po_re_over">
+						<img id="pictureUrl05Img" src="$!imageServerAddr$!pictureUrl05"
+							alt="" title="点击查看大图" width="120" height="120" class="po_re_img"/>
+						#if("$!releaseState"!="view")
+						<div class="c-upload-spe none">
+							<span class="font_span">上传图片</span>
+							<input type="file" id="pictureUrl05File" class="file-img" name="file"
+							onchange="startUpload('pictureUrl05File','pictureUrl05Img','pictureUrl05Src')">
+						</div>
+						<input id="pictureUrl05Src" name="pictureUrl" type="hidden" value="$!pictureUrl05" />
+						#end
+						</div>
+						<Span class="font_12 font_c7">最多可上传五张图片,每张格式包括JPG、JPEG、PNG、BMP格式，大小不超过1M</Span>
+				</li>
+				<li class="wid_110 font_right" >商品描述：</li>
+				<li class="wid_820">
+					<p class="hei_32 mar_l10">提示：请简要概述商品情况，此处文本会在二手商品首页展示，文本长度限制220字，建议文本内容不多于4段，段中不要换行。</p>
+					<div class="release_show">
+					<textarea id="contentView" name="contentView" style="width:700px;height:136px;"></textarea>
+					<textarea id="contentView1" style="display:none">$!itemOldDTO.describeUr</textarea></div>
+					<div class="release_hide">
+						##<p class="hei_32 mar_l10">提示：建议上传的图片大小限制为3M,尺寸宽度为950，否则系统会自动压缩和宽度调整可能会使图片失真。</p>
+						<textarea id="content" name="content" style="width:700px;height:136px;margin:0px">
+						</textarea>
+						<textarea id="content1" style="display:none">
+							#if("$!itemOldDTO.id"!="")
+								$!itemOldDTO.describeUr
+							#else
+								1.使用时长：<br/>2.新旧程度描述：<br/>3.存在的问题：<br/>4.到手时间/有效期/适用条件：
+							#end
+						</textarea>
+	          			<input type="hidden" name="describeUr" id="describeUr" value=""/>
+					</div>
+				</li>
+				<li class="wid_110 font_right" >商品详情：</li>
+				<li class="wid_820">
+					<div class="release_show">##<p class="hei_32 mar_l10">提示：建议上传的图片大小限制为3M,尺寸宽度为950，否则系统会自动压缩和宽度调整可能会使图片失真。</p>
+    					<textarea id="contentDetailView" name="contentDetailView" style="width:700px;height:300px;"></textarea>
+    					<textarea id="contentDetailView1" style="display:none;">$!itemOldDTO.describeDetail</textarea>
+					</div>
+					<div class="release_hide">
+						<p class="hei_32 mar_l10">提示：建议上传的图片大小限制为3M，尺寸宽度为980，否则系统会自动压缩和宽度调整可能会使图片失真。</p>
+						<textarea id="contentDetail" name="contentDetail" style="width:700px;height:300px;"></textarea>
+						<textarea id="contentDetail1" style="display:none;">$!itemOldDTO.describeDetail</textarea>
+	          			<input type="hidden" name="describeDetail" id="describeDetail" value=""/>
+					</div>
+				</li>
+				#if("$!releaseState"=="view")
+				<li class=" wid_350 font_cen">
+					<button id="cancelBtn" type="button" class="button_2 hei_35">返回列表</button>
+				</li>
+				#else
+				<li class="wid_440 font_cen">
+					<button id="releaseBtn" type="button" class="button_2 hei_35 mar_r10" loadMsg="正在发布...">立即发布</button>
+					<button id="cancelBtn" type="button" class="button_3 hei_35">取消发布</button>
+				</li>
+				#end
+			</ul>
+		</form></div>
+		#elseif("$!pageState"=="resell")
+		<!-- 一键转卖 -->
+		<div id="myTab0_Content0" class="TabContent">
+		<form id="queryForm" method="post" action="$request.contextPath/secondGoods/initResell">
+			<input type="hidden" name="page" id="page" value="$!pager.page">
+			<div id="right_top" class="right_top">
+				<div class="right_top_l">
+					<ul class="list">
+						<li >
+							<span class="font_wid mar_l">店铺名称：</span>
+							<input name="shopName" class="input_Style2 wid_120 hei_30"
+								type="text" value="$!inDTO.shopName"/>
+						</li>
+						<li >
+							<span class="font_wid">商品名称：</span>
+							<input name="itemName" class="input_Style2 wid_180 hei_30"
+								type="text" value="$!inDTO.itemName"/>
+						</li>
+						<li>
+							<span class="font_wid">下单日期：</span>
+							<input class="input_Style2 wid_110 hei_30" name="updateStart" type="text"
+								value="$!date.format('yyyy-MM-dd',$!inDTO.updateStart)"
+								onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});" />
+							<i class="demo-icons">-</i>
+							<input class="input_Style2 wid_110 hei_30" name="updateEnd" type="text"
+								value="$!date.format('yyyy-MM-dd',$!inDTO.updateEnd)"
+								onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+						</li>
+					</ul>
+				</div>
+				<div class="right_top_r ">
+					<button id="queryBtn" type="button" class=" wid_80 button_4 mar_t10">
+						<a class="font_1c hei_24">搜索</a>
+					</button>
+				</div>
+			</div>
+			<div id="right_bot" class="right_bot mar_t10">
+				<ul class="list_top bg_08 font_14b wid_950 mar">
+					<li class="wid_300 font_cen hei_35">商品信息</li>
+					<li class="wid_230 font_cen hei_35">产品类目</li>
+					<li class="wid_120 font_cen hei_35">单价</li>
+					<li class="wid_90 font_cen hei_35">数量</li>
+					<li class="wid_90 font_cen hei_35">实付款</li>
+					<li class="wid_110 font_cen hei_35">操作</li>
+				</ul>
+				#foreach($entity in $pager.records)
+				<div class="wid_950 mar_cen border-4 hei_min_80" >
+					<p class="hei_40 bg_05 wid_950 border-6">
+						<i class="fl mar_l10">
+							订单号：<b class="font_fe mar_r20"> $!entity.orderId</b>
+							#foreach($json in $!jsonArray)
+							#if($!entity.orderId == $!json.orderId)
+								<a class="cursor" href="$request.getContextPath()/shopItemListIndexController/toIndex?shopId=$!json.shopId" target="_blank" title="$!json.shopName">$!json.shopName</a>
+							#end
+						#end
+						</i>
+						<i class="fr mar_r10 font_c7">下单时间：$!date.format('yyyy-MM-dd HH:mm:ss ',$!entity.createTime )</i>
+					</p>
+					#foreach($entityItem in $!entity.items)
+					<ul class="list_bottom">
+						#foreach($json in $!jsonArray)
+							#if($!entity.orderId == $!json.orderId)
+								#foreach($jsonItem in $!json.items)
+									#if($!entityItem.skuId == $!jsonItem.skuId)
+										<li class="wid_100  hei_80">
+											<a href="$request.getContextPath()/productController/details?id=$!entityItem.itemId&skuId=$!entityItem.skuId" target="_blank">
+												<img class="fl mar_r10 skuPicUrl_js mar_t10 border-1" src="$!imageServerAddr$!jsonItem.skuPicUrl" width="80" height="60" />
+											</a>
+										</li>
+                                        <li class="wid_200  hei_80">
+                                            <div style="line-height: 20px;position: relative;">
+                                                $!jsonItem.itemName
+                                            </div>
+                                        </li>
+										<li class="wid_230 cursor" style="line-height:20px;" title="$!jsonItem.categoryName">
+										       #set($str=$!$!jsonItem.categoryName)
+												#if($str.length()>40)
+													#set($str=$str.substring(0,40))
+													$str ...
+												#else
+													$!jsonItem.categoryName
+												#end
+										</li>		
+										<li class="wid_120 font_cen hei_80">￥$!jsonItem.payPrice </li>
+										<li class="wid_60 font_cen font_e3  num_js">$!jsonItem.num</li>
+										<li class="wid_90 font_cen hei_80">￥$jsonItem.payPrice*$jsonItem.num</li>
+									#end
+								#end
+							#end
+						#end
+						<li class="wid_110 font_cen">
+							<a href="$request.contextPath/secondGoods/initRelease?orderId=$!entity.orderId&&itemId=$entityItem.itemId" class="button_2 hei_30">转手卖掉</a>
+						</li>
+					</ul>
+					#end
+				</div>
+				#end
+			</div>
+			<!--分页数据-->
+			#pageVelocity($pager)
+       		<!--分页結束 -->
+       	</form></div>
+		#end
+	</div>
+</div></div>
+<!--右边部分结束-->
+<!-- 审批-驳回：弹出层 -->
+	<div class="po_fai" id="po_fai" style="display:none">
+		<div class="po_fai_bg" style="z-index:1000"></div>
+	    <div class="po_main" style="width:400px; margin-left:-200px;z-index:1000">
+	      <div class="mar_l30 mar_r30 mar_t10">
+	        <div class="clear"></div>
+	        <p class="hei_30" style="font-size:15px;">驳回原因:</p>
+			<div class="clear"></div>
+	        <div class="user">
+	            <textarea style="width:330px; height:100px" id="auditRemark"></textarea>
+	        </div>
+	        <div class="clear"></div>
+	        <div class="font_cen mar_t20 pad_t50 close" >
+	          <button type="button" class="button_2 hei_32 font_16" onclick="closePo();">关闭</button>
+	        </div>
+		</div>
+	  </div>
+	</div>##弹出层
+	<!-- 页面跳转选择弹出层 -->
+	<div class="po_fai" id="returnPage" style="display:none;">
+		<div class="po_fai_bg" style="z-index:1000"></div>
+	    <div class="po_main" style="width:400px; margin-left:-200px;z-index:1000">
+	      <div class="mar_l30 mar_r30 mar_t10">
+			<div class="clear"></div>
+	        <div class="user">
+				<p >
+					您的二手商品已经提交平台审核，您可以在“我的二手”中查看详细信息
+                </p>
+	        </div>
+	        <div class="clear"></div>
+	        <div class="font_cen mar_t20 pad_t50 close" >
+	          <button type="button" class="button_2 hei_32 font_10" onclick="returnLocal();">继续上传</button>
+			  &nbsp;&nbsp;&nbsp;
+	          <button type="button" class="button_2 hei_32 font_10" onclick="returnList();">去查看</button>
+	        </div>
+		</div>
+	  </div>
+	</div>##弹出层
+</div>

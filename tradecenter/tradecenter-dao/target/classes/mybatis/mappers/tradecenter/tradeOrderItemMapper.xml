@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.tradecenter.dao.TradeOrderItemsDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="tradeOrderItemsMap" type="com.camelot.tradecenter.domain.TradeOrderItems">
+		<result property="id" column="id"/>
+		<result property="orderId" column="order_id"/>
+		<result property="itemId" column="item_id"/>
+		<result property="skuId" column="sku_id"/>
+		<result property="skuName" column="sku_name"/>
+		<result property="primitivePrice" column="primitive_price"/>
+		<result property="areaId" column="area_id"/>
+		<result property="num" column="num"/>
+		<result property="payPriceTotal" column="pay_price_total" />
+		<result property="promotionDiscount" column="promotion_discount"/>
+		<result property="promotionId" column="promotion_id"/>
+		<result property="promotionType" column="promotion_type"/>
+		<result property="couponDiscount" column="coupon_discount"/>
+		<result property="integralDiscount" column="integral_discount"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="shopFreightTemplateId" column="shop_freight_template_id"/>
+		<result property="deliveryType" column="delivery_type"/>
+		<result property="integral" column="integral"/>
+		<result property="contractNo" column="contract_no"/>
+		<result property="number" column="number"/>
+		<result property="pay" column="pay"/>
+		<result property="activitesDetailsId" column="activites_details_id"/>
+	</resultMap>
+	
+	<resultMap id="tradeOrderItemsDTOMap" type="com.camelot.tradecenter.dto.TradeOrderItemsDTO" >
+		<id property="orderId" column="order_id" />
+		<result property="orderItemId" column="id"/>
+		<result property="itemId" column="item_id" />
+		<result property="skuId" column="sku_id" />
+		<result property="cid" column="cid" />
+		<result property="skuName" column="sku_name" />
+		<result property="primitivePrice" column="primitive_price" />
+		<result property="areaId" column="area_id" />
+		<result property="num" column="num" />
+		<result property="promotionDiscount" column="promotion_discount" />
+		<result property="promotionId" column="promotion_id" />
+		<result property="promotionType" column="promotion_type" />
+		<result property="couponDiscount" column="coupon_discount" />
+		<result property="integralDiscount" column="integral_discount"/>
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="payPrice" column="pay_price" />
+		<result property="payPriceTotal" column="pay_price_total" />
+		<result property="shopFreightTemplateId" column="shop_freight_template_id"/>
+		<result property="deliveryType" column="delivery_type"/>
+		<result property="integral" column="integral"/>
+		<result property="contractNo" column="contract_no"/>
+		<result property="number" column="number"/>
+		<result property="pay" column="pay"/>
+		<result property="activitesDetailsId" column="activites_details_id"/>
+	</resultMap>
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,order_id
+ 			,item_id
+ 			,sku_id
+ 			,sku_name
+ 			,primitive_price
+ 			,area_id
+ 			,num
+ 			,pay_price_total
+ 			,promotion_discount
+ 			,promotion_id
+ 			,promotion_type
+ 			,coupon_discount
+ 			,integral_discount
+ 			,create_time
+ 			,update_time
+ 			,shop_freight_template_id
+ 			,delivery_type
+ 			,integral
+ 			,contract_no
+ 			,activites_details_id
+		FROM 
+		trade_order_items trade_order_items_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.id != null  and entity.id !=''">
+				<![CDATA[ and trade_order_items_.id  = #{entity.id} ]]>
+			</if>
+			<if test="entity.orderId != null  and entity.orderId !=''">
+				<![CDATA[ and trade_order_items_.order_id  = #{entity.orderId} ]]>
+			</if>
+			<if test="entity.itemId != null  and entity.itemId !=''">
+				<![CDATA[ and trade_order_items_.item_id  = #{entity.itemId} ]]>
+			</if>
+			<if test="entity.skuId != null  and entity.skuId !=''">
+				<![CDATA[ and trade_order_items_.sku_id  = #{entity.skuId} ]]>
+			</if>
+			<if test="entity.skuName != null  and entity.skuName !=''">
+				<![CDATA[ and trade_order_items_.sku_name  = #{entity.skuName} ]]>
+			</if>
+			<if test="entity.primitivePrice != null  and entity.primitivePrice !=''">
+				<![CDATA[ and trade_order_items_.primitive_price  = #{entity.primitivePrice} ]]>
+			</if>
+			<if test="entity.areaId != null  and entity.areaId !=''">
+				<![CDATA[ and trade_order_items_.area_id  = #{entity.areaId} ]]>
+			</if>
+			<if test="entity.num != null  and entity.num !=''">
+				<![CDATA[ and trade_order_items_.num  = #{entity.num} ]]>
+			</if>
+			<if test="entity.promotionDiscount != null  and entity.promotionDiscount !=''">
+				<![CDATA[ and trade_order_items_.promotion_discount  = #{entity.promotionDiscount} ]]>
+			</if>
+			<if test="entity.promotionId != null  and entity.promotionId !=''">
+				<![CDATA[ and trade_order_items_.promotion_id  = #{entity.promotionId} ]]>
+			</if>
+			<if test="entity.promotionType != null  and entity.promotionType !=''">
+				<![CDATA[ and trade_order_items_.promotion_type  = #{entity.promotionType} ]]>
+			</if>
+			<if test="entity.createTime != null  and entity.createTime !=''">
+				<![CDATA[ and trade_order_items_.create_time  = #{entity.createTime} ]]>
+			</if>
+			<if test="entity.updateTime != null  and entity.updateTime !=''">
+				<![CDATA[ and trade_order_items_.update_time  = #{entity.updateTime} ]]>
+			</if>
+			<if test="entity.shopFreightTemplateId != null  and entity.shopFreightTemplateId !=''">
+				and trade_order_items_.shop_freight_template_id = #{entity.shopFreightTemplateId}
+			</if>
+			<if test="entity.deliveryType != null  and entity.deliveryType !=''">
+				and trade_order_items_.delivery_type = #{entity.deliveryType}
+			</if>
+			<if test="entity.integral != null">
+				and trade_order_items_.integral = #{entity.integral}
+			</if>
+			<if test="entity.contractNo != null">
+				and trade_order_items_.contract_no = #{entity.contractNo}
+			</if>
+			<if test="entity.activitesDetailsId != null">
+				and trade_order_items_.activites_details_id = #{entity.activitesDetailsId}
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="tradeOrderItemsMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where trade_order_items_.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="tradeOrderItemsMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		trade_order_items trade_order_items_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="addItemsBatch" >
+		<![CDATA[
+		insert into trade_order_items (
+		    	 order_id
+		    	 ,item_id
+		    	 ,sku_id
+		    	 ,sku_name
+		    	 ,primitive_price
+		    	 ,area_id
+		    	 ,num
+		    	 ,promotion_discount
+		    	 ,promotion_id
+		    	 ,promotion_type
+		    	 ,coupon_discount
+		    	 ,integral_discount
+		    	 ,create_time
+		    	 ,update_time
+		    	 ,pay_price
+		    	 ,pay_price_total
+		    	 ,cid
+		    	 ,shop_freight_template_id
+		    	 ,delivery_type
+		    	 ,integral
+		    	 ,contract_no
+		    	 ,activites_details_id
+		   )values
+	    ]]>	
+	    <foreach collection="items" item="item" open="" separator="," close="">
+		    	(
+		    	#{orderId}
+		    	,#{item.itemId}
+		    	,#{item.skuId}
+		    	,#{item.skuName}
+		    	,#{item.primitivePrice}
+		    	,#{item.areaId}
+		    	,#{item.num}
+		    	,#{item.promotionDiscount}
+		    	,#{item.promotionId}
+		    	,#{item.promotionType}
+		    	,#{item.couponDiscount}
+		    	,#{item.integralDiscount}
+		    	,now()
+		    	,now()
+		    	,#{item.payPrice}
+		    	,#{item.payPriceTotal}
+		    	,#{item.cid}
+		    	,#{item.shopFreightTemplateId}
+		    	,#{item.deliveryType}
+		    	,#{item.integral}
+		    	,#{item.contractNo}
+		    	,#{item.activitesDetailsId}
+		    	)
+	    </foreach>
+	</insert>
+	<insert id="add" parameterType="com.camelot.tradecenter.domain.TradeOrderItems" keyProperty="id" useGeneratedKeys="true">
+		<![CDATA[
+		insert into trade_order_items (
+		    	 order_id
+		    	 ,item_id
+		    	 ,sku_id
+		    	 ,sku_name
+		    	 ,primitive_price
+		    	 ,area_id
+		    	 ,num
+		    	 ,promotion_discount
+		    	 ,promotion_id
+		    	 ,promotion_type
+		    	 ,coupon_discount
+		    	 ,integral_discount
+		    	 ,create_time
+		    	 ,update_time
+		    	 ,pay_price
+		    	 ,pay_price_total
+		    	 ,cid
+		    	 ,shop_freight_template_id
+		    	 ,delivery_type
+		    	 ,integral
+		    	 ,contract_no
+		    	 ,activites_details_id
+		   )values
+	    ]]>	
+		    	(
+		    	#{orderId}
+		    	,#{itemId}
+		    	,#{skuId}
+		    	,#{skuName}
+		    	,#{primitivePrice}
+		    	,#{areaId}
+		    	,#{num}
+		    	,#{promotionDiscount}
+		    	,#{promotionId}
+		    	,#{promotionType}
+		    	,#{couponDiscount}
+		    	,#{integralDiscount}
+		    	,now()
+		    	,now()
+		    	,#{payPrice}
+		    	,#{payPriceTotal}
+		    	,#{cid}
+		    	,#{shopFreightTemplateId}
+		    	,#{deliveryType}
+		    	,#{integral}
+		    	,#{contractNo}
+		    	,#{activitesDetailsId}
+		    	)
+	</insert>
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.tradecenter.domain.TradeOrderItems">
+		<![CDATA[
+		update trade_order_items set
+   			pay_price_total = #{payPriceTotal}
+   			,update_time = now()
+		 where order_id = #{orderId}
+		 	and sku_id = #{skuId}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from trade_order_items where id = #{id}
+		]]>
+	</delete>
+	
+	<select id="queryItemsByOrderId" resultMap="tradeOrderItemsDTOMap">
+		<![CDATA[
+		SELECT * FROM trade_order_items t WHERE t.order_id=#{orderId}
+		]]>
+	</select>
+	
+	<delete id="deleteOrders">
+		<![CDATA[
+			DELETE 
+			FROM
+			  trade_order_items 
+			WHERE trade_order_items.order_id IN 
+		]]>
+		<foreach collection="orders" item="order" open="(" separator="," close=")">
+			#{order.orderId}
+		</foreach>
+	</delete>
+	
+	
+	<select id="countNumber" resultMap="tradeOrderItemsDTOMap">
+		<![CDATA[ 
+			select SUM(toi.num) number ,toi.sku_id skuId 
+			   FROM trade_order_items toi 
+			where toi.contract_no=#{contractNo}
+			 GROUP BY toi.sku_id 
+		]]>
+	</select>
+	<select id="countCost" resultMap="tradeOrderItemsDTOMap">
+		<![CDATA[ 
+			 select SUM(toi.pay_price_total) pay  ,toi.sku_id skuId
+			 FROM trade_order_items toi 
+			 where toi.contract_no=#{contractNo} 
+			 GROUP BY toi.sku_id 
+		]]>
+	</select>
+	
+	
+	
+	
+	
+</mapper>

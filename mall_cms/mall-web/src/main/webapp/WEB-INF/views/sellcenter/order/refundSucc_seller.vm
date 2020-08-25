@@ -1,0 +1,55 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+<!-- 
+<link href="css/basic.css" rel="stylesheet" type="text/css" />
+<link href="css/manage_style.css" rel="stylesheet" type="text/css" />
+ -->
+ <link href="$staticPath/css/register.css" rel="stylesheet" type="text/css" />
+<script language="javascript" type="text/javascript" src="$staticPath/js/tab.js"></script>
+<script language="javascript" type="text/javascript" src="$staticPath/js/xiaoguo.js"></script>
+<script language="javascript">
+$(function(){
+	//加载左侧菜单
+	$("#leftSeller").load("$request.getContextPath()/leftBuyer");
+});
+</script>
+<div id="main">
+	<!--左边部分开始-->
+	<div id="leftSeller" class="border-4"></div>
+	<!--左边部分结束-->
+<!--右边部分开始-->
+<div id="right" class="bg_06 border-4 pad_tb20">
+		<!-- 流程 -->
+		<div class="stepflex" style="width:640px;">
+			<dl class="first doing"><!-- 正在哪个流程就加入 doing 这个样式 -->
+				<dt class="s-num">1</dt>
+				<dd class="s-text">选择退款货品<s></s><b></b></dd>
+			</dl>
+			<dl class="normal doing">
+				<dt class="s-num">2</dt>
+				<dd class="s-text">填写退款原因、金额<s></s><b></b></dd>
+			</dl>
+			<dl class="normal doing">
+				<dt class="s-num">3</dt>
+				<dd class="s-text">退款处理<s></s><b></b></dd>
+			</dl>
+			<dl class="last doing">
+				<dt class="s-num"><i class="fa-check"></i></dt>
+				<dd class="s-text">退款完成<s></s><b></b></dd>
+			</dl>
+			<div class="clear"></div>
+		</div>
+		<!-- 流程 end-->
+        <div class="mar_20">
+			<!-- <i class="font_7a font_14b">退款编号：123456789</i> -->
+			<p class="hei_35">当前退款状态：退款已完成！</p>
+        </div>
+        <!-- <div class="wid_940 bg_05 min-hei mar_cen pad_tb20">
+			<p class="hei_30 mar_l10"><i class="demo-icons fa-exclamation-triangle"></i>重要提示：</p>
+			<p class="hei_30 mar_20"> 1.如您对退款有疑问请主动联系卖家。</p>
+			<p class="hei_30 mar_20"><span class="fl"> 2.如双方未能协商一致，您可以</span><button class="button_2 hei_30" id="button_lang">申请客服介入</button><span class="fl">。申请客服介入对卖家售后服务进行评价！</span></p>
+		</div> -->
+    </div>
+
+  </div>
+</div><!--id="right" end-->

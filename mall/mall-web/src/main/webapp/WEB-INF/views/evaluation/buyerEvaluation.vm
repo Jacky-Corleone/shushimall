@@ -1,0 +1,284 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+
+<style>
+.comm-tag{
+  display: inline-block;
+  height: 18px;
+  line-height: 18px;
+  padding: 2px 8px 3px;
+  margin: 0 10px 0 0;
+  vertical-align: middle;
+  font-size: 12px;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #999;
+  max-width: 90px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+</style>
+
+<script type="text/javascript">
+$(function(){
+	//加载左侧菜单
+	$("#leftBuyer").load("$request.contextPath/leftBuyer");
+	//加载页面
+	initPage();
+	//评价星级
+	$("#scopeSelect").change(function(){
+		$("#page").val(1);
+		$("#queryForm").submit();
+	});
+	//评价内容
+	$("#contentEmptySelect").change(function(){
+		$("#page").val(1);
+		$("#queryForm").submit();
+	});
+});
+//初始化方法
+function initPage(){
+	//页面状态
+	if("$!pageState"=="received"){
+		$("#received").attr("class","active");
+	}else if("$!pageState"=="given"){
+		$("#given").attr("class","active");
+	}
+	//评价星级
+	if("$!scopeVal" != ""){
+		$("#scopeSelect").val("$!scopeVal");
+	}else{
+		$("#scopeSelect").val("");
+	}
+	//评价内容
+	if("$!contentEmptyVal" != ""){
+		$("#contentEmptySelect").val("$!contentEmptyVal");
+	}else{
+		$("#contentEmptySelect").val("");
+	}
+}
+//Form表单提交
+function topage(page){
+	$("#page").val(page);
+	$("#queryForm").submit();
+}
+
+
+function showDiv(id,content,Id){
+    $("#contentId").html($("#"+content).html());
+    $("#"+id).show();
+    $("#hideId").val($("#"+Id).val());
+    $("#Id").val(Id);
+
+}
+function hideDiv(id){
+   $("#"+id).hide();
+}
+
+
+</script>
+
+<div id="main">
+<!--left start-->
+<div id="leftBuyer"></div>
+<!--left end-->
+
+<!--right start-->
+<div id="right">
+	<div class="nTab">
+	<form id="queryForm" method="post" action="$request.contextPath/buyerEvaluation/initEvaluation" >
+		<input id="page" name="page" type="hidden" value="$!page"/>
+		<input id="pageState" name="pageState" type="hidden" value="$!pageState"/>
+		<div class="TabTitle">
+			<ul id="myTab0">
+				<a href="$request.contextPath/buyerEvaluation/initEvaluation?pageState=received">
+					<li id="received" class="normal">收到的评价</li>
+				</a>
+				<a href="$request.contextPath/buyerEvaluation/initEvaluation?pageState=given">
+					<li id="given" class="normal">做出的评价</li>
+				</a>
+			</ul>
+		</div>
+		<div class="TabContent">
+			#if($!pageState=="received")
+			<div class="wid_220 fl mar_lr10 fl font_cen mar_t30">
+				<div class="hei_30 wid_220">作为买家收到
+					<i class="font_fe font_14b"> 
+						#if("$!evaluationTotal.evaluationNum" != "")
+							$!evaluationTotal.evaluationNum
+						#else
+							0
+						#end
+					</i>条评价
+				</div>
+				<div class="hei_30 wid_220">
+					<span id="star1">
+						#if($!evaluationTotal.scopeAvg>4)
+							<span class="star sa5"></span>
+						#elseif($!evaluationTotal.scopeAvg>3)
+							<span class="star sa4"></span>
+						#elseif($!evaluationTotal.scopeAvg>2)
+							<span class="star sa3"></span>
+						#elseif($!evaluationTotal.scopeAvg>1)
+							<span class="star sa2"></span>
+						#elseif($!evaluationTotal.scopeAvg>0)
+							<span class="star sa2"></span>
+						#else
+							<span id="star3" class="starbigSpan">
+								<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+								<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+								<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+								<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+								<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+							</span>
+						#end
+						<i class="font_fe font_14b"> 
+							#if("$!evaluationTotal.scopeAvg" != "")
+								$!evaluationTotal.scopeAvg
+							#else
+								0
+							#end
+						</i>分
+					</span>
+				</div>
+				</div>
+				<table class="Comment fl mar_t20">
+					<thead>
+ 						<tr class="hei_24 bg_05">
+							<th class="wid_160 border-1 font_cen">星级</th>
+							<th class="wid_80 border-1 font_cen">总计</th>
+						</tr>
+					</thead>
+					<tbody>
+						#foreach($totalDetail in $totalDetailList)
+						<tr>
+							<td class="border-1 font_cen">
+								#if($velocityCount==1)
+									<span class="star sa5"></span>
+								#elseif($velocityCount==2)
+									<span class="star sa4"></span>
+								#elseif($velocityCount==3)
+									<span class="star sa3"></span>
+								#elseif($velocityCount==4)
+									<span class="star sa2"></span>
+								#elseif($velocityCount==5)
+									<span class="star sa1"></span>
+								#end
+								#if("$!totalDetail.percent" != "")
+									$!totalDetail.percent%
+								#else
+									0.00%
+								#end
+							</td>
+							<td class="border-1 font_cen">
+								#if("$!totalDetail.count" != "") 
+									$!totalDetail.count
+								#else
+									0
+								#end
+							</td>
+						</tr>
+						#end
+					</tbody>
+				</table>
+			#end
+			<div id="right_bot" class="right_bot ">
+				<div id="right_bot" class="right_bot">
+					<ul class="list_top bg_08 font_14b wid_950 mar">
+						<li class="wid_80 font_cen hei_35">序 号</li>
+						<li class="wid_110 font_cen hei_35">
+							<select id="scopeSelect" name="scope" class="price">
+								<option value="" selected="selected">评价星级</option>
+								<option value="5">五颗星</option>
+								<option value="4">四颗星</option>
+								<option value="3">三颗星</option>
+								<option value="2">二颗星</option>
+								<option value="1">一颗星</option>
+							</select>
+						</li>
+						<li class="wid_300 font_cen hei_35">
+							<select id="contentEmptySelect" name="contentEmpty" class="price">
+								<option value="" selected="selected">评价内容</option>
+								<option value="1">有评论内容</option>
+								<option value="0">无评论内容</option>
+							</select>
+						</li>
+						<li class="wid_300 font_cen hei_35">订单编号/商品名称</li>
+						<li class="wid_150 font_cen hei_35">评价方</li>
+					</ul>
+					<!--每一笔订单可以循环一下内容 开始-->
+					<div class="wid_950 mar_cen border-4" >
+						#foreach($evaluation in $pager.records)
+						<!-- 每一条评论订单 -->
+						<ul class="list_top hei_80">
+							<li class="wid_80 font_cen">$velocityCount</li>
+							<li class="wid_110 font_cen">
+								#if($!evaluation.skuScope=="5")
+									<span class="star sa5"></span>
+								#elseif($!evaluation.skuScope=="4")
+									<span class="star sa4"></span>
+								#elseif($!evaluation.skuScope=="3")
+									<span class="star sa3"></span>
+								#elseif($!evaluation.skuScope=="2")
+									<span class="star sa2"></span>
+								#elseif($!evaluation.skuScope=="1")
+									<span class="star sa1"></span>
+								#end
+							</li>
+							<li class="wid_300 font_cen hei_20 pad_t20">
+								<p class="font_12 over_ell f1 cursor" title="点击此处查看评价详情" id="evalua_content_$velocityCount" onclick="showDiv('shopNewsDiv','evalua_content_$velocityCount','$!evaluation.id');" >$!evaluation.content</p>
+
+								<p class="font_c7 font_12">$!date.format('yyyy-MM-dd HH:mm:ss',$!evaluation.createTime)</p>
+							</li>
+							<li class="wid_300 font_cen _cen hei_20 pad_t20  " title="$!evaluation.orderId / $!evaluation.itemName">
+								<p class="font_12 over_ell cursor">$!evaluation.orderId / $!evaluation.itemName</p>
+								<p class="font_c7">$!evaluation.skuName</p>
+							</li>
+							<li class="wid_150 font_cen">
+								#foreach($userDTO in $userDTOMap.entrySet())
+					          		#if($!userDTO.key==$evaluation.userId)
+					          			$userDTO.value.uname
+					          		#end
+					          	#end
+							</li>
+						</ul>
+						#if($!evaluationMap2Tags.get($!evaluation.id))
+    						<ul class="list_top border-5">
+                        			<i class="font_14b mar_l20">评价标签：</i>
+                        			#foreach($tag in $!evaluationMap2Tags.get($!evaluation.id))
+                        				<span class="comm-tag">$tag.tagName</span>
+                        			#end
+                            </ul>
+						#else
+							<ul class="list_top hei_20 border-5">
+							</ul>
+                		#end
+						#end
+						<!--分页数据-->
+            		#pageVelocity($pager)<!--分頁結束 -->
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</form>
+	</div>
+</div>
+<!-- right end-->
+</div>
+
+<!-- 弹出层  -->
+<div class="po_fai" style="display:none;" id="shopNewsDiv">
+    <div class="po_fai_bg"></div>
+    <div class="po_main0 pad_t10" >
+        <div class=" hei_40 bg_05 pad_l10 font_14b"><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor" onclick="hideDiv('shopNewsDiv')"></i>详细信息</div>
+        <div class="add_qynm">
+            <span class="list_top font_14b f1" id="contentId"></span>
+        </div>
+        <div class="wid_130 mar_cen">
+            <button type="button" class="button_3 but_cx hei_30 " onclick="hideDiv('shopNewsDiv')"><a class="font_82">关闭</a>  </button>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,221 @@
+#set($layout = "common/blanklayout.vm")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>询价详情</title>
+<link href="$request.contextPath/assets/css/detail.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="$request.contextPath/assets/js/iscroll.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/tab.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/ajaxfileupload.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        changeIconToRed(2);
+    });
+function queryRquestPriceInfo(thisObj, Num) {
+	if (thisObj.className == "active")
+		return;
+	var tabObj = thisObj.parentNode.id;
+	var tabList = document.getElementById(tabObj).getElementsByTagName("li");
+
+	for (i = 0; i < tabList.length; i++) {
+
+		if (i == Num) {
+		//显示相关的页面信息
+			$.ajax({
+			   type: "POST",
+			   url: "$request.contextPath/requestPriceController/queryRequstPrice?flag=all&num="+Num,
+			   dataType: "html",
+			   success: function(data){
+				   $("#"+tabObj + "_Content" + Num).empty().append(data);
+			   }
+			});
+		
+			thisObj.className = "active";
+			document.getElementById(tabObj + "_Content" + i).style.display = "block";
+		} else {
+
+			tabList[i].className = "normal";
+			document.getElementById(tabObj + "_Content" + i).style.display = "none";
+		}
+	}
+}
+
+
+//附件上传
+var sccount=0;
+//文件上传
+	function startUpload(){
+        //判断图片格式
+        var fileInput = $("#fileInput").val();
+        var extStart = fileInput.lastIndexOf(".");
+        var ext = fileInput.substring(extStart,fileInput.length).toUpperCase();
+        if(ext!=".JPG" && ext!=".jpg" && ext!=".BMP"&&ext!=".bmp"&& ext!=".PNG"&&ext!=".PNG"&& ext!=".JPEG" && ext!=".jpeg"&&ext!=".gif"&&ext!=".GIF"){
+            alert("图片限于JPG,BMP,PNG,JPEG格式");
+            return false;
+        }
+        $.ajaxFileUpload({
+            url: '$request.getContextPath()/orderWx/upload?size=1024000', //用于文件上传的服务器端请求地址
+            secureuri: false, //是否需要安全协议，一般设置为false
+            fileElementId: 'fileInput', //文件上传域的ID
+            dataType: 'text', //返回值类型 一般设置为json
+            type:"post",
+            success: function (data, status){  //服务器成功响应处理函数
+    			var dataStr = data;
+            	if(dataStr.indexOf("<pre>") != -1){
+            		dataStr = dataStr.replace("<pre>","")
+            	}
+            	if(dataStr.indexOf("</pre>") != -1){
+            		dataStr = dataStr.replace("</pre>","")
+            	}
+            	var data = eval("("+dataStr+")");
+                if(data.success){
+                    sccount=sccount+1;
+                    var trid="trid"+sccount;
+                    appendtable(data.url,trid);
+                }else{
+                    alert(data.msg);
+                    $("#fileInput").replaceWith('<input type="file" id="fileInput" class="file-img" name="file" onchange="startUpload();" />');
+                }
+            },
+            error: function (data, status, e){//服务器响应失败处理函数
+			alert(JSON.stringify(data));
+				alert(e);
+                alert("亲系统繁忙，请稍后再试");
+                $("#fileInput").replaceWith('<input type="file" id="fileInput" class="file-img" name="file" onchange="startUpload();" />');
+            }
+        });
+    }
+    function appendtable(url,id){
+	    var imageUrl = '$!imageServerAddr'+url;
+		$("#annex").val(imageUrl);
+        $("#uploadLi").html("<p class='wid_25 fl font_right pad_r5'><span class='font_e5'>*</span>附件</p><span>上传成功&nbsp;&nbsp;&nbsp;</span><a href=javascript:cancleimg() >删除</a>");
+       
+    }
+	
+	//清除指定tr
+    function cancleimg(){
+        $("#uploadLi").html("<p class='wid_25 fl font_right pad_r5'><span class='font_e5'>*</span>附件</p><input type='file' class='wid_50 mar_t10' id='fileInput' name='file' onchange='startUpload();'/>");
+		$("#annex").val('');
+    }
+	
+	
+</script>
+<!--询价相关js方法-->
+<script type="text/javascript" src="$request.contextPath/assets/js/requestPrice/requestPrice.js"></script>
+</head>
+<input type="hidden" id="contextPath" value="$request.getContextPath()"/>
+<body class="bg_03">
+<div id="main" class="po_re">
+    <!-- 中间内容 -->
+    <div class="content" id="wrapper1">
+        <div class="nTab">
+            <div class="clear"></div>
+            <!-- 内容开始 -->
+            <div class="TabContent">
+                <!-- 切换内容    2   -->  
+                <div id="myTab0_Content1" class="bg_01" style="padding-top:10px;">
+                   <!-- 报价创建 -->
+                        <form id="inquiryForm" method="post" onsubmit="return false;" action="$request.contextPath/requestPriceJavaController/resopnseModifyInquiry">
+                        		<!-- 表单 -->
+                                <ul class="pass ">
+                                    <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5">*</span>询价编码</p><input type="text" class="wid_50 input_3" id="inquiryNo" name="inquiryNo" value="$!inquiryNo" readOnly/></li>
+                                    <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5">*</span>询价名称</p><input type="text" class="wid_50 input_3" id="inquiryName" name="inquiryName" value="$!inquiryName"/></li>
+                                    <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5">*</span>询价日期</p><input type="text" class="wid_50 input_3" id="beginDate1" name="beginDate1" value = "$!date.format('yyyy-MM-dd', $!beginDate)" readOnly/></li>
+                                    <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5">*</span>截至报价日期</p><input type="text" class="wid_50 input_3" id="endDate1" name="endDate1" value="$!date.format('yyyy-MM-dd', $!endDate)" readOnly/></li>
+                                    <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5">*</span>交货日期</p><input type="text" class="wid_50 input_3" id="deliveryDate1" name="deliveryDate1" value="$!date.format('yyyy-MM-dd', $!deliveryDate)" readOnly/></li>
+                                    <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5">*</span>采购方</p>
+                        				<input type="hidden"  id="updateBy" name="updateBy" value="$!uid" /><input type="text" class="wid_50 input_3" id="uName" value="$!uName" readOnly/></li>
+                                    <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5"></span>备注</p><input type="text" class="wid_50 input_3" id="remarks" name="remarks" value="$!remarks" readOnly/></li>
+                                    <li id="uploadLi"><p class="wid_30 fl font_right pad_r5"><span class="font_e5"></span>附件</p>
+										#if($!annex != "" && $!annex != "null")
+                                            <p class='fl wid_30 one' ><a href="$!gix$!annex">$!fileName </a></p>
+										#else
+											<p class="fl wid_30 one"></p>
+										#end
+									</li>
+                        			<input type="hidden"  id="annex" name="annex" value="$!annex" />
+                                </ul><!-- 表单 end-->
+                                <!-- table -->
+                                 <div>
+                                    <input type="hidden" id="deleteIds" name = "deleteIds" value="" />
+                                        <div id="itemList">
+                                        #foreach($detail in $details)
+                                        <ul class='mar_lr5'>
+                                            <input type="hidden"  name="detailId" value= "$!detail.get('detailId')" />
+                                            <input type="hidden"  name="itemIds" value= "$!detail.get('matCd')" />
+                                            <div class='hei_32 border_2'>
+                                            <p class='fl'><span style='font-weight:bold;'>物品名：</span><span>$!detail.get('matDesc')</span></p>
+                                            </div>
+                                            <div class='hei_32 border_2'>
+                                                <p class='fl'><span style='font-weight:bold;'>供应商：</span><span>$!detail.get('shopName')</span></p>
+                                            </div>
+                                            <div class='hei_32 border_2'>
+                                                <p class='fl'><span style='font-weight:bold;'>交货时间：</span>$!date.format('yyyy-MM-dd',$!detail.get('deliveryDate2'))</p>
+                                            </div>
+                                            <div class='hei_32 border_2'>
+                                            <p class='fl'><span style='font-weight:bold;'>销售属性：</span><span>$!detail.get('attrSale')</span></p>
+                                            </div>
+                                            <div class='border_2 shop_order pad_tb5' >
+                                            <p class='wid_95 fl shop_order_p'><span style='font-weight:bold;'>数量：</span>$!detail.get('quantity')
+                                            </p>
+                                            <p class='wid_95 fl shop_order_p'><span style='font-weight:bold;'>单价：</span> $!detail.get('matPrice')
+                                            </p>
+                                            <p class='wid_95 fl shop_order_p'><span style='font-weight:bold;'>开始时间：</span>
+                                               $!date.format('yyyy-MM-dd', $!detail.get('beginDate'))
+                                            </p>
+                                            <p class='wid_95 fl shop_order_p'><span style='font-weight:bold;'>结束时间：</span>
+                                                $!date.format('yyyy-MM-dd', $!detail.get('endDate'))
+                                            </p>
+                                            <div class='clear'></div>
+                                            </div>
+                                        </ul>
+                                        #end
+                                        </div>
+                                </div>
+
+
+                                <!-- table -->
+                                <div class="font_right"><button class="hei_32 pad_lr10 button_1" onclick="goBackPage('requestPrice');">返回</button></div>
+                                <div class="clear"></div>
+                        		<div class="font_cen" style="margin-top:10px;">
+                        			<span style="color:red;" class="errorMsg"></span>
+                                </div>
+							</form>
+                </div>
+                <!-- 切换内容    2   -->
+            </div>
+        </div>
+         
+    </div><!-- 中间内容 end-->
+	
+
+</div>
+    #parse("common/footer.vm")
+</body>
+   <!-- 弹出层 Start -->
+    <div id="Idiv"
+         style="width:100%;border:1px solid red;display: none; position: absolute; z-index: 20000;background:#dedede">
+        <div id="mou_head"
+             style="width:100%; height:100%;z-index: 20001; position: absolute;">
+            <div style="float:center;width:100%;height:5%">
+                <input style="height: 100%; width:50%;float:right;background: red" type="button" value="关闭"
+                       onclick="closeDiv();"/>
+            </div>
+            <div class="clear"></div>
+            <form id="partB" method="post">
+                <input name="page" type="hidden">
+            </form>
+            <div id="partBDetail" style="background:white;width:100%;height:80%">
+
+            </div>
+        </div>
+    </div>
+    <!-- 弹出层 end -->
+
+</html>
+

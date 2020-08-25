@@ -1,0 +1,201 @@
+#parse("/sonhome/header_top.vm")
+<script type="text/javascript" src="$staticPath/js/respond.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+       // $("#loginArea").load("$request.contextPath/loginFragement");
+
+        // 搜索类型切换  宝贝/店铺
+        $(".mid_search .big_class span").click(function(){
+            $(".mid_search .big_class span").removeClass("focus_class font_ff");
+            $(this).addClass("focus_class font_ff");
+        });
+
+        // 搜索按钮事件添加
+        $(".mid_search .button_search").click(function(){
+            var flag = "$!flag";//标识位，区分是否是二手市场
+            if(flag && flag=='used'){
+                usedSearch();
+            }else{
+                wholeNewSearch();
+            }
+        });
+
+        $("#keyword_searchForm").keydown(function(e){
+            if(e.keyCode==13){
+                $(".mid_search .button_search").trigger("click");
+            }
+        });
+
+        $("[module='$!module']").addClass("first_current");
+
+        // 搜索框下的热销词
+        $.getJSON("$request.contextPath/mallWord",function(data){
+            $(data).each(function(i,obj){
+                $(".mid_search .Tag").append('<a href="#"><span class="mall_word">'+obj.word+'</span></a>');
+            });
+
+            $(".mall_word").bind("click",function(){
+                var word = $(this).html();
+                $("#keyword_searchForm").val(word);
+                wholeNewSearch();
+            });
+        });
+
+        $("#buyer").on("mouseenter",function(){
+            $("#loginArea").load("$request.contextPath/loginFragement?type=buyer");
+            $("#loginArea").show();
+            $(this).addClass("Nav_focus");
+            $("#seller").removeClass();
+        });
+        $("#seller").on("mouseenter",function(){
+            $("#loginArea").load("$request.contextPath/loginFragement?type=seller");
+            $("#loginArea").show();
+            $(this).addClass("Nav_focus");
+            $("#buyer").removeClass();
+        });
+        $("#loadcenter").on("mouseleave",function(){
+            $("#loginArea").hide();
+            $("#seller").removeClass();
+            $("#buyer").removeClass();
+        });
+
+
+
+    });
+    function top_banner(){
+        $("#top_banner").slideUp("slow");
+    }
+
+    // 搜索全新商品
+    function wholeNewSearch(){
+        var type = $(".mid_search .big_class").find(".focus_class").attr("type");
+        var keyword = $.trim($("#keyword_searchForm").val());
+        if( keyword != null && keyword != "" ){
+            if(type=="g"){
+                //商品搜索
+                location.href="$request.getContextPath()/searchController/searchItem?keyword="+keyword;
+            }else if(type=="s"){
+                //店铺搜索
+                location.href="$request.getContextPath()/searchController/searchShop?keyword="+keyword;
+            }
+            $("#searchForm").submit();
+        }
+    }
+
+    // 搜索二手商品
+    function usedSearch(){
+        var keyword = $.trim($("#keyword_searchForm").val());
+        if( keyword != null && keyword != "" ){
+            location.href="$request.getContextPath()/usedMarket?keyword="+keyword;
+        }else{
+            location.href="$request.getContextPath()/usedMarket";
+        }
+    }
+
+	function closeMenu(){
+		$.cookie('clicked_menu', null, {path:'/'});
+	}
+
+</script>
+<div id="top_banner" class="top_banner" style="display:none;">
+    <div class="top_img  po_re">
+        <a class="adVisitCount cursor" target="_blank">
+            <img src=""  height="80"/>
+        </a>
+        <i class="fa-times-circle po_ab font_ff font_16 cancel" onclick="top_banner()"></i>
+    </div>
+</div>
+<div class="clear"></div>
+<div id="header">
+    <div class="left_img">
+        <a href="$!siteDomain">
+            <img id="logo" src="$!imageServerAddr$!{logoDTO.picUrl}" width="227" height=" 90"/>
+        </a>
+    </div>
+
+    <div class="mid_search">
+        <div class="big_class">
+            #if(!$flag || $flag != 'used')
+                <span type="g" class="focus_class font_ff pointer cursor">宝贝</span>
+                <span type="s" class="pointer cursor">店铺</span>
+            #end
+        </div>
+        <!--(输入框和搜索按钮)-->
+        <div class="search po_re">
+            <input name="keyword" id="keyword_searchForm" type="text" class="search_input" value="$!keyword" placeholder="请输入要搜索的信息"/>
+            <button type="button" class="button_search wid_80 po_ab pa_01 pointer js_search cursor" style="outline: none;">
+                #if(!$flag || $flag != 'used')
+                    搜 索
+                #else
+                    搜 二 手
+                #end
+            </button>
+        </div>
+        <!--search po_re end (输入框和搜索按钮)-->
+
+        <!--（中间搜索框下的标签）-->
+        <div class="Tag"></div>
+        <!--Tag（中间搜索框下的标签） end-->
+
+    </div>
+    <!--mid_search (包着中间搜索的框)end-->
+
+    <div class="right_img">
+        <!-- 每一个所占div-->
+        <div class="per_one">
+            <span class="Service"></span>诚信保障
+        </div>
+        <!-- 每一个所占div-->
+        <div class="per_one">
+            <span class="approve"></span>企业认证
+        </div>
+        <!-- 每一个所占div-->
+        <div class="per_one">
+            <span class="safety"></span>安全交易
+        </div><!--header end -->
+    </div><!--right_img end-->
+</div>
+<!--头部结束-->
+
+
+
+<!--导航菜单开始-->
+<div class="Nav_bg border-3">
+    <div class="Nav" >
+        <div class="Nav_left po_re wid_220 fl">
+            <h2 class="all_select" style="text-align:center">
+                <a>
+					<span id="categParentName"></span>
+                </a>
+            </h2>
+            <div class="Nav_classify hide"></div>
+        </div>
+        <div class="menu_mid_new">
+            <ul class="fl">
+                <li module="index"><a href="$request.contextPath/">首页</a></li>
+                <li module="pmarket"><a href="$request.contextPath/productController/categoryItems">产品大全</a></li>
+                <li module="bmarket"><a href="$request.contextPath/brandMarket">品牌频道</a></li>
+                <li module="umarket"><a href="$request.contextPath/usedMarket">二手市场</a></li>
+                <!--<li module="umarket"><a href="$request.contextPath/centralPurchasing">集采活动</a></li>-->
+                <!--<li module="umarket"><a href="$request.contextPath/coupons">优惠券</a></li>-->
+                <!--<li module="umarket"><a href="$request.contextPath/integralMall">积分商城</a></li>-->
+                <li module="umarket"><a href="http://screenprint.shushi100.com">网印 +</a></li>
+                <!--
+                <li currentClass="first_current"><a href="javascript:void(0);">平台活动</a></li>
+                -->
+            </ul>
+        </div>
+        <!--
+        <div id="loadcenter" class="fr wid_300 Nav_right po_re ">
+            <h2 id="buyer" ><i class="demo-icons fa-unlock font_16 mar_r10"></i><a href="$request.contextPath/buyercenter/loadBuyerCenter" onclick="closeMenu()">个人中心</a></h2>
+            <b class="fl">|</b>
+            <h2 id="seller" ><i class="demo-icons fa-unlock-alt font_16 mar_r10"></i><a href="$request.contextPath/information/informationSeller/initLoad" onclick="closeMenu()">卖家中心</a></h2>
+            <!--登录框 -->
+            <div id="loginArea" class="loginArea border-4 po_ab box-shadow1 hide" style="display: none;margin-top: -2px;">
+                <img src="$staticPath/images/loading-1j.gif">
+            </div>
+        </div>
+        -->
+    </div>
+</div>
+<!--导航菜单结束-->

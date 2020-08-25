@@ -1,0 +1,59 @@
+#set($ctxPath="$request.contextPath")
+#set($layout = "common/blanklayout.vm")
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>商品详情页</title>
+#parse("common/scriptAndCss.vm")
+<style >
+.content{
+	position : static;
+}
+</style>
+<script >
+function redirctPage(index){
+	switch (index){
+        case 1:
+			jQuery.ajax({
+                    type : "post",
+                    async : false, //同步执行  
+                    url : "$ctxPath/person/sendPerMsg",
+                    success : function(result) {
+                    },
+                    error : function(errorMsg) {
+                    }
+                });
+          break;
+        case 2:
+          alert('2');
+          break;
+        case 3:
+          alert('3');
+          break;
+	    case 4:
+          alert('4');
+          break;
+	}
+}
+
+</script>
+</head>
+<body style = "background-color : white;">
+<div id="main" class="po_re">
+
+    <!-- 中间内容 -->
+    <div class="content" id="wrapper">
+      <ul class="individual mar_lr5 mar_t20">
+        <li class="border_2" onmouseover="this.style.background='#bbb'" onmouseout="this.style.background='#fff'" onclick="window.location.href='$ctxPath/person/sendPerMsg'"><span class="wid_95 fl">个人信息</span><i class="fa fa-angle-right fr"></i></li>
+        <li class="border_2" onmouseover="this.style.background='#bbb'" onmouseout="this.style.background='#fff'" onclick="window.location.href='$ctxPath/person/bindingAccount'"><span class="wid_95 fl">帐号绑定</span><i class="fa fa-angle-right fr"></i></li>
+        <li class="border_2" onmouseover="this.style.background='#bbb'" onmouseout="this.style.background='#fff'" onclick="window.location.href='$ctxPath/person/modifyPwd'"><span class="wid_95 fl">修改密码</span><i class="fa fa-angle-right fr"></i></li>
+        <li class="border_2" onmouseover="this.style.background='#bbb'" onmouseout="this.style.background='#fff'" onclick="window.location.href='$ctxPath/person/hisMsg'"><span class="wid_95 fl">历史信息</span><i class="fa fa-angle-right fr"></i></li>
+      </ul>
+         
+    </div><!-- 中间内容 end-->
+</div>
+</body>
+</html>

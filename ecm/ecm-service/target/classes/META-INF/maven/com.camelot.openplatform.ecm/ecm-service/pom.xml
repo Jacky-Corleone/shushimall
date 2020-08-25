@@ -1,0 +1,174 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>ecm-parent</artifactId>
+		<groupId>com.camelot.openplatform.ecm</groupId>
+		<version>shushi100-1.0.3.daily-SNAPSHOT</version>
+		<relativePath>../ecm-parent/pom.xml</relativePath>
+	</parent>
+	<artifactId>ecm-service</artifactId>
+	<name>ecm-service</name>
+	<url>http://maven.apache.org</url>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>com.camelot.openplatform.ecm</groupId>
+			<artifactId>ecm-dao</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.camelot.openplatform.ecm</groupId>
+			<artifactId>ecm-rpc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml-schemas</artifactId>
+		</dependency>
+		
+		<!-- EHCACHE begin -->
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache-core</artifactId>
+		</dependency>
+		<dependency>
+            <groupId>net.sf.ehcache</groupId>  
+            <artifactId>ehcache-web</artifactId>  
+        </dependency>
+		<!-- EHCACHE end -->
+		<!-- SECURITY begin -->
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-spring</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-ehcache</artifactId>
+		</dependency>
+		<!-- SECURITY end -->
+
+		<!--job-->
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+        </dependency>
+
+
+		<!-- Activiti -->
+		<dependency>
+			<groupId>org.activiti</groupId>
+			<artifactId>activiti-engine</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.activiti</groupId>
+			<artifactId>activiti-spring</artifactId>
+		</dependency>
+		
+		<!-- xstream xml -->
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+		</dependency>
+		
+		<!-- email -->
+		<dependency>
+		    <groupId>javax.mail</groupId>
+		    <artifactId>mail</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>javax.activation</groupId>
+		    <artifactId>activation</artifactId>
+		</dependency>
+		<!-- poi office -->
+	  	<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi-ooxml</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi-ooxml-schemas</artifactId>
+		</dependency>
+		
+		<!-- image util -->
+		<dependency>
+		    <groupId>com.drewnoakes</groupId>
+		    <artifactId>metadata-extractor</artifactId>
+		</dependency>
+		
+		
+		
+		
+		<!-- DUBBO CONSUMER DEPENDENCY -->
+		<dependency>
+			<groupId>com.camelot.openplatform.basecenter</groupId>
+			<artifactId>basecenter-export</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.camelot.openplatform.sellercenter</groupId>
+			<artifactId>sellercenter-export</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.camelot.openplatform.goodscenter</groupId>
+			<artifactId>goodscenter-export</artifactId>
+		</dependency>
+		<dependency>
+            <groupId>com.camelot.openplatform.marketcenter</groupId>
+            <artifactId>marketcenter-export</artifactId>
+        </dependency>
+		<!-- DUBBO CONSUMER DEPENDENCY -->
+		
+		
+		
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<!-- NOTE: We don't need a groupId specification because the group is 
+					org.apache.maven.plugins ...which is assumed by default. -->
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<descriptor>src/main/assemble/service-impl-jar-with-dependency.xml</descriptor>
+					<!-- <archive> <manifest> <addClasspath>true</addClasspath> <classpathPrefix>lib/</classpathPrefix> 
+						<mainClass>com.alibaba.dubbo.container.Main</mainClass> </manifest> </archive> -->
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id> <!-- this is used for inheritance merges -->
+						<phase>package</phase> <!-- bind to the packaging phase -->
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

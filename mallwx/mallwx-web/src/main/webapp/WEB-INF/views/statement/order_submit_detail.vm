@@ -1,0 +1,67 @@
+#set($layout = "common/order.vm")
+#if(${orderInfo.size()} > $0)
+	#foreach($order in ${orderInfo})
+		#if(${order})
+        <div class="pad_lr5 bg_01 mar_b10">
+            <!-- 订单号 -->
+            <div class="hei_32 border_2">
+                <p class="fl wid_57">
+                    <i onclick="checkThis(this);" ischeck orderId="${order.orderId}" class="fa fa-circle-thin font_3"></i>##fa-check-circle
+                    <span>订单号:$!{order.orderId}</span>
+                </p>
+                <p class="fr wid_35 font_right">
+                    ## 						<a href="$request.getContextPath()/orderWx/queryOrderInfoBuyer?orderId=$!order.orderId" target="_blank" class="mar_r2">订单详情</a>
+                    <a class="font_e5 mar_l5" id="$!order.orderId">$!{order.ordreStatus}</a>
+                </p>
+                <input type="hidden" id="totalItem" value="$!{totalItem}">
+            </div>
+            <!-- 订单号 -->
+			#if(${order.items})
+				#foreach($item in ${order.items})
+                    <!-- 商品信息 -->
+                    <div class="border_2 shop_order pad_tb5">
+                        <p class="fl shop_order_img">
+                            <a href="$request.contextPath/product/toDetail?id=$!item.itemId&skuId=$!item.skuId">
+                                <img src="$!imageServerAddr$!item.skuPicUrl" width="75px" height="75px"/>
+                            </a>
+                        </p>
+                        <div class="wid_50 fl shop_order_p">
+                            <p>
+                                <a href="$request.contextPath/product/toDetail?id=$!item.itemId&skuId=$!item.skuId">
+									$!{item.itemName}
+                                </a>
+                            </p>
+                            <p>商品属性：$!{item.skuName}</p>
+                        </div>
+                        <div class="fl lin_24">
+                            <p>￥$!{item.payPrice}</p>
+                            <p class="font_66">x$!{item.num}</p>
+                        </div>
+
+                        <div class="clear"></div>
+                    </div>
+                    <!-- 商品信息 -->
+				#end
+			#else
+                没有商品
+			#end
+            <p class="hei_34">下单时间：$!{order.createTime}&nbsp;&nbsp;&nbsp;&nbsp;<span class="fr">总价：$!{order.paymentPrice}</span></p>
+            <!-- 按钮 -->
+            <div class="pad_tb5">
+                <button class="button_3 pad_mlr5" id="orderDetail" onclick="orderDetail('$!{order.orderId}')">订单详情</button>
+                <div class="clear"></div>
+            </div>
+        </div>
+		#else
+        没有订单
+		#end
+	#end
+
+#else
+<script>toast("没有订单信息了");</script>
+#end
+<script>
+    pager.page=$!{pager.page};
+    pager.nextPage=$!{pager.nextPage};
+    pager.totalPage=$!{pager.totalPage};
+</script>

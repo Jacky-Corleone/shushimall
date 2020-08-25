@@ -1,0 +1,331 @@
+@charset "utf-8";
+@import url("style.css");
+/* CSS Document */
+@font-face {
+ font-family: 'FontAwesome';
+ src: url('../fonts/glyphicons/fontawesome-webfont.eot?v=4.2.0');
+ src: url('../fonts/glyphicons/fontawesome-webfont.eot?#iefix&v=4.2.0') format('embedded-opentype'), url('../fonts/glyphicons/fontawesome-webfont.woff?v=4.2.0') format('woff'), url('../fonts/glyphicons/fontawesome-webfont.ttf?v=4.2.0') format('truetype'), url('../fonts/glyphicons/fontawesome-webfont.svg?v=4.2.0#fontawesomeregular') format('svg');
+ font-weight: normal;
+ font-style: normal;
+}
+[class^="fa-"], [class*="fa-"] {
+ font-family: 'FontAwesome';
+ font-style: normal;
+ font-weight: normal;
+ font-variant: normal;
+ text-transform: none;
+ speak: none;
+ -webkit-font-smoothing: antialiased;
+ -moz-osx-font-smoothing: grayscale;
+}
+.demo-icons{
+	display: inline-block;
+	width: auto;
+	margin:0px 3px;
+}
+.fa-caret-right:before {
+content: "\f0da";
+}
+.fa-map-marker:before {
+content: "\f041";
+}
+.fa-sort-desc:before {
+content: "\f0dd";
+}
+.fa-weibo:before {
+content: "\f18a";
+}
+.fa-wechat:before, .fa-weixin:before {
+content: "\f1d7";
+}
+.fa-star:before {
+content: "\f005";
+}
+.fa-angle-left:before {
+content: "\f104";
+}
+.fa-times-circle:before {
+content: "\f057";
+}
+.fa-angle-right:before {
+content: "\f105";
+}
+.fa-unlock:before {
+content: "\f09c";
+}
+.fa-unlock-alt:before {
+content: "\f13e";
+}
+.fa-list-ul:before {
+content: "\f0ca";
+}
+.fa-th-large:before {
+content: "\f009";
+}
+.fa-search:before {
+content: "\f002";
+}
+.fa-angle-down:before {
+content: "\f107";
+}
+.fa-cny:before, .fa-rmb:before, .fa-yen:before, .fa-jpy:before {
+content: "\f157";
+}
+.fa-warning:before, .fa-exclamation-triangle:before {
+content: "\f071";
+}
+.fa-edit:before, .fa-pencil-square-o:before {
+content: "\f044";
+}
+.fa-exclamation-circle:before {
+content: "\f06a";
+}
+.fa-check-circle:before {
+content: "\f058";
+}
+.fa-info-circle:before {
+content: "\f05a";
+}
+.fa-user:before {
+content: "\f007";
+}
+.fa-lock:before {
+content: "\f023";
+}
+.fa-check-square-o:before {
+content: "\f046";
+}
+html, body, ul, ol, li, p, h1, h2, h3, h4, h5, h6, form, fieldset, img, div, dl, dt, dd {
+	margin:0;
+	padding:0;
+	font-family:Microsoft Yahei, Arial;
+	font-size:12px;
+	list-style:none;
+	color:#747474;
+}
+i{
+	font-style:normal
+}
+a {
+	color:#747474;
+	outline:none;
+	text-decoration:none;
+}
+a:hover {
+	color:#000;
+}
+.clear {
+	clear:both;
+	font-size:0;
+	line-height:0;
+	height:0;
+}
+.hide{display:none;}
+.fl{ float:left;}
+.fr{ float:right}
+.font_left{ text-align:left}
+.font_right{ text-align:right}
+
+.font_14{ font-size:14px;}
+.font_14b{ font-size:14px; font-weight:bold;font-family:Microsoft Yahei;}
+.font_16{ font-size:16px;}
+.font_18{ font-size:18px;}
+.font_20{ font-size:20px;}
+.font_24{ font-size:24px;}
+.font_36{ font-size:36px;}
+.font_c7,.font_c7 a{ color:#c7c7c7}
+.font_ec,.font_e3 a{ color:#ece9e9}
+.font_60,.font_e3 a{ color:#60b700}
+.font_e3,.font_e3 a{ color:#e32529}
+.font_00,.font_00 a{ color:#000}
+.font_82,.font_82 a{ color:#828282}
+.font_fe,.font_fe a{ color:#E50011}
+.font_ff,.font_ff a{ color:#ffffff}
+.font_7a,.font_7a a{ color:#7abd54;}
+.wid{ width:1200px;margin:auto;}
+.wid_auto{ width:1200px;margin:0 auto; overflow:hidden;}
+.wid_1160{ width:1160px;margin:0 auto; overflow:hidden;}
+.hei_600{ min-height:600px;}
+.hei_32{ height:32px; line-height:32px;}
+.hei_35{ height:35px; line-height:35px;}
+.hei_40{ height:40px; line-height:40px;}
+.hei_45{ height:45px; line-height:45px;}
+.mar{ margin:0 auto}
+.mar_t10{ margin-top:10px;}
+.mar_t30{ margin-top:30px;}
+
+.mar_r10{ margin-right:10px;}
+.mar_l10{ margin-left:10px;}
+.mar_lr10{ margin-left:10px;margin-right:10px;}
+.mar_lr20{ margin-left:20px;margin-right:20px;}
+.mar_tb20{ margin-top:20px;margin-bottom:20px;}
+.pad_tb20{ padding-top:20px; padding-bottom:20px;}
+.pad_lr10{ padding-left:10px; padding-right:10px;}
+.pad_lr15{ padding-left:15px; padding-right:15px;}
+.pad_lr20{ padding-left:20px; padding-right:20px;}
+.pad_t20{ padding-top:20px;}
+.wid_80{ width:80px;}
+.wid_120{ width:120px;}
+.wid_180{ width:180px;}
+.wid_200{ width:200px;}
+.wid_260{ width:260px;}
+.wid_300{ width:300px;}
+.wid_330{ width:330px;}
+.wid_460{ width:460px;}
+.wid_500{ width:500px;}
+.po_re{ position:relative}
+.po_ab{ position:absolute}
+.pa_01{ top:0px; right:0px;}
+.pa_02{ top:5px; left:-45px;}
+.border-1{border:1px solid #ddd;}
+.border-2{border-bottom:2px solid #f5ad00}
+.border-3{border-bottom:2px solid #d9251b}
+.border-4{border:1px solid #e8e8e8;}
+.border-5{border-bottom:1px dashed #e8e8e8;}
+.border-6{border-bottom:1px solid #e8e8e8;}
+.border-7{border:1px solid #E50011;}
+.bg_01{ background:#f7eae8;}
+.bg_02{ background:#e9edf6;}
+.bg_03{ background:#414141;}
+.bg_04{ background:#d9251b;}
+.bg_05{ background:#fafafa;}
+.bg_06{ background:#fff;}
+/******头部样式开始******/
+.header_top{width:100%; height:35px; line-height:35px; background:#f7f7f7; border-bottom:1px solid #d3d3d3;}
+.header_top .top_mid{ width:1200px; margin:0 auto;}
+.header_top .top_mid .top_mid_l{ width:20%; float:left;}
+.header_top .top_mid .top_mid_r{ width:26%; float:right; text-align:right;}
+.header_top .top_mid .top_mid_r .fa-cart{ width:20px; height:22px; margin-right:5px;background:url(../images/basic_icon.png) no-repeat -4px -196px; display: inline-table; }
+
+#header{ width:1200px; height:110px; margin:0 auto; overflow:hidden;}
+#header .left_img{ width:300px; float:left;}
+#header .left_img img{ margin:10px 0px auto 0px;}
+#header .mid_search{width:650px; float:left;}
+#header .mid_search .search{
+	width:550px;
+	margin-top: 30px;
+	height:33px;
+	border: 2px solid #E50011;
+	outline: 0;}
+
+#header .mid_search .Tag{width:550px;  height:30px; line-height:30px;}
+#header .mid_search .Tag span{display: inline;}
+.search_input{
+	height:30px;
+	line-height:30px;
+	font-size:24px;
+	padding-left:10px;
+	line-height: 1.42857143;
+	color: #555;
+	background-color: #fff;
+	font-family:Microsoft Yahei, Arial;
+	border:none;
+	color:#323232;
+	font: 12px/18px 'Hiragino Sans GB',"Simsun",Arial;}
+.button_search{
+	height:34px;
+	line-height:32px;
+	background:#E50011; 
+	color:#fff; 
+	border:none;
+	font-size:16px; 
+	font-family:Microsoft Yahei, Arial; }
+#header .right_img{width:250px;float:right;}
+#header .right_img .per_one{ width:70px; height:80px; line-height:25px; margin:20px 10px 0 0;text-align:center; float:left;}
+#header .right_img span{width:45px; height:45px; float:left; display:block; margin:0 12px;}
+#header .right_img .Service{ background:url(../images/basic_icon.png) -2px 0 no-repeat;}
+#header .right_img .approve{ background:url(../images/basic_icon.png) -90px 0 no-repeat;}
+#header .right_img .safety{ background:url(../images/basic_icon.png) -173px 0 no-repeat;}
+/******底部样式开始******/
+#foot{ width:100%; height:360px; background:#e4e5e6; border-top:1px solid #d3d3d3; margin-top:10px;}
+#foot ul{ width:1200px; margin:30px auto;}
+#foot li{ width:240px; float:left; line-height:26px;}
+#foot li dl{border-right:1px solid #d3d3d3;}
+#foot li dt{height:40px;line-height:40px;font-family:Microsoft Yahei, Arial; font-size:20px; }
+#foot li dt,#foot li dd{width:100px;margin:auto;}
+#foot .icon_1,#foot .icon_2,#foot .icon_3,#foot .icon_4,#foot .icon_5{width:38px; height:38px;}
+#foot .icon_1{ background:url(../images/basic_icon.png) -3px -51px no-repeat;}
+#foot .icon_2{ background:url(../images/basic_icon.png) -46px -51px no-repeat;}
+#foot .icon_3{ background:url(../images/basic_icon.png) -90px -51px no-repeat;}
+#foot .icon_4{ background:url(../images/basic_icon.png) -135px -51px no-repeat;}
+#foot .icon_5{ background:url(../images/basic_icon.png) -179px -51px no-repeat;}
+#foot p{width:1200px; text-align:center; line-height:24px; margin:30px auto;}
+#content{ width:1200px; margin:auto;}
+/******导航样式开始******/
+.Nav{background:#434141;font-family:"Verdana", "Arial", Microsoft Yahei, Arial; font-weight:bold;height:40px; line-height:40px;}
+.Nav_left,.Nav_right{z-index:2;background:#E50011;}
+.Nav_left h2,.Nav_right h2{width:170px;height:40px;line-height:40px;color:#fff;font-size:15px;font-weight:bold;padding:0 15px 0 15px; float:left;}
+.Nav_left h2 a,.Nav_right h2 a,.Nav_right b{color:#fff;}
+.Nav_right h2{ width:110px; text-align:center}
+.Nav_classify{position:absolute;top:40px;left:0;width:198px;height:360px;border:1px solid #d3d3d3;border-top:none; background:#f7f7f7;-moz-box-shadow:0 0 5px #ddd;-webkit-box-shadow:0 0 5px #ddd;box-shadow:0 0 5px #ddd;}
+.mc{position:relative;z-index:5;}
+.mc_classify_list,.Nav_classify li{display:block;cursor:pointer;line-height:32px;height:32px;}
+.Nav_classify li h3{font-size:14px;font-weight:normal;padding-left:14px;}
+/*左侧菜单鼠标滑上弹出层样式 start*/
+.mc_classify_list01{border:1px solid #d3d3d3;height:30px;line-height:30px;border-left:none;border-right:none;background:#fff;width:200px;}
+.mc_classify_prompt{width:660px;border: 1px solid #d3d3d3;background:#fff;position:absolute;left:199px;top:0px;z-index:3;display:none;-moz-box-shadow:0 0 8px #ddd;-webkit-box-shadow:0 0 8px #ddd;box-shadow:0 0 8px #ddd;}
+.mc_prompt_close {float:right;height:19px;width:19px;position: absolute;top:-5px;right: 0;z-index:9999;cursor:pointer;}
+.mc_subitem{float: left;width: 480px;min-height:279px;_height:279px;background-image: none;padding: 2px 4px 2px 8px;}
+.mc_subitem dl {float: left;text-align: left;overflow: hidden;padding: 6px 0;border-bottom: 1px  solid #d3d3d3;margin: 0px;width:480px;}
+.mc_subitem dl dt {float: left;width: 54px;line-height: 22px;text-align:right;color: #E50011;font-weight: bold;}
+.mc_subitem dl dd {float: left;padding-top: 1px;margin-left: 6px;width:402px;+width:auto;overflow:hidden;}
+.mc_subitem dl dd b {font-weight: normal;float: left;padding: 0px 8px;line-height: 14px;margin: 4px 0;}
+.mc_itemright{width: 156px;background: none;}
+.mc_itemright dl {width: 156px;border: none;}
+.mc_itemright dl dt {width: 140px;text-align: left;}
+.mc_itemright dl dd {width:154px;_width:auto;float: right;display: inline;margin-left: 2px;}
+.mc_itemright dl dd b {padding-left: 0px;width: 74px;padding-right: 2px;}
+.mc_itemright dl .mc_salelist h1 {width:136px;line-height:18px;margin-top: 0px; font-size:12px; font-weight:normal;}
+/*左侧菜单鼠标滑上弹出层样式end*/
+
+.menu_mid{width:700px;margin-left:200px;}
+.menu_mid ul li {text-align:center;float:left;}
+.menu_mid ul li a {float:left;height: 40px;line-height:40px;width:120px;color: #fff;font-size: 14px;}
+.menu_mid ul li a:hover {background: #2e2e2e;color: #fff;}
+.menu_mid ul li.first_current a:link,.menu_mid ul li.first_current a:visited,.menu_mid ul li.first_current a:hover {background:#2e2e2e; }
+/******导航样式介绍******----------------------------/
+
+
+/*分页*/
+.page{position:relative;width:auto;float:right; text-align:left;height:30px;line-height:30px; margin:10px 0px;border-left:1px solid #dedede;}
+.page ul li{ display:inline-block;width:auto; float:left; background:#fff;}
+.page ul li a{ padding:0px 10px;border-bottom:1px solid #dedede; border-right:1px solid #dedede; border-top:1px solid #dedede; width:auto; float:left;}
+.page ul li a.curr{ display:block;background:#e4261c; height:30px; color:#fff;border:1px solid #ea2655;}
+.page ul li a:hover.curr{ background:#c11208;border:1px solid #cf0505;}
+.page ul li a.lastPage{ -ms-border-radius:5px 0px 0px 5px; border-radius:5px 0px 0px 5px;border:1px solid #dedede;}
+.page ul li a.nextPage{ -ms-border-radius:0px 5px 5px 0px;border-radius:0px 5px 5px 0px;border-bottom:1px solid #dedede; border-right:1px solid #dedede; border-top:1px solid #dedede;}
+.skip{ float:right;height:30px; line-height:30px;}
+.skip input{ width:35px; float:left;height:28px; border:1px solid #dedede;}
+a.go{display:block;background:#0483C7; padding:0px 5px; float:left; width:20px; color:#fff;}
+a:hover.go{background:#22b1e6;}
+/*分页end*/
+.mic{ width:100%;height:40px; line-height:40px; text-align:left; margin:10px;}
+.mic a{color:#666;}
+.mic a:hover {color:#B20000;}
+.mic span{font-size:16px; font-family:Microsoft Yahei, Arial; font-weight:bold;text-align:left;}
+
+.box-shadow1{-moz-box-shadow:0px 0px 8px #ddd;-webkit-box-shadow:0px 0px 8px #ddd;box-shadow:0px 4px 8px #ddd;}
+
+.button_1,.button_2,.button_3{width:auto; padding:0px 25px;background:#E50011;text-align:center; border:none;font-family:Microsoft Yahei;color:#fff;border-radius:2px; cursor:pointer;}
+.button_1:hover{ background:#c11208; color:#fff;}
+.button_2{ background:#7abd54;}
+.button_2:hover{ background:#5fa835; color:#fff;}
+.button_3{background:#d3d3d3;}
+.button_3:hover{background:#efefef; color:#000;}
+/******流程图开始******/
+.tree{ width:482px; height:48px; margin:40px 0px 0px auto;float:right;background-image:url(../images/tree.jpg); background-repeat:no-repeat;}
+.tree_1{ background-position:0px 0px;}
+.tree_2{ background-position:0px -48px;}
+.tree_3{ background-position:0px -96px;}
+/******流程图结束******/
+/***********表单样式开始**********/
+.input_Style1{
+font-family:Microsoft Yahei;
+color:#474747;
+height:35px;
+line-height:35px;
+padding-left:15px;
+border:1px solid #e8e8e8;
+background:#fff;
+border-radius:2px;
+}

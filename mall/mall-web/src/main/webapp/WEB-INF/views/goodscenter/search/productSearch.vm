@@ -1,0 +1,882 @@
+
+#set($assetsPath="$request.contextPath/assets")
+#set($layout = "/searchitem_layout.vm")
+<link href="$assetsPath/css/Details.css" rel="stylesheet" type="text/css"/>
+<link href="$assetsPath/css/loading.css" rel="stylesheet" type="text/css"/>
+<!-- js 扩展的 map 对象 -->
+<script src="$assetsPath/js/goodscenter/map.js"></script>
+<script src="$assetsPath/js/delayLoading.min.js"></script>
+<script type="text/javascript">
+$(function () {
+	$("img").delayLoading({
+		defaultImg: "",    // 预加载前显示的图片
+		errorImg: "",                        // 读取图片错误时替换图片(默认：与defaultImg一样)
+		imgSrcAttr: "originalSrc",           // 记录图片路径的属性(默认：originalSrc，页面img的src属性也要替换为originalSrc)
+		beforehand: 0,                       // 预先提前多少像素加载图片(默认：0)
+		event: "scroll",                     // 触发加载图片事件(默认：scroll)
+		duration: "normal",                  // 三种预定淡出(入)速度之一的字符串("slow", "normal", or "fast")或表示动画时长的毫秒数值(如：1000),默认:"normal"
+		container: window,                   // 对象加载的位置容器(默认：window)
+		success: function (imgObj) { },      // 加载图片成功后的回调函数(默认：不执行任何操作)
+		error: function (imgObj) { }         // 加载图片失败后的回调函数(默认：不执行任何操作)
+	});
+}); 
+</script>
+
+<script type="text/javascript">
+
+	function showManJian(itemId){
+		$("#"+itemId).show();
+	}
+	function hideManJian(itemId){
+		$("#"+itemId).hide();
+	}
+
+	function addCartx(shopId, sellerId, itemId, skuId, jiaqianBL){
+		if(!jiaqianBL){
+			alert("商品无价格不能加入购物车");
+		} else{
+			// 判断买家是否购买自己商品
+			$.ajax({
+    			type: "POST",
+    			dataType: "text",
+    			url: "$request.contextPath/productController/checkItem",
+    			async:false,//同步执行
+    			data: {
+    				id: itemId
+    			},
+    			success: function(data){
+    				data = eval("("+data+")");
+    				if(data.success == true){
+    					alert(data.msg);
+    				}
+					if (!data.msg) {
+    					// 判断库存
+            			var skuInventory = $("#skuInventory" + skuId).val();
+            			if(skuInventory && parseInt(skuInventory) > 0){
+            				$.ajax({
+                				url: "$request.contextPath/shopCart/add",
+                				data: {
+                					"shopId": shopId,
+                					"sellerId": sellerId,
+                					"itemId": itemId,
+                					"skuId": skuId,
+                					"quantity": 1
+                				},
+                				type: "post",
+                				dataType: "json",
+                				success: function(data){
+                					$("#addCartBomb").fadeIn();
+                					$.getJSON("$request.contextPath/shopCart/cart",function(data){
+                						//购物车商品数量超过99的时候
+                						if(data.allQuantity > 99 ){
+                							$("#cartQuantity").html('99+');
+                						}else{
+                							$("#cartQuantity").html(data.allQuantity);
+                						}
+                					});
+                				}
+                			});
+            			} else{
+            				alert("该商品已售罄，无法购买");
+            			}
+					}
+    			},
+    			error:function(data){
+    				data = eval("("+data+")");
+    				alert(data.msg);
+    				msg=data.msg;
+    			}
+    		});
+
+		}
+	}
+	//到指定的分页页面
+	function topage(page){
+		$("input[name='page']").val(page);
+		$("#productForm").submit();
+	}
+	//按时间排序
+	function orderSortEvent(obj){
+		$("input[name='orderSort']").val(obj);
+		$("input[name='page']").val("1");//分页从1开始
+		$("#productForm").submit();
+	}
+	$(function(){
+		//头部搜索框选中：宝贝
+		$(".mid_search .big_class span").removeClass("focus_class font_ff");
+		$("span[type='g']").addClass("focus_class font_ff");
+		//搜索关键词
+		var keyword = $("#keyword_hidden").val();
+		$("#keyword_searchForm").val(keyword);
+		$("#keywordMessage").html(keyword);
+
+
+		//品牌查询
+		$("ul.brand>li").unbind("click");
+		$("ul.brand>li").bind("click",function(){
+			var brandId = $(this).attr("id");
+			//console.log("brandId=="+brandId);
+			if(brandId == "-1"){
+				$("input[name='brandId']").val("");
+			}else{
+				$("input[name='brandId']").val(brandId);
+			}
+    		$("input[name='page']").val("1");//分页从1开始
+    		$("#productForm").submit();
+		});
+
+		//属性查询
+		$(".js_attrValues").unbind("click");
+		$(".js_attrValues").bind("click",function(){
+			//属性查询提交格式2:4;5:3;10:2;12:5;按key值从小到大排序
+			var map = new Map();
+			var attrKeyVal = $("input[name='attributes']").val();
+			if(attrKeyVal!=null && attrKeyVal!=""){
+				var arrattrKeyVal = attrKeyVal.split(";");
+				//arrattrKeyVal.length-1  是排除最后一个分号
+				for(var i=0;i<arrattrKeyVal.length-1;i++){
+					if(arrattrKeyVal[i].split(":")[1]==''||arrattrKeyVal[i].split(":")[1]==undefined){
+						map.put(arrattrKeyVal[i].split(":")[0],'');
+					}else{
+						map.put(arrattrKeyVal[i].split(":")[0], arrattrKeyVal[i].split(":")[1]);
+					}
+				}
+			}
+			//获取用户点击的属性值
+			var attrKey = $(this).parent().parent().siblings("div").attr("id");
+			var attrValId = $(this).attr("id");
+			if(attrValId!=null && attrValId == "-1"){
+				//值等于-1，是不限属性值
+				map.remove(attrKey);
+			}else{
+				map.remove(attrKey);
+				map.put(attrKey,attrValId);
+			}
+			var input_attrKeyVal = "";
+			if(map.size()>0){
+				//获取所有key值，返回一个数组
+				var arrkeys = map.keys();
+				//从小到大排序
+				arrkeys = arrkeys.sort(function(a,b){return a>b?1:-1});
+				for(var i=0; i<arrkeys.length; i++){
+					input_attrKeyVal += arrkeys[i]+":"+map.get(arrkeys[i])+";";
+				}
+			}
+			//console.log("input_attrKeyVal===="+input_attrKeyVal);
+			$("input[name='attributes']").val(input_attrKeyVal);
+    		$("input[name='page']").val("1");//分页从1开始
+    		$("#productForm").submit();
+		});
+
+		//属性查询
+		$(".js_categories").click(function(){
+			if($(this).children("i").hasClass("fa-angle-double-down")){
+				$(this).children("i").removeClass("fa-angle-double-down").addClass("fa-angle-double-up");
+				$(this).next().hide();
+			}else{
+				$(this).children("i").removeClass("fa-angle-double-up").addClass("fa-angle-double-down");
+				$(this).next().show();
+			}
+		});
+		//点击左侧 类目
+		$("#js_leftCategory li").click(function(){
+			var cid = $(this).attr("name");
+			$("input[name='cid']").val(cid);
+			$("#productForm").attr("action","$request.getContextPath()/searchController/searchItem?cid="+cid).submit();
+		});
+		$(".tab_ul").find("li").each(function(i){
+			var str = '';
+			$(".gaoji:last").after("<div class='tab_div tab_div"+i+"' gaoji><a class='shuxing cursor font_fe' id='' onclick='dianji(this,"+i+")'>不限</a></div>");
+			var $array = $.parseJSON('$seniorAttrList')[i].values;
+	        $.each($array,function(index,item){
+	        	 str='<a id="'+item.id+'" class="shuxing cursor " onclick="dianji(this,'+i+')">'+item.name+'</a>';
+	        	$(".tab_div"+i).append(str);
+	        });
+		    $(this)[0].flag=false;
+		    $(this).mouseover(function(){
+		        $(this).siblings().removeClass("selected");
+		        $(this).addClass("selected");
+		        $(this).find("i").removeClass("fa-angle-down2");
+		        $(this).find("i").addClass("fa-angle-down3");
+		        $(".tab_div").css("display","none");
+		        $(".tab_div"+i).css("display","block");
+		    });
+		    $(this).mouseout(function(){
+		        $(this).find("i").removeClass("fa-angle-down3");
+		        $(this).find("i").addClass("fa-angle-down2");
+		    })
+		});
+
+		$(".tab_ul").mouseout(function(){
+		    $(".tab_ul").find("li").removeClass("selected");
+		    $(".tab_div").css("display","none");
+		});
+		$(".tab_div").mouseover(function(){
+		    var str=$(this)[0].className;
+		    var indexN=str.charAt(15);
+		    //console.log(indexN);
+		   /* alert(indexN);*/
+		    $(this).css("display","block");
+		    $(".tab_ul").find("li").eq(indexN).addClass("selected");
+		    $(".tab_ul").find("li").eq(indexN).find("i").addClass("fa-angle-down3");
+		});
+
+
+		$(".tab_div").mouseout(function(){
+		    var str=$(this)[0].className;
+		    var indexN=str.charAt(15);
+		    /* alert(indexN);*/
+		    $(this).css("display","none");
+		   $(".tab_ul").find("li").eq(indexN).removeClass("selected");
+		    $(".tab_ul").find("li").eq(indexN).find("i").addClass("fa-angle-down2");
+		    $(".tab_ul").find("li").eq(indexN).find("i").removeClass("fa-angle-down3");
+		});
+
+		//属性选中效果
+		var attributes = $("input[name='attributes']").val();
+		if(attributes!=null){
+			attributes = attributes.slice(0, attributes.length-1);
+			var attributesArray = attributes.split(";");
+			for(var i=0;i<attributesArray.length;i++){
+				var attrId = attributesArray[i].split(":")[0];
+				var attrValue = attributesArray[i].split(":")[1];
+				//console.log(attrId+"    "+attrValue);
+				$(".js_attrValues").each(function(){
+					if(attrValue == parseInt($(this).attr("id"))){
+						$(this).addClass("focusbg");
+						$(this).siblings().removeClass("focusbg");
+					}
+				});
+				$(".shuxing").each(function(){
+					if(attrValue == parseInt($(this).attr("id"))){
+						$(this).addClass("font_fe");
+						$(this).siblings().removeClass("font_fe");
+					}
+				});
+			}
+		}
+
+
+	});
+
+	function categorySearch(cid){
+		$("input[name='cid']").val(cid);
+		$("#productForm").attr("action","$request.getContextPath()/searchController/searchItem?cid="+cid).submit();
+	}
+	function dianji(obj,index){
+		//属性查询提交格式2:4;5:3;10:2;12:5;按key值从小到大排序
+		var map = new Map();
+		var attrKeyVal = $("input[name='attributes']").val();
+		if(attrKeyVal!=null && attrKeyVal!=""){
+			var arrattrKeyVal = attrKeyVal.split(";");
+			//arrattrKeyVal.length-1  是排除最后一个分号
+			for(var i=0;i<arrattrKeyVal.length-1;i++){
+				if(arrattrKeyVal[i].split(":")[1]==''||arrattrKeyVal[i].split(":")[1]==undefined){
+					map.put(arrattrKeyVal[i].split(":")[0],'');
+				}else{
+					map.put(arrattrKeyVal[i].split(":")[0], arrattrKeyVal[i].split(":")[1]);
+				}
+			}
+		}
+	//获取用户点击的属性值
+	var attrKey = $(".gaoji").find("li").eq(index).attr("id");
+	var attrValId = $(obj).attr("id");
+	if(attrValId!=null && attrValId == "-1"){
+		//值等于-1，是不限属性值
+		map.remove(attrKey);
+	}else{
+		map.remove(attrKey);
+		map.put(attrKey,attrValId);
+	}
+	var input_attrKeyVal = "";
+	if(map.size()>0){
+		//获取所有key值，返回一个数组
+		var arrkeys = map.keys();
+		//从小到大排序
+		arrkeys = arrkeys.sort(function(a,b){return a>b?1:-1});
+		for(var i=0; i<arrkeys.length; i++){
+			input_attrKeyVal += arrkeys[i]+":"+map.get(arrkeys[i])+";";
+		}
+	}
+	//console.log("input_attrKeyVal===="+input_attrKeyVal);
+	$("input[name='attributes']").val(input_attrKeyVal);
+	$("input[name='page']").val("1");//分页从1开始
+	$("#productForm").submit();
+
+	};
+    function openCustomerWin() {
+        if( '$!userId' ==  ''){
+            alert("你目前处于非登录状态，请先登录再联系客服！");
+			var retUrl = window.location.href;
+			retUrl = retUrl.replace(window.location.host,'').replace('http://','').replace('/mall-web','');
+            this.location.href="$request.contextPath/user/login?retUrl="+retUrl;
+            return false;
+        }
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            url:"$request.contextPath/shopCart/ifLogin_shopCustomer",
+            success: function(data){
+                if(data.ifLogin_shopCustomer == false){
+                    alert("你目前处于非登录状态，请先登录再联系客服！");
+                    this.location.href="$request.contextPath/user/login";
+                    return false;
+                }
+            }
+        });
+    }
+
+	function closeAddCartBomb(){
+		$("#addCartBomb").hide();
+	}
+
+	function closenTabAddress(){
+		$("#nTab_address_div").hide();
+		setTimeout(function(){
+			$(".address_delivery").removeAttr("onmouseenter");
+			$(".address_delivery").attr("onmouseenter","showTabAddress();");
+		},100);
+	}
+
+	function showTabAddress(){
+		$('.address_delivery').attr('data-on','false');
+		$("#nTab_address_div").show();
+	}
+
+	function removeAddress(){
+		$(".address_delivery").removeAttr("onmouseenter");
+		$(".address_delivery").attr("data-on","true");
+		$("#nTab_address_div").show();
+	}
+
+	function isHide(){
+		if($('.address_delivery').attr('data-on')=='true'){
+			showTabAddress();
+		}else{
+			closenTabAddress();
+		}
+	}
+
+</script>
+
+
+ <!--内容开始-->
+<div id="content">
+#if(!$itemSkus_isNull || $itemSkus_isNull == "true")
+	<div class="wid">
+		<div class="mar_b20" style="width:370px; min-height:100px; margin:100px auto;">
+			<input type="hidden" name="keyword" id="keyword_hidden" value="$!keyword" />
+			<img src="$assetsPath/images/fish.jpg" class="fl mar_r20">
+			<span class="fl mar_t20">十分抱歉，没有找到您想要的相关商品<br/>
+        	<button type="button" class="button_1 hei_30 mar_tb10" onclick="location.href='$request.contextPath/'">
+        		返回首页
+        	</button>
+            <button type="button" class="button_1 hei_30 mar_tb10" onclick="history.back();" style="padding-left: 10px; padding-right: 10px; margin-left: 15px;">
+                返回上一页
+            </button>
+        </span>
+		</div>
+	</div>
+#else
+<!--下面内容开始-->
+<div class="wid_10">
+	 <!--筛选条件开始-->
+     	 <div class="search_condition">
+            <!--每一行开始-->
+             <div class="search_condition_box">
+            	<div class="left_class bl">品牌</div>
+            	<div class="right_list">
+                 <!--tabs开始-->
+                    <!-- 内容开始 -->
+                    <div class="TabContent">
+
+						<!-- 所有品牌的内容开始 -->
+						<div id="myTab0_Content0" >
+	                      <ul class="brand TabContent_first">
+							#if ($brandId)
+							<li id="-1">所有品牌</li>
+							#else
+							<li class="focusbg" id="-1">所有品牌</li>
+							#end
+							#foreach($entity in $brandList)
+							#if ($brandId && $brandId.equals($entity.brandId))
+								<li id="$entity.brandId"><span class="press_classes po_re border-8" style="min-width:80px;"><img src="$!imageServerAddr$!entity.brandLogoUrl"
+									 alt="$!entity.brandName" title="$!entity.brandName"
+									 ## 搜索该品牌，突出样式 #if ($brandId && $brandId.equals($entity.brandId)) class="focusbg" #end
+									 style="width: 78px; height: 38px;"/><b class="po_ab pa_01"></b></span></li>
+								#else
+								<li id="$entity.brandId"><img src="$!imageServerAddr$!entity.brandLogoUrl"
+									 alt="$!entity.brandName" title="$!entity.brandName"
+									 ## 搜索该品牌，突出样式 #if ($brandId && $brandId.equals($entity.brandId)) class="focusbg" #end
+									 style="width: 78px; height: 38px;"/></li>
+								#end	
+	                        #end
+							<!-- <span class="span_more po_ab pa_01 border-7">更多<i class="fa-angle-double-down demo-icons font_14"></i></span> -->
+							<!--展开查看更多 用这个span-->
+							<!-- <span class="span_more po_ab pa_01 border-7 none">收起<i class="fa-angle-double-up demo-icons font_14"></i></span> -->
+							<!--收起 用这个span 其中隐藏用class="none"样式-->
+	                      </ul>
+							<a class="s_more menu_head" href="javascript:;">更多<i></i></a>
+						</div>
+						<!-- 所有品牌的内容结束 -->
+                    </div>
+					<!-- 内容结束 -->
+				<!--tabs结束-->
+				</div>
+      	    </div>
+     	    <!--每一行结束-->
+     	    #foreach($entity in $attrList)
+            <!--每一行开始-->
+	            <div class="search_condition_box">
+	                <div class="left_class bl over_ell" title="$entity.name" id="$entity.id">$entity.name</div>
+	                <div class="right_list">
+	                    <ul class="attr TabContent_second">
+							<li class="focusbg js_attrValues" id="-1">全部</li>
+	                        #foreach($val in $entity.values)
+							<li id="$val.id" class="js_attrValues">$val.name</li>
+		                    #end
+	                    </ul>
+						<a class="s_more menu_head" href="javascript:;">更多<i></i></a>
+	                </div>
+	            </div>
+            <!--每一行结束-->
+            #end
+			 <!--每一行开始-->
+            #if($seniorAttrList!=[])
+				 <div class="search_condition_box search_condition_box2 gaoji">
+					 <div class="left_class bl" id="3715">高级选项</div>
+					 <div class="right_list">
+						 <ul class="attr tab_ul">
+						 #foreach($entity in $seniorAttrList)
+							<li id="$entity.id">$entity.name <i class="fa-angle-down2"></i></li>
+						 #end
+						 </ul>
+					 </div>
+				 </div>
+			 #end
+			<div class="search_condition_box">
+                <div class="left_class bl over_ell" title="输入价格区间" id="">价格</div>
+                <div class="right_list">
+					<input type="text" class="input_Style2 wid_90 mar_l10" value="$!minPrice"/> - <input type="text" class="input_Style2  wid_90" value="$!maxPrice" />
+					<input type="button" id="priceSubmit" value="确定" class="button_gary"/>
+                </div>
+            </div>
+			<div class="search_condition_box">
+                <div class="left_class bl over_ell" title="适合户型" id="">适合户型</div>
+                <div class="right_list">
+					<ul class="attr TabContent_second" id="houseTypeOptions" style="height: auto;">
+						<li name="" #if("$!houseType"=="") class="focusbg" #end>全部</li>
+						#foreach($houseTypeItem in $houseTypeItems)
+							<li #if($!houseType.contains($houseTypeItem.id.toString())) class="focusbg" #end
+								name="$houseTypeItem.id">$houseTypeItem.name</li>
+						#end
+					</ul>
+                </div>
+            </div>
+			<div class="search_condition_box">
+                <div class="left_class bl over_ell" title="商品类型">商品类型</div>
+                <div class="right_list">
+					<ul class="attr TabContent_second" id="addSourceOptions">
+						<li name="" #if("$!addSourcesStr"=="") class="focusbg" #end>全部</li>
+						<li name="1" #if($!addSourcesStr.contains("1")) class="focusbg" #end>单品</li>
+						<li name="3" #if($!addSourcesStr.contains("3")) class="focusbg" #end>套装商品</li>
+						<li name="4" #if($!addSourcesStr.contains("4")) class="focusbg" #end>服务商品</li>
+					</ul>
+                </div>
+            </div>
+
+
+        </div>
+	<div class="More-Options">
+          <a href="javascript:;" id="J_selectorMore">更多选项<i></i></a>
+    </div>
+
+     <!--筛选条件结束-->
+	  <!--分页条开始-->
+    <form id="productForm" action="$request.getContextPath()/searchController/searchItem" method="post">
+		<div class="Search_Sort">
+	        <ul class="fl">
+	            <a href="javascript:void(0);">
+	            	<li onclick="orderSortEvent(#if($!orderSort==5)6#else 5#end);" #if($!orderSort==5) class="bg_04 font_ff" #end>
+	            		销量<i class="#if($!orderSort==5)arrow_up#else arrow_down#end"></i>
+	            	</li>
+	            </a>
+
+	            <a href="javascript:void(0);">
+	            	<li onclick="orderSortEvent(#if($!orderSort==7)8#else 7#end);" #if($!orderSort==7) class="bg_04 font_ff" #end>
+	            		价格<i class="#if($!orderSort==7)arrow_up#else arrow_down#end"></i>
+	            	</li>
+	            </a>
+
+	            <a href="javascript:void(0);">
+	            	<li onclick="orderSortEvent(#if($!orderSort==3)4#else 3#end);" #if($!orderSort==3) class="bg_04 font_ff" #end>
+	            		好评<i class="#if($!orderSort==3)arrow_up#else arrow_down#end"></i>
+	            	</li>
+	            </a>
+	        </ul>
+			<!--配送至开始 -->
+					<div id="destSwitch" class="Search_Sort_delivery">
+
+            			<p class="Sort_delivery">
+            				配送至：<div class="address_delivery" onmouseenter="showTabAddress()" onmouseleave="isHide()" data-on="true">
+									 <span id="destText"></span>
+									 <i class="demo-icons fa-sort-desc font_14"></i>
+									</div>
+    						<!-- 配送至地址选择  end-->
+                            <div class="nTab_address box-shadow1 hide cursor bg_06" id="nTab_address_div" onmouseenter="removeAddress()" onmouseleave="closenTabAddress()">
+                            	<!-- 标题开始 -->
+                            	<div class="TabTitle_address" id="destAreaWrapper">
+                            		<i class="demo-icons fa-times-circle font_16 fr mar_r10" onclick="closenTabAddress()"></i>
+                            		<ul id="Tabaddress">
+                            			<li id="area_item_search0" class="active">
+                            				<a href="javascript:void(0);">省份<i class="fa fa-caret-down"></i></a>
+                            			</li>
+
+                            			<li id="area_item_search1" class="normal none" style="display:none">
+                            				<a href="javascript:void(0);">城市<i class="fa fa-caret-down"></i></a>
+                						</li>
+
+                            			<!-- <li class="normal none">
+                            				<span class="js_tabAddress_three">请选择</span>
+                            				<i class="demo-icons fa-angle-down"></i>
+                            			</li> -->
+                            		</ul>
+                            	</div>
+                            	<!-- 内容开始 -->
+                            	<div class="TabContent_address">
+                            		  <!-- 全部购买咨询 的内容开始 -->
+                            		  <div>
+                            			<ul id="areaList_item_search0">
+
+                            			</ul>
+                            		  </div>
+                            		  <div >
+                            			<ul class="none"  id="areaList_item_search1">
+
+                            			</ul>
+                            		  </div>
+                            	</div>
+                            </div>
+                            <!--tabs end-->
+            	        </p>
+
+            		</div>
+
+			<!--配送至结束 -->
+		</div>
+
+		<!--分页条结束 Search_Sort-->
+	<!--左侧开始-->
+	<div id="shop_left">
+		<dl>
+			<dt class="pad_l10" style="cursor: default;">所有类目</dt>
+			<!--向上class="fa-angle-double-up" 向下class="fa-angle-double-down"的箭头-->
+			#foreach($categoryOne in $categories)
+			#foreach($categoryTwo in $categoryOne.childCats)
+			<dd class="js_categories over_ell cursor" style="width:200px;" title="$categoryTwo.categoryName">
+				<i class="fa-angle-double-down fr mar_r10"></i>
+				<span onclick="categorySearch($categoryTwo.categoryId)">$categoryTwo.categoryName</span>
+			</dd>
+				<ul id="js_leftCategory">
+					#foreach($categoryThree in $categoryTwo.childCats)
+					<li class="cursor over_ell" style="width:140px;" title="$categoryThree.categoryName" name="$categoryThree.categoryId">
+						<i class="demo-icons fa-angle-right"></i>
+						$categoryThree.categoryName
+					</li>
+					#end
+				</ul>
+			#end
+			#end
+		</dl>
+	</div>
+	<!--左侧结束-->
+
+ <!-- 右侧开始-->
+ <div id="right">
+
+		<!--右边第三块产品列表开始-->
+		<input type="hidden" name="page" value="$!pager.page" />
+		<input type="hidden" name="brandId" value="$!brandId" />
+		<input type="hidden" name="attrId" value="$!attrId" />
+		<input type="hidden" name="attributes" value="$!attributes" />
+		<input type="hidden" name="keyword" id="keyword_hidden" value="$!keyword" />
+		<input type="hidden" name="cid" value="$!cid" />
+		<input type="hidden" name="orderSort" value="$!orderSort" />
+		<input type="hidden" name="addSourcesStr" id="addSourcesStr" value="$!addSourcesStr" />
+		<input type="hidden" name="houseType" id="houseType" value="$!houseType" />
+		<input type="hidden" name="minPrice" id="minPrice" value="$!minPrice" />
+		<input type="hidden" name="maxPrice" id="maxPrice" value="$!maxPrice" />
+
+		<div class="Search_list">
+		#foreach($entity in $!itemSkus)
+			<input type="hidden" id="skuInventory$!entity.skuId" value="$!entity.skuInventory"/>
+			<!--每个产品的div开始-->
+			<div class="Product_box" style="position: relative;">
+					<div class="big_img">
+						<a href="$request.getContextPath()/productController/details?id=$entity.itemId&skuId=$entity.skuId" target="_blank">
+							<img originalSrc="$!imageServerAddr$entity.picUrl" style="width: 220px;height: 220px; margin-top: 4px;background:url($assetsPath/images/loading-5.gif) no-repeat center;"/>
+						</a>
+					</div>
+					<div class="n_font">
+						#set($fullAttVal="")
+						#foreach($atts in $!entity.attributes)
+							#foreach($attvalue in $!atts.values)
+								#set($fullAttVal = $fullAttVal + $!attvalue.name)
+							#end
+						#end
+						<a  href="$request.getContextPath()/productController/details?id=$entity.itemId&skuId=$entity.skuId" title="$entity.itemName &nbsp; $fullAttVal" alt="$entity.itemName &nbsp; $fullAttVal" target="_blank">
+						$entity.itemName&nbsp;
+						$fullAttVal
+						</a>
+
+					</div>
+					<div title="$!entity.ad" class="puplic_txt">
+						$!entity.ad
+					</div>
+					<div class="jiaqian po_re">
+					#set($jiaqianBL=true)
+					#if($!entity.skuInquiryPirce)
+						$!entity.skuInquiryPirce
+					#else
+						#if($!entity.hasPrice == 1)
+							#set($key = $entity.skuId)
+							#if(${downMap.get($key)})
+							    <div class="ship icon-service-sales $!entity.skuId"></div>
+								<strong class="font_fz font_18">￥#if($downMap.get($key) > 0)${downMap.get($key)}#else 0 #end</strong>
+							#else
+<!-- 								￥$!entity.skuPrice -->
+                       			<strong class="font_fz font_18">￥$!entity.skuPrice</strong>
+                            #end
+
+						#else
+							#set($jiaqianBL=false)
+							<em style="color:red">暂无报价</em>
+						#end
+					#end
+
+					#foreach($full in $fulljsonArray)
+						#if($!full.shopId == $!entity.shopId && $!full.itemId == $!entity.itemId)
+<!-- 							<a onmouseenter="showManJian($!entity.skuId)" onmouseleave="hideManJian($!entity.skuId)" class="promotion_manjian font_14b font_fe cursor">满减</a> -->
+							<div class="ship icon-service-marketing cursor" onmouseenter="showManJian($!entity.skuId)" onmouseleave="hideManJian($!entity.skuId)"></div>
+						#end
+					#end
+
+					    <!--  满减详情页 -->
+							<div id="$!entity.skuId"  class="open_active box-shadow1 none">
+								<h3 class="mar_lr10 border-5">
+									<a><span class="mar_r20 font_12b font_fe ">满减</span><span id="promotionTime"></span></a>
+								</h3>
+								#foreach($full in $fulljsonArray)
+									#if(${full.promotionFullReduction})
+										#if($!full.shopId == $!entity.shopId && $!full.itemId == $!entity.itemId)
+											#foreach($fullReduction in $!full.promotionFullReduction)
+												<div class="mar_l10" id="promotionList_manjian" style="line-height:24px;">
+													<ul>
+														<li class="over_ell" title="">商品总额满 $!{fullReduction.meetPrice}减 $!{fullReduction.discountPrice}元</li>
+
+													</ul>
+												</div>
+											#end
+										#end
+									#end
+								#end
+							</div>
+					</div>
+					<div class="details"  style="position:absolute; bottom:0px; left:0px;">
+						<a class="n_font_detail" href="$request.getContextPath()/productController/details?id=$entity.itemId&skuId=$entity.skuId">了解详情 <i class="fa-angle-right"></i></a>
+						<i onclick="online_advice()" class="fr icon-bell cursor"></i>
+					</div>
+			</div>
+			<!--每个产品的div结束-->
+		#end
+		</div>
+		<!--右边第三块产品列表结束-->
+	</form>
+ </div>
+ <!-- 右侧right结束-->
+</div>
+
+		<!--分页-->
+		#pageVelocity($pager)
+#end
+<!--下面内容结束-->
+
+
+
+<!--加入购物车弹出层   开始-->
+<div id="addCartBomb" class="po_fai" style="display: none;">
+    <div class="po_fai_bg"></div>
+    <div class="po_main">
+		<ul>
+	    	<li class="font_18">
+	    		<i class="fa-info-circle demo-icons font_24 mar_r10"></i>
+	    		<span class="title">加入购物车成功！</span>
+	    	</li>
+	        <li class="msg font_14"></li>
+	        <li>
+        		<button type="button" class="button_3 hei_40" onclick="closeAddCartBomb();" style="margin-right: 10px;">
+        			继续浏览
+        		</button>
+        		<button type="button" class="button_1 hei_40" onclick="location.href='$request.contextPath/shopCart/toCart'">
+					去购物车结算
+        		</button>
+	        </li>
+    	</ul>
+	</div>
+</div>
+<!--加入购物车弹出层   结束-->
+
+</div>
+<!--内容结束-->
+<script src="$assetsPath/js/search_box.js"></script>
+<script type="text/javascript">
+    selectorMore();
+    search_More();
+	$(function(){
+
+		// 数值金额满足xxx.xx的规则
+		var priceInputPair = $("#priceSubmit").parent().children("input:lt(2)");
+		priceInputPair.bind('keyup', function() {
+			var val = this.value;
+			var regex = /^[0-9]*(\.[0-9]{0,2})?$/g;
+			if (val.match(regex)) {
+				this.backed = val;
+			} else {
+				this.value = this.backed||'';
+			}
+		});
+
+		// 价格区间查询
+		$("#priceSubmit").bind('click', function() {
+			var pricePair = $("#priceSubmit").siblings();
+			var minPrice = pricePair[0].value;
+			var maxPrice = pricePair[1].value;
+			if (isPriceValid(minPrice)) {
+				$("#minPrice").val(minPrice);
+			}
+			if (isPriceValid(maxPrice)) {
+				$("#maxPrice").val(maxPrice);
+			}
+			$("#productForm").submit();
+
+			function isPriceValid(price) {
+				if (!isNaN(price)) {
+					return true;
+				}
+				return false;
+			}
+		});
+
+		// 适合户型查询
+		$("#houseTypeOptions li").bind('click', function() {
+			var houseType = $(this).attr('name');
+			$("#houseType").val(houseType);
+    		$("input[name='page']").val("1");//分页从1开始
+    		$("#productForm").submit();
+		});
+
+		// 是否套装查询
+		$("#addSourceOptions li").bind('click', function() {
+			var addSource = $(this).attr('name');
+			$("#addSourcesStr").val(addSource);
+    		$("input[name='page']").val("1");//分页从1开始
+    		$("#productForm").submit();
+
+		});
+
+		// 配送至
+		/* $('.address_delivery').on('mouseenter',function(){
+			$("#nTab_address_div").show();
+			return false;
+		}); */
+
+		/* $('#nTab_address_div').on('mouseleave',function(){
+			//$('#nTab_address_div').attr('data-on','true');
+			$(this).hide();
+		}); */
+
+		 //$('#nTab_address_div').on('mouseleave',function(){
+			/*  if(){
+				 $(this).hide();
+				 return false;
+			 }else{
+
+			 }
+			$(this).hide();
+			return false; */
+		//});
+
+        $("#destAreaWrapper li").click(function(){
+    		$(this).prop('class', 'active');
+    		$(this).siblings('.active').prop('class', 'normal none');
+    		$("#areaList_item_search"+$(this).index()).show();
+    		$("#areaList_item_search"+$(this).index()).siblings().hide();
+    		if($(this).index() == 0){
+    			$("#area_item_search1").hide();
+    			$("#areaList_item_search1").hide();
+    		}
+    	});
+		$.post('$request.contextPath/address/getCodeAndQualifiedName?areaCode='+$.cookie('regionCode'),
+			function(data) {
+				$("#destText").text(data.qualifiedName);
+			}
+		);
+    	getSubAddress_item_search(0, "areaList_item_search0");
+	});
+
+    //获取省市区
+    function getSubAddress_item_search(addressId, domId){
+    	$.ajax({
+    	   type: "POST",
+    	   dataType: "json",
+    	   url: "$request.contextPath"+"/address/query",
+    	   data: {
+    			id: addressId
+    	   },
+    	   success: function(data){
+    	   		var addressList = '';
+    			for(var i=0;i<data.length;i++){
+    				var name = data[i].name;
+    				var code = data[i].code;
+    				var addressLabel = '<li onclick="forwardGetSubAddress_item_search('+addressId+','+code+',\''+name+'\')">' + name + '</li>';
+    				addressList += addressLabel;
+    			}
+    			$("#"+domId).html(addressList);
+    			if(domId == 'areaList_item_search1'){
+    				//添加事件
+    	    		$("#nTab_address_div").attr("onmouseleave","closenTabAddress();");
+    			}
+    	   }
+    	});
+    }
+
+    function forwardGetSubAddress_item_search(addressId, code, name){
+    	var max_code_of_province = 82;
+    	if(addressId==0){
+    		$("#area_item_search0").prop('class', 'normal none');
+    		$("#areaList_item_search0").hide();
+    		$("#area_item_search1").prop('class', 'active');
+    		$("#area_item_search1").show();
+    		getSubAddress_item_search(code, 'areaList_item_search1');
+    		$("#areaList_item_search1").html('').show();
+
+    		//移除事件
+    		$("#nTab_address_div").removeAttr("onmouseleave");
+
+    		$("#nTab_address_div").show();
+    	}
+    	/**
+    	else if (+addressId <= max_code_of_province) {
+    		$("#area_item_search1").prop('class', '');
+    		$("#areaList_item_search1").hide();
+    		$("#area_item_search2").prop('class', 'current');
+    		getSubAddress_item_search(code, 'areaList_item_search2');
+    		$("#areaList_item_search2").html('').show();
+    	}
+    	*/
+    	else{
+    		selectRegion(code, name);
+    	}
+    }
+
+</script>

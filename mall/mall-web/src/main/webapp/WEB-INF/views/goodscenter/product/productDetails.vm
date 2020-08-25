@@ -1,0 +1,1211 @@
+#set($assetsPath="$request.contextPath/assets")
+<link href="$assetsPath/css/basic.css" rel="stylesheet" type="text/css"/>
+<link href="$assetsPath/css/Details.css" rel="stylesheet" type="text/css"/>
+<link href="$assetsPath/plugin/jquery-validation/1.11.1/jquery.validate.css" type="text/css" rel="stylesheet" />
+##<script language="javascript" type="text/javascript" src="$assetsPath/js/tab.js"></script>
+<script language="javascript" type="text/javascript" src="$assetsPath/js/js.js"></script>
+<script type="text/javascript" src="$assetsPath/plugin/jquery-validation/1.11.1/jquery.validate.js"></script>
+<script type="text/javascript" src="$assetsPath/plugin/jquery-validation/1.11.1/messages_zh.js"></script>
+<script type="text/javascript" src="$assetsPath/js/jquery.blockUI.js"></script>
+<script type="text/javascript" src="$assetsPath/js/jquery-migrate-1.1.0.js"></script>
+<script type="text/javascript" src="$assetsPath/plugin/fancyzoom/jquery.shadow.js"></script>
+<script type="text/javascript" src="$assetsPath/plugin/fancyzoom/jquery.ifixpng.js"></script>
+<script type="text/javascript" src="$assetsPath/plugin/fancyzoom/jquery.fancyzoom.js"></script>
+<script type="text/javascript" src="$assetsPath/plugin/common/loadMsg.js"></script>
+<script type="text/javascript" src="$assetsPath/js/centralPurchasing/signUp.js"></script>
+<script type="text/javascript" src="$assetsPath/js/jquery.selectlist.js"></script>
+<script type="text/javascript" src="$assetsPath/js/delayLoading.min.js"></script>
+<script type="text/javascript">
+$(function() {
+	$(".describe img").delayLoading({
+		defaultImg: "",    // 预加载前显示的图片
+		errorImg: "",                        // 读取图片错误时替换图片(默认：与defaultImg一样)
+		imgSrcAttr: "originalSrc",           // 记录图片路径的属性(默认：originalSrc，页面img的src属性也要替换为originalSrc)
+		beforehand: 0,                       // 预先提前多少像素加载图片(默认：0)
+		event: "scroll",                     // 触发加载图片事件(默认：scroll)
+		duration: "normal",                  // 三种预定淡出(入)速度之一的字符串("slow", "normal", or "fast")或表示动画时长的毫秒数值(如：1000),默认:"normal"
+		container: window,                   // 对象加载的位置容器(默认：window)
+		success: function (imgObj) { },      // 加载图片成功后的回调函数(默认：不执行任何操作)
+		error: function (imgObj) { }         // 加载图片失败后的回调函数(默认：不执行任何操作)
+	});
+}); 
+	var loadingImg = "<div style='height: 42px; line-height: 42px; text-align: center;'><img src='$assetsPath/images/loading-1j.gif'></div>";
+	// 页面初始化、改变sku_id
+	function flushCommCount() {
+		var param = {};
+		if ($.trim( $("#skuId").val() )) {
+			param.skuId = $("#skuId").val();
+		} else {
+			param.itemId = $("#itemId").val();
+		}
+		$.post(
+			'$request.contextPath/productController/getItemEvaluationCount',
+			param,
+			function(data) {
+				data.success && $("#commCount").text(data.count);
+			},
+			'json'
+		);
+	}
+	
+	// myTab0样式更新，显示激活区块
+	function active_myTab0(obj, index) {
+    	// li的样式更改
+    	if ($(obj).hasClass('active')) return;
+    	$(obj).removeClass('normal').addClass('active')
+    		.siblings('.active').removeClass('active').addClass('normal');
+    	
+    	// 显示对应的div块
+    	var refContentDiv = $("#myContent0 > div:eq(" + index + ")");
+    	refContentDiv.show().siblings().hide();
+	}
+	
+				
+	// 请求所需要的参数，返回itemId或skuId
+	function getItemOrSku() {
+		var itemId = $("#itemId").val();
+		var skuId = $("#skuId").val();
+		if (skuId) return {skuId: skuId};
+		return {itemId: itemId};
+	}
+	
+	// 评价内容检索
+	function evaluationContentSearch(page) {
+		$("#tabContent").html(loadingImg);
+		var reqParam = getItemOrSku();
+		if ($("#hasShow").val()=="1") reqParam.hasShow = 1;
+		if (page) reqParam.page = page;
+		$("#tabContent").load(
+			'$request.contextPath/productController/getItemEvaluation',
+			reqParam,
+			function() {
+				// 晒图可以放大查看
+				$("img[fancy_zoom='view_img']").fancyzoom({
+            		Speed:400,
+            		showoverlay:false,
+            		imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+            	});
+			}
+		);
+	}
+	
+	$(function() {
+		
+		flushCommCount();
+		
+		/*
+		详情介绍、规格参数、用户评价、服务支持这一行的li，绑定点击事件
+		除了<li>用户评价</li>这一项，其他的都是简单的改变样式和显示对应的div块
+		*/
+		$('#myTab0 li').each(function (index) {
+			var id = this.id;
+			// 点击用户评价
+			if (id == 'userCommTab') {
+				$(this).click(function () {
+					var obj = this;
+    				if (!$.trim( $("#commWrapper").html() ) || isSkuChange()) {
+						$("#commWrapper").html(loadingImg);
+						active_myTab0(obj, index);
+						var reqParam = getItemOrSku();
+    					// 加载评价页头部
+    					$("#commWrapper").load(
+    						'$request.contextPath/productController/getItemEvaluationHead',
+    						reqParam,
+							function () {
+								$("#commCount2").text($("#commCount").text());
+								
+								// 全部评价、有图评价绑定点击事件
+								$("#Tab0 li").each(function(index) {
+									$(this).click(function() {
+										$("#hasShow").val(index);
+										if ($(this).hasClass('active')) return;
+                                    	$(this).removeClass('normal').addClass('active')
+                                    		.siblings('.active').removeClass('active').addClass('normal');
+										evaluationContentSearch();
+									});
+								});
+								
+								// 加载页面评价内容
+								evaluationContentSearch();
+							}
+    					);
+    				} else {
+						active_myTab0(this, index);
+					}
+				});
+				
+				// 判断sku是否切换过
+				function isSkuChange() {
+					var pageSku = +$("#skuId").val();
+					return pageSku != comm_skuId;
+				}
+			} else {
+				$(this).click(function () {
+					active_myTab0(this, index);
+				});
+			}
+		});
+	});
+
+
+
+	function loadEvaluation(page){
+		$("#myTab0_Content2").html("<div style='height: 42px; line-height: 42px; text-align: center;'><img src='$assetsPath/images/loading-1j.gif'></div>");
+		var skuId = $("#skuId").val();
+		var itemId = $("#itemId").val();
+		$.ajax({
+			url: '$request.contextPath/productController/getItemEvaluation',
+			data: { "page": page,"skuId":skuId,"itemId":itemId },
+			type: 'post',
+			dataType: "html",
+			success: function(data){
+				$("#myTab0_Content2").html(data);
+				$("img[fancy_zoom='view_img']").fancyzoom({
+            		Speed:400,
+            		showoverlay:false,
+            		imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+            	});
+			}
+		});
+	};
+    $(document).ready(function(){
+        //loadEvaluation(0);
+    });
+
+    function openCustomerWin(){
+        var retUrl = window.location.href;
+        retUrl = retUrl.replace(window.location.host,'').replace('http://','').replace('/mall-web','');
+        this.location.href="$request.contextPath/user/login?retUrl="+retUrl;
+        return false;
+    }
+	/**
+	 * 倒计时回调
+     *
+     * @param {o} 倒计时对象
+     * @param {activitesDetailsId} 活动详情ID
+     * @returns void
+     *
+     * @date 2015-12-12
+     * @author 宋文斌
+     */
+	function setCentralPurchasingState(o,activitesDetailsId){
+		window.location.reload();
+	}
+	
+	$(document).ready(function(){
+		$(".mc_prompt_close").click(function(){
+			$(this).parents(".po_fai").fadeOut();
+		});
+	
+		$(".cou_img").click(function(e){
+	        $(this).next().toggle()
+	        e.stopPropagation();
+	        e.cancelBubble=true;
+	    });
+	    $(".coupon_bg").click(function(e){
+	        e.stopPropagation();
+	        e.cancelBubble=true;
+	    });
+	    $(".coupon_close").click(function(){
+	        $(".coupon_bg").hide();
+	    });
+	    $(document).click(function(){
+	        $(".coupon_bg").hide();
+	    })
+	});
+	
+	//领取优惠券
+	function getCoupon(couponId) {
+	    if (couponId && '' != $.trim(couponId)) {
+	        $.ajax({
+	            url: "$request.contextPath/coupons/getCoupons",
+	            data: {
+	                "couponId": couponId
+	            },
+	            type: 'post',
+	            dataType: 'json',
+	            success: function (data) {
+	                // 提示信息
+	                alert(data.resultMessage);
+	
+	                // 如果领取成功且满足限领条件后，页面中删除该优惠券
+	                var result = data.result;
+	                if (result) {
+	                    $("li").remove("." + couponId);
+	                }
+	            }
+	        });
+	    }
+	}
+</script>
+
+<!-- js 扩展的 map 对象 -->
+<script type="text/javascript" src="$assetsPath/plugin/common/newtimer.js"></script>
+<script src="$assetsPath/js/goodscenter/map.js"></script>
+<script src="$assetsPath/js/goodscenter/details.js"></script>
+<script src="$assetsPath/js/goodscenter/productDetails.js"></script>
+<input type="hidden" id="contextPath" value="$request.getContextPath()"/>
+<input type="hidden" id="shopId" value="$!item.shopId"/>
+<input type="hidden" id="itemId" value="$!item.itemId"/>
+<input type="hidden" id="sellerId" value="$!item.sellerId"/>
+<input type="hidden" id="itemName" value="$!item.itemName"/>
+<input type="hidden" id="itemStatus" value="$!item.itemStatus"/>
+<input type="hidden" id="marketPrice" value="$!item.marketPrice"/>
+<input type="hidden" id="hasPrice" value="$!item.hasPrice"/>
+<input type="hidden" id="skuId" value="$!skuId"/>
+<input type="hidden" id="areaCode" value=""/>
+<input type="hidden" id="logging_status" value="$!logging_status"/>
+<input type="hidden" id="imageServerAddr" value="$!imageServerAddr"/>
+<input type="hidden" id="hasShow"/>
+<style type="text/css">
+	.right_box {
+		right: 0;
+		width:220px;
+	}
+	.right_box h3{
+		width:210px;
+	}
+	.mid_font1 li .mid_f_left {
+		width:60px;
+	}
+	
+	.nTab_address .TabContent_address ul li:hover{
+		color: #00a2ea;
+	}
+</style>
+</style>
+
+
+
+<div id="skuInfos" style="display:none;">
+	#foreach( $skuInfos in $!item.skuInfos)
+	<ul>
+		<li class="attributes">$skuInfos.attributes</li>
+		<li class="skuId">$skuInfos.skuId</li>
+		<li class="skuInventory">$skuInfos.skuInventory</li>
+		<li class="skuPicUrl">$skuInfos.skuPicUrl</li>
+		<li class="skuType">$skuInfos.skuType</li>
+	</ul>
+	#end
+</div>
+
+<!--内容开始-->
+<div id="content">
+	<input type="hidden" id="checkService"/>
+	<input type="hidden" id="addService" value="no"/>
+	<input type="hidden" id="addSource" value="$!item.addSource"/>
+	<input type="hidden" id="signUpTargetUrl" value="$request.getContextPath()/productController/details?id=$!item.itemId&skuId=$!skuId&centralPurchasingId=$!centralPurchasingDTO.centralPurchasingId">
+	<!-- 是否为集采商品 -->
+	<input type="hidden" id="isCentralPurchasing" value="$!centralPurchasingDTO.activitesDetailsId"/>
+	<div class="wid mar_b20 pad_b20">
+		<div class="wid bg_06">
+			<!--面包屑开始-->
+			<div class="mic border-17">
+				#foreach( $cadeOne in $catCascade)
+					<span><a href="$request.getContextPath()/searchController/searchItemByCategory?cid=$!cadeOne.cid">$!cadeOne.cname</a></span> >
+					#foreach( $cadeTwo in $cadeOne.childCats)
+						<a href="$request.getContextPath()/searchController/searchItemByCategory?cid=$!cadeTwo.cid">$!cadeTwo.cname ></a>
+						#foreach( $cadeThree in $cadeTwo.childCats)
+							<a href="$request.getContextPath()/searchController/searchItemByCategory?cid=$!cadeThree.cid">$!cadeThree.cname</a> >
+						#end
+					#end
+				#end
+				<a href="#">$!item.itemName</a>
+			</div>
+			<!--面包屑结束-->
+			<!--左侧图片开始-->
+			<div class="left_pic mar_t30">
+				<div id="vertical" class="bigImg">
+					<img src="$!imageServerAddr#foreach( $picUrl in $!item.picUrls)#if($velocityCount == 1)$picUrl#end#end" width="398" height="398" id="midimg"/>
+					<div style="display:none;" id="winSelector"></div>
+				</div><!--bigImg end-->
+
+				<div class="smallImg">
+					<div class="scrollbutton smallImgUp disabled"><i class="fa-angle-left font_20"></i></div>
+					<div id="imageMenu">
+						<!-- $!item.picUrls -->
+						#if($!item.picUrls)
+							<ul>
+							#foreach( $picUrl in $!item.picUrls)
+								<li><img src="$!imageServerAddr$picUrl"/></li>
+							#end
+							</ul>
+						#end
+					</div>
+					<div class="scrollbutton smallImgDown"><i class="fa-angle-right font_20"></i></div>
+				</div><!--smallImg end-->
+				<div id="bigView" style="display:none;"><img width="800" height="800" alt="" src="" /></div>
+				
+				<div class="mar_t10">
+					<!--下图片下面的分享信息 商品信息 开始 -->
+				<!-- JiaThis Button BEGIN -->
+				<!--
+				<div class="jiathis_style">
+					<a class="jiathis_button_weixin"></a>
+					<a class="jiathis_button_tsina"></a>
+					<a class="jiathis_button_qzone"></a>
+				</div>
+				<script type="text/javascript">
+				var jiathis_config = {data_track_clickback:'true'};
+				</script>
+				<script type="text/javascript" src="http://v3.jiathis.com/code_mini/jia.js?uid=2081714" charset="utf-8"></script>
+				-->	
+					<span class="mar_l10 fr cursor js_favourite">
+						#if($!favouriteItem == "true")
+							<i id="wjx" class="demo-icons fa-star font_ffd font_14"></i>
+						#else
+							<i id="wjx" class="star-wsc"></i>
+						#end
+						
+						<span id="shoucangshangpin">
+						
+						#if($!favouriteItem == "true")
+							已收藏
+						#else
+							收藏商品
+						#end
+						</span>
+					</span>
+				</div>
+				<!--下图片下面的分享信息 商品信息 开始 -->
+			</div><!--left_pic end -->
+		<!--左侧图片结束-->
+		<!--中间文字购买信息开始-->
+		<div class="mid po_re mar_t30">
+			<div class="mid_tit">
+				#if($!item.itemStatus != 4)
+					<h1 class="fl over_ell cursor" title="$!item.itemName">$!item.itemName</h1>
+					<span class="font_fe" style="display: block;font-size: 16px;font-weight:normal;" title="$!item.ad">$!item.ad</span>
+					<p class="font-c1">商品不是在售状态，无法购买！</p>
+				#end
+				#if($!item.itemStatus == 4)
+					#if($centralPurchasingDTO)
+						<h1 class="fl over_ell cursor" title="$!item.itemName">$!item.itemName</h1>
+						<span class="font_fe" style="display: block;font-size: 16px;font-weight:normal;" title="$!item.ad">$!item.ad</span>
+						<p class="font-c1">该商品已参加集采活动！</p>
+					#else
+						<h1 class="fl over_ell cursor" title="$!item.itemName">$!item.itemName</h1>
+    					<span class="font_fe" style="display: block;font-size: 16px;font-weight:normal;" title="$!item.ad">$!item.ad</span>
+    				#end
+				#end
+			</div>
+			<div class="mid_font1">
+				<ul style="min-height:320px;">
+					<li class="border-17 hei_50">
+   						<div id="shoujia" class=" mar_t15">
+							#if($!item.hasPrice == 1)
+								<strong class="font_fe font_fz fl" style="position:relative;"><span id="itemPrice_js" class="font_40">#if($!item.guidePrice > 0)$!item.guidePrice元#end</span></strong>
+    							<div class="style_div01">
+    								<div id="promotion_title" class="style_tj fl" style="display:none">
+    									<span>特价优惠</span>
+                                    </div>
+    								<div class="fl" id="marketPrice_div" style="padding-top:10px;margin-left:10px;">
+    									厂家建议售价：<del id="marketPrice_del">￥$!item.marketPrice</del>
+                                    </div>
+    								<div class="fr" id="marketPrice_div" style="padding-top:10px;position:relative;">
+										
+										#if($!couponsList.size() > 0 )
+							                <div class="coupon" style="padding-right:98px;"><img src="$assetsPath/pic/ico_yhq.png" alt="优惠券" class="cou_img cursor"/>
+							                <div class="coupon_bg" style="z-index:1;top:55px; left:-250px;background:#FFF;border:1px solid #dfdfdf">
+							                	<b class="pos_b"><img src="$assetsPath/pic/pos-trian.png"/></b>
+							                    <div class="coupon_bg_in" >
+							                        <p><img src="$assetsPath/pic/cio_cou_close.png" alt="" style="float: right;cursor: pointer" class="coupon_close"/></p>
+							                        <p class="bor_1">有新优惠券可领取</p>
+							                        <div class="coupon_bg_minbox">
+							                            <ul class="coupon_ul">
+							                                #foreach($coupon in $!couponsList)
+							                                    <li class="$!coupon.couponId">
+							                                        <div class="money_bg">
+							                                        	<span>
+							                                        		#if($!coupon.couponType == $FULL)
+							                                        			￥$!number.format("0", $!coupon.couponAmount)
+							                                        		#elseif($!coupon.couponType == $CASH)
+							                                        			#set($str = $!coupon.couponAmount.toString())
+							                                        			#set($val = $!str.length())
+																				#if($!str.endsWith(".00"))
+																				   $!number.format("0", $!coupon.couponAmount)折
+																				#else
+																					#set($val_x = $val - 1)
+																					$!str.substring(0,$val_x)折
+																				#end
+							                                        		#else
+							                                        			降$!number.format("0", $!coupon.couponAmount)
+							                                        		#end
+							                                        	</span>
+							                                        </div>
+							                                        <div class="coupon_ul_mind" style="float: left;margin-left: 12px">
+							                                        	 <p class="wid_140 over_ell cursor" title="$!coupon.couponName，$!coupon.descr">$!coupon.couponName，$!coupon.descr</p>
+							                                            <p class="cor_2">$!date.format("yyyy-MM-dd", $!coupon.couponStartTime)-$!date.format("yyyy-MM-dd", $!coupon.couponEndTime)</p>
+							                                        </div>
+							                                        <span class="get" onclick="getCoupon('$!coupon.couponId')">领取</span>
+							                                    </li>
+							                                #end
+							                            </ul>
+							                        </div>
+							                    </div>
+							                </div>
+							                </div>
+							            #end
+                                    </div>
+    								<!--<div class="fl mar_l30"><span>已预约<span class="font_fz">111</span>次</span><span class="mar_l10">评价<span class="font_fz">123</span>次</span></div>-->
+    							</div>
+							#else
+								<strong class="font_fe font_fz fl font_40" style="position:relative;">暂无报价</strong>
+							#end
+   						</div>
+   					</li>
+					<!-- 集采的商品 -->
+					#if($centralPurchasingDTO)
+    					<li>
+    						<div class="mid_f_left">预估价：</div>
+    						<div class="mid_f_right">#if($centralPurchasingDTO.estimatePrice) ￥$!centralPurchasingDTO.estimatePrice #end</div>
+    					</li>
+						#if($!centralPurchasingDTO.detailedStatus==1 || $!centralPurchasingDTO.detailedStatus==5 
+							|| $!centralPurchasingDTO.detailedStatus==6 || $!centralPurchasingDTO.detailedStatus==7)
+    						<li>
+        						<div class="mid_f_left">集采价：</div>
+                                <div class="mid_f_right"><span id="itemPrice_js">#if($centralPurchasingDTO.centralPurchasingPrice) ￥$!centralPurchasingDTO.centralPurchasingPrice #end</span></div>
+        					</li>
+						#else
+							<li>
+        						<div class="mid_f_left">集采价：</div>
+        						<div class="mid_f_right">待定</div>
+        					</li>
+						#end
+					#else
+						<!--
+						<li style="display: none;" id="cuxiaojia">
+        					<div class="mid_f_left">促销价：</div>
+        					<div class="mid_f_right">
+        						<strong class="font_fe font_16" >
+        							<span id="itemCXPrice_js"></span>
+        						</strong>
+        					</div>
+    				    </li>
+						-->
+						<div style="display:none;" id="promotion_zhijiang">
+        					<li class="po_re">
+            					<div class="mid_f_left">直降信息：</div>
+            					<div class="mid_f_right">
+            						<!-- 满减 -->
+        							<em class="zhijiang" id="promotionType_zhijiang">直降</em>
+        							<span class="font_fe" id="promotionMsg_zhijiang"></span>
+        							<a class="js_qing_zhijiang cursor" id="promotionInfo_zhijiang">&nbsp;&nbsp;详情 <s class="s-arrow">&gt;&gt;</s></a>
+            					</div>
+								<div class="wid_440 js_xiang_zhijiang min-hei bg_06 box-shadow1 po_ab none" style="z-index: 1; left: 5px; top: 25px;">
+            						<div class="tit mar_lr10 mar_r10 border-6">
+            							<a><span class="mar_r20 font_14b">直降</span><span id="promotionTime"></span></a><a class="fr js_down_zhijiang cursor">收起</a>
+            						</div>
+            						<div class="mar_l10" id="promotionList_zhijiang">								 							
+            						</div>
+            					</div>
+            				</li>
+        				</div>
+    				    <div style="display:none;" id="promotion_manjian">
+        					<li class="po_re">
+            					<div class="mid_f_left">满减信息：</div>
+            					<div class="mid_f_right">
+            						<!-- 满减 -->
+        							<em class="manjian" id="promotionType_manjian">满减</em>
+        							<span class="font_fe" id="promotionMsg_manjian"></span>
+        							<a class="js_qing_manjian cursor" id="promotionInfo_manjian">&nbsp;&nbsp;详情 <s class="s-arrow">&gt;&gt;</s></a>
+            					</div>
+								<div class="wid_440 js_xiang_manjian min-hei bg_06 box-shadow1 po_ab none" style="z-index: 1; left: 5px; top: 25px;">
+            						<div class="tit mar_lr10 mar_r10 border-6">
+            							<a><span class="mar_r20 font_14b">满减</span><span id="promotionTime"></span></a><a class="fr js_down_manjian cursor">收起</a>
+            						</div>
+            						<div class="mar_l10" id="promotionList_manjian">								 							
+            						</div>
+            					</div>
+            				</li>
+        				</div>
+					#end
+					#if($item && $!item.addSource==3)
+						#foreach( $attrSale in $!item.attrSale)
+        					<li class="mar_t10">
+								<div class="attrName_js over_ell" title="$attrSale.name" name="" style="height:auto;">$attrSale.name：</div>
+        						<div class="">
+        							<!--选中用border-8 的样式 然后加上<b class="po_ab pa_04"></b>标签-->
+        							#foreach( $values in $!attrSale.values)
+        								#if($skuItem)
+        									#foreach($!skuItemSales in $!skuItem.attrSales )
+        										#if($!skuItemSales.id == $attrSale.id)
+        											#foreach($!skuValues in $!skuItemSales.values )
+        												#if($!skuValues.itemSkuAttr == $!values.itemSkuAttr)
+                                							<span class="press_classes po_re border-8 js_attr" name="$values.itemSkuAttr" style="height:28px">
+                                								$values.itemSkuName
+                                								<b class="po_ab pa_01"></b>
+                                							</span>
+														#else
+        													#if(!$centralPurchasingDTO)
+            													<span class="press_classes po_re border-13 js_attr" name="$values.itemSkuAttr">$values.itemSkuName</span>
+            												#end
+        												#end
+        											#end
+        										#end
+        									#end
+        								#else
+    										<span class="press_classes po_re border-13 js_attr" name="$values.itemSkuAttr">$values.itemSkuName</span>
+        								#end
+        							#end
+        						</div>
+        						<div class="clear"></div>
+        					</li>
+    					#end
+					#else
+						#foreach( $attrSale in $!item.attrSale)
+        					<li class="mar_t10">
+								<!--换行<div class="attrName_js over_ell" title="$attrSale.name" name="$attrSale.id:$attrSale.name" style="height:auto;">$attrSale.name：</div>-->
+								<!-- 不换行 -->
+								<div class="attrName_js over_ell mid_f_left fl" title="$attrSale.name" name="$attrSale.id:$attrSale.name" style="height:auto;">$attrSale.name：</div>
+        						<div class="fl" style="text-align:left; width:680px;">
+        							<!--选中用border-8 的样式 然后加上<b class="po_ab pa_04"></b>标签-->
+        							#foreach( $values in $!attrSale.values)
+        								#if($skuItem)
+        									#foreach($!skuItemSales in $!skuItem.attrSales )
+        										#if($!skuItemSales.id == $attrSale.id)
+        											#foreach($!skuValues in $!skuItemSales.values )
+        												#if($!skuValues.id == $!values.id)
+															<!-- 房型选择加上hei_20 wid_130 -->
+                                							<span class="press_classes po_re border-8 js_attr" name="$values.id:$values.name" style="height:28px">
+                                								$values.name
+                                								<b class="po_ab pa_01"></b>
+                                							</span>
+                            							#else
+        													#if(!$centralPurchasingDTO)
+            													<span class="press_classes po_re border-13 js_attr" name="$values.id:$values.name">$values.name</span>
+            												#end
+        												#end
+        											#end
+        										#end
+        									#end
+        								#else
+    										<span class="press_classes po_re border-13 js_attr" name="$values.id:$values.name">$values.name</span>
+        								#end
+        							#end
+        						</div>
+        						<div class="clear"></div>
+        					</li>
+    					#end
+					#end
+					<!--
+					<li class="mar_t10">
+						<div class="over_ell" title="型号：ERW-344" style="height:auto;">型号：ERW-344</div>
+						<div class="">
+							<span class="press_classes po_re border-8">
+								家居型金牌一型
+								<b class="po_ab pa_01"></b>
+							</span>
+						</div>
+						<div class="">
+							<span class="press_classes po_re border-13">
+								家居型金牌二型erw-13
+							</span>
+						</div>
+						<div class="clear"></div>
+					</li>
+					-->
+					<li id="distrib" class="mar_t15">
+						<div class="mid_f_left">配送至：</div><!--mid_f_left end-->
+                        <div class="mid_f_right">
+							<div class="text border-4 js_guanqu cursoe">
+								<div class="js_address_title">
+									<span class="js_address" style="cursor:pointer"></span>
+									<b class="fa-angle-down"></b>
+                                </div>
+								<!-- 配送内容 部分 -->
+								<div class="nTab_address box-shadow1 hide cursor bg_06" id="nTab_address_div" style="top:24px;">
+                                	<!-- 标题开始 -->
+                                	<div class="TabTitle_address">
+                                		<i class="demo-icons fa-times-circle font_16 fr mar_r10 no" onclick="closenTabAddress()"></i>
+                                		<ul id="Tabaddress">
+                                			<li class="active">
+                                				<span class="js_tabAddress_one">请选择</span>
+                                				<i class="demo-icons fa-angle-down font_14b"></i>
+                                			</li>
+                                			<li class="normal none">
+                                				<span class="js_tabAddress_two">请选择</span>
+                                				<i class="demo-icons fa-angle-down"></i>
+                                			</li>
+                                			<!-- <li class="normal none">
+                                				<span class="js_tabAddress_three">请选择</span>
+                                				<i class="demo-icons fa-angle-down"></i>
+                                			</li> -->
+                                		</ul>
+                                	</div>
+                                	<!-- 内容开始 -->
+                                	<div class="TabContent_address">
+										<!-- 配送地址 的内容开始 -->
+										<div>
+											<ul id="Tabaddress_Content0">
+                            
+											</ul>
+										</div>
+										<div class="none" >
+											<ul id="Tabaddress_Content1">
+                            
+											</ul>
+										</div>
+										<div class="none" >
+											<ul id="Tabaddress_Content2">
+                            
+											</ul>
+										</div>
+                                	</div>
+								</div><!-- 配送内容 end-->
+							</div><!--text border-4 end-->
+                            <div class="store-prompt" id="store-prompt-ESM" >
+								#if($deliveryTypes)
+									#if($deliveryTypes.size() == 0)包邮
+									#else
+										<span id="defaultDeliveryType">
+											#if($deliveryTypes.get(0).deliveryType==1)
+												快递
+    										#elseif($deliveryTypes.get(0).deliveryType==2)
+    											EMS
+    										#elseif($deliveryTypes.get(0).deliveryType==3)
+    											平邮
+    										#end
+    										#if($deliveryTypes.get(0).groupFreight == 0)
+    											包邮
+    										#else
+    											￥$!{deliveryTypes.get(0).groupFreight}
+											#end
+										</span>
+										<i class="demo-icons fa-caret-down"></i>
+										<ul id="store-prompt-ESM-ul" style="display: none;">
+    										#foreach( $shopDeliveryTypeDTO in $deliveryTypes)
+    											<li #if($velocityCount==1)style="background:#fff7f1"#end>
+													<span>
+        												#if($shopDeliveryTypeDTO.deliveryType==1)
+        													快递
+                										#elseif($shopDeliveryTypeDTO.deliveryType==2)
+                											EMS
+                										#elseif($shopDeliveryTypeDTO.deliveryType==3)
+                											平邮
+        												#end
+    												</span>
+    												<span style="margin-left:5px">
+    													#if($!shopDeliveryTypeDTO.groupFreight == 0)
+            											包邮
+                										#else
+                											￥$!shopDeliveryTypeDTO.groupFreight
+        												#end
+                                                    </span>
+    												<b class="po_ab pa_04" #if($velocityCount!=1)style="display: none"#end ></b>
+												</li>
+    										#end
+										</ul>
+									#end
+								#end
+                            </div><!--store-prompt end-->
+							#if($preferentialWay)
+    						<div style="height:24px;float:left;margin-left:5px; position: relative;">
+    							<em class="manjian js_qing_youhui" style="cursor:pointer">优惠</em>
+    							<div class="wid_300 js_xiang_youhui min-hei bg_06 box-shadow1 po_ab none" style="z-index: 1; left:0px; top:25px;">
+        							<div class="tit mar_lr10 mar_r10 border-6">
+        								<a><span class="mar_r20 font_14b">优惠</span></a><a class="fr js_down_youhui cursor">收起</a>
+        							</div>
+        							<div class="mar_l10">
+    									#if($preferentialWay.deliveryType == 1)
+        									满$!{preferentialWay.full}件
+        									#elseif($preferentialWay.deliveryType == 2)
+        										满$!{preferentialWay.full}kg
+        										#elseif($preferentialWay.deliveryType == 3)
+        											满$!{preferentialWay.full}m³
+        											#elseif($preferentialWay.deliveryType == 4)
+        												满$!{preferentialWay.full}元
+        								#end
+        								#if($preferentialWay.strategy == 1)
+        									减$!{preferentialWay.reduce}元
+        									#elseif($preferentialWay.strategy == 2)
+        										包邮
+        								#end
+        							</div>
+        						</div>
+                			</div>
+    						#end
+                        </div><!--mid_f_right end-->
+						<!--
+						#if($!item.inventory>0)
+							<div>有货 <b>|</b> 库存<span class="font_fz">$!item.inventory</span>套</div>
+						#else
+							<div>缺货</div>
+						#end
+						-->
+						<!-- 购买数量 -->
+						<!-- <input value="1" class="number_js" type="hidden"> -->
+					</li>
+					#if($item && $!item.addSource==3)
+						<li class="mar_t10">
+    						<label class="fl">辅料类型：</label>
+    						#if($auxiliaryItems && $!auxiliaryItems.size() > 0)
+    							#foreach($auxiliaryItem in $auxiliaryItems)
+    								<div class="fl list_div">
+            							<i class="fl">辅</i>
+            							<span class="fl">$auxiliaryItem.itemName</span>
+            							<b class="fl style_b01"></b>
+            						</div>
+    							#end
+    						#else
+    							<div class="fl list_div">
+        							<span style=" background: none repeat scroll 0 0 #a3b4cc;color: #fff;padding: 0 5px;">无</span>
+        						</div>
+    						#end
+    					</li>
+    					<li>
+    						<label class="fl">安装服务：</label>
+    						#if($basicItems && $!basicItems.size() > 0)
+    							#foreach($basicItem in $basicItems)
+    								<div class="fl list_div">
+            							<i class="fl">安</i>
+            							<span class="fl">$basicItem.itemName</span>
+            							<b class="fl style_b01"></b>
+            						</div>
+    							#end
+    						#else
+    							<div class="fl list_div">
+    								<span style=" background: none repeat scroll 0 0 #a3b4cc;color: #fff;padding: 0 5px;">无</span>
+                                </div>
+    						#end
+    					</li>
+    					<li class="serve_li">
+    						<label class="fl">增值服务：</label>
+    						<div class="fl" style="max-width:550px;" id="valueAddedServiceDiv">
+								#parse("/goodscenter/product/valueAddedService.vm")
+    						</div>
+                        </li>
+					#end
+					<!--<li>
+						<div class="mid_f_left">购买限制：</div>
+						<div class="mid_f_right">
+							#if($centralPurchasingDTO)
+								<div>
+									<span>每位用户限购$!{centralPurchasingDTO.perPerchaseMaxNum}件</span>
+                                </div>
+							#else
+								<div>
+    								<span style=" background: none repeat scroll #7fbda9;color: #fff;padding: 0 5px;">起批</span>
+    								<span style="margin-left: 5px;">
+    									<span>金额要求：订单总价大于<font style="color: #be0a00;">$!shopInfo.initialPrice</font>元</span>
+    									#if($!shopInfo.initialCondition == 1)
+    									<span>或</span>
+    									#end
+    									#if($!shopInfo.initialCondition == 2)
+    									<span>且</span>
+    									#end
+    									<span>数量要求：货品总数大于<font style="color: #be0a00;">$!shopInfo.initialMount</font>件</span>
+    								</span>
+    							</div>
+    							<div>
+    								<span style=" background: none repeat scroll 0 0 #a3b4cc;color: #fff;padding: 0 5px;">混批</span>
+    								<span style="margin-left: 5px;">
+    									#if($!shopInfo.mutilPrice == 1)
+    										<span>金额要求：订单总价大于<font style="color: #be0a00;">$!shopInfo.priceMin</font>元</span>
+    										#if($!shopInfo.mutilCondition == 1)
+    										<span>或</span>
+    										#end
+    										#if($!shopInfo.mutilCondition == 2)
+    										<span>且</span>
+    										#end
+    										<span>数量要求：货品总数大于<font style="color: #be0a00;">$!shopInfo.mountMin</font>件</span>
+    									#else
+    										无
+    									#end
+    								</span>
+    							</div>
+							#end
+						</div>
+					</li>-->
+					<!--
+					<li>
+						<div class="mid_f_left">服务承诺：</div>
+						<div class="mid_f_right">
+						#if($!shopFreightTemplateDTO.deliveryTime)
+							<strong class="font_fe" >
+							卖家承诺$!shopFreightTemplateDTO.deliveryTime
+							</strong>
+					    #end
+					    </div>
+					</li>
+					-->
+					<li style="clear: both;">
+						<div class="mid_f_left">数量：</div>
+						<div class="mid_f_right">
+							<div class="wrap-input">
+								<a class="btn-reduce border-4" href="javascript:void(0);" onclick="minus(this)">-</a>
+								<input value="1" class="text border-4 number_js" onkeyup="handEntry(this);">
+								<a class="btn-add border-4" href="javascript:void(0);" onclick="plus(this)">+</a>
+							</div>
+						</div>
+						<!--
+						#if($centralPurchasingDTO)
+							<div class="store-prompt" style="height: 26px;line-height: 26px;">
+    							#if($!centralPurchasingDTO.releaseGoodsMaxNum > 0)
+    								<strong>有货#if($!item.hasPrice == 1)（库存$!centralPurchasingDTO.releaseGoodsMaxNum件）#end</strong>
+    							#else
+    								<strong class="font_fe font_14">缺货</strong>
+    								<span></span>
+								#end
+								#if($!centralPurchasingDTO.releaseGoodsMaxNum >= $!centralPurchasingDTO.perPerchaseMaxNum)
+									<input type="hidden" id="qty_js" value="$!centralPurchasingDTO.perPerchaseMaxNum">
+								#else
+									<input type="hidden" id="qty_js" value="$!centralPurchasingDTO.releaseGoodsMaxNum">
+								#end
+    						</div>
+						#else
+							<div class="store-prompt" style="height: 26px;line-height: 26px;">
+    							#if($!item.inventory>0)
+    								<strong>有货#if($!item.hasPrice == 1)（库存$!item.inventory件）#end</strong>
+    							#else
+    								<strong class="font_fe font_14">缺货</strong>
+    								<span></span>
+    							#end
+    							<input type="hidden" id="qty_js" value="$!item.inventory">
+    						</div>
+						#end
+						-->
+					</li>
+				</ul>
+
+			</div>
+			<!-- mid_font1 end-->
+			<div class="mid_font2 border-4 js_buyList" style="display:none;">
+				<!--标题 开始 -->
+				<!-- <ul class="font_14b bg_05 border-3">
+					<li>品牌</li>
+					<li>单价</li>
+					<li>活动价</li>
+					<li>库存量</li>
+					<li>采购量</li>
+				</ul> -->
+				<!--标题结束 -->
+				<!--内容一行循环一个ul 开始 -->
+				<!-- <ul>
+					<li>北京印刷出版社</li>
+					<li>100.00￥</li>
+					<li>80.00￥</li>
+					<li>100件</li>
+					<li>
+					<div class="wrap-input">
+						<a class="btn-reduce border-4" href="#" onclick="minus(obj)">-</a>
+						<input value="1" class="text border-4" onkeyup="handEntry(obj)">
+						<a class="btn-add border-4" href="#" onclick="plus(obj)">+</a>
+					</div>
+					</li>
+				</ul> -->
+				<!--内容一行循环一个ul end -->
+
+			</div>
+			<!--mid_font2 end-->
+			<!-- <div class="mid_font3 js_buyAll" style="display:none;">
+				<ul>
+					<li>共计<i class="mar_lr10 collectNum_js"></i>件商品</li>
+					<li>总金额：<i class="font_fe font_14b">￥<span class="collectMoney_js"></span></i></li>
+				</ul>
+			</div> -->
+			#if($centralPurchasingDTO && $!item.itemStatus == 4)
+				#if($centralPurchasingDTO.detailedStatus && $!centralPurchasingDTO.detailedStatus==1)
+					#if($!logging_status == "true")
+						#if($centralPurchasingRefEnterpriseDTO)
+    						<div onclick="addCart($!centralPurchasingDTO.activitesDetailsId);" class="mall_button js_addCart">
+                				<span class="icon"></span>立即抢购
+        					</div>
+						#else
+							<div class="mall_button_disabled js_addCart" style="width:180px">
+                				<span class="icon"></span>您没有报名此活动
+        					</div>
+						#end
+					#else
+						<div class="mall_button_disabled js_addCart">
+            				<span class="icon"></span>登录后可抢购
+    					</div>
+					#end
+					<div style="margin-left:20px;font-size:12px">
+    					抢购结束时间：$!date.format('yyyy-MM-dd',$!centralPurchasingDTO.activityEndTime)&nbsp;&nbsp;
+						<span class="wid_110 font_12m countDown"  countDown='true'
+							serverTime = "$!serverTime"
+            				startTime = "$!date.format('yyyy/MM/dd HH:mm:ss',$!centralPurchasingDTO.activityBeginTime)"
+            				noStartTip=""
+            				endTime="$!date.format('yyyy/MM/dd HH:mm:ss',$!centralPurchasingDTO.activityEndTime)"
+            				endTip=""
+							callBack="setCentralPurchasingState(this,$!centralPurchasingDTO.activitesDetailsId)">
+							正在计算时间...
+            			 </span>
+                    </div>
+        			#elseif($centralPurchasingDTO.detailedStatus && $!centralPurchasingDTO.detailedStatus==2)
+						#if($!logging_status == "true")
+    						<div onclick="javascript:editCentralPurchasing(this,'$!centralPurchasingDTO.activitesDetailsId');" class="mall_button js_addCart">
+                				<span class="icon"></span>立即报名
+        					</div>
+    					#else
+    						<div class="mall_button_disabled js_addCart">
+                				<span class="icon"></span>登录后可报名
+        					</div>
+    					#end
+        				<div style="margin-left:20px;font-size:12px">
+        					报名结束时间：$!date.format('yyyy-MM-dd',$!centralPurchasingDTO.activityEndTime)&nbsp;&nbsp;
+    						<span class="wid_110 font_12m countDown"  countDown='true'
+    							serverTime = "$!serverTime"
+                				startTime = "$!date.format('yyyy/MM/dd HH:mm:ss',$!centralPurchasingDTO.activitySignUpTime)"
+                				noStartTip=""
+                				endTime="$!date.format('yyyy/MM/dd HH:mm:ss',$!centralPurchasingDTO.activitySignUpEndTime)"
+                				endTip=""
+								callBack="setCentralPurchasingState(this,$!centralPurchasingDTO.activitesDetailsId)">
+    							正在计算时间...
+                			 </span>
+                        </div>
+        			#elseif($centralPurchasingDTO.detailedStatus && $!centralPurchasingDTO.detailedStatus==3)
+        				<div class="mall_button_disabled js_addCart">
+            				<span class="icon"></span>立即报名
+            			</div>
+        				<div style="margin-left:20px;font-size:12px">
+        					报名开始时间：$!date.format('yyyy-MM-dd',$!centralPurchasingDTO.activityEndTime)&nbsp;&nbsp;
+    						<span class="wid_110 font_12m countDown"  countDown='true'
+    							serverTime = "$!serverTime"
+                				startTime = "$!serverTime"
+                				noStartTip=""
+                				endTime="$!date.format('yyyy/MM/dd HH:mm:ss',$!centralPurchasingDTO.activitySignUpTime)"
+                				endTip=""
+								callBack="setCentralPurchasingState(this,$!centralPurchasingDTO.activitesDetailsId)">
+    							正在计算时间...
+                			 </span>
+                        </div>
+        			#elseif($centralPurchasingDTO.detailedStatus && $!centralPurchasingDTO.detailedStatus==4)
+        				<div class="mall_button_disabled js_addCart">
+            				<span class="icon"></span>立即抢购
+            			</div>
+        				<div style="margin-left:20px;font-size:12px;">
+        					活动开始时间：$!date.format('yyyy-MM-dd',$!centralPurchasingDTO.activityBeginTime)&nbsp;&nbsp;
+							<span class="wid_110 font_12m countDown"  countDown='true'
+								serverTime = "$!serverTime"
+                				startTime = "$!serverTime"
+                				noStartTip=""
+                				endTime="$!date.format('yyyy/MM/dd HH:mm:ss',$!centralPurchasingDTO.activityBeginTime)"
+                				endTip=""
+								callBack="setCentralPurchasingState(this,$!centralPurchasingDTO.activitesDetailsId)">
+								正在计算时间...
+                			 </span>
+                        </div>
+        			#elseif($centralPurchasingDTO.detailedStatus && $!centralPurchasingDTO.detailedStatus==5)
+        				<div class="mall_button_disabled">
+            				<span class="icon"></span>已售罄
+            			</div>
+        			#elseif($centralPurchasingDTO.detailedStatus && $!centralPurchasingDTO.detailedStatus==6)
+        				<div class="mall_button_disabled">
+            				<span class="icon"></span>活动终止
+            			</div>
+        			#elseif($centralPurchasingDTO.detailedStatus && $!centralPurchasingDTO.detailedStatus==7)
+        				<div class="mall_button_disabled">
+            				<span class="icon"></span>活动已结束
+            			</div>
+        			#else
+        				<div class="mall_button_disabled">
+            				<span class="icon"></span>活动已结束
+            			</div>
+				#end
+			#else
+				#if($!item.hasPrice == 1)
+					<div onclick="toProOrderView();" class="fl mar_t20 mar_r20 tb_btn-sku js_toProOrderView">
+						立即购买
+					</div>
+					<div onclick="addCart();" class="fl mar_t20 mall_button js_addCart">
+						<span class="icon"></span>加入购物车
+					</div>
+				#else
+					<div onclick="javascript:alert('商品无价格不能购买');" class="fl mar_t20 mar_r20 tb_btn-sku js_toProOrderView">
+						立即购买
+					</div>
+					<div onclick="javascript:alert('商品无价格不能加入购物车');" class="fl mar_t20 mall_button js_addCart">
+						<span class="icon"></span>加入购物车
+					</div>
+				#end
+				<!--
+				#if($!item.hasPrice == 1)
+					<div onclick="addCart();" style="float:left" class="mall_button js_addCart">
+				#else
+					<div class="mall_button_disabled">
+				#end
+    			<span class="icon"></span>加入购物车
+    			</div>
+				-->
+			#end
+			<!--中间文字购买信息结束-->
+		   </div><!-- 右侧div结束-->
+		</div><!--1160 -->
+    </div><!--1200的外围盒子 -->
+	<!--推荐套餐开始-->
+	<div id="packageSku">
+        #parse("/goodscenter/product/packageSku.vm")
+	</div>
+</div>
+<!--推荐套装结束-->
+<!--#content end内容结束-->
+<!--下面内容开始-->
+<!--tabs开始-->
+<div class="ntab">
+    <!-- 标题开始 -->
+    <div class="TabTitle">
+      <ul id="myTab0" style="width:550px">
+		<li class="active">详情介绍<i></i></li>
+		#if("$!item.specification" != "")
+			<li class="normal" >规格参数<i></i></li>
+		#end
+		<li class="normal" id="userCommTab" >用户评价(<span id="commCount" class="pj_sp"></span>)<i></i></li>
+		#if("$!item.afterService" != "")
+			<li class="normal" >服务支持<i></i></li>
+		#end
+		<li class="normal" >发表咨询<i></i></li>
+      </ul>
+    </div>
+    <!-- 内容开始 -->
+    <div class="wid">
+	<div class="TabContent" id="myContent0">
+		<!-- 商品介绍下的内容开始 -->
+		<div style="min-height:500px" class="describe">
+			#set($addr = 'originalSrc="' + $!imageServerAddr +"/")
+			#set($describeUrl = $!item.describeUrl.replaceAll('src="/', $addr))
+			$!describeUrl
+		</div>
+
+		<!-- 规格参数下的内容开始 -->
+		#if("$!item.specification" != "")
+		<div class="none" style="min-height:500px">
+			#set($imageaddr = 'src="' + $!imageServerAddr +"/")
+			#set($specification = $!item.specification.replaceAll('src="/', $imageaddr))
+			$!specification
+		</div>
+		#end
+
+    	<!-- 商品评价下的内容开始 -->
+        <div class="none" style="min-height:500px">
+        	<div class="assess border-18" id="commWrapper">
+        	</div> 
+        </div>
+    	<!-- 服务支持下的内容开始 -->
+    	#if("$!item.afterService" != "")
+            <div class="none" style="min-height:500px">
+    			#set($afterService = $!item.afterService.replaceAll('src="/', $imageaddr))
+        		$!afterService
+            </div>
+		#end
+		<div class="none" id="consultContent" style="min-height:0px;">
+
+		</div>
+		</div>
+	</div>
+</div>
+<!--tabs结束-->
+ 
+<!-- 右侧结束-->
+<!-- 咨询价格  start-->
+<div id="xunjia" class="po_fai price none " >
+    <div class="po_fai_bg"></div>
+    <div class="po_main pad_t10" >
+    <div class=" hei_32 bg_05 pad_l10 font_14b">
+		<i class="demo-icons fa-times-circle font_16 fr mar_r10 no" style="cursor:pointer;"></i>
+		咨询价格
+	</div>
+    <div class="clear"></div>
+    <div class="register_content">
+         <p class="hei_30 font_cen font_fe">请填入询价信息，以便店家回复!</p>
+          <div class="register_box_mid">
+				<div class="hei_35 mar_tb10">
+                    <div class="fl wid_110 font_right font_14b hei_35"><span style="color:red;padding-right:5px;" class="font_fs">*</span>我的邮箱：</div>
+                    <div class="fl">
+						<input type="text" name="email" id="email_xunjia" value="$!userEmail" class="input_Style2 hei_30 wid_180">
+                    </div>
+                </div>
+				<div class="hei_35 mar_tb10">
+                    <div class="fl wid_110 font_right font_14b hei_35"><span class="demo-icons font_fs">*</span>手机：</div>
+                    <div class="fl">
+						<input name="mobile" id="mobile_xunjia" maxlength="11" type="text" class="input_Style2 hei_30 wid_180" value="$!userMobile" />
+                    </div>
+                </div>
+				<div class="hei_35 mar_tb10">
+                    <div class="fl wid_110 font_right font_14b hei_35"><span class="demo-icons font_fs">*</span>采购数量：</div>
+                    <div class="fl">
+						<input name="inquiryQty" id="inquiryQty" onkeyup="this.value=this.value.replace(/\D/g,'')" type="text" class="input_Style2 hei_30 wid_180"/>
+                    </div>
+                </div>
+				<div class="hei_150 mar_tb10">
+                    <div class="fl wid_110 font_right font_14b hei_35">采购说明：</div>
+                    <div class="fl">
+						<textarea name="comment" id="comment" maxlength="300" class="input_Style2 wid_300 hei_100" placeholder="不能超过300字" ></textarea><br>
+                    </div>
+                </div>
+
+                <!--如需增加可循环dl结束-->
+                <div class="font_cen wid_260 mar_cen">
+                    <button class="button_2 hei_40 font_16 js_xunjia">提交</button>
+                    <button class="button_5 hei_40 font_16 cancel mar_l10">取消</button>
+                </div>
+				<div class="font_cen" style="margin-top:10px;">
+					<span style="color:red;" class="errorMsg"></span>
+				</div>
+            </div><!--register_box-->
+    </div>
+    </div>
+</div>
+<!-- 咨询价格  end-->
+
+<!--tabs end-->
+<!--加入购物车弹出层   开始-->
+<div id="addCartBomb" class="po_fai" style="display: none;">
+    <div class="po_fai_bg"></div>
+    <div class="po_main">
+		<ul>
+	    	<li class="font_18">
+	    		<i class="fa-info-circle demo-icons font_24 mar_r10"></i>
+	    		<span class="title" style="font-size: 22px;">加入购物车成功！</span>
+	    	</li>
+	        <li class="msg font_14"></li>
+	        <li>
+        		<button type="button" class="button_3 hei_40" onclick="closeAddCartBomb();" style="margin-right: 10px;">
+        			继续浏览
+        		</button>
+        		<button type="button" class="button_1 hei_40" onclick="location.href='$request.contextPath/shopCart/toCart'">
+					去购物车结算
+        		</button>
+	        </li>
+    	</ul>
+	</div>
+</div>
+<!--加入购物车弹出层   结束-->
+<!-- <div class="dowebok"><a href="#top"> 返回顶部</a></div> -->
+
+<script language="javascript">
+    var LR_username='$!userId';
+    var LR_userdata="店铺名称：'$!shopInfo.shopName'<br/>商品名称：'$!item.itemName'";
+    function openZoosUrl_UserDefine(){
+        //你们的判断登录跳转功能，也可以在这里进行判断
+        if( '$!userId' == ''){
+            alert("你目前处于非登录状态，请先登录再联系客服！");
+            var retUrl = "$request.contextPath/productController/details?id="+$!item.itemId;
+            window.location.href="$request.contextPath/user/login?retUrl=" + encodeURI(retUrl);
+            return true;
+        }
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            url:"$request.contextPath/shopCart/ifLogin_shopCustomer",
+            success: function(data){
+                if(data.ifLogin_shopCustomer == false){
+                    alert("你目前处于非登录状态，请先登录再联系客服！");
+                    this.location.href="$request.contextPath/user/login";
+                    return true;
+                }
+            }
+        });
+        //隐藏浮动图标
+        var obj = document.getElementById('LRdiv0');
+        if (obj){
+            obj.style.display = 'none';
+        }
+    }
+</script>
+<script language="javascript" src="http://im.printhome.com/JS/LsJS.aspx?siteid=$!stationId&float=1&lng=cn"></script>
+<!-- 报名信息 开始-->
+#parse("/centralPurchasing/sign_up.vm")
+<!-- 报名信息 end -->
+#set($layout = "/product_layout.vm")

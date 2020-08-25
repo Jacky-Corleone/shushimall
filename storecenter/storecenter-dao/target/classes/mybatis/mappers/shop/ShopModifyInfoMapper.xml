@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.storecenter.dao.ShopModifyInfoDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="shopModifyInfoMap" type="com.camelot.storecenter.dto.ShopModifyInfoDTO">
+				<result property="id" column="id"/>
+				<result property="shopId" column="shop_id"/>
+				<result property="applicantUserid" column="applicant_userid"/>
+				<result property="applyStatus" column="apply_status"/>
+				<result property="createTime" column="create_time"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			shop_modify_info_.id
+ 			,shop_modify_info_.shop_id
+ 			,shop_modify_info_.applicant_userid
+ 			,shop_modify_info_.apply_status
+ 			,shop_modify_info_.create_time
+		FROM 
+		shop_modify_info shop_modify_info_,shop_modify_detail shop_modify_detail_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where  shop_modify_info_.id=shop_modify_detail_.modify_info_id 
+		<if test="entity!=null">
+			<if test="entity.shopIds != null ">
+				<![CDATA[ and shop_modify_info_.shop_id in ]]>
+				<foreach collection="entity.shopIds" item="item" index="index"  open="(" separator="," close=")">
+				<![CDATA[ #{item} ]]>
+				</foreach>
+			</if>
+			<if test="entity.id != null  and entity.id !=''">
+				<![CDATA[ and shop_modify_info_.id  = #{entity.id} ]]>
+			</if>
+			<if test="entity.shopId != null  and entity.shopId !=''">
+				<![CDATA[ and shop_modify_info_.shop_id  = #{entity.shopId} ]]>
+			</if>
+			<if test="entity.applicantUserid != null  and entity.applicantUserid !=''">
+				<![CDATA[ and shop_modify_info_.applicant_userid  = #{entity.applicantUserid} ]]>
+			</if>
+			<if test="entity.applyStatus != null  and entity.applyStatus !=''">
+				<![CDATA[ and shop_modify_info_.apply_status  = #{entity.applyStatus} ]]>
+			</if>
+			<if test="entity.createTime != null  and entity.createTime !=''">
+				<![CDATA[ and shop_modify_info_.create_time  = #{entity.createTime} ]]>
+			</if>
+		</if>
+		<![CDATA[group by shop_modify_info_.shop_id
+		
+		ORDER BY shop_modify_info_.create_time desc  ]]>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="selectById" resultMap="shopModifyInfoMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where shop_modify_info_.shop_id = #{id} 
+		]]>
+	</select>
+	<select id="selectByIds" resultMap="shopModifyInfoMap" parameterType="long">
+			select * from shop_modify_info shop_modify_info_
+			where shop_modify_info_.shop_id in
+			<if test="shopIds != null ">
+				<foreach collection="shopIds" item="item" index="index"  open="(" separator="," close=")">
+				 #{item}
+				</foreach>
+			</if>
+	</select>
+	<!-- 分页查询 -->
+	<select id="selectListGroupShopId" resultMap="shopModifyInfoMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectCountGroupShopId" resultType="long">
+		<include refid="count_Tail" />
+		( select shop_modify_info_.shop_id from
+		shop_modify_info shop_modify_info_,shop_modify_detail shop_modify_detail_
+		<include refid="where_fragement" />
+		) a
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="com.camelot.storecenter.dto.ShopModifyInfoDTO" useGeneratedKeys="true" keyProperty="id">
+		<![CDATA[
+		insert into shop_modify_info (
+		    	 shop_id
+		    	 ,applicant_userid
+		    	 ,apply_status
+		    	 ,create_time
+		   )values(
+		    	#{shopId}
+		    	,#{applicantUserid}
+		    	,'1'
+		    	,now()
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.storecenter.dto.ShopModifyInfoDTO">
+		<![CDATA[
+		update shop_modify_info set
+   			apply_status = #{applyStatus}
+		 where shop_id = #{shopId}
+		]]>
+	</update>
+	<update id="updateDate" parameterType="com.camelot.storecenter.dto.ShopModifyInfoDTO">
+		<![CDATA[
+		update shop_modify_info set
+			apply_status = '0',
+   			create_time = now()
+		 where shop_id = #{id}
+		]]>
+	</update>
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from shop_modify_info where id = #{id}
+		]]>
+	</delete>
+</mapper>

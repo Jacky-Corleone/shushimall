@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.basecenter.dao.GrowthDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="growthMap" type="com.camelot.basecenter.dto.GrowthDTO">
+		<result property="id" column="id"/>
+		<result property="type" column="type"/>
+		<result property="growthValue" column="growth_value"/>
+		<result property="userLevel" column="user_level"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,type
+ 			,growth_value
+ 			,user_level
+		FROM 
+		user_growth_config
+		]]>
+	</sql>
+	
+	<sql id="where_entity">
+		where 1=1 
+		<if test="entity!=null">
+			<if test="entity.id != null">
+				<![CDATA[ and user_growth_config.id =#{entity.id} ]]>
+			</if>
+			<if test="entity.type != null">
+				<![CDATA[ and user_growth_config.type =#{entity.type} ]]>
+			</if>
+			<if test="entity.growthValue != null">
+				<![CDATA[ and user_growth_config.growth_value =#{entity.growthValue} ]]>
+			</if>
+			<if test="entity.userLevel != null">
+				<![CDATA[ and user_growth_config.user_level =#{entity.userLevel} ]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+	<!-- 分页查询广告点击量报表 -->
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="growthMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_entity" />
+		ORDER BY type 
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		select count(1) from user_growth_config user_growth_config
+		<include refid="where_entity" />
+	</select>
+	
+	<select id="queryType" resultType="long">
+		<include refid="count_Tail" />
+		user_growth_config user_growth_config
+		<include refid="where_entity" />
+	</select>
+					
+	<!-- <select id="getEntityByEntity" resultType="growthMap">
+		<include refid="selectAllColumns"/>
+		<include refid="where_entity"></include>
+	</select> -->
+	<!-- 插入记录 -->
+	<insert id="add" >
+		<![CDATA[
+		insert into user_growth_config (
+ 			 type
+ 			,growth_value
+ 			,user_level
+		   )values(
+		    	#{type}
+		    	,#{growthValue}
+		    	,#{userLevel}
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" >
+		<![CDATA[
+		update user_growth_config set
+   			id = #{id},
+   			type = #{type},
+   			growth_value = #{growthValue},
+   			user_level = #{userLevel}
+		 where id = #{id}
+		]]>
+	</update>
+</mapper>

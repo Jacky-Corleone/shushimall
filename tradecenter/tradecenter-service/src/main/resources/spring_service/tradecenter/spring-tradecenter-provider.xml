@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+	<!-- 使用dubbo协议暴露服务 -->
+	<dubbo:service interface="com.camelot.tradecenter.service.TradeOrderExportService"
+		owner="camelot" ref="tradeOrderExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+	<dubbo:service interface="com.camelot.tradecenter.service.SalesVolumeExportService"
+		owner="camelot" ref="salesVolumeExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+
+	<dubbo:service interface="com.camelot.tradecenter.service.MonthlyStatementExportService"
+				   owner="camelot" ref="monthlyStatementExportService" version="1.0" protocol="dubbo"
+				   delay="-1" registry="qingdaoRegistry" />
+    <dubbo:service interface="com.camelot.tradecenter.service.TradeApprovedOrdersExportService"
+		owner="camelot" ref="tradeApprovedOrdersExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+	<dubbo:service interface="com.camelot.tradecenter.service.InvoiceExportService"
+		owner="camelot" ref="invoiceExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		
+	<dubbo:service interface="com.camelot.tradecenter.service.TradeOrderItemsDiscountExportService"
+		owner="camelot" ref="tradeOrderItemsDiscountExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		
+	<!-- 订单附件 -->
+	<dubbo:service interface="com.camelot.tradecenter.service.TradeOrdersEnclosureService"
+		owner="camelot" ref="tradeOrdersEnclosureService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		
+	<!-- 提现记录 -->
+	<dubbo:service interface="com.camelot.payment.FinanceWithdrawRecordExportService"
+		owner="camelot" ref="financeWithdrawRecordService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		
+	<!-- 套装商品订单记录 -->
+	<dubbo:service interface="com.camelot.tradecenter.service.TradeOrderItemsPackageExportService"
+		owner="camelot" ref="tradeOrderItemsPackageExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+
+</beans>

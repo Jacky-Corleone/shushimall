@@ -1,0 +1,328 @@
+#set($staticPath="$request.contextPath/assets")
+<link type="text/css" href="$staticPath/css/basic.css" rel="stylesheet"/>
+<script type="text/javascript" src="$staticPath/js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="$staticPath/js/jquery.cookie.js"></script>
+<script type="text/javascript" src="$staticPath/js/xiaoguo.js"></script>
+<script type="text/javascript" src="$staticPath/js/js.js"></script>
+<script type="text/javascript">
+
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "http://hm.baidu.com/hm.js?9c9bebbed43bc9522993f0f7caf3e1e3";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+
+	$(document).ready(function(){
+		// ajax global setting
+		$.ajaxSetup({
+			type: 'post',
+			cache: false,
+			timeout: 30000,
+			dataType: 'json',
+			error: function(evt, request, settings){
+				if(evt.status == "600" ){
+			    	$("#winFastLogin").show();
+				}
+			}
+		});
+		
+		var region = $.cookie('region');
+		if(!region){
+			selectRegion("11","北京");
+		}else{
+			$("#region").text(region);
+		}
+		
+		$("#shop_car").mouseenter(function(){
+			$("#mini_cart").load("$request.contextPath/shopCart/mini");
+		});
+		
+		var nickname = $.cookie('uname');
+		if(nickname != null && nickname != "") {
+			$("#top_login_id").html("<span class='font_82'>Hi，" + nickname + "&nbsp;欢迎来到舒适100！</span>&nbsp;&nbsp;<a href='$request.contextPath/user/logout'>[注销]</a>");
+		}
+		
+		$.getJSON("$request.contextPath/shopCart/cart",function(data){
+			$("#cartQuantity").html(data.allQuantity);
+		});
+		
+		$.getJSON("$request.contextPath/user/status",function(data){
+			if(data.msg){
+                var htmlStr = "<span class='font_82'>Hi，<a href='$request.contextPath/buyercenter/loadBuyerCenter' onclick='closeMenu()'>" + data.user.loginname + "</a>&nbsp;欢迎来到舒适100！</span>&nbsp;&nbsp;<a href='$request.contextPath/user/logout'>[注销]</a>";
+				$("#top_login_id").html(htmlStr);
+			} else {
+				$("#top_login_id").html('<a href="$request.contextPath/user/login">请登录</a><i class="mar_lr10 font_ec">|</i><a href="$request.contextPath/information/register/initRegister">免费注册</a>');
+			}
+		});
+		
+		/**当图片地址不存在时，修改图片的src为"",避免出现裂图的问题*/
+		$("img").each(function(index){
+			if($(this).attr("src")=="$!imageServerAddr"){
+				$(this).attr("src","");
+			}
+		});
+		
+		$.getJSON("$request.contextPath/logo", function(data){
+			if(data){
+				$("#logo").attr("src","$!imageServerAddr"+data.picUrl).attr("title",data.logoName);
+			}
+		});
+	});
+	
+	function selectRegion(code,name){
+		$.cookie('region',name,{expires: 7, path:"/"});
+		$.cookie('regionCode',code,{expires: 7, path:"/"});
+		$("#region").text(name);
+		$(".city").hide();
+	}
+	
+	Date.prototype.format = function(format) {
+		var o = {
+			"M+" : this.getMonth() + 1, // month
+			"d+" : this.getDate(), // day
+			"h+" : this.getHours(), // hour
+			"m+" : this.getMinutes(), // minute
+			"s+" : this.getSeconds(), // second
+			"q+" : Math.floor((this.getMonth() + 3) / 3), // quarter
+			"S" : this.getMilliseconds()
+			// millisecond
+		}
+		if (/(y+)/.test(format)) {
+			format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+		}
+		for ( var k in o) {
+			if (new RegExp("(" + k + ")").test(format)) {
+				format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+			}
+		}
+		return format;
+	};
+</script>
+<style type="text/css">
+.tip{
+	position: absolute; 
+	display: inline-block; 
+	line-height: 14px;
+	height: 14px;
+	min-width: 14px; 
+	border-radius: 5px 5px 5px 0; 
+	background-color: #c80103; 
+	text-align: center; 
+	font-weight: bold; 
+	color: white;
+	top: 2px;
+}
+</style>
+
+<!--头部开始-->
+<div class="header_top" >
+	<div class="top_mid po_re">
+    	<div class="top_mid_l po_re" style="width:auto">
+			<span id="top_login_id" class="mar_l10 font_fe">
+				<a href="$request.contextPath/user/login">请登录</a>
+          		<i class="mar_lr10 font_ec">|</i>
+				<a href="$request.contextPath/information/register/initRegister">免费注册</a>
+			</span>
+
+        </div>
+        <!--top_mid_l end-->
+        
+        <div class="top_mid_r po_re">
+        <ul class="nav_list">
+            <li class="drop-menu-effect" style="text-align:right;"><span class="demo-icons fa-map-marker font_20 font_82"></span>
+        	  <b id="region" class="font_14 mar_r10">北京市</b>
+        	</li>
+        	<li class="drop-menu-effect">
+        	  <a>切换省份
+	        	<i class="demo-icons fa-sort-desc font_14"></i>
+	         </a>
+	        <!-- 城市 -->
+	        <div class="city submenu hide" style="width:380px;">
+	            <div class="tit mar_lr10 bg_05 pad_l10 mar_tb10" style="text-align: left;">请选择您的收货地区:</div>
+	            <dl class="wid_460 fl mar_20 hei_35">
+					<dt class="fl font_b">东北地区</dt>
+					<dd class="fl mar_l10">
+						<a class="mar_r10" onclick="selectRegion('21', '辽宁')" href="javascript:void(0);">辽宁</a>
+						<a class="mar_r10" onclick="selectRegion('22', '吉林')" href="javascript:void(0);">吉林</a>
+						<a class="mar_r10" onclick="selectRegion('23', '黑龙江')" href="javascript:void(0);">黑龙江</a>
+					</dd>
+	            </dl>
+	            <dl class="wid_460 fl mar_20 hei_35">
+					<dt class="fl font_b">华东地区</dt>
+					<dd class="fl mar_l10">
+						<a class="mar_r10" onclick="selectRegion('37', '山东')" href="javascript:void(0);">山东</a>
+						<a class="mar_r10" onclick="selectRegion('32', '江苏')" href="javascript:void(0);">江苏</a>
+						<a class="mar_r10" onclick="selectRegion('34', '安徽')" href="javascript:void(0);">安徽</a>
+						<a class="mar_r10" onclick="selectRegion('33', '浙江')" href="javascript:void(0);">浙江</a>
+						<a class="mar_r10" onclick="selectRegion('35', '福建')" href="javascript:void(0);">福建</a>
+						<a class="mar_r10" onclick="selectRegion('31', '上海')" href="javascript:void(0);">上海</a>
+					</dd>
+				</dl>
+	            <dl class="wid_460 fl mar_20 hei_35">
+					<dt class="fl font_b">华中地区</dt>
+					<dd class="fl mar_l10">
+						<a class="mar_r10" onclick="selectRegion('42', '湖北')" href="javascript:void(0);">湖北</a>
+						<a class="mar_r10" onclick="selectRegion('43', '湖南')" href="javascript:void(0);">湖南</a>
+						<a class="mar_r10" onclick="selectRegion('41', '河南')" href="javascript:void(0);">河南</a>
+						<a class="mar_r10" onclick="selectRegion('36', '江西')" href="javascript:void(0);">江西</a>
+					</dd>
+				</dl>
+				<dl class="wid_460 fl mar_20 hei_35">
+					<dt class="fl font_b">华北地区</dt>
+					<dd class="fl mar_l10">
+						<a class="mar_r10" onclick="selectRegion('11', '北京')" href="javascript:void(0);">北京</a>
+						<a class="mar_r10" onclick="selectRegion('12', '天津')" href="javascript:void(0);">天津</a>
+						<a class="mar_r10" onclick="selectRegion('13', '河北')" href="javascript:void(0);">河北</a>
+						<a class="mar_r10" onclick="selectRegion('14', '山西')" href="javascript:void(0);">山西</a>
+						<a class="mar_r10" onclick="selectRegion('15', '内蒙古')" href="javascript:void(0);">内蒙古</a>
+					</dd>
+				</dl>
+				<dl class="wid_460 fl mar_20 hei_35">
+					<dt class="fl font_b">西南地区</dt>
+					<dd class="fl mar_l10">
+						<a class="mar_r10" onclick="selectRegion('51', '四川')" href="javascript:void(0);">四川</a>
+						<a class="mar_r10" onclick="selectRegion('53', '云南')" href="javascript:void(0);">云南</a>
+						<a class="mar_r10" onclick="selectRegion('52', '贵州')" href="javascript:void(0);">贵州</a>
+						<a class="mar_r10" onclick="selectRegion('54', '西藏')" href="javascript:void(0);">西藏</a>
+						<a class="mar_r10" onclick="selectRegion('50', '重庆')" href="javascript:void(0);">重庆</a>
+					</dd>
+				</dl>
+				<dl class="wid_460 fl mar_20 hei_35">
+					<dt class="fl font_b">华南地区</dt>
+					<dd class="fl mar_l10">
+						<a class="mar_r10" onclick="selectRegion('44', '广东')" href="javascript:void(0);">广东</a>
+						<a class="mar_r10" onclick="selectRegion('45', '广西')" href="javascript:void(0);">广西</a>
+						<a class="mar_r10" onclick="selectRegion('46', '海南')" href="javascript:void(0);">海南</a>
+					</dd>
+				</dl>
+				<dl class="wid_460 fl mar_20 hei_35">
+					<dt class="fl font_b">西北地区</dt>
+					<dd class="fl mar_l10">
+						<a class="mar_r10" onclick="selectRegion('64', '宁夏')" href="javascript:void(0);">宁夏</a>
+						<a class="mar_r10" onclick="selectRegion('65', '新疆')" href="javascript:void(0);">新疆</a>
+						<a class="mar_r10" onclick="selectRegion('63', '青海')" href="javascript:void(0);">青海</a>
+						<a class="mar_r10" onclick="selectRegion('61', '陕西')" href="javascript:void(0);">陕西</a>
+						<a class="mar_r10" onclick="selectRegion('62', '甘肃')" href="javascript:void(0);">甘肃</a>
+					</dd>
+				</dl>
+				<dl class="wid_460 fl mar_20 hei_35">
+					<dt class="fl font_b">港澳台&nbsp;&nbsp;&nbsp;</dt>
+					<dd class="fl mar_l10">
+						<a class="mar_r10" onclick="selectRegion('81', '香港')" href="javascript:void(0);">香港</a>
+						<a class="mar_r10" onclick="selectRegion('82', '澳门')" href="javascript:void(0);">澳门</a>
+						<a class="mar_r10" onclick="selectRegion('71', '台湾')" href="javascript:void(0);">台湾</a>
+					</dd>
+				</dl>
+          	</div>
+        	</li>
+            <li class="drop-menu-effect"><a href="$!siteDomain" class="selected2">商城首页</a><i class="font_ec">|</i></li>
+            <li class="drop-menu-effect"><a href="$request.contextPath/buyercenter/loadBuyerCenter" class="selected2" onclick="closeMenu()">我的订单</a><i class="font_ec">|</i></li>
+            <li class="drop-menu-effect"><a href="javascript:void(0);"><i class="demo-icons fa-star font_82"></i><span>收藏夹</span><i class="demo-icons fa-sort-desc font_14 font_c7"></i></a><i class="font_ec ">|</i>
+               <ul class="submenu collect">
+                <li><a href="$request.contextPath/favourite/shops">店铺收藏</a></li>
+                <li><a href="$request.contextPath/favourite/products">宝贝收藏</a></li>
+              </ul>
+            </li>
+        	<li class="drop-menu-effect" id="shop_car" >
+        	<a href="$request.contextPath/shopCart/toCart"><i class="fa-cart"></i>购物车
+        	<span class="tip" id="cartQuantity"></span><i class="demo-icons fa-sort-desc font_14 font_c7"></i></a>
+        	<i class="font_ec ">|</i>
+        	
+		    	<div id="mini_cart" class="shopping right_botton wid_400 po_ab bg_06 border-4 box-shadow1 hide" style="top:35px;">
+					<div class="tit mar_lr10 bg_05 pad_l10 mar_tb10" style="text-align: left;">最新加入的商品</div>
+					<div class="car_shopping" style="height: 60px; line-height: 60px; text-align: center;">
+						<img src="$staticPath/images/loading-1j.gif">
+					</div>
+		    	</div>
+        	</li>
+        	 <li class="drop-menu-effect"><a href="#"><span>客服中心</span></a>
+               <ul class="submenu collect">
+				#foreach( $dto in $mallDocumentDTOs)
+			        <li><a href="$request.contextPath/document/$dto.mallType?mallId=$dto.mallId" onclick="openDocs($dto.mallId)">$dto.mallTitle</a></li>
+				#end
+              </ul>
+            </li>
+        </ul>
+      </div><!-- top_mid_r 结束-->
+        
+    </div><!--top_mid end-->
+</div><!--header_top end-->
+
+
+
+<!--以下为弹出层-->
+<div id="winFastLogin" class="po_fai" style="display: none;">
+    <div class="po_fai_bg"></div>
+    <div class="po_main" style="width:400px; margin-left:-200px;">
+    	<form action="$request.contextPath/user/homepage" id="top_login_form" method="post">
+      		<input id="def_id" type="hidden" name="def" value="2"/>
+      		<div class="tit pad_l10 hei_24 bg_05" >
+        		<p class="fl">您尚未登陆</p><i id="winFastLoginClose"  class="fa-times-circle fr font_14 mar_r10 cursor"></i>
+      		</div>
+      		<div class="mar_l30 mar_r30">
+         		<h3 class="hei_35  font_16 fl">舒适100会员</h3>
+         		<p class="fr font_65 hei_35 cursor">
+         			<i class="fa fa-arrow-right"></i><a href="$request.contextPath/information/register/initRegister">免费注册</a>
+         		</p>
+        		<div class="clear"></div>
+        		<div class="user">
+            		<i class="fa fa-uesr wid_30 hei_32 fl bg_05 font_cen border-1 border-12"></i>
+            		<input type="text" id="top_loginname_id" name="loginname" class="input_Style2 hei_30 wid_220" value="" placeholder="用户名" />
+        		</div>
+        		<div class="user mar_t20 ">
+            		<i class="fa fa-lock wid_30 hei_32 fl bg_05 font_cen border-1 border-12"></i>
+            		<input type="password" id="top_loginpwd_id" name="loginpwd" class="input_Style2 hei_30 wid_220" value="" placeholder="密码" />
+        		</div>
+        		<div class="jizhu mar_t20 ">
+<!--           	<input name="remember" type="checkbox" value="remember" class="fl"/><span class="fl">自动登录</span> -->
+          			<span class="fr mar_r20 cursor"><a href="$request.contextPath/findpwd/editusername">忘记密码？</a></span>
+        		</div> 
+        		<div class="clear"></div>
+        		<div class="font_cen mar_t20 pad_t50" >
+          			<button class="button_1 hei_30 " type="button" style="width:200px;" id="top_btn_submit">登录</button>
+        		</div>
+        		#*<p>使用合作网站帐号登陆京东</p>
+        		<p class="hei_40">
+        			<a href="$request.contextPath/twitte/index"><i class="demo-icons fa-weibo font_16 mar_r10"></i></a>
+	        		<a href="$request.contextPath/qq/index"><i class="demo-icons  fa-wechat font_16"></i></a>
+	    		</p>*#
+  	  		</div>
+  	  	</form>
+	</div>
+</div>
+<!--以上为弹出层-->
+
+<script type="text/javascript">
+  $("#winFastLoginClose").click(function(){
+    $("#winFastLogin").hide();
+  });
+  
+  $("#top_login_id_i").click(function(){
+	  $("#winFastLogin").show();
+  });
+
+	$("#top_btn_submit").click(function(){
+	  var logname = $("#top_loginname_id").val();
+	  var logpwd = $("#top_loginpwd_id").val();
+	  $.ajax({
+			url:"$request.contextPath/user/ajaxLogin",
+			type:"post",
+			data:{loginname:logname, loginpwd:logpwd},
+			success:function(data){
+				if(data.success){
+					//if(data.ustatus > 1){
+						$("#winFastLogin").hide();
+					//} else {
+					//	window.location.href="$request.contextPath/user/login";
+					//}
+				}else{
+					alert(data.errorMessages)
+				}
+			}
+		});
+	  });
+  	
+</script>
+	

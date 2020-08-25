@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.usercenter.dao.UserCreditLogDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="userCreditLogMap" type="com.camelot.usercenter.dto.UserCreditLogDTO">
+				<result property="id" column="id"/>
+				<result property="creditId" column="credit_id"/>
+				<result property="sorceType" column="sorce_type"/>
+				<result property="credit" column="credit"/>
+				<result property="description" column="description"/>
+				<result property="created" column="created"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{pager.pageOffset} , #{pager.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,credit_id
+ 			,sorce_type
+ 			,credit
+ 			,description
+ 			,created
+		FROM 
+		user_credit_log user_credit_log_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.id != null  and entity.id !=''">
+				<![CDATA[ and user_credit_log_.id  = #{entity.id} ]]>
+			</if>
+			<if test="entity.creditId != null  and entity.creditId !=''">
+				<![CDATA[ and user_credit_log_.credit_id  = #{entity.creditId} ]]>
+			</if>
+			<if test="entity.sorceType != null  and entity.sorceType !=''">
+				<![CDATA[ and user_credit_log_.sorce_type  = #{entity.sorceType} ]]>
+			</if>
+			<if test="entity.credit != null  and entity.credit !=''">
+				<![CDATA[ and user_credit_log_.credit  = #{entity.credit} ]]>
+			</if>
+			<if test="entity.description != null  and entity.description !=''">
+				<![CDATA[ and user_credit_log_.description  = #{entity.description} ]]>
+			</if>
+			<if test="entity.created != null  and entity.created !=''">
+				<![CDATA[ and user_credit_log_.created  = #{entity.created} ]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="selectById" resultMap="userCreditLogMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where user_credit_log_.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="selectList" resultMap="userCreditLogMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="pager!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectCount" resultType="long">
+		<include refid="count_Tail" />
+		user_credit_log user_credit_log_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="com.camelot.usercenter.dto.UserCreditLogDTO">
+		<![CDATA[
+		insert into user_credit_log (
+				  credit_id
+		    	 ,sorce_type
+		    	 ,credit
+		    	 ,description
+		    	 ,created
+		   )values(
+		    	#{creditId}
+		    	,#{sorceType}
+		    	,#{credit}
+		    	,#{description}
+		    	,now()
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.usercenter.dto.UserCreditLogDTO">
+		<![CDATA[
+		update user_credit_log set
+   			
+   			credit_id = #{creditId}
+   			,sorce_type = #{sorceType}
+   			,credit = #{credit}
+   			,description = #{description}
+   			,created = #{created}
+		 where id = #{id}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from user_credit_log where id = #{id}
+		]]>
+	</delete>
+</mapper>

@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.storecenter.dao.ShopInfoDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="shopDTOMap" type="com.camelot.storecenter.dto.ShopDTO">
+				<result property="shopId" column="shop_id"/>
+				<result property="shopName" column="shop_name"/>
+				<result property="sellerId" column="seller_id"/>
+				<result property="status" column="status"/>
+				<result property="shopUrl" column="shop_url"/>
+				<result property="logoUrl" column="logo_url"/>
+				<result property="keyword" column="keyword"/>
+				<result property="introduce" column="introduce"/>
+				<result property="mainSell" column="main_sell"/>
+				<result property="priceMin" column="price_min"/>
+				<result property="mountMin" column="mount_min"/>
+				<result property="provinceCode" column="province_code"/>
+				<result property="provinceName" column="province_name"/>
+				<result property="zcode" column="zcode"/>
+				<result property="streetName" column="street_name"/>
+				<result property="mobile" column="mobile"/>
+				<result property="areaCode" column="area_code"/>
+				<result property="landline" column="landline"/>
+				<result property="extensionNumber" column="extension_number"/>
+				<result property="created" column="created"/>
+				<result property="modified" column="modified"/>
+				<result property="passTime" column="pass_time"/>
+				<result property="endTime" column="end_time"/>
+				<result property="sellerBrand" column="seller_brand"/>
+				<result property="comment" column="comment"/>
+				<result property="platformUserId" column="platform_user_id"/>
+				<result property="mutilPrice" column="mutilPrice"/>
+				<result property="cityName" column="city_name"/>
+				<result property="cityCode" column="city_code"/>
+				<result property="districtName" column="district_name"/>
+				<result property="districtCode" column="district_code"/>
+				<result property="mutilCondition" column="mutil_condition"/>
+				<result property="initialPrice" column="initial_price"/>
+				<result property="initialMount" column="initial_mount"/>
+				<result property="initialCondition" column="initial_condition"/>
+				<result property="modifyStatus" column="modify_status"/>
+				<result property="runStatus" column="run_status"/>
+				<result property="cid" column="cid"  />
+				<result property="cStatus" column="cStatus"  />
+				<result property="shopType" column="shop_type"  />
+				<result property="brandType" column="brand_type"  />
+				<result property="businessType" column="business_type"  />
+				<result property="disclaimer" column="disclaimer"  />
+				<result property="trademarkRegistCert" column="trademark_regist_cert"  />
+				<result property="inspectionReport" column="inspection_report"  />
+				<result property="productionLicense" column="production_license"  />
+				<result property="marketingAuth" column="marketing_auth"  />
+				<result property="financing" column="financing"  />
+				<result property="financingAmt" column="financing_amt"  />
+				<result property="gpCommitmentBook" column="gp_commitment_book"  />
+				<result property="scope" column="scope"/>
+				<result property="salesVolume" column="salesVolume"/>
+				<result property="platformId" column="platform_id"/>
+				<result property="linkMan1" column="link_man1"/>
+				<result property="linkPhoneNum1" column="link_phone_num1"/>
+				<result property="linkMan2" column="link_man2"/>
+				<result property="linkPhoneNum2" column="link_phone_num2"/>
+				<result property="directSale" column="direct_sale"/>
+				<result property="remark" column="remark"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			 shop_info_.*
+ 			,ifnull(shop_eval_.scope,0) scope
+ 			,ifnull(shop_sales_volume_.sales_volume,0) salesVolume
+ 			
+		FROM 
+		shop_info shop_info_  LEFT JOIN 
+		    (SELECT 
+		      tt.by_shop_id,
+		      ROUND(tt.shop_scope,1) scope 
+		    FROM
+		      (SELECT 
+		        shop_evaluation_.by_shop_id,
+		        SUM(
+		          (
+		            shop_evaluation_.shop_arrival_scope + shop_evaluation_.shop_description_scope + shop_evaluation_.shop_service_scope
+		          ) / 3
+		        )/COUNT(1) shop_scope 
+		      FROM
+		        shop_evaluation shop_evaluation_
+		        GROUP BY shop_evaluation_.by_shop_id) tt 
+		    GROUP BY tt.by_shop_id) shop_eval_ 
+		    ON shop_eval_.by_shop_id = shop_info_.shop_id 
+			LEFT JOIN 
+		    shop_sales_volume shop_sales_volume_
+		    ON shop_sales_volume_.shop_id= shop_info_.shop_id
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.shopName != null  and entity.shopName !=''">
+				<![CDATA[ and shop_info_.shop_name  like concat('%',#{entity.shopName},'%') ]]>
+			</if>
+			<if test="entity.shopId != null  and entity.shopId !=''">
+				<![CDATA[ and shop_info_.shop_id  LIKE '%${entity.shopId}%' ]]>
+			</if>
+			<if test="entity.sellerId != null  and entity.sellerId !=''">
+				<![CDATA[ and shop_info_.seller_Id =#{entity.sellerId}]]>
+			</if>
+			<if test="entity.status != null  and entity.status !=''">
+				<![CDATA[ and shop_info_.status =#{entity.status}]]>
+			</if>
+			<if test="entity.keyword != null  and entity.keyword !=''">
+				<![CDATA[ and (shop_info_.keyword   LIKE '%${entity.keyword}%' or shop_info_.shop_name  LIKE '%${entity.keyword}%' )]]>
+			</if>
+			<if test="entity.provinceCode != null  and entity.provinceCode !=''">
+				<![CDATA[ and shop_info_.province_code  = #{entity.provinceCode} ]]>
+			</if>
+			<if test="entity.createdend != null  and entity.createdend !=''">
+				<![CDATA[ and DATE_FORMAT(shop_info_.created,'%Y-%m-%d ' ) <= DATE_FORMAT(#{entity.createdend},'%Y-%m-%d' ) ]]>
+			</if>
+			<if test="entity.createdstr != null  and entity.createdstr !=''">
+				<![CDATA[ and DATE_FORMAT(shop_info_.created,'%Y-%m-%d ' )  >= DATE_FORMAT(#{entity.createdstr},'%Y-%m-%d') ]]>
+			</if>
+			<if test="entity.passTimeBegin != null  and entity.passTimeBegin !=''">
+                <![CDATA[ and DATE_FORMAT(shop_info_.pass_time,'%Y-%m-%d ' ) >= DATE_FORMAT(#{entity.passTimeBegin},'%Y-%m-%d' ) ]]>
+            </if>
+            <if test="entity.passTimeEnd != null  and entity.passTimeEnd !=''">
+                <![CDATA[ and DATE_FORMAT(shop_info_.pass_time,'%Y-%m-%d ' ) < DATE_FORMAT(#{entity.passTimeEnd},'%Y-%m-%d' ) ]]>
+            </if>
+
+			<if test="entity.sellerBrand != null  and entity.sellerBrand !=''">
+				<![CDATA[ and shop_info_.seller_brand  = #{entity.sellerBrand} ]]>
+			</if>
+			<if test="entity.mutilPrice != null  and entity.mutilPrice !=''">
+				<![CDATA[ and shop_info_.mutilPrice =#{entity.mutilPrice} ]]>
+			</if>
+			<if test="entity.cityCode != null  and entity.cityCode !=''">
+				<![CDATA[ and shop_info_.city_code  = #{entity.cityCode} ]]>
+			</if>
+			<if test="entity.districtCode != null  and entity.districtCode !=''">
+				<![CDATA[ and shop_info_.district_code  = #{entity.districtCode} ]]>
+			</if>
+			<if test="entity.mutilCondition != null  and entity.mutilCondition !=''">
+				<![CDATA[ and shop_info_.mutil_condition =#{entity.mutilCondition} ]]>
+			</if>
+			<if test="entity.initialCondition != null  and entity.initialCondition !=''">
+				<![CDATA[ and shop_info_.initial_condition  =#{entity.initialCondition} ]]>
+			</if>
+			<if test="entity.modifyStatus != null  and entity.modifyStatus !=''">
+				<![CDATA[ and shop_info_.modify_status  =#{entity.modifyStatus} ]]>
+			</if>
+			<if test="entity.runStatus != null  and entity.runStatus !=''">
+				<![CDATA[ and shop_info_.run_status  =#{entity.runStatus} ]]>
+			</if>
+			<if test="entity.platformId!=null">
+		      <if test="entity.platformId==''">
+		      and shop_info_.platform_id is null
+		      </if>
+		      <if test="entity.platformId !=''">
+		      and shop_info_.platform_id =#{entity.platformId}
+		      </if>
+		    </if>
+			<if test="entity.shopUrl != null  and entity.shopUrl !=''">
+				<![CDATA[ and shop_info_.shop_url  =#{entity.shopUrl} ]]>
+			</if>
+			<if test="entity.statuss!=null">
+				<![CDATA[ and shop_info_.status in ]]>
+			  		<foreach collection="entity.statuss" item="it" index="index" open="(" separator="," close=")">
+			   			<![CDATA[   #{it} ]]>
+			   		</foreach>
+			</if>
+			<if test="entity.collation==1">
+				<![CDATA[ORDER BY  modified desc ]]>
+			</if>
+			<if test="entity.collation==2">
+				<![CDATA[ORDER BY  modified  ]]>
+			</if>
+				
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="selectById" resultMap="shopDTOMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where shop_info_.shop_id = #{id}
+		]]>
+	</select>
+	
+	<select id="queryShopInfoByIds" resultMap="shopDTOMap" parameterType="long[]">
+	  <![CDATA[ select s.*,sc.cid,sc.status cStatus from shop_info s,shop_platform_category sc  where s.shop_id=sc.shop_id ]]>
+		  <if test="entity.createdstr!= null and entity.createdstr !='' ">
+		  		<![CDATA[ and s.created > #{entity.createdstr} ]]>
+		  </if>
+		  <if test="entity.createdend!= null and entity.createdend !='' ">
+		  		<![CDATA[ and s.created < #{entity.createdend} ]]>
+		  </if>
+		  <if test="entity.passTimestr!= null and entity.passTimestr !='' ">
+		  		<![CDATA[ and s.pass_Time > #{entity.passTimestr} ]]>
+		  </if>
+		  <if test="entity.passTimeend!= null and entity.passTimeend !='' ">
+		  		<![CDATA[ and s.pass_Time < #{entity.passTimeend} ]]>
+		  </if>
+		  <if test="entity.sellerId!= null and entity.sellerId !='' ">
+		  		<![CDATA[ and s.seller_id = #{entity.sellerId} ]]>
+		  </if>	
+		  <if test="entity.cid != null  and entity.cid !=''">
+				<choose>
+			         <when test="entity.childCategorys != null and entity.childCategorys!='' ">
+			            <![CDATA[ and FIND_IN_SET(sc.cid,#{entity.childCategorys}) ]]>
+			        </when>
+			        <otherwise>
+			            <![CDATA[ and sc.cid = #{entity.cid} ]]>
+			        </otherwise>
+		        </choose>
+			</if>		
+		  <if test="entity.shopName!= null and entity.shopName !='' ">
+		  		<![CDATA[ and s.shop_name LIKE '%${entity.shopName}%' ]]>
+		  </if>		
+		  <if test="entity.status!= null and entity.status !='' ">
+		  		<![CDATA[ and s.status = #{entity.status} ]]>
+		  </if>	
+		  <if test="entity.shopIds!=null">
+		  		<![CDATA[ and s.shop_id in]]>
+			  <foreach collection="entity.shopIds" item="it" index="index" open="(" separator="," close=")">
+			   	<![CDATA[   #{it} ]]>
+			  </foreach>
+		  </if>
+	</select>
+	
+	
+	
+	<!-- 分页查询 -->
+	<select id="selectListByCondition" resultMap="shopDTOMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectCountByCondition" resultType="long">
+		<include refid="count_Tail" />
+		shop_info shop_info_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="com.camelot.storecenter.dto.ShopDTO" useGeneratedKeys="true" keyProperty="shopId">
+		<![CDATA[
+		insert into shop_info (
+				 shop_id
+		    	 ,shop_name
+		    	 ,seller_id
+		    	 ,status
+		    	 ,shop_url
+		    	 ,logo_url
+		    	 ,keyword
+		    	 ,introduce
+		    	 ,main_sell
+		    	 ,price_min
+		    	 ,mount_min
+		    	 ,province_code
+		    	 ,province_name
+		    	 ,zcode
+		    	 ,street_name
+		    	 ,mobile
+		    	 ,area_code
+		    	 ,landline
+		    	 ,extension_number
+		    	 ,created
+		    	 ,modified
+		    	 ,pass_time
+		    	 ,end_time
+		    	 ,seller_brand
+		    	 ,comment
+		    	 ,platform_user_id
+		    	 ,mutilPrice
+		    	 ,city_name
+		    	 ,city_code
+		    	 ,district_name
+		    	 ,district_code
+		    	 ,mutil_condition
+		    	 ,initial_price
+		    	 ,initial_mount
+		    	 ,initial_condition
+		    	 ,modify_status
+		    	 ,run_status
+		    	 ,shop_type
+		    	 ,brand_type
+		    	 ,business_type
+		    	 ,disclaimer
+		    	 ,trademark_regist_cert
+		    	 ,inspection_report
+		    	 ,production_license
+		    	 ,marketing_auth
+		    	 ,financing
+		    	 ,financing_amt
+		    	 ,platform_id
+		    	 ,gp_commitment_book
+		    	 ,link_man1
+		    	 ,link_phone_num1
+		    	 ,link_man2
+		    	 ,link_phone_num2
+		    	 ,direct_sale
+		    	 ,remark
+		   )values(
+		   		#{shopId}
+		    	,#{shopName}
+		    	,#{sellerId}
+		    	,#{status}
+		    	,#{shopUrl}
+		    	,#{logoUrl}
+		    	,#{keyword}
+		    	,#{introduce}
+		    	,#{mainSell}
+		    	,#{priceMin}
+		    	,#{mountMin}
+		    	,#{provinceCode}
+		    	,#{provinceName}
+		    	,#{zcode}
+		    	,#{streetName}
+		    	,#{mobile}
+		    	,#{areaCode}
+		    	,#{landline}
+		    	,#{extensionNumber}
+		    	,now()
+		    	,now()
+		    	,#{passTime}
+		    	,#{endTime}
+		    	,#{sellerBrand}
+		    	,#{comment}
+		    	,#{platformUserId}
+		    	,#{mutilPrice}
+		    	,#{cityName}
+		    	,#{cityCode}
+		    	,#{districtName}
+		    	,#{districtCode}
+		    	,#{mutilCondition}
+		    	,#{initialPrice}
+		    	,1
+		    	,#{initialCondition}
+		    	,#{modifyStatus}
+		    	,2
+		    	,#{shopType}
+		    	,#{brandType}
+		    	,#{businessType}
+		    	,#{disclaimer}
+		    	,#{trademarkRegistCert}
+		    	,#{inspectionReport}
+		    	,#{productionLicense}
+		    	,#{marketingAuth}
+		    	,#{financing}
+		    	,#{financingAmt}
+		    	,#{platformId}
+		    	,#{gpCommitmentBook}
+		    	,#{linkMan1}
+		    	,#{linkPhoneNum1}
+		    	,#{linkMan2}
+		    	,#{linkPhoneNum2}
+		    	,#{directSale}
+		    	,#{remark}
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.storecenter.dto.ShopDTO">
+		
+		update shop_info set
+		
+			modified = now()
+			<if test="shopName !=null " > ,shop_name = #{shopName} </if>
+   			<if test="sellerId !=null " > ,seller_id = #{sellerId} </if>
+   			<if test="status !=null " > ,status = #{status} </if>
+   			<if test="shopUrl !=null " >,shop_url = #{shopUrl}</if>
+   			<if test="logoUrl !=null " > ,logo_url = #{logoUrl}</if>
+   			<if test="keyword !=null " > ,keyword = #{keyword}</if>
+   			<if test="introduce !=null " > ,introduce = #{introduce}</if>
+   			<if test="mainSell !=null " >,main_sell = #{mainSell}</if>
+   			<if test="priceMin !=null " > ,price_min = #{priceMin} </if>
+   			<if test="mountMin !=null " >,mount_min = #{mountMin}</if>
+   			<if test="provinceCode !=null " >,province_code = #{provinceCode} </if>
+   			<if test="provinceName !=null " > ,province_name = #{provinceName}</if>
+   			<if test="zcode !=null " > ,zcode = #{zcode} </if>
+   			<if test="streetName !=null " > ,street_name = #{streetName}</if>
+   			<if test="mobile !=null " > ,mobile = #{mobile} </if>
+   			<if test="areaCode !=null " >,area_code = #{areaCode} </if>
+   		    <if test="landline !=null " >,landline = #{landline}</if>
+   			<if test="extensionNumber !=null " > ,extension_number = #{extensionNumber}</if>
+   			<if test="created !=null " > ,created = #{created}</if>
+   			<if test="passTime !=null " >,pass_time = #{passTime}</if>
+   			<if test="endTime !=null " >,end_time = #{endTime}</if>
+   			<if test="sellerBrand !=null " >,seller_brand = #{sellerBrand} </if>
+   			<if test="comment !=null " >,comment = #{comment} </if>
+   			<if test="platformUserId !=null " >,platform_user_id = #{platformUserId} </if>
+   			<if test="mutilPrice !=null " > ,mutilPrice = #{mutilPrice}</if>
+   			<if test="cityName !=null " > ,city_name = #{cityName}</if>
+   			<if test="cityCode !=null " >,city_code = #{cityCode}</if>
+   			<if test="districtName !=null " >,district_name = #{districtName}</if>
+   			<if test="districtCode !=null " >,district_code = #{districtCode}</if>
+   			<if test="mutilCondition !=null " >,mutil_condition = #{mutilCondition} </if>
+   			<if test="initialPrice !=null " > ,initial_price = #{initialPrice}</if>
+   			<if test="initialMount !=null " > ,initial_mount = #{initialMount} </if>
+   			<if test="initialCondition !=null " >,initial_condition = #{initialCondition}</if>
+   			<if test="modifyStatus !=null " >,modify_status = #{modifyStatus} </if>
+   			<if test="runStatus !=null " > ,run_status = #{runStatus} </if>
+   			<if test="shopType !=null " > ,shop_type = #{shopType} </if>
+   			<if test="brandType !=null " > ,brand_type = #{brandType} </if>
+   			<if test="businessType !=null " >,business_type=#{businessType}</if>
+   			<if test="disclaimer !=null " > ,disclaimer = #{disclaimer} </if>
+   			<if test="trademarkRegistCert !=null " > ,trademark_regist_cert = #{trademarkRegistCert} </if>
+   			<if test="inspectionReport !=null " > ,inspection_report = #{inspectionReport} </if>
+   			<if test="productionLicense !=null " > ,production_license = #{productionLicense} </if>
+   			<if test="marketingAuth !=null " > ,marketing_auth = #{marketingAuth} </if>
+   			<if test="financing !=null " > ,financing = #{financing} </if>
+   			<if test="financingAmt !=null " > ,financing_amt = #{financingAmt} </if>
+   			<if test="gpCommitmentBook !=null " > ,gp_commitment_book = #{gpCommitmentBook} </if>
+   			<if test="linkMan1 !=null " > ,link_man1 = #{linkMan1} </if>
+   			<if test="linkPhoneNum1 !=null " > ,link_phone_num1 = #{linkPhoneNum1} </if>
+   			<if test="linkMan2 !=null " > ,link_man2 = #{linkMan2} </if>
+   			<if test="linkPhoneNum2 !=null " > ,link_phone_num2 = #{linkPhoneNum2} </if>
+   			<if test="directSale !=null " > ,direct_sale = #{directSale} </if>
+   			<if test="remark !=null " > ,remark = #{remark} </if>
+		 where shop_id = #{shopId}
+		
+	</update>
+	<update id="modifyShopInfostatus" parameterType="com.camelot.storecenter.dto.ShopDTO">
+		update  shop_info set
+   			status = #{status}
+   			,modified =now()
+   			<if test="comment != null">,comment=#{comment}</if>
+   			<if test="platformUserId != null">,platform_user_id=#{platformUserId}</if>
+   			<if test="status==2 ">,pass_time =now()</if>
+		 where shop_id = #{shopId}
+	</update>
+	<!-- 修改店铺运行状态 -->
+	<update id="modifyShopRunStatus" parameterType="com.camelot.storecenter.dto.ShopDTO">
+		update  shop_info set
+   			run_status = #{runStatus}
+   			,modified =now()
+		 where shop_id = #{shopId}
+	</update>
+	<update id="updateShopInfo" parameterType="com.camelot.storecenter.dto.ShopModifyDetailDTO">
+		update  shop_info set
+   			${propertiesColumn} = #{afterChange}
+   			,modified =now()
+		 where shop_id = #{shopId}
+	</update>
+	<select id="getShopId" resultType="long">
+		SELECT get_shop_no()
+	</select>
+		
+	<select id="queryShopInfoByBrandId" resultMap="shopDTOMap" >
+	   select distinct s.* from  shop_brand sb,shop_info s  
+			where sb.shop_id=s.shop_id
+			 and sb.brand_id=#{brandId}
+			 and sb.`status`='2'
+			  and s.`status`='5'
+			and s.run_status='1'
+		limit #{page.pageOffset} , #{page.rows}
+	</select>
+	<select id="queryCountShopInfoByBrandId" resultType="long" >
+	  select count(1) from ( select distinct s.* from  shop_brand sb,shop_info s  
+			where sb.shop_id=s.shop_id
+			 and sb.brand_id=#{brandId}
+			 and sb.`status`='2'
+			  and s.`status`='5'
+			and s.run_status='1') a
+	</select>
+	
+	<!-- 查询所有的科印的店铺信息 -->
+	<select id="findAllKeyinShopInfo" resultMap="shopDTOMap" >
+	  <include refid="selectAllColumns" />
+		<![CDATA[
+		where shop_info_.platform_id is null or shop_info_.platform_id=1
+		]]>
+	</select>
+		
+</mapper>

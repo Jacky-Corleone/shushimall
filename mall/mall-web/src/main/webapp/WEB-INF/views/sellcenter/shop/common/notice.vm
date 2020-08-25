@@ -1,0 +1,9 @@
+<!-- 店铺公告 start -->
+<div class="left_box" >
+	<div class="left_top border-9 pad_l10">
+    	<span style="float:right;">
+        <a id='more_font' href="$request.contextPath/shopItemListIndexController/toListIndex?shopId=$!shopId" #if(!$!shopTemplates.color) style="color:#000000;font-weight:100" #else style="color:#ffffff;font-weight:100" #end >更多>></a>
+    	</span>
+    </div>
+</div>
+<!-- 店铺公告end -->

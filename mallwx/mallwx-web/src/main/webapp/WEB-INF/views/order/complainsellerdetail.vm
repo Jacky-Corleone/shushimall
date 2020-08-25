@@ -1,0 +1,33 @@
+#set($layout="common/order.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>仲裁结果</title>
+#parse("common/scriptAndCss.vm")
+</head>
+<body>
+	<div id="main" class="bg_02 po_re">
+		<div class="content" id="wrapper">
+			<div class="arbitration mar_lr5">
+	            <p class="hei_32">涉及订单:$!{orderId}</p>
+	            <p class="hei_32">类型:$!typeName</p>
+	            <p class="hei_32">状态:$!zcstace</p>
+	            <p class="hei_32">投诉方:$!tusufang</p>
+	        </div>
+	        <div class="bg_01">
+	            <ul class="arbitration mar_lr5">
+	                <li class="border_2"><div class="arbitration_left">投诉原因：</div><div class="arbitration_right">$!complainresion</div></li>
+	                <li class="border_2"><div class="arbitration_left">投诉内容：</div><div class="arbitration_right">$!remark</div></li>
+	                <li class="border_2"><div class="arbitration_left">处理结果：</div><div class="arbitration_right">$!stacetext</div></li>
+	                <li class="border_2"><div class="arbitration_left">处理意见：</div><div class="arbitration_right">$!comment</div></li>
+	                <li class="border_2"><div class="arbitration_left">提交时间：</div><div class="arbitration_right">$!createdate</div></li>
+	            </ul>
+	        </div>
+		</div>
+	</div>
+	#parse("common/footer.vm")
+</body>
+</html>

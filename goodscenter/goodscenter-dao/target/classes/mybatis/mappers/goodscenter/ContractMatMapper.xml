@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.goodscenter.dao.ContractMatDAO">
+	<resultMap id="contractMatMapper" type="com.camelot.goodscenter.dto.ContractMatDTO">
+			<result property="id" column="id" />
+			<result property="contractNo" column="contract_no" />
+			<result property="matCd" column="mat_cd" />
+			<result property="matDesc" column="mat_desc" />
+			<result property="lable1Cd" column="lable1_cd" />
+			<result property="lable1Desc" column="lable1_desc" />
+			<result property="lable2Cd" column="lable2_cd" />
+			<result property="lable2Desc" column="lable2_desc" />
+			<result property="lable3Cd" column="lable3_cd" />
+			<result property="lable3Desc" column="lable3_desc" />
+			<result property="matSpec" column="mat_spec" />
+			<result property="matBrand" column="mat_brand" />
+			<result property="matDiscount" column="mat_discount" />
+			<result property="matPrice" column="mat_price" />
+			<result property="matUnit" column="mat_unit" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="activeFlag" column="active_flag" />
+			<result property="itemName" column="item_name" />
+			<result property="protocolType" column="contract_type" />
+		    <result property="number" column="number" />
+			<result property="cost" column="cost" />
+			
+	</resultMap>
+	
+	<sql id="where">
+		<where>
+			contractMat.active_flag = 1
+			<if test="contractMat.id != null and contractMat.id != '' ">
+				and  contractMat.id = #{contractMat.id}
+			</if>
+			<if test="contractMat.contractNo != null and contractMat.contractNo != '' ">
+				and  contractMat.contract_no = #{contractMat.contractNo}
+			</if>
+			<if test="contractMat.matCd != null and contractMat.matCd != '' ">
+				and  contractMat.mat_cd = #{contractMat.matCd}
+			</if>
+			<if test="contractMat.matDesc != null and contractMat.matDesc != '' ">
+				and  contractMat.mat_desc = #{contractMat.matDesc}
+			</if>
+			<if test="contractMat.lable1Cd != null and contractMat.lable1Cd != '' ">
+				and  contractMat.lable1_cd = #{contractMat.lable1Cd}
+			</if>
+			<if test="contractMat.lable1Desc != null and contractMat.lable1Desc != '' ">
+				and  contractMat.lable1_desc = #{contractMat.lable1Desc}
+			</if>
+			<if test="contractMat.lable2Cd != null and contractMat.lable2Cd != '' ">
+				and  contractMat.lable2_cd = #{contractMat.lable2Cd}
+			</if>
+			<if test="contractMat.lable2Desc != null and contractMat.lable2Desc != '' ">
+				and  contractMat.lable2_desc = #{contractMat.lable2Desc}
+			</if>
+			<if test="contractMat.lable3Cd != null and contractMat.lable3Cd != '' ">
+				and  contractMat.lable3_cd = #{contractMat.lable3Cd}
+			</if>
+			<if test="contractMat.lable3Desc != null and contractMat.lable3Desc != '' ">
+				and  contractMat.lable3_desc = #{contractMat.lable3Desc}
+			</if>
+			<if test="contractMat.matSpec != null and contractMat.matSpec != '' ">
+				and  contractMat.mat_spec = #{contractMat.matSpec}
+			</if>
+			<if test="contractMat.matBrand != null and contractMat.matBrand != '' ">
+				and  contractMat.mat_brand = #{contractMat.matBrand}
+			</if>
+			<if test="contractMat.matDiscount != null and contractMat.matDiscount != '' ">
+				and  contractMat.mat_discount = #{contractMat.matDiscount}
+			</if>
+			<if test="contractMat.matPrice != null and contractMat.matPrice != '' ">
+				and  contractMat.mat_price = #{contractMat.matPrice}
+			</if>
+			<if test="contractMat.matUnit != null and contractMat.matUnit != '' ">
+				and  contractMat.mat_unit = #{contractMat.matUnit}
+			</if>
+			<if test="contractMat.createBy != null and contractMat.createBy != '' ">
+				and  contractMat.create_by = #{contractMat.createBy}
+			</if>
+			<if test="contractMat.createDate != null and contractMat.createDate != '' ">
+				and  contractMat.create_date = #{contractMat.createDate}
+			</if>
+			<if test="contractMat.updateBy != null and contractMat.updateBy != '' ">
+				and  contractMat.update_by = #{contractMat.updateBy}
+			</if>
+			<if test="contractMat.updateDate != null and contractMat.updateDate != '' ">
+				and  contractMat.update_date = #{contractMat.updateDate}
+			</if>
+			<if test="contractMat.activeFlag != null and contractMat.activeFlag != '' ">
+				and  contractMat.active_flag = #{contractMat.activeFlag}
+			</if>
+		</where>
+	</sql>
+	
+	<select id="queryPage" resultType="map">
+		select * from contract_mat contractMat
+		LEFT JOIN item_sku itemSku
+		ON contractMat.mat_cd = itemSku.sku_id
+		LEFT JOIN item item
+		ON itemSku.item_id = item.item_id
+		LEFT JOIN item_category itemCategory
+		ON item.cid = itemCategory.cid
+		<include refid="where"/>
+		limit #{pager.pageOffset},#{pager.rows}
+	</select>
+	
+	<select id="queryPageCount" resultType="long">
+		select count(0) from contract_mat contractMat
+		<include refid="where"/>
+	</select>
+	
+	<select id="findById" resultMap="contractMatMapper" >
+		select * from contract_mat contractMat
+		where id = #{id}
+	</select>
+
+	<select id="findByContractMatDTO" resultMap="contractMatMapper" >
+		select * from contract_mat contractMat
+		<include refid="where"/>
+	</select>
+	<insert id="insert" parameterType="com.camelot.goodscenter.dto.ContractMatDTO" useGeneratedKeys="true" keyProperty="id">
+		insert into contract_mat(
+				contract_no,
+				mat_cd,
+				mat_desc,
+				lable1_cd,
+				lable1_desc,
+				lable2_cd,
+				lable2_desc,
+				lable3_cd,
+				lable3_desc,
+				mat_spec,
+				mat_brand,
+				mat_discount,
+				mat_price,
+				mat_unit,
+				create_by,
+				create_date,
+				update_by,
+				update_date,
+				active_flag,
+				contract_type,
+				number,
+				cost
+			
+		)values(
+				#{contractNo},
+				#{matCd},
+				#{matDesc},
+				#{lable1Cd},
+				#{lable1Desc},
+				#{lable2Cd},
+				#{lable2Desc},
+				#{lable3Cd},
+				#{lable3Desc},
+				#{matSpec},
+				#{matBrand},
+				#{matDiscount},
+				#{matPrice},
+				#{matUnit},
+				#{createBy},
+				SYSDATE(),
+				#{updateBy},
+				#{updateDate},
+				#{activeFlag},
+				#{protocolType},
+				#{number},
+				#{cost}
+
+		)
+
+	</insert>
+	
+	<update id="update">
+		update contract_mat set
+				contract_no = #{contractNo},
+				mat_cd = #{matCd},
+				mat_desc = #{matDesc},
+				lable1_cd = #{lable1Cd},
+				lable1_desc = #{lable1Desc},
+				lable2_cd = #{lable2Cd},
+				lable2_desc = #{lable2Desc},
+				lable3_cd = #{lable3Cd},
+				lable3_desc = #{lable3Desc},
+				mat_spec = #{matSpec},
+				mat_brand = #{matBrand},
+				mat_discount = #{matDiscount},
+				mat_price = #{matPrice},
+				mat_unit = #{matUnit},
+				create_by = #{createBy},
+				create_date = #{createDate},
+				update_by = #{updateBy},
+				update_date = #{updateDate},
+				active_flag = #{activeFlag},
+				contract_type	=#{protocolType},
+				number=#{number},
+				cost=#{cost}
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from contract_mat
+		<if test=" codes != null and codes.size() > 0 ">
+			where id in
+			<foreach collection="codes" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test=" codes == null or codes.size() == 0 ">
+			where 1 = 3
+		</if>
+	</delete>
+	
+	<select id="findAll" resultMap="contractMatMapper">
+		select * from contract_mat contractMat
+		<include refid="where"/>
+	</select>
+</mapper>

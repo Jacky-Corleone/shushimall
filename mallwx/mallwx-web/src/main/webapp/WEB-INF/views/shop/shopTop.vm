@@ -1,0 +1,109 @@
+<!-- 小广告条、导航、轮播图 -->
+	<!-- 小广告条开始 -->
+	<div class="ban mar_t10 min-hei" style="background-image: url('$!imageServerAddr$!shopRenovationMap.get('1b').pictureUrl'); background-size:100%;" id="shopLogoEdit_bgPictureUrlName">
+		<!-- 广告图片开始 -->
+		<div class="ban_img mar wid_980 min-hei po_re" onmouseover="javascript:$('#ban_revise').show();" onmouseout="javascript:$('#ban_revise').hide();">
+			<a href="$!shopRenovationMap.get('1a').chainUrl" target="_blank">
+				<img src="$!imageServerAddr$!shopRenovationMap.get('1a').pictureUrl" id="shopLogoEdit_pictureUrlName" width="100%" height="100%">
+			</a>
+		</div>
+		<!-- 广告图片 end -->
+	</div>
+	<!-- 小广告条 end -->
+ 
+   <div class="nav_bg shop_color0">
+        
+   </div>
+ 
+    <!-- 店铺导航 end -->
+	<!-- 店铺导航开始 -->
+	<div class="main_flash banner po_re">
+  		<!-- 每一行轮播图片站位一个DIV-->
+		#foreach($banner in $banners)
+			 #if($velocityCount == 1)
+				<div class="focusPic" style="display: block;">
+                	<a href="$banner.chainUrl" target="_blank">
+                		<img src="$!imageServerAddr$banner.pictureUrl" id="adUrl$velocityCount" border="0" width="100%" height="100%"/>
+                	</a>
+           		</div>
+            #else
+                <div class="focusPic" style="display: none;">
+                	<a href="$banner.chainUrl" target="_blank">
+                		<img src="$!imageServerAddr$banner.pictureUrl" id="adUrl$velocityCount" border="0" width="100%" height="100%"/>
+                	</a>
+           		</div>
+            #end
+		#end
+      <!--轮播图片的图标 开始 -->
+		<div class="num_bg1">
+			<ul>
+    			 #foreach($banner in $banners)
+                    #if($velocityCount == 1)
+                        <li class="focus_num">
+                            <a href="#" onmouseover="SetActiveIndex_($('.main_flash>.focusPic'), $('.main_flash>.num_bg1>ul>li'),${velocityCount} - 1,this);"></a>
+                        </li>
+                    #else
+                        <li>
+                            <a href="#" onmouseover="SetActiveIndex_($('.main_flash>.focusPic'), $('.main_flash>.num_bg1>ul>li'), ${velocityCount} - 1,this);"></a>
+                        </li>
+                    #end
+    			 #end
+			</ul>
+		</div>
+        <!--轮播图片的图标 end -->
+        
+  	</div>
+  	<script type="text/javascript">
+	$(function(){
+		//轮播图
+		$("#shopAdEdit").bind("click",function(){
+			$("#adDialog").show();
+		});
+	});
+	
+	//宋文斌start
+	// JavaScript Document
+	var mainFlashTimer_ = null;
+    $(function() {
+    	mainFlashTimer_ = window.setInterval(function() {
+    		SetNextActive_($('.main_flash>.focusPic'),
+    				$(".main_flash>.num_bg1>ul>li"));
+    	}, 3000);
+    });
+    function SetActiveIndex_(jElms, jElmNums, i) {
+    	if (jElms.length == 0)
+    		return;
+    	//jElms.hide();
+		$(jElms).each(function(i,o){
+			$(o).hide();
+		});
+    	$(jElms[i]).show();
+    
+    	jElmNums.removeClass("focus_num");
+        $(jElmNums[i]).addClass("focus_num");
+    };
+    
+    function GetActiveIndex_(jElms) {
+    	return jElms.index(jElms.filter(":visible"));
+    };
+    
+    function SetNextActive_(jElms, jElmNums) {
+    	if (jElms.length == 0)
+    		return;
+		//显示下一个
+    	var i = GetActiveIndex_(jElms) + 1;
+    	if (i >= jElms.length)
+    		i = 0;
+    	SetActiveIndex_(jElms, jElmNums, i);
+    };
+    
+	$(".main_flash").mouseover(function(){
+		clearInterval(mainFlashTimer_);
+	});
+
+	$(".main_flash").mouseleave(function(){
+		mainFlashTimer_ = window.setInterval(function() {
+			SetNextActive_($('.main_flash>.focusPic'), $(".main_flash>.num_bg1>ul>li"));
+		}, 3000);
+	});
+</script>

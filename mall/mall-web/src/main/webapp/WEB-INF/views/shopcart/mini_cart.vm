@@ -1,0 +1,72 @@
+#set($layout = "/none_layout.vm")
+<script type="text/javascript">
+
+	function removeMiniPro(skuid, activitesDetailsId){
+		$.ajax({
+			url: "$request.contextPath/shopCart/del",
+			data: {"skuId": skuid, "activitesDetailsId":activitesDetailsId},
+			dataType: "text",
+			success: function(data){
+				$("#mini_cart").load("$request.contextPath/shopCart/mini");
+			}
+		});
+	}
+	setTimeout(function(){
+		//购物车商品数量超过99的时候
+		if($("[name='cartQuantity']").val() > 99 ){
+			$("#cartQuantity").html('99+');
+		}else{
+			$("#cartQuantity").html($("[name='cartQuantity']").val());
+		}
+	},200);
+</script>
+<input type="hidden" name="cartQuantity" value="$!myCart.allQuantity">
+#if( $!myCart.shops.size() > 0 )
+	<div style="text-align: left; text-indent: 8px; background-color: #fafafa; margin: 10px;">最新加入的商品</div>
+	<div class="car_shopping" style="overflow-x: hidden;">
+		#foreach( $shop in $myCart.shops )
+			#foreach( $product in $shop.products )
+				<table >
+			      	<tr>
+			            <td class="wid_90">
+			                <a href="$request.contextPath/productController/details?id=$product.itemId&skuId=$product.skuId">
+			            		<img src="$!imageServerAddr$product.src" width="75" height="75"/>
+			            	</a>
+			            </td>
+			            <td class="wid_180" style="height: 75px;">
+			            	<span>$product.title</span><br>
+			            	<div style="height: 30px;width: 180px; white-space:nowrap; overflow: hidden; text-overflow: ellipsis;">
+			                	<a href="$request.contextPath/productController/details?id=$product.itemId&skuId=$product.skuId">
+			            			#foreach( $attr in $product.attrs )
+			            				$attr.name:$attr.value &nbsp;&nbsp;
+			            			#end
+			            		</a>
+			            	</div>
+			            </td>
+			            <td class="wid_90 ">
+			            	#if( $product.hasPrice )
+			            		$product.payPrice*$product.quantity
+			            	#else
+			            		<font color='red'>暂无报价</font>
+			            	#end
+			            	<br>
+			            	<a class="font_1c" href="javascript:void(0);" onclick="removeMiniPro('$!product.skuId','$!product.activitesDetailsId')">删除</a>
+		            	</td>
+			      	</tr>
+				</table>
+			#end
+		#end
+	</div>
+	<div class="tit fr mar_r20">
+		共<span class="font_fe">$myCart.allQuantity</span>件商品，金额总计：<span class="font_fe">￥$myCart.allTotal</span>
+	</div>
+	<div class="clear "></div>
+	<div class="fr mar_tb10 mar_r20">
+		<button type="button" class="button_1 hei_40" onclick="location.href='$request.contextPath/shopCart/toCart'">去购物车结账</button>
+	</div>
+#else
+	<div style="text-align: left; text-indent: 8px; background-color: #fafafa; margin: 10px;">最新加入的商品</div>
+	<div style="height: 68px; line-height: 68px; text-align: center; margin-top: -10px; color: #d8d2d2;">
+		购物车中还没有商品，赶紧选购吧！
+	</div>
+#end

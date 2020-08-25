@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.basecenter.dao.BaseWebSiteMessageDAO">
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="baseWebSiteMessageMapper" type="com.camelot.basecenter.domain.BaseWebsiteMessage">
+			<result property="id" column="id" />
+			<result property="wmFromUserid" column="wm_from_userid" />
+			<result property="wmToUserid" column="wm_to_userid" />
+			<result property="wmToUsername" column="wm_to_username" />
+			<result property="wmFromUsername" column="wm_from_username" />
+			<result property="wmContext" column="wm_context" />
+			<result property="wmCreated" column="wm_created" />
+			<result property="wmRead" column="wm_read" />
+			<result property="modified" column="modified" />
+			<result property="type" column="type" />
+	</resultMap>
+	<resultMap id="webSiteMessageDTO" type="com.camelot.basecenter.dto.WebSiteMessageDTO">
+			<result property="id" column="id" />
+			<result property="wmFromUserid" column="wm_from_userid" />
+			<result property="wmToUserid" column="wm_to_userid" />
+			<result property="wmToUsername" column="wm_to_username" />
+			<result property="wmFromUsername" column="wm_from_username" />
+			<result property="wmContext" column="wm_context" />
+			<result property="wmCreated" column="wm_created" />
+			<result property="wmRead" column="wm_read" />
+			<result property="modified" column="modified" />
+			<result property="type" column="type" />
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                        -->
+    <!-- =========================================================== -->
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+		 	id,
+			wm_from_userid,
+			wm_to_userid,
+			wm_to_username,
+			wm_from_username,
+			wm_context,
+			wm_created,
+			wm_read,
+			modified,
+			type
+		from 
+			base_website_message 
+		]]>
+	</sql>
+	
+	
+	<!-- mysql 分页尾 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- Dao方法中的基本增删改查方法                                                                                                                                                  -->
+    <!-- =========================================================== -->
+	<!-- 站内信数量统计 -->
+	<select id="totalMessages" resultType="int">
+		select count(*) from base_website_message
+		where 1=1 
+			<if test="wmFromUserid != null and wmFromUserid !=0">
+				and	wm_from_userid = #{wmFromUserid}
+			</if>
+			<if test="type != null and type !=0">
+				and	type = #{type}
+			</if>
+			<if test="wmRead != null and wmRead !=0">
+				and	wm_read = #{wmRead}
+			</if>
+	</select>
+	
+	<select id="queryById" resultMap="baseWebSiteMessageMapper" >
+		select * from base_website_message
+		where id = #{id}
+	</select>
+	
+	<select id="getWebSiteMessageInfo" resultMap="webSiteMessageDTO" >
+		select * from base_website_message
+		<include refid="where_webSiteMessage_dto"/>
+	</select>
+	
+	<sql id="where_webSiteMessage_dto">
+		where 1=1
+		<if test="entity != null">
+			<if test="entity.id!= null">
+				and id = #{entity.id}
+			</if>
+			<if test="entity.wmFromUserid!= null">
+				and wm_from_userid = #{entity.wmFromUserid}
+			</if>
+			<if test="entity.wmToUserid!= null">
+				and wm_to_userid = #{entity.wmToUserid}
+			</if>
+			<if test="entity.wmToUsername!= null">
+				and wm_to_username = #{entity.wmToUsername}
+			</if>
+			<if test="entity.wmFromUsername!= null">
+				and wm_from_username = #{entity.wmFromUsername}
+			</if>
+			<if test="entity.wmRead!= null">
+				and wm_read = #{entity.wmRead} 
+			</if>
+			<if test="entity.wmCreated!= null">
+				and DATE_FORMAT(wm_created, '%Y-%m-%d') =  DATE_FORMAT(#{entity.wmCreated}, '%Y-%m-%d')
+			</if>
+			<if test="entity.type!= null">
+				and type = #{entity.type}
+			</if>
+            <if test="entity.wmContext!= null">
+                and wmContext = #{entity.wmContext}
+            </if>
+			and wm_read != 3
+		</if>
+		order by wm_created desc
+	</sql>
+	
+	<insert id="add" keyProperty="id" useGeneratedKeys="true">
+		insert into base_website_message(
+			wm_from_userid,
+			wm_to_userid,
+			wm_to_username,
+			wm_from_username,
+			wm_context,
+			wm_created,
+			wm_read,
+			modified,
+			type
+		)values(
+			#{wmFromUserid},
+			#{wmToUserid},
+			#{wmToUsername},
+			#{wmFromUsername},
+			#{wmContext},
+			#{wmCreated},
+			#{wmRead},
+			#{modified},
+			#{type}
+		)
+	</insert>
+	
+	<!-- 查询总数 -->
+	<select id="queryCount" resultType="java.lang.Long">
+		select count(1) from base_website_message
+		<include refid="where_webSiteMessage_dto"/>
+	</select>
+	
+	<update id="update">
+		update base_website_message set
+				id = #{id},
+				wm_from_userid = #{wmFromUserid},
+				wm_to_userid = #{wmToUserid},
+				wm_to_username = #{wmToUsername},
+				wm_from_username = #{wmFromUsername},
+				wm_context = #{wmContext},
+				wm_created = #{wmCreated},
+				wm_read = #{wmRead},
+				modified = #{modified},
+				type = #{type}
+		where id = #{id}
+	</update>
+	
+	<!-- 站内信阅读状态更改 -->
+	<update id="modifyWebSiteMessage" parameterType="string">
+		update base_website_message set
+				wm_read = #{wmRead}
+		where id = #{id}
+	</update>
+	
+	<update id="updateBySelect">
+	
+	</update>
+	
+	<delete id="delete">
+		delete from base_website_message
+		<if test=" codes != null and codes.size() > 0 ">
+			where id in
+			<foreach collection="codes" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test=" codes == null or codes.size() == 0 ">
+			where 1 = 3
+		</if>
+	</delete>
+	
+	<!-- 分页查询 -->
+	<select id="queryWebSiteMessageList" resultMap="webSiteMessageDTO">
+		<include refid="selectAllColumns"/>
+		<include refid="where_webSiteMessage_dto"/>
+		<!-- order by 手工添加 -->
+		<if test=" page != null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+</mapper>

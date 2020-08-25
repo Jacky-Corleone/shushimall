@@ -1,0 +1,141 @@
+<script type="text/javascript">
+$(function(){
+	//初始化验证
+	initValidPluginTax();
+	//初始化页面
+	initTax();
+
+	/*暂存：税务登记证信息*/
+	$("#taxBtn").click(function(){
+		//暂存操作
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			url:"$request.contextPath/information/registerSeller/stagingInformation",
+			data:$("#taxForm").serializeArray(),
+			success: function(data){
+				alert(data.result);
+			}
+		});
+	});
+});
+
+/*初始化页面*/
+function initTax(){
+	//纳税人类型
+	if("$!userTaxDTO.taxpayerType"!=null && "$!userTaxDTO.taxpayerType"!=""){
+		$("#taxpayerType").val("$!userTaxDTO.taxpayerType");
+	}
+	//纳税人类型税码
+	if("$!userTaxDTO.taxpayerCode"!=null && "$!userTaxDTO.taxpayerCode"!="" ){
+		$("#taxpayerCode").val("$!userTaxDTO.taxpayerCode");
+	}
+}
+
+/*初始化校验控件*/
+function initValidPluginTax(){
+	$("#taxForm").validate({
+		rules: {
+			"userTaxDTO.taxManId":{
+				required: true,
+				specialCharValidate: true
+			},
+			"userTaxDTO.taxpayerType":{
+				required: true
+			},
+			"userTaxDTO.taxpayerCode":{
+				required: true
+			}
+		}
+	});
+
+
+}
+</script>
+
+<!--税务登记证信息 start -->
+<form id="taxForm" method="post">
+<div class="bg_07 border-6" id="hideTaxForm">
+<div class="approve_buyer" id="approve_buyer">
+	<h1 class="font_18 mar_20">公司税务登记证信息：</h1>
+	<input name="stagingType" type="hidden" value="3"/>
+	<ul>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>税务人识别号：</span>
+			<span class="userInfo_class_show">$!userTaxDTO.taxManId</span>
+			<div class="userInfo_class_hide">
+			<input id="taxManId" name="userTaxDTO.taxManId" value="$!userTaxDTO.taxManId" type="text"
+				class="input_Style1 wid_250" placeholder="输入税务人识别号..."/>
+			</div>
+		</li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>纳税人类型：</span>
+			<span class="userInfo_class_show">$!userTaxDTO.taxpayerType</span>
+			<div class="userInfo_class_hide">
+			<select id="taxpayerType" name="userTaxDTO.taxpayerType" class="input_Style1 wid_260">
+				<option value="" selected="selected"> 请选择 </option>
+				<option value="一般纳税人" >一般纳税人</option>
+				<option value="小规模纳税人" >小规模纳税人</option>
+				<option value="非增值税纳税人" >非增值税纳税人</option>
+			</select>
+			</div>
+		</li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>纳税人类型税码：</span>
+			<span class="userInfo_class_show">$!userTaxDTO.taxpayerCode</span>
+			<div class="userInfo_class_hide">
+			<select id="taxpayerCode" name="userTaxDTO.taxpayerCode" class="input_Style1 wid_260">
+				<option value="" selected="selected"> 请选择 </option>
+				<option value="0%" >0%</option>
+				<option value="3%" >3%</option>
+				<option value="6%" >6%</option>
+				<option value="7%" >7%</option>
+				<option value="11%" >11%</option>
+				<option value="13%" >13%</option>
+				<option value="17%" >17%</option>
+			</select>
+			</div>
+		</li>
+		<div class="clear"></div>
+		<span style="color: red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;提示:&nbsp;上传图片仅支持JPG、JPEG、PNG、BMP格式，上传图片大小不得超过1M</span>
+		<div class="clear"></div>
+		<div class="fl">
+			<li>
+				<p class="font_span"><i class="demo-icons font_fs">*</i>税务登记证电子版：</p>
+				<img src="$!imageServerAddr$!userTaxDTO.taxRegistrationCertificatePicSrc" id="taxRegistrationCertificatePicSrcImg"
+					alt="" width="55" height="55" class="mar_lr10 fl po_re_img" title="点击查看大图">
+				<div class="userInfo_class_hide">
+				<p class="hei_40 fl registere_class_hide z-upload">
+					<button type="button" class="button_4 font_12 border-1 button_small">上传图片</button>
+					<input type="file" id="taxRegistrationCertificatePicSrcFile" class="file-img" name="file" onchange="startUpload('taxRegistrationCertificatePicSrcFile','taxRegistrationCertificatePicSrcImg','taxRegistrationCertificatePicSrc')">
+				</p>
+				</div>
+				<input id="taxRegistrationCertificatePicSrc" name="userTaxDTO.taxRegistrationCertificatePicSrc" type="hidden" value="$!userTaxDTO.taxRegistrationCertificatePicSrc"/>
+			</li>
+			<div class="clear"></div>
+			<li>
+				<p class="font_span"><i class="demo-icons font_fs">*</i>纳税人资格证电子版：</p>
+				<img src="$!imageServerAddr$!userTaxDTO.taxpayerCertificatePicSrc" id="taxpayerCertificatePicSrcImg"
+					alt="" width="55" height="55" class="mar_lr10 fl po_re_img" title="点击查看大图">
+				<div class="userInfo_class_hide">
+				<p class="hei_40 fl registere_class_hide z-upload">
+					<button type="button" class="button_4 font_12 border-1 button_small">上传图片</button>
+					<input type="file" id="taxpayerCertificatePicSrcFile" class="file-img" name="file" onchange="startUpload('taxpayerCertificatePicSrcFile','taxpayerCertificatePicSrcImg','taxpayerCertificatePicSrc')">
+				</p>
+				</div>
+				<input id="taxpayerCertificatePicSrc" name="userTaxDTO.taxpayerCertificatePicSrc" type="hidden" value="$!userTaxDTO.taxpayerCertificatePicSrc"/>
+			</li>
+		</div>
+		#if("$!pageState"!="view")
+		<div class="fl mar_l170">
+			<p><img src="$request.contextPath/assets/images/taxRegistrationCertificatePic.jpg" width="150" height="80" title="点击查看大图" class="po_re_img"/></p>
+			<p><img src="$request.contextPath/assets/images/taxpayerCertificatePic.jpg" width="150" height="80" title="点击查看大图" class="po_re_img"/></p>
+		</div>
+		#end
+	</ul>
+	#if("$!pageState"=="register")
+	<div class="button_2 hei_40 font_14b" style="margin:20px auto" id="taxBtn">暂 存</div>
+	#end
+</div></div>
+</form>
+<!--税务登记证信息end-->

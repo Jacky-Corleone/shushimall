@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jms="http://www.springframework.org/schema/jms"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+    http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+    http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-3.2.xsd"
+    >
+	<!-- 真正可以产生Connection的ConnectionFactory，由对应的 JMS服务厂商提供--> 
+	<bean id="targetConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+		<property name="brokerURL" value="tcp://172.21.102.54:61616"/>
+	</bean>
+	
+	<!-- 配置Spring提供的ConnectionFactory -->
+	<bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+		<!-- 目标ConnectionFactory对应真实的可以产生JMS Connection的ConnectionFactory -->  
+    	<property name="targetConnectionFactory" ref="targetConnectionFactory"/>
+    	<!-- Session缓存数量 -->
+    	<property name="sessionCacheSize" value="10"></property>
+	</bean>
+	
+	<!-- Spring提供的JMS工具类，它可以进行消息发送、接收等 -->  
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">  
+    	<!-- 这个connectionFactory对应的是我们定义的Spring提供的那个ConnectionFactory对象 -->  
+    	<property name="connectionFactory" ref="connectionFactory"/>  
+	</bean>
+	
+	
+	
+	<!-- 短信通知消息     消息队列 -->
+	<!--这个是队列目的地，点对点的,消息一旦被处理就不在队列中存在-->  
+	<bean id="smsNoticQueueDestination" class="org.apache.activemq.command.ActiveMQQueue">  
+	    <constructor-arg>  
+	        <value>smsNoticQueue</value>
+	    </constructor-arg>
+	</bean>
+	<!-- 邮件通知消息     消息队列 -->
+	<!--这个是队列目的地，点对点的,消息一旦被处理就不在队列中存在-->  
+	<bean id="emailNoticQueueDestination" class="org.apache.activemq.command.ActiveMQQueue">  
+	    <constructor-arg>
+	        <value>emailNoticQueue</value>
+	    </constructor-arg>
+	</bean>  
+	<!-- 短信验证码    消息队列 -->
+	<bean id="smsVerifyCodeDestination" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg>
+			<value>smsVerifyCodeQueue</value>
+		</constructor-arg>
+	</bean>
+	
+	<!-- 邮箱验证码    消息队列 -->
+	<bean id="emailVerifyCodeDestination" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg>
+			<value>emailVerifyCodeQueue</value>
+		</constructor-arg>
+	</bean>
+	
+	<!-- 绿印 -->
+	<!-- 短信通知消息     消息队列 -->
+	<!--这个是队列目的地，点对点的,消息一旦被处理就不在队列中存在-->  
+	<bean id="smsNoticGreenQueueDestination" class="org.apache.activemq.command.ActiveMQQueue">  
+	    <constructor-arg>  
+	        <value>smsNoticQueueGreen</value>  
+	    </constructor-arg>  
+	</bean>  
+	<!-- 短信验证码    消息队列 -->
+	<bean id="smsVerifyCodeGreenDestination" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg>
+			<value>smsVerifyCodeQueueGreen</value>
+		</constructor-arg>
+	</bean>
+	<!-- 邮箱验证码    消息队列 -->
+	<bean id="emailVerifyCodeGreenDestination" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg>
+			<value>emailVerifyCodeQueueGreen</value>
+		</constructor-arg>
+	</bean>
+	<!-- 邮件通知消息     消息队列 -->
+	<!--这个是队列目的地，点对点的,消息一旦被处理就不在队列中存在-->  
+	<bean id="emailNoticGreenQueueDestination" class="org.apache.activemq.command.ActiveMQQueue">  
+	    <constructor-arg>  
+	        <value>emailNoticQueueGreen</value>  
+	    </constructor-arg>  
+	</bean>  
+</beans>

@@ -1,0 +1,118 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+
+<html>
+<head>
+	<title>公告查看</title>
+	<meta name="decorator" content="default"/>
+    <%@ include file="/WEB-INF/views/include/dialog.jsp"%>
+	<script src="${ctxStatic}/ueditor/ueditor.config.js" type="text/javascript"></script>
+	<script src="${ctxStatic}/ueditor/ueditor.all.js" type="text/javascript"></script>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			//公告内容赋值
+			$("#noticeTitle").focus();
+			var ue = UE.getEditor('editor_id',{
+				serverUrl:'${ctx}/ueditor/exec',
+				imageUrlPrefix:"${filePath}"
+			});
+			
+			ue.addListener('ready',function(){
+		
+				var imgObjs = $("#ueditor_0").contents().find("img");
+				imgObjs.each(function () {
+		           if($(this).attr("src") != "" && $(this).attr("src").indexOf("http://") < 0){
+		        	   $(this).attr("src","${filePath}"+$(this).attr("src"));
+		           }
+		           if($(this).attr("_src") != "" && $(this).attr("_src").indexOf("http://") < 0){
+		        	   $(this).attr("_src","${filePath}"+$(this).attr("_src"));
+		           }
+		   	 	});
+		   	 	ue.setDisabled('fullscreen');
+	   	 	});
+		});
+		
+		function noticeAdd(val) {
+            $("#noticeContent").val(UE.getEditor('editor_id').getContent());
+            $("#noticeStatus").val(val);
+            var id = $("#noticeId").val();
+            if (id == "") {
+                $("#inputForm").submit();
+            } else {
+                $("#inputForm").attr("action", "${ctx}/notice/edit").submit();
+            }
+		};
+		function goBack(url,title){
+			parent.openTab("${ctx}"+url,title,'7dd40d99f10a4c5e835d4a12cb27d23b');
+		}
+	</script>
+</head>
+<body>
+
+	<form:form id="inputForm" modelAttribute="mallNoticeDTO" method="post" action="${ctx}/notice/save" class="form-horizontal">
+		<form:hidden path="noticeId"/>
+		<form:hidden path="noticeContent" id="noticeContent"/>
+		<form:hidden path="noticeStatus" id="noticeStatus"/>
+		<tags:message content="${message}"/>
+		<div class="control-group">
+			<label class="control-label" for="noticeTitle">公告标题:</label>
+			<div class="controls">
+				<label>${mallNoticeDTO.noticeTitle}</label>
+			</div>
+		</div>
+        <div class="control-group">
+            <label class="control-label" for="noticeType">公告类型:</label>
+            <div class="controls">
+                <c:if test="${not empty mallNoticeDTO.noticeType}">
+                    <c:if test="${mallNoticeDTO.noticeType=='1'}">
+                        <label>文字公告</label>
+                    </c:if>
+                    <c:if test="${mallNoticeDTO.noticeType=='2'}">
+                        <label>链接公告</label>
+                    </c:if>
+                </c:if>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="platformId">平台类型:</label>
+            <div class="controls">
+                <c:if test="${not empty mallNoticeDTO.platformId}">
+                    <c:if test="${mallNoticeDTO.platformId=='0'}">
+                        <label>舒适100平台</label>
+                    </c:if>
+                    <%-- <c:if test="${mallNoticeDTO.platformId=='2'}">
+                        <label>绿印平台</label>
+                    </c:if> --%>
+                </c:if>
+            </div>
+        </div>
+        <c:if test="${mallNoticeDTO.noticeType=='2'}">
+        	<div class="control-group">
+	            <label class="control-label" for="noticeTitle">公告链接:</label>
+	            <div class="controls">
+	                <a href="${mallNoticeDTO.url}" target="_blank">
+	                    ${mallNoticeDTO.url}
+	                </a>
+	            </div>
+	        </div>
+        </c:if>
+        
+        <c:if test="${mallNoticeDTO.noticeType=='1'}">
+	        <div class="control-group">
+				<label class="control-label" for="editor_id">公告内容:</label>
+				<div class="controls">
+					<textarea id="editor_id" name="content" style="width:700px;height:300px;" class="required">${mallNoticeDTO.noticeContent}</textarea>
+				</div>
+			</div>
+        </c:if>
+		
+
+		<div class="control-group">
+            <div class="controls">
+			<input class="btn btn-primary" type="button" onclick="history.go(-1)" value="取消"/>&nbsp;
+            </div>
+		</div>
+	</form:form>
+</body>
+</html>

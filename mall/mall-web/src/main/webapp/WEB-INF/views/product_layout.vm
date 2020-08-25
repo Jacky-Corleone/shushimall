@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="renderer" content="webkit" />
+    #parse("/common/tdk_product.vm")
+</head>
+<body>
+#parse("/common/header.vm")
+<div class="clear"></div>
+<section class="w">
+    $screen_content
+</section>
+<div class="clear"></div>
+#parse("/common/footer.vm")
+</body>
+</html>

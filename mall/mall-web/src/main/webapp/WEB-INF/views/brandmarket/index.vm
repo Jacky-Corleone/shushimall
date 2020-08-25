@@ -1,0 +1,63 @@
+#set($staticPath="$request.contextPath/assets")
+<link rel="stylesheet" type="text/css" href="$staticPath/css/manage_style.css"/>
+<link rel="stylesheet" type="text/css" href="$staticPath/css/Details.css"/>
+<script type="text/javascript">
+	$(document).ready(function(){
+		var simpleCode = "$!simpleCode";
+		$("#brands").find("li[name='" + simpleCode + "']").addClass("focus_li");
+		
+		$("#brands li").click(function(){
+			var simpleCode = $(this).attr("name");
+			location.href = "$request.contextPath/brandMarket/"+simpleCode;
+		});
+	});
+</script>
+<div id="main">
+ 	<div class="Brand_left bg_05 border-4">
+    	<ul id="brands">
+        	<li name="A">A</li>
+        	<li name="B">B</li>
+        	<li name="C">C</li>
+        	<li name="D">D</li>
+        	<li name="E">E</li>
+        	<li name="F">F</li>
+        	<li name="G">G</li>
+            <li name="H">H</li>
+            <li name="I">I</li>
+            <li name="J">J</li>
+            <li name="K">K</li>
+            <li name="L">L</li>
+            <li name="M">M</li>
+            <li name="N">N</li>
+            <li name="O">O</li>
+            <li name="P">P</li>
+            <li name="Q">Q</li>
+            <li name="R">R</li>
+            <li name="S">S</li>
+            <li name="T">T</li>
+            <li name="U">U</li>
+            <li name="V">V</li>
+            <li name="W">W</li>
+            <li name="X">X</li>
+            <li name="Y">Y</li>
+            <li name="Z">Z</li>
+            <li id="other" name="其它">其它</li>
+        </ul>
+    </div><!--Brand_left end -->
+ 	<div class="Brand_right">
+    	<ul id="brandsLogo">
+    		#foreach( $brand in $brands )
+        		<li >
+                    <div >
+                        <a href="$request.contextPath/brandMarket/brand?id=$!brand.brandId">
+                            <img src="$!imageServerAddr$!brand.brandLogoUrl" width="140" height="50" alt="$!brand.brandName" title="$!brand.brandName"/>
+                        </a>
+                    </div>
+                    <div class="mar_t10">
+                      <a href="$request.contextPath/brandMarket/brand?id=$!brand.brandId" > $!brand.brandName</a>
+                    </div>
+        		</li>
+    		#end
+        </ul>
+    </div><!--Brand_left end -->
+ </div><!--main end -->

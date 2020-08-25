@@ -1,0 +1,455 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<script type="text/javascript" src="$staticPath/js/common.js"></script>
+<!--头部开始-->
+<script type="text/javascript">
+    $(document).ready(function () {
+    	//加载左侧菜单
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+    });
+    
+  //复选框事件
+  //全选、取消全选的事件
+  function selectAll() {
+      if ($("#all_select").is(":checked")) {
+          $("input:checkbox[id='subCheck']").prop("checked", true);
+      } else {
+          $("input:checkbox[id='subCheck']").prop("checked", false);
+      }
+  }
+  
+  function toSeeCoupon() {
+	    var a = $("input:checkbox[name='contractId']:checked");
+	    if (a.length == 0) {
+	        alert("请选择一个优惠券");
+	        return;
+	    }
+	    if (a.length > 1) {
+	        alert("只能选择一条优惠券进行查看");
+	        return;
+	    }
+	    var couponsId = $(a[0]).val();
+	    window.location = $("#contextPath").val() + "/coupons/couponsAdd?type=2&couponsId=" + couponsId;
+	}
+  
+  function deleteCoupons(){
+	  var a = $("input:checkbox[name='contractId']:checked");
+	  if (a.length == 0) {
+	        alert("请选择至少一个优惠券");
+	        return;
+	  }
+	  var key = true;
+	  $(a).each(function () {
+	  	if(key && $(this).attr("class")!="3" && $(this).attr("class")!="2" ){
+ 		 	alert("只可删除状态为已终止/已结束的优惠券");
+			key = false;
+		}
+ 	  });
+ 	  if(key&&confirm("确定删除所选优惠券？")){
+ 		 var couponsIds = '';
+ 		  $(a).each(function () {
+ 			  couponsIds += $(this).val()+";";
+ 		  });
+ 		  window.location = $("#contextPath").val() + "/coupons/couponsDelete?couponsIds=" + couponsIds;
+	  }
+  }
+  
+  function couponsUpdate(state){
+	  var a = $("input:checkbox[name='contractId']:checked");
+	  if (a.length == 0) {
+	        alert("请选择至少一个优惠券");
+	        return;
+	    }
+ 	  if(confirm("确定终止所选优惠券？")){
+ 		 var couponsIds = '';
+ 		  $(a).each(function () {
+ 			  couponsIds += $(this).val()+";";
+ 		  });
+ 		  window.location = $("#contextPath").val() + "/coupons/couponsUpdate?couponsIds=" + couponsIds + "&state="+state;
+	  }
+  }
+  
+  
+  //子复选框的事件
+  function setSelectAll() {
+      //当没有选中某个子复选框时，SelectAll取消选中
+      if (!$("#subcheck").checked) {
+          $("#all_select").prop("checked", false);
+      }
+      var chsub = $("input:checkbox[id='subCheck']").length; //获取subcheck的个数
+      var checkedsub = $("input:checkbox[id='subCheck']:checked").length; //获取选中的subcheck的个数
+      if (checkedsub == chsub) {
+          $("#all_select").prop("checked", true);
+      }
+  }
+   
+  //跳转到新增优惠券页面couponsId传空
+  function toCouponListCreatePage(type){
+	  window.location = $("#contextPath").val() + "/coupons/couponsAdd?type=" + type +"&couponsId=";
+  }
+  
+    //分页
+    function topage(page) {
+        searchContractInfo(0,page);
+    }
+    
+    function searchContractInfo(e, page) {
+        var contractInfo = {};
+        contractInfo['couponName'] = $("#couponName").val();
+        contractInfo['couponType'] = $("#couponType").val();
+        contractInfo['platformId'] = $("#platformId").val();
+        if(!page){
+            page=1;
+        }
+        var contractSearchModel = JSON.stringify(contractInfo);
+        $.ajax({
+            url: $("#contextPath").val() + "/coupons/couponsList",
+            data: {
+                "contractSearchModel": contractSearchModel,
+                "sourcePage": $("#sourcePage").val(),
+                "page": page,
+            },
+            type: 'post',
+            dataType: 'html',
+            success: function (data) {
+                $("#contractList").html(data);
+            },
+        });
+    }
+    
+    
+    function createLoadMask() {
+        $("#loadMask").show();
+    }
+
+    function closeLoadMask() {
+        $("#loadMask").hide();
+    }
+    
+    function showModifyNumDiv(){
+    	var a = $("input:checkbox[name='contractId']:checked");
+	    if (a.length == 0) {
+	        alert("请选择一个优惠券");
+	        return;
+	    }
+	    if (a.length > 1) {
+	        alert("每次只能修改一条优惠券的数量");
+	        return;
+	    }
+	    
+	    var state = $(a).attr("class");
+	    if(state != "0" && state != "1"){
+	    	alert("只能修改状态为未开始/已开始的优惠券");
+	        return;
+	    }
+	    
+    	$("#modify_name").html($(a).parent().parent().find('li')[2].title);
+	    $("#modify_no").html($(a).parent().parent().find('li')[1].title);
+	    $("#couponId").val($(a).parent().parent().find('li')[1].title);
+	    $("#modify_descr").html($(a).parent().parent().find('li')[6].title);
+	    $("#modify_oldNum").html($(a).parent().parent().find('li')[7].title);
+	    $("#modify_receivedNumber").html($(a).parent().parent().find('li')[8].title);
+	    $("#couponNum").val("");
+    	createLoadMask();
+        $("#modify_num_div").show();
+        document.body.style.overflow = "hidden";
+    }
+    
+    function closeModifyNumDiv() {
+    	closeLoadMask();
+        $("#modify_num_div").hide();
+        document.body.style.overflow = "auto"; // 恢复页面滚动条
+    }
+    
+    function compareUserCount(value){
+    	//正整数
+    	var zzs = /^[1-9]*[1-9][0-9]*$/;
+    	if(!zzs.test(value)){
+			$("#couponNum").val("1");
+			alert("增加优惠券数量请输入大于0的整数");
+			return false;
+		}else{
+			var c = parseInt(value) + parseInt($("#modify_oldNum").html());
+			if(c > 999999){
+				alert("优惠券数量最大为 99,9999");
+				return false;
+			}
+		}
+   		return true;
+    }
+    
+    function modifyNum(){
+    	var value = $("#couponNum").val();
+    	var couponId = $("#couponId").val();
+    	if(compareUserCount(value)){
+    		$.ajax({
+    			type: "POST",
+    			dataType: "json",
+    			url: "$request.contextPath/coupons/modifyCouponsNum",
+    			data: {
+    				couponId: couponId,
+    				couponNum : value
+    			},
+    			success: function(data){
+    				alert(data.resultMessage);
+    				if(data.resultMessage == "增加成功"){
+    					var a = $("input:checkbox[name='contractId']:checked");
+    					var  num = $(a).parent().parent().find('li')[7].title ;
+    					$(a).parent().parent().find('li')[7].title = (parseInt(value) +parseInt(num));
+    					$(a).parent().parent().find('li')[7].innerHTML = (parseInt(value) +parseInt(num));
+    					closeModifyNumDiv();
+    				}
+    			}
+    		});
+    	}
+    }
+</script>
+<div id="main">
+	<!--left start -->
+	<div id="leftSeller">
+	</div>
+	<!--left end -->
+
+	<input id="contextPath" type="hidden" value="$request.contextPath">
+    <!--右边部分开始-->
+    <div id="right">
+        <div id="right_top" class="right_top border-4 bg_06">
+            <div class="right_top_l">
+                <ul class="list">
+                    <li class="wid_270">
+                        <span class="font_wid">优惠券名称：</span>
+                        <input id="couponName" class="input_Style2 wid_150 hei_30" type="text"/>
+                    </li>
+                    
+                    <li class="wid_270"><span class="font_wid mar_l">优惠券类型：</span>
+	                   <select id="couponType" class="input_Style2 wid_160 mar_r10 hei_35 ">
+	                        <option value="">--请选择--</option>
+	                        <option value="1">满减券</option>
+	                        <option value="2">折扣券</option>
+	                        <option value="3">现金券</option>
+	                    </select>
+                    </li>
+                    
+                    <li class="wid_270"><span class="font_wid mar_l" style= "display:none">使用平台：</span>
+	                   <select id="platformId" class="input_Style2 wid_160 mar_r10 hei_35 " style= "display:none">
+	                        <option value="">--请选择--</option>
+	                        <option value="1">PC端</option>
+	                        <!-- <option value="2">绿印平台</option> -->
+	                        <option value="3">移动端</option>
+	                        <option value="4">PC端和移动端</option>
+	                    </select>
+                    </li>
+                </ul>
+            </div>
+            <div class="right_top_r ">
+                <button type="button" class="button_4 but_cx3" onclick="searchContractInfo(0)">查 询</button>
+            </div>
+        </div>
+        <!-- 查询 结束 -->
+
+        <div class="right_bot border-4 mar_t10 bg_06">
+            <!-- 商品列表开头 -->
+            <div class="right_xinxi mar_l14">
+                <ul class="list_top bg_08 font_cen font_14b">
+                    <li class="wid_30 font_cen">
+                        <input type="checkbox" class="mar_l10 hei_22" id="all_select" onclick="selectAll()"/>
+                    </li>
+                    <li class="wid_120">编码</li>
+                    <li class="wid_100">名称</li>
+                    <li class="wid_80" style= "display:none">平台</li>
+                    <li class="wid_80">使用范围</li>
+                    <li class="wid_60">类型</li>
+                    <li class="wid_120">使用规则</li>
+                    <li class="wid_50">总数量</li>
+                    <li class="wid_50">已领数量</li>	
+                    <li class="wid_250">有效时间</li>
+                    <li class="wid_80">状态</li>
+                    <!--<li class="wid_80">创建时间</li>  -->
+                    <!-- <li class="wid_80">创建人</li> -->
+                </ul>
+                <ul class="right_select">
+                	<li>
+                        <button type="button" class="button_4 mar_l10 hei_24" onclick="toSeeCoupon()">
+                                                        查看
+                        </button>
+                    </li>
+                    
+                    <li>
+                        <button type="button" class="button_4 mar_l10 hei_24" onclick="showModifyNumDiv()">
+                        	增加优惠券数量
+                        </button>
+                    </li>
+                    
+                    <li>
+                        <button type="button" class="button_4 mar_l10 hei_24" onclick="deleteCoupons()">
+                        	删除
+                        </button>
+                    </li>
+                    
+                     <li>
+                    	<button type="button" class="button_4 mar_l10 hei_24" onclick="couponsUpdate(3)">终止</button>
+                   	 </li>
+                    
+                    <span class="fr mar_tb10">
+                    	<button type="button" class="button_2 hei_24 " onclick="toCouponListCreatePage('1')">+新增优惠券</button>
+                    </span>
+                </ul>
+                <!-- 内容开始 -->
+                <div id="contractList">
+                #foreach($couponsInfo in $pager.records)
+                    <ul class="list_top hei_40">
+                        <li class="wid_30 over_ell font_cen">
+                        	<input type="checkbox" id="subCheck" onclick="setSelectAll()" name="contractId" class="$couponsInfo.state" value="$couponsInfo.couponId"/>
+                        </li>
+                        <li class="wid_120 over_ell font_cen" title="$!couponsInfo.couponId"><!-- 编码 -->
+                        	$!couponsInfo.couponId
+                        </li>
+                        <li class="wid_100 over_ell font_cen" title="$!couponsInfo.couponName"><!-- 名称 -->
+                        	$!couponsInfo.couponName
+                        </li>
+                        
+                        <!-- 平台 -->
+                        <li class="wid_80 over_ell font_cen" style= "display:none">
+                        	#if($!couponsInfo.platformId == '1')
+                              	  PC端
+                            #elseif($!couponsInfo.platformId == '2')
+                           		  绿印平台
+                            #elseif($!couponsInfo.platformId == '3')
+                                                                  移动端
+                            #elseif($!couponsInfo.platformId == '4')
+                                 PC端和移动端
+                            #end
+                        </li>
+                        <li class="wid_80 over_ell font_cen"><!-- 范围 -->
+                        	#if($!couponsInfo.couponUsingRange == '1')
+                              	  平台通用
+                            #elseif($!couponsInfo.couponUsingRange == '2')
+                           		 店铺通用
+                            #elseif($!couponsInfo.couponUsingRange == '3')
+                                                                  品类通用
+                            #elseif($!couponsInfo.couponUsingRange == '4')
+                                                                  限制SKU
+                            #end
+                        </li>
+                        <li class="wid_60 over_ell font_cen"><!-- 类型 -->
+                        	#if($!couponsInfo.couponType == '1')
+                              	  满减券
+                            #elseif($!couponsInfo.couponType == '2')
+                           		  折扣券	
+                            #elseif($!couponsInfo.couponType == '3')
+                                                                  现金券
+                            #end
+                        </li>
+                        <!-- 使用规则 -->
+                        <li class="wid_120 over_ell font_cen" title= "$!couponsInfo.descr">
+                              	  	$!couponsInfo.descr
+                        </li>
+                        <li class="wid_50 over_ell font_cen" title="$!couponsInfo.couponNum"><!--总数量  -->
+                        	$!couponsInfo.couponNum
+                        </li>
+                        <li class="wid_50 over_ell font_cen" title="$!couponsInfo.receivedNumber"><!-- 已领数量 -->
+                        	$!couponsInfo.receivedNumber
+                        </li>
+                        <li class="wid_250 over_ell font_cen" title="$!date.format('yyyy-MM-dd HH:mm:ss',$!couponsInfo.couponStartTime)至$!date.format('yyyy-MM-dd HH:mm:ss',$!couponsInfo.couponEndTime)"><!-- 有效时间 -->
+                        	$!date.format('yyyy-MM-dd HH:mm:ss',$!couponsInfo.couponStartTime)至$!date.format('yyyy-MM-dd HH:mm:ss',$!couponsInfo.couponEndTime)
+                        </li>
+                        <li class="wid_80 over_ell font_cen"><!-- 状态 -->
+                        	#if($!couponsInfo.state == '0')
+                              	  未开始
+                        	#elseif($!couponsInfo.state == '1')
+                              	  已开始
+                            #elseif($!couponsInfo.state == '2')
+                           		  已结束
+                            #elseif($!couponsInfo.state == '3')
+                                                                  已终止
+                            #elseif($!couponsInfo.state == '4')
+                                                                  待送审
+                            #elseif($!couponsInfo.state == '5')
+                                                                  待审核
+                            #elseif($!couponsInfo.state == '6')
+                                                                  审核驳回
+                            #end
+                        </li>
+                        <!-- 创建时间 <li class="wid_80 font_cen">
+                        	$!date.format('yyyy-MM-dd',$!couponsInfo.updateDate)
+                        </li> -->
+                        <!-- 创建人 -->
+                        <!--
+                        <li class="wid_80 font_cen">
+                        	$!couponsInfo.userName
+                        </li>  -->
+                        
+                    </ul>
+                       #end
+                        <!-- 分页 -->
+                    #pageVelocity($pager)
+                </div><!-- 内容结束 -->
+            </div>
+        </div>
+    </div><!-- 右侧内容结束 -->
+    
+    
+    <!-- 查询物品sku信息 -->
+<div id="modify_num_div" class="po_fai" style="display:none;">
+    <!--弹出蒙版背景-->
+    <div class="po_main_Mess pad_t10" style="width:500px;overflow-y: auto;height:50%;">
+        <ul class="list_top hei_40">
+             <li class="wid_200 over_ell font_cen"><!-- 编码 -->
+             	优惠券名称
+             </li>
+             <li class="wid_200 over_ell font_cen" id="modify_name"><!-- 编码 -->
+             	&nbsp;
+             </li>
+             <li class="wid_200 over_ell font_cen"><!-- 编码 -->
+             	优惠券编号
+             </li>
+             <li class="wid_200 over_ell font_cen" id="modify_no"><!-- 编码 -->
+             	&nbsp;
+             </li>
+             <li class="wid_200 over_ell font_cen"><!-- 编码 -->
+             	使用规则
+             </li>
+             <li class="wid_200 over_ell font_cen" id="modify_descr"><!-- 编码 -->
+             	&nbsp;
+             </li>
+             <li class="wid_200 over_ell font_cen"><!-- 编码 -->
+             	优惠券数量
+             </li>
+             <li class="wid_200 over_ell font_cen" id="modify_oldNum"><!-- 编码 -->
+             	&nbsp;
+             </li>
+             <li class="wid_200 over_ell font_cen"><!-- 编码 -->
+             	已领取数量
+             </li>
+             <li class="wid_200 over_ell font_cen" id="modify_receivedNumber"><!-- 编码 -->
+             	&nbsp;
+             </li>
+             <li class="wid_200 over_ell font_cen"><!-- 编码 -->
+             	增加优惠券数量
+             </li>
+             <li class="wid_180 over_ell font_cen"><!-- 编码 -->
+             	<form action="">
+             		<input type="hidden" id="couponId"/>
+             		<input type="text" class="wid_160 input_Style2 hei_30" id="couponNum" onchange="compareUserCount(this.value)" maxlength="6"/>
+             	</form>
+             </li>
+        </ul>
+        <div class="wid_200 mar_cen" style="position: absolute;bottom: 0;left:0;right:0;">
+            <button class="button_2 hei_35 " onclick="modifyNum()">
+                修改
+            </button>
+            <button class="button_3  hei_35" onclick="closeModifyNumDiv()">
+                关闭
+            </button>
+        </div>
+        <!-- 确认 取消 结束 -->
+    </div>
+    <!--po_main_Mess end-->
+</div>
+
+<!-- 背景蒙板 -->
+<div class="po_fai" id="loadMask" style="display: none">
+    <div class="po_fai_bg"></div>
+</div>
+    
+</div>

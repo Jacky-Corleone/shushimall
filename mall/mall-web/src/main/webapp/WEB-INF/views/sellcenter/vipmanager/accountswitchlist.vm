@@ -1,0 +1,179 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+<script type="text/javascript">
+	var AccountSwitch = {
+		init:function(){
+			//加载左侧菜单
+			$("#leftBuyer").load("$request.contextPath/leftBuyer");
+			//确认切换
+			$(".register_content").find("button:eq(0)").bind("click", function(){
+				AccountSwitch.accountSwitch();
+			});
+			$(".demo-icons").bind("click", function(){
+				AccountSwitch.closeDialog();
+			});
+		},
+		//弹框并赋值
+		toViewPage:function(obj){
+			//列表(数组索引)和弹框(数组值)中li元素索引对应关系
+			//申请人、审核状态、申请时间、描述信息
+			var relationArr = [,0,2,,1,3,4,5]; 
+			var listEle = $(obj).parent().siblings();
+			var viewEle = $(".register_content ul li");
+			for(var i=0; i<relationArr.length; i++){
+				if(relationArr[i] !== undefined){
+					var liTag = viewEle.get(relationArr[i])
+					var liValue = $(listEle.get(i)).text();
+					$(liTag).children("div.po_re").text(liValue);
+				}
+			}
+			//已审核通过的数据，查看时 不显示确认切换按钮
+			if($.trim($(listEle.get(4)).text())=="通过"){
+				$("#dialog").find("button:eq(0)").hide();
+			}else{
+				$("#dialog").find("button:eq(0)").show();
+			}
+			$("#dialog").show();
+		},
+		accountSwitch:function(){
+			var buyerName = $(".register_content ul li:eq(0) .po_re").text();
+			var buyerId = $(".register_content ul li:eq(5) .po_re").text();
+			var retVal = window.confirm("切换账号后，您与【"+buyerName+"】的账号信息将进行切换，切换后，您可继续使用现有登录账号，切换后立即生效，确认切换吗？");
+			if(retVal){
+				$.post("$request.contextPath/sellcenter/vipmanager/accountSwitch",{childAccountUid:buyerId},
+				function(response){
+						if(response.result=='success'){
+							alert("切换成功，请重新登录");
+							window.location.href = "$request.contextPath/user/logout";
+						}else{
+							alert("系统繁忙，请稍后再试！");
+						}
+				},"json");
+			}
+		},
+		closeDialog:function(){
+			$("#dialog").hide();
+		}
+	};
+	
+	$(function(){
+		AccountSwitch.init();
+	});
+</script>
+<div id="main">
+<!--中间部分开始-->
+<!--left start -->
+<div id="leftBuyer" class="border-4">
+                        
+</div>
+<!--left end -->
+
+<!--右边部分开始-->
+<div id="right">
+    <div class="Notice border-4 box-shadow1 hei_600">
+     <!--标题开始 -->
+      <ul class="bg_08 font_14b border-3">
+          <li class="wid_40">编号</li>
+          <li class="wid_160">用户姓名</li>
+          <li class="wid_180">创建时间</li>
+          <li class="wid_180">审核时间</li>
+          <li class="wid_180">审核状态</li>
+          <li class="wid_180 hide">描述</li>
+          <li class="wid_110">操作</li> 
+      </ul>
+       <!--标题 end -->
+       
+       #foreach($entity in $!listRecord)
+       	    <!--内容1行 单双行变背景色 加class="bg_05"开始 -->
+			<ul #if($!velocityCount % 2 != 0 ) class="bg_05" #end>
+		        <li class="wid_40">$!velocityCount</li>
+		        <li class="wid_160">$!entity.nickName</li>
+		        <li class="wid_180">$!date.format('yyyy-MM-dd HH:mm:ss ',$!entity.createDt)</li>
+		        <li class="wid_180">$!date.format('yyyy-MM-dd HH:mm:ss ',$!entity.auditDate)</li>
+		        <li class="wid_180">
+		        	#if($!entity.auditStatus==0)
+		        		驳回
+		        	#end
+		        	#if($!entity.auditStatus==1)
+		        		待审核
+		        	#end
+		        	#if($!entity.auditStatus==2)
+		        		通过
+		        	#end
+		        </li>
+		        <li class="hide">$!entity.remark</li>
+		        <li class="hide">$!entity.id</li> 
+		        <li class="hide">$!entity.userId</li>
+		        <li class="wid_110 font_1c">
+					<a href="javascript:void(0);" onclick="AccountSwitch.toViewPage(this)">查看</a>
+		        </li>
+		    </ul>
+		#end
+    <!--内容1行 end -->
+    </div><!--Notice end-->
+<!--又底边图标开始-->
+<div class="clear"></div>
+</div> 
+<!--id="right" end--> 
+<!--右边部分结束-->
+</div>
+<!--#main end -->
+
+
+
+<div class="po_fai small_ban" style="display: none" id="dialog">
+	<div class="po_fai_bg"></div>
+	<div class="po_main pad_t10">
+		<div class=" hei_32 bg_05 pad_l10 ">
+			<i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor"></i>
+			子主账号切换申请
+		</div>
+		<div class="clear"></div>
+		<div class="register_content" style="width: 650px; margin-top: 10px">
+			<ul>
+				<li class="hei_30">
+					<div class="wid_110 fl">
+						<p class="hei_30 font_right">申请人：</p>
+					</div>
+					<div class="wid_410 hei_30 fl mar_l10 po_re font_left"></div>
+				</li>
+				<li class="hei_30">
+					<div class="wid_110 fl">
+						<p class="hei_30 font_right">审核状态：</p>
+					</div>
+					<div class="wid_410 hei_30 fl mar_l10 po_re font_left"></div>
+				</li>
+				<li class="hei_30">
+					<div class="wid_110 fl">
+						<p class="hei_30 font_right">申请时间：</p>
+					</div>
+					<div class="wid_410 hei_30 fl mar_l10 po_re font_left"></div>
+				</li>
+				<li class="hei_30">
+					<div class="wid_110 fl">
+						<p class="hei_30 font_right">描述信息：</p>
+					</div>
+					<div class="wid_410 hei_30 fl mar_l10 po_re font_left"></div>
+				</li>
+				<li class="hei_30 hide">
+					<div class="wid_110 fl">
+					</div>
+					<div class="wid_410 hei_30 fl mar_l10 po_re font_left"></div>
+				</li>
+				<li class="hei_30 hide">
+					<div class="wid_110 fl">
+					</div>
+					<div class="wid_410 hei_30 fl mar_l10 po_re font_left"></div>
+				</li>
+			</ul>
+			<div class="wid_410 mar">
+				<div class="wid_200 mar_t10 pad_t50">
+					<button class="button_1 hei_30">确认切换</button>
+					<button class="button_5 hei_30 mar_l10 demo-icons">
+						<a href="javascript:void(0)">取消</a>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

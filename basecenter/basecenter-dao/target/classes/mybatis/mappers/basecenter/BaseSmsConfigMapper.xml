@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.basecenter.dao.BaseSmsConfigDAO">
+	<resultMap id="baseSmsConfigMapper" type="com.camelot.basecenter.domain.BaseSmsConfig">
+			<result property="id" column="id" />
+			<result property="sendName" column="send_name" />
+			<result property="sendAddress" column="send_address" />
+			<result property="emailType" column="email_type" />
+			<result property="sendServer" column="send_server" />
+			<result property="sendServerPort" column="send_server_port" />
+			<result property="receiveServer" column="receive_server" />
+			<result property="receiveServerPort" column="receive_server_port" />
+			<result property="isUseSmtpAuth" column="is_use_smtp_auth" />
+			<result property="loginEmail" column="login_email" />
+			<result property="loginPassword" column="login_password" />
+			<result property="msgUrl" column="msg_url" />
+			<result property="msgHost" column="msg_host" />
+			<result property="msgAccount" column="msg_account" />
+			<result property="msgPassword" column="msg_password" />
+			<result property="msgPszsubport" column="msg_pszSubPort" />
+			<result property="msgSa" column="msg_sa" />
+			<result property="msgSoapaddress" column="msg_soapAddress" />
+	</resultMap>
+	<resultMap id="baseSmsConfigDTO" type="com.camelot.basecenter.dto.SmsConfigDTO">
+			<result property="id" column="id" />
+			<result property="sendName" column="send_name" />
+			<result property="sendAddress" column="send_address" />
+			<result property="emailType" column="email_type" />
+			<result property="sendServer" column="send_server" />
+			<result property="sendServerPort" column="send_server_port" />
+			<result property="receiveServer" column="receive_server" />
+			<result property="receiveServerPort" column="receive_server_port" />
+			<result property="isUseSmtpAuth" column="is_use_smtp_auth" />
+			<result property="loginEmail" column="login_email" />
+			<result property="loginPassword" column="login_password" />
+			<result property="msgUrl" column="msg_url" />
+			<result property="msgHost" column="msg_host" />
+			<result property="msgAccount" column="msg_account" />
+			<result property="msgPassword" column="msg_password" />
+			<result property="msgPszsubport" column="msg_pszSubPort" />
+			<result property="msgSa" column="msg_sa" />
+			<result property="msgSoapaddress" column="msg_soapAddress" />
+	</resultMap>
+	
+	<select id="queryById" resultMap="baseSmsConfigMapper" >
+		select * from base_sms_config where id = #{id}
+	</select>
+	
+	<insert id="add">
+		insert into base_sms_config(
+				id,
+				send_name,
+				send_address,
+				email_type,
+				send_server,
+				send_server_port,
+				receive_server,
+				receive_server_port,
+				is_use_smtp_auth,
+				login_email,
+				login_password,
+				msg_url,
+				msg_host,
+				msg_account,
+				msg_password,
+				msg_pszSubPort,
+				msg_sa,
+				msg_soapAddress
+		)values(
+				#{id},
+				#{sendName},
+				#{sendAddress},
+				#{emailType},
+				#{sendServer},
+				#{sendServerPort},
+				#{receiveServer},
+				#{receiveServerPort},
+				#{isUseSmtpAuth},
+				#{loginEmail},
+				#{loginPassword},
+				#{msgUrl},
+				#{msgHost},
+				#{msgAccount},
+				#{msgPassword},
+				#{msgPszsubport},
+				#{msgSa},
+				#{msgSoapaddress}
+		)
+		<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+			select @@IDENTITY
+		</selectKey>
+	</insert>
+	
+	<update id="update">
+		update base_sms_config 
+		<set>
+			<if test="sendName != null">
+				send_name = #{sendName},
+			</if>
+			<if test="sendAddress != null">
+				send_address = #{sendAddress},
+			</if>
+			<if test="emailType != null">
+				email_type = #{emailType},
+			</if>
+			<if test="sendServer != null">
+				send_server = #{sendServer},
+			</if>
+			<if test="sendServerPort != null">
+				send_server_port = #{sendServerPort},
+			</if>
+			<if test="receiveServer != null">
+				receive_server = #{receiveServer},
+			</if>
+			<if test="receiveServerPort != null">
+				receive_server_port = #{receiveServerPort},
+			</if>
+			<if test="isUseSmtpAuth != null">				
+				is_use_smtp_auth = #{isUseSmtpAuth},
+			</if>
+			<if test="loginEmail != null">
+				login_email = #{loginEmail},
+			</if>
+			<if test="loginPassword != null">
+				login_password = #{loginPassword},
+			</if>
+			<if test="msgUrl != null">
+				msg_url = #{msgUrl},
+			</if>
+			<if test="msgHost != null">
+				msg_host = #{msgHost},
+			</if>
+			<if test="msgAccount != null">
+				msg_account = #{msgAccount},
+			</if>
+			<if test="msgPassword != null">
+				msg_password = #{msgPassword},
+			</if>
+			<if test="msgPszsubport != null">
+				msg_pszSubPort = #{msgPszsubport},
+			</if>
+			<if test="msgSa != null">
+				msg_sa = #{msgSa},
+			</if>
+			<if test="msgSoapaddress != null">
+				msg_soapAddress = #{msgSoapaddress},
+			</if>
+		</set>	
+		where id = #{id}
+	</update>
+	<update id="updateBySelect">
+	
+	</update>
+	
+	<delete id="delete">
+		delete from base_sms_config
+		<if test=" codes != null and codes.size() > 0 ">
+			where id in
+			<foreach collection="codes" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test=" codes == null or codes.size() == 0 ">
+			where 1 = 3
+		</if>
+	</delete>
+	
+	<select id="getSmsConfig" resultMap="baseSmsConfigDTO">
+		select * from base_sms_config WHERE platform_id is NULL OR platform_id=1
+	</select>
+	
+	<select id="getSmsConfigGreen" resultMap="baseSmsConfigDTO">
+		select * from base_sms_config WHERE platform_id=2
+	</select>
+	
+	<select id="queryCount"></select>
+	
+	<select id="queryList"></select>
+	
+</mapper>

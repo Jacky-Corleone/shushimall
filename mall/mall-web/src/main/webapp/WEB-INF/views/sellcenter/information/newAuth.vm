@@ -1,0 +1,381 @@
+#set($layout = "/none_layout.vm")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ #parse("/common/tdk.vm")
+<link href="$request.contextPath/assets/css/basic.css" rel="stylesheet" type="text/css"/>
+<link href="$request.contextPath/assets/css/register.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+var timeType = "";
+var timeNum = 90;
+	$(function(){
+
+    $("#newAddress").blur(function(){
+        if('$!changeType' =='phone'){
+            var phone = $.trim($("#newAddress").val());
+            if('' == phone){
+                $("#emailOrPhone_span").html("请输入手机号");
+                $("#emailOrPhone_span").css("color", "red");
+                return false;
+            }else{
+                $("#emailOrPhone_span").html("");
+            }
+            $.ajax({
+                url:"$request.contextPath/information/register/verifyPersonalMobile",
+                type:"post",
+                data:{
+                    personalPhoneInput: $("#newAddress").val()
+                },
+                dataType: "json",
+                success:function(data){
+                    if(data == false){
+                        $("#emailOrPhone_span").html("手机已存在，请重新输入");
+                        $("#emailOrPhone_span").css("color", "red");
+                    }else{
+                        $("#emailOrPhone_span").html("");
+                    }
+                }
+            });
+        }else{
+            var email = $.trim($("#newAddress").val());
+            if('' == email){
+                $("#emailOrPhone_span").html("请输入邮箱");
+                $("#emailOrPhone_span").css("color", "red");
+                return false;
+            }else{
+                $("#emailOrPhone_span").html("");
+            }
+            $.ajax({
+                url:"$request.contextPath/information/register/verifyPersonalEmail",
+                type:"post",
+                data:{
+                    personalMailInput_div: $("#newAddress").val()
+                },
+                dataType: "json",
+                success:function(data){
+                    if(data == false){
+                        $("#emailOrPhone_span").html("邮箱已存在，请重新输入");
+                        $("#emailOrPhone_span").css("color", "red");
+                    }else{
+                        $("#emailOrPhone_span").html("");
+                    }
+                }
+            });
+        }
+    }
+    );
+
+
+		//下一步
+		$("#next").click(function(){
+			var captcha = $("#code").val();
+			if(captcha == ""){
+				alert("请输入验证码");
+				return;
+			}
+			var data = {code:captcha,codeKey:$('#code_key').val()};
+			$.ajax({
+				url:"$request.contextPath/captcha/check",
+				type:"post",
+				data:data,
+				dataType: "json",
+				success:function(data){
+					if(!data.message){
+						alert("验证码不正确");
+					} else {
+						window.location.href="$request.contextPath/information/informationSeller/newAuthEdit?changeType=$!changeType&backUrl=$!backUrl&uid=$!userDTO.uid&address="+$("#newAddress").val();
+					}
+				}
+			});
+		});
+	});
+
+	var code = "";
+	var authType = "$!changeType";
+	function sendCode(){
+	debugger
+        var pass = false;
+        if('$!changeType' =='phone'){
+            var phone = $.trim($("#newAddress").val());
+            if('' == phone){
+                $("#emailOrPhone_span").html("请输入手机");
+                $("#emailOrPhone_span").css("color", "red");
+                return false;
+            }else{
+                $("#emailOrPhone_span").html("");
+            }
+            $.ajax({
+                async: false,
+                url:"$request.contextPath/information/register/verifyPersonalMobile",
+                type:"post",
+                data:{
+                    personalPhoneInput: $("#newAddress").val()
+                },
+                dataType: "json",
+                success:function(data){
+                    if(data == false){
+                        $("#emailOrPhone_span").html("手机已存在，请重新输入");
+                        $("#emailOrPhone_span").css("color", "red");
+                    }else{
+                        $("#emailOrPhone_span").html("");
+                        pass = true;
+                    }
+                }
+            });
+        }else{
+            var email = $.trim($("#newAddress").val());
+            if('' == email){
+                $("#emailOrPhone_span").html("请输入邮箱");
+                $("#emailOrPhone_span").css("color", "red");
+                return false;
+            }else{
+                $("#emailOrPhone_span").html("");
+            }
+            $.ajax({
+                async: false,
+                url:"$request.contextPath/information/register/verifyPersonalEmail",
+                type:"post",
+                data:{
+                    personalMailInput_div: $("#newAddress").val()
+                },
+                dataType: "json",
+                success:function(data){
+                    if(data == false){
+                        $("#emailOrPhone_span").html("邮箱已存在，请重新输入");
+                        $("#emailOrPhone_span").css("color", "red");
+                    }else{
+                        $("#emailOrPhone_span").html("");
+                        pass = true;
+                    }
+                }
+            });
+        }
+
+        if(pass == false){
+            return false;
+        }
+		var type = "";
+		var message = "";
+		var smsType = "";
+		var val = $("#newAddress").val();
+
+
+		if(authType == "phone"){
+			type = 4;
+			smsType = "UPBINDPHONE";
+			message = validatePhone(val);
+		}else{
+			type = 3;
+			smsType = "EMAIL_UP_BIND_EMAIL";
+			message = validateMail(val);
+		}
+		if(message != ""){
+			alert(message);
+			$("#newAddress").focus();
+			return false;
+		}
+
+	    $("#sendBtn").html("重新发送90");
+	    $("#sendBtn").attr("disabled","disabled");
+
+	    $("#msg_send").html("验证码已发送，请查看");
+		$("#newAddress").attr("disabled","disabled");
+		$("#msg_send").parent().addClass("font_7a");
+	    sand_timer();
+		$.ajax({
+			 timeout:90000,
+		     type: "get",
+		     dataType: "json",
+		     url:"$request.contextPath/captcha/send",
+		     data:{
+		    	 contact:$("#newAddress").val(),
+		    	 type:type,
+		    	 smsType:smsType
+		     },
+		     success: function(result){
+		    	 if(result.isOK == "1"){
+		    		 window.clearInterval(timer);//去掉定时器
+		    		 time = timeNum;
+					 if(result.message!=''){
+    					alert(result.message);
+    				}else{
+    					alert("验证码发送失败");
+    				}
+		    		 $("#msg_send").html("验证码发送失败");
+		    		 $("#sendBtn").replaceWith("<button id=\"sendBtn\" class=\"mar_lr20 button_4 hei_24\" type=\"button\" onclick=\"sendCode()\">获取验证码</button>");
+		    		 $("#sendBtn").removeAttr("disabled");
+		    		 $("#newAddress").removeAttr("disabled");
+		    		 $("#msg_send").parent().removeClass("font_7a");
+		    	 }else{
+	 				 $("#code_key").val(result.codeKey);
+		    	 }
+		     }
+		 });
+	}
+
+	//手机号码校验
+	function validatePhone(phone){
+	    if(phone.length==0)
+        {
+           return '请输入手机号码！';
+        }
+        if(phone.length!=11)
+        {
+            return '请输入有效的手机号码！';
+        }
+        var reg = /^\d+$/;
+        if(!phone.match(reg))
+        {
+        	 return '请输入有效的手机号码！';
+        }
+        return '';
+	}
+
+	function validateMail(mail){
+		if(mail.length==0)
+        {
+           return '请输入电子邮箱！';
+        }
+		var reg = /^([0-9a-zA-Z_\.-]+)@([0-9a-zA-Z\.-]+)\.([a-z]{2,6})$/;
+		if (!reg.test(mail))
+		{
+			return "无效的电子邮箱";
+		}
+		return "";
+	}
+
+	var time = timeNum;
+	var timer;
+	function sand_timer(){
+		timer = window.setInterval(showalert, 1000);
+	}
+	function showalert()
+	{
+		time--;
+		if(time > 0){
+	    	$("#sendBtn").html("重新发送"+time);
+		} else {
+			if(authType == "phone"){
+				$("#sendBtn").replaceWith("<button id=\"sendBtn\" class=\"mar_lr20 button_4 hei_24\" type=\"button\" onclick=\"sendCode()\">获取验证码</button>");
+			}else{
+				$("#sendBtn").replaceWith("<button id=\"sendBtn\" class=\"mar_lr20 button_4 hei_24\" type=\"button\" onclick=\"sendCode()\">获取验证码</button>");
+			}
+		 	$("#msg_send").html("请发送验证码");
+		 	$("#msg_send").parent().removeClass("font_7a");
+			window.clearInterval(timer);//去掉定时器
+			time = timeNum;
+			timeType = "";
+			$("#newAddress").removeAttr("disabled");
+			$("#sendBtn").removeAttr("disabled");
+		}
+	}
+
+</script>
+</head>
+
+<body>
+ <!--顶部开始-->
+#parse("/common/header_top.vm")
+    <!--顶部结束-->
+
+ <!--头部开始-->
+ <div id="header" >
+   <div class="left_img">
+   		<a href="$!siteDomain">
+   			<img src="$!imageServerAddr$!{logoDTO.picUrl}"/>
+   		</a>
+   	</div><!--left_img （放logo的div） end-->
+	<div class="right_img mar_lr20">
+        <!-- 每一个所占div-->
+        	<div class="per_one">
+        		<dl>
+        			<dt class="fl Service"></dt>
+        			<dd class="fl">
+        				<b class="font-c1">140个</b>
+        				<p>全国可服务城市</p>
+        			</dd>
+        		</dl>
+            </div>
+        <!-- 每一个所占div-->
+        	<div class="per_one">
+        		<dl>
+        			<dt class="fl approve"></dt>
+        			<dd class="fl">
+        				<b class="font-c1">100万用户</b>
+        				<p>放心的舒适选择</p>
+        			</dd>
+        		</dl>
+            </div>
+        <!-- 每一个所占div-->
+        	<div class="per_one">
+        		<dl>
+        			<dt class="fl safety"></dt>
+        			<dd class="fl">
+        				<b class="font-c1">工程保</b>
+        				<p>13万元平安理赔</p>
+        			</dd>
+        		</dl>
+            </div><!--header end -->
+   </div><!--right_img end-->
+</div>
+ <!--头部结束-->
+<!--内容流程start-->
+    #if(($!changeType == "mail" && $!userDTO.userEmail) || ($!changeType == "phone" && $!userDTO.umobile))
+    <div class="stepflex">
+        <dl class="first" style="width:213px;"><!--正在哪个流程就加入 doing 这个样式 -->
+            <dt class="s-num">1</dt>
+            <dd class="s-text">验证身份<s></s><b></b></dd>
+        </dl>
+        <dl class="normal doing"  style="width:213px;">
+            <dt class="s-num">2</dt>
+            <dd class="s-text">设置绑定信息<s></s><b></b></dd>
+        </dl>
+        <dl class="last"  style="width:214px;">
+            <dt class="s-num"><i class="fa-check"></i></dt>
+            <dd class="s-text">完成<s></s><b></b></dd>
+        </dl>
+    #else
+    <div class="stepflex" style="width:430px; border:0;">
+    	<dl class="first doing"  style="width:213px;">
+            <dt class="s-num">1</dt>
+            <dd class="s-text">设置绑定信息<s></s><b></b></dd>
+        </dl>
+        <dl class="last"  style="width:214px;">
+            <dt class="s-num"><i class="fa-check"></i></dt>
+            <dd class="s-text">完成<s></s><b></b></dd>
+        </dl>
+    #end
+    </div><!--stepflex end -->
+    <div class="clear"></div>
+    <div class="register_content">
+        	<div class="register_box_mid"  style="margin-top:40px; min-height: 330px;">
+            	<dl>
+                    <dt>输入新#if($!changeType =='mail')电子邮箱#else手机号码#end：</dt>
+                    <dd style="border:none;width: 380px;" class="po_re" id="sendDD" >
+                        <span id="emailOrPhone_span" class="msg_span"></span>
+                   		<input id="newAddress" style="float: left; height: 31px;" name="newAddress" type="text" #if($!changeType =='phone') maxlength="11" #end class="input_Style2 hei_32 wid_180" />
+
+                   		<button id="sendBtn" class="button_4 hei_35" type="button" onclick="sendCode()">获取验证码</button>
+
+
+                    	<p class="font_18" style="width: 330px; margin-left: 0px;">
+                    		<i class="fa-check-circle font_24 mar_r10"></i>
+                    		<b id="msg_send">请发送验证码</b>
+                    		<input type="hidden" id="code_key" name="codeKey">
+                    	</p>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>校验码：</dt>
+                    <dd style="border:none;width: 380px;"><input name="code" id="code" type="text"  class="input_Style2 hei_30 wid_180" />
+                    </dd>
+                </dl>
+                <div class="button_1 hei_40 font_16" style="width: 280px;" id="next">下一步</div>
+             </div><!--register_box-->
+    </div><!--register_content-->
+<!--内容end-->
+</div>
+ </body>
+</html>

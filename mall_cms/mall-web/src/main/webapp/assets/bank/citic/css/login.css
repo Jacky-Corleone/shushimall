@@ -1,0 +1,155 @@
+*{
+	padding:0px;
+	margin:0px;
+	list-style:none;
+}
+body {
+	font-size: 12px;
+}
+
+.login_bg{
+	background:url("../images/logonImages/login_bg_2008.jpg") repeat-x scroll center bottom rgba(0, 0, 0, 0);
+}
+
+#container{
+	width:880px;
+	margin:0px auto;
+}
+
+#centerBox{
+	border:1px solid #cfcfcf;
+	background:url(../images/container_bg_2008.jpg) #ffffff center bottom repeat-x;
+	padding-top:12px;
+	height:480px;
+}
+
+.main{
+	width:779px;
+	margin-left:55px;
+}
+
+#mainBox{
+	background:url(../images/inf_bg_2008.jpg) center top no-repeat;
+	height:390px;
+	padding-top:35px;	
+}
+
+#menu{
+	float:left;
+	width:200px;
+	border:1px solid #e4e4e4;
+	background:url(../images/menuBox_bg.jpg) center center repeat-x;
+	height:290px;
+	padding:0px 5px;
+	margin-right: 5px;
+}
+
+.menu_title{
+	background:url(../images/quickLink_2.png) left center no-repeat;
+	height:33px;
+	line-height:33px;
+	font-size:14px;
+	font-weight:bold;
+	color:#4c6a8d;	
+	border-bottom:1px dashed #7d7d7d;
+	padding-left: 20px;
+}
+
+.menu_title2{
+	height:33px;
+	line-height:33px;
+	font-size:13px;
+	color:#4c6a8d;	
+	border-bottom:1px dashed #7d7d7d;
+	padding-left: 5px;
+}
+.menu_title3{
+	height:23px;
+	line-height:23px;
+	font-size:13px;
+	color:#4c6a8d;	
+	padding-left: 5px;
+}
+
+.left{
+	float:left;
+	width:500px;
+	border:1px solid #e4e4e4;
+	background:url(../images/login_inf_bg2008.jpg) center center repeat-x;
+	height:290px;
+	position:relative;
+}
+.login_bg{
+	background:url(../images/login_bg_2008.jpg) bottom center repeat-x;
+}
+
+
+.table_inf{
+	width:90%;
+	margin:0px auto;
+	margin-top:22px;	
+}
+
+.bottom{
+	padding:3px 0px;	
+	background:#d90909;
+
+}
+
+.copyRight{
+	padding:10px 0px;
+	text-align:center;
+	line-height:23px;
+	color:#545454;
+}
+
+img{
+	border:none;
+}
+
+.tip_2{
+	width:100%;
+	margin:0px;
+	padding:0px;
+	padding:12px 0px;
+	color:#545454;
+	clear:both;
+}
+
+.tip_2 li{
+	line-height:23px;
+	background:url(../images/logonImages/explain_list.gif) left center no-repeat;
+	padding-left:10px;
+}
+
+.icon001{
+	height:16px;
+	margin-top:6px;
+	line-height:16px;
+	vertical-align:middle;
+	text-align:left;
+}
+
+.menu_bottom{
+	margin-top:40px;
+}
+
+.table_inf td{
+	color:#295079;
+	font-weight:bold;
+	line-height:28px;
+	height:28px;
+}
+
+.inputOut{
+	background:#fff;
+	border:1px solid #7984a0;
+	height:18px;
+	width:190px;
+	line-height:18px;
+	padding:1px;
+}
+
+.tdRight{
+	text-align:right;
+}

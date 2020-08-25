@@ -1,0 +1,29 @@
+
+<div class="foot bg_02">
+	<footer>
+		<dl class="fl">
+			<dt>
+				<i class="fa-search"></i>
+			</dt>
+			<dd>搜索</dd>
+		</dl>
+		<dl class="fl">
+			<dt>
+				<i class="fa-shopping-cart"></i>
+			</dt>
+			<dd>购物车</dd>
+		</dl>
+		<dl class="fl">
+			<dt>
+				<i class="fa-user-md"></i>
+			</dt>
+			<dd>买家中心</dd>
+		</dl>
+		<dl class="fl">
+			<dt>
+				<i class="fa-heart-o"></i>
+			</dt>
+			<dd>买家中心</dd>
+		</dl>
+	</footer>
+</div>

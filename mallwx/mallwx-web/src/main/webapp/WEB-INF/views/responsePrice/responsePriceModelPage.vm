@@ -1,0 +1,58 @@
+ #set($layout = "common/order.vm")
+ #foreach($inquiry in $!pager.records)
+ <div class="mar_b10 bg_01 pad_lr5">
+    <!-- 发货商城 -->
+    <div class="hei_32 border_2">
+         <p class="fl" style="font-weight:bold;"><span>询价编号：$!inquiry.inquiryNo</span></p>
+		 #if($!inquiry.status == "1")
+			<p class="fr font_e5">申请</p>
+	    #elseif($!inquiry.status == "2")
+			<p class="fr font_e5">报价中</p>
+		#elseif($!inquiry.status == "3")
+			<p class="fr font_e5">已接收</p>
+		#else
+			<p class="fr font_e5"></p>
+		#end
+		
+    </div><!-- 发货商城 -->
+    <p class="hei_32" >商品信息：</p>
+	<!--物品信息展示-->
+	#foreach($listDetail in $inquiry.inquiryMatDTOs )
+        <!-- 发货信息 -->
+        <div class="border_2 shop_order pad_tb3" >
+            <p class="wid_87 shop_order_p">$listDetail.matDesc</p>
+            <div class="fr lin_24">
+                <p></p>
+             </div>
+			 <div id="$!listDetail.id" >								 
+				<p class="wid_87 shop_order_p">供应商：$!listDetail.alternate1</p>
+				<p class="wid_87 shop_order_p">销售属性：$!listDetail.alternate4</p>
+				 #if($!listDetail.status == "1")
+                     <p class="wid_87 shop_order_p">状   态：<span style="color:red">已接收</span></p>
+				 #else
+                     <p class="wid_87 shop_order_p">状   态：未接收</p>
+				 #end
+                 <p class="wid_87 shop_order_p">有效期(始)：$!date.format('yyyy-MM-dd', $!listDetail.beginDate)</p>
+                 <p class="wid_87 shop_order_p">有效期(止)：$!date.format('yyyy-MM-dd', $!listDetail.endDate)</p>
+				<p class="wid_87 shop_order_p">价   格：$!listDetail.matPrice</p>
+			</div>
+            <div class="clear"></div>
+        </div>
+        <!-- 发货信息 -->
+    <!--物品信息展示end-->
+    #end
+     <p>&nbsp;</p>
+     <p>截至报价时间：$!date.format('yyyy-MM-dd HH:mm', $!inquiry.endDate)</p>
+        <!-- 按钮 -->
+        <div class="pad_tb5">
+			<!--#if($!inquiry.status == "3")
+			<button class="button_3 pad_mlr5" onclick="commitResponseInquiry('$!inquiry.inquiryNo','$!inquiry.status','$!inquiry.endDate');">确认</button>
+			#end -->
+			#if($!inquiry.status == "2")
+			<button class="button_3 pad_mlr5" onclick="updateResponseInquiry('$!inquiry.inquiryNo','$!inquiry.status','$!date.format('yyyy/MM/dd HH:mm:ss', $!inquiry.endDate)')">报价</button>
+			#end
+			<button class="button_3 pad_mlr5" onclick="lookInquiryInfo('$!inquiry.inquiryNo');">查看</button>
+			<div class="clear"></div>
+		</div>
+		</div>
+#end

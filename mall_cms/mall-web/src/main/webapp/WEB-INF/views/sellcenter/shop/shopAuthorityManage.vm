@@ -1,0 +1,164 @@
+#set($staticPath="$request.contextPath/assets")
+#if($!moduleType==1)
+	#set($layout = "/buyer_layout.vm")
+#else
+	#set($layout = "/seller_layout.vm")
+#end
+<script type="text/javascript">
+	var moduleType = "$!moduleType";
+	$(function(){
+		//加载左侧菜单
+		if(moduleType=="1"){
+			$("#leftBuyer").load("$request.contextPath/leftBuyer");
+		}else{
+			$("#leftSeller").load("$request.contextPath/leftSeller");
+		}
+		
+		//创建店铺店员
+		$("#addClerk").bind("click",function(){
+			$("#add_div").show();
+			$("#add_div").load("$request.contextPath/shopAuthorityManageController/shopEmployeeAdd?moduleType="+moduleType);
+		});
+	});
+	
+	//生成拥有权限格子
+    function setResources(resources) {
+    	var _values = resources.split("|");
+    	for (var j = 0; j < _values.length; j++) {
+    		document.write('<a class="toolbtn02">'+_values[j]+'</a>');
+    	}
+    };
+	
+	//到指定的分页页面
+	function topage(page){
+		$("input[name='page']").val(page);
+		$("#queryForm").submit();
+	};
+	
+	//修改操作
+	function toUpdate(username,nickname,resourceIds,userId,action){
+    	$("#update_div").show();
+		$("#update_div").load("$request.contextPath/shopAuthorityManageController/shopEmployeeUpdate",
+		{"username":username,"nickname":nickname,"resourceIds":resourceIds,"userId":userId,"action":action,"moduleType":moduleType});
+	};
+	
+	//删除操作
+	function toDelete(userId){
+    	$.get("$request.contextPath/shopAuthorityManageController/deleteEmploy", {
+    		"userId" : userId, "moduleType":moduleType
+    	}, function(response) {
+    		if (response.result == 'success') {
+    			alert("操作成功");
+    			window.location.reload();
+    		} else {
+        		alert("操作失败");
+        		window.location.reload();
+    		}
+    	}, "json");
+	};
+	
+
+	
+</script>
+<style type="text/css">
+	.cl{zoom:1}
+	.s-title05{ margin-left:20px; margin-top:5px; float:left; display:inline-block; *display:inline; *zoom:1; line-height:16px; font-size:15px;}
+	.fn-right{ float:right;}
+	.r-addbtn{ width:75px; font-size:15px; height:28px; font-weight:700; margin-right:0px; line-height:28px; color:#2bb8aa;}
+	.r-addbtn:hover{ color:#2bb8aa;}
+	.toolbtn02 {
+      margin: 2px;
+      display: inline-block;
+      padding: 0 10px;
+      height: 20px;
+      line-height: 20px;
+      background: #FFF;
+      border: 1px solid #2bb8aa;
+      color: #2bb8aa;
+    }
+	table{border-collapse:collapse;}
+</style>
+
+<form action="$request.getContextPath()/shopAuthorityManageController/tolist" method="get" id="queryForm">
+		<input type="hidden" name="page" value="$!pager.page" />
+		<input type="hidden" name="moduleType" value="$!moduleType" />
+</form>
+<!--头部开始-->
+<div id="main">
+<!--中间部分开始-->
+<!-- left start -->
+#if("$!moduleType"=="1")
+    <div id="leftBuyer" class="border-4"></div>
+#else
+    <div id="leftSeller" class="border-4"></div>
+#end
+<!--left end -->
+<!--右边部分开始-->
+<div class="cl">  
+    #if($!{isChildAccount} == "n")
+        ##买家显示文本为创建采购员账号，卖家显示为创建子账号
+        #if($!{moduleType} == 1)
+        	<h3 class="s-title05">采购员权限管理</h3>
+            <div class="fn-right"><a class="r-addbtn" href="javascript:void(0);" id="addClerk">+创建采购员账号</a></div>
+        #else
+        	 <h3 class="s-title05">店铺店员权限管理</h3>
+            <div class="fn-right"><a class="r-addbtn" href="javascript:void(0);" id="addClerk">+创建店员</a></div>
+        #end
+    #end
+</div>
+<div id="right">
+    <div class="Notice border-4 bg_06 box-shadow1 hei_600">
+     <!--标题开始 -->
+      <ul class="bg_08 font_14b border-3">
+          <li class="wid_60" >编号</li>
+          <li class="wid_60">用户名</li>
+          <li class="wid_120">姓名</li>
+          <li style="width:370px;">拥有权限</li>
+          <li class="wid_150">修改时间</li>  
+          <li class="wid_120">操作</li> 
+      </ul>
+       <!--标题 end -->
+       
+	 <!--循环列表begin-->
+		<table width="100%">
+			
+        #foreach($entity in $pager.records)
+			#if($!{velocityCount}%2==0)<tr class="bg_05" height = "45px" >
+			#else<tr  height = "45px">
+			#end
+			
+			#set($newNum = ( $!pager.page - 1 ) * 10 + $!{velocityCount})
+            <td class="wid_60 hei_60" align="center" >$newNum</td>
+            <td class="wid_80">$!entity.username</td>
+			<td class="wid_120">$!entity.nickName</td>
+            <td style="width:370px;">
+				<script type="text/javascript">setResources('$!entity.resourceIds');</script>
+			</td>
+            <td class="wid_150">$!date.format('yyyy-MM-dd HH:mm:ss',$!entity.updateTime )</td>
+            <td class="wid_150 font_1c">
+				<a href="javascript:;" onclick="toUpdate('$!entity.username','$!entity.nickName','$!entity.resourceIds','$!entity.userId','update')" >修改</a>&nbsp;
+				<a href="javascript:;" onclick="toUpdate('$!entity.username','$!entity.nickName','$!entity.resourceIds','$!entity.userId','view')" >查看</a>&nbsp;
+				<a href="javascript:;" onclick="if(confirm('确定删除此记录吗？')) toDelete('$!entity.userId')" >删除</a>
+			</td>
+          </tr>
+		#end
+		</table>
+		
+	</div><!--Notice end-->
+    <!-- 创建店铺员工弹出层start -->
+            
+            #pageVelocity($pager)
+				<!--循环列表end-->
+
+	<div id="add_div" style="display:none" >
+	</div>
+	<!-- 创建店铺员工弹出层 end -->
+
+	<!-- 权限修改弹出层 begin -->
+	<div  id = "update_div" style="display:none">
+	</div>
+	<!-- 权限修改弹出层 end -->
+
+</div><!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->

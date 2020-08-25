@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.maketcenter.dao.CentralPurchasingActivitesDetailsDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="centralPurchasingActivitesDetails" type="com.camelot.centralPurchasing.domain.CentralPurchasingActivitesDetails">
+		<result property="activitesDetailsId" column="activites_details_id"/>
+		<result property="centralPurchasingId" column="central_purchasing_id"/>
+		<result property="itemId" column="item_id"/>
+		<result property="skuId" column="sku_id"/>
+		<result property="cid" column="cid"/>
+		<result property="estimatePrice" column="estimate_price"/>
+		<result property="centralPurchasingPrice" column="central_purchasing_price"/>
+		<result property="originalPrice" column="original_price"/>
+		<result property="signUpNum" column="sign_up_num"/>
+		<result property="placeOrderNum" column="place_order_num"/>
+		<result property="paidNum" column="paid_num"/>
+		<result property="perPerchaseMaxNum" column="per_perchase_max_num"/>
+		<result property="releaseGoodsMaxNum" column="release_goods_max_num"/>
+		<result property="insertTime" column="insert_time"/>
+		<result property="insertBy" column="insert_by"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateBy" column="update_by"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			activites_details_id,
+ 			central_purchasing_id,
+ 			sku_id,
+ 			item_id,
+ 			cid,
+ 			estimate_price,
+ 			central_purchasing_price,
+ 			original_price,
+ 			sign_up_num,
+ 			place_order_num,
+ 			paid_num,
+ 			per_perchase_max_num,
+ 			release_goods_max_num,
+ 			insert_time,
+ 			insert_by,
+ 			update_time,
+ 			update_by
+		FROM 
+		CENTRAL_PURCHASING_ACTIVITES_DETAILS details_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.activitesDetailsId != null">
+				<![CDATA[ and details_.activites_details_id = #{entity.activitesDetailsId} ]]>
+			</if>
+			<if test="entity.centralPurchasingId != null">
+				<![CDATA[ and details_.central_purchasing_id = #{entity.centralPurchasingId} ]]>
+			</if>
+			<if test="entity.skuId != null">
+				<![CDATA[ and details_.sku_id = #{entity.skuId} ]]>
+			</if>
+			<if test="entity.itemId != null and entity.itemId != ''">
+				<![CDATA[ and details_.item_id = #{entity.itemId} ]]>
+			</if>
+			<if test="entity.cid != null and entity.cid != ''">
+				<![CDATA[ and details_.cid = #{entity.cid} ]]>
+			</if>
+			<if test="entity.estimatePrice != null and entity.estimatePrice !=''">
+				<![CDATA[ and details_.estimate_price = #{entity.estimatePrice} ]]>
+			</if>
+			<if test="entity.centralPurchasingPrice != null">
+				<![CDATA[ and details_.central_purchasing_price = #{entity.centralPurchasingPrice} ]]>
+			</if>
+			<if test="entity.originalPrice != null">
+				<![CDATA[ and details_.original_price = #{entity.originalPrice} ]]>
+			</if>
+			<if test="entity.signUpNum != null">
+				<![CDATA[ and details_.sign_up_num = #{entity.signUpNum} ]]>
+			</if>
+			<if test="entity.placeOrderNum != null">
+				<![CDATA[ and details_.place_order_num = #{entity.placeOrderNum} ]]>
+			</if>
+			<if test="entity.paidNum != null">
+				<![CDATA[ and details_.paid_num = #{entity.paidNum} ]]>
+			</if>
+			<if test="entity.perPerchaseMaxNum != null">
+				<![CDATA[ and details_.per_perchase_max_num = #{entity.perPerchaseMaxNum} ]]>
+			</if>
+			<if test="entity.releaseGoodsMaxNum != null">
+				<![CDATA[ and details_.release_goods_max_num = #{entity.releaseGoodsMaxNum} ]]>
+			</if>
+			<if test="entity.insertTime != null">
+				<![CDATA[ and details_.insert_time = #{entity.insertTime} ]]>
+			</if>
+			<if test="entity.insertBy != null">
+				<![CDATA[ and details_.insert_by = #{entity.insertBy} ]]>
+			</if>
+			<if test="entity.updateTime != null">
+				<![CDATA[ and details_.update_time = #{entity.updateTime} ]]>
+			</if>
+			<if test="entity.updateBy != null">
+				<![CDATA[ and details_.update_by = #{entity.updateBy} ]]>
+			</if>
+
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="centralPurchasingActivitesDetails" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where details_.activites_details_id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="centralPurchasingActivitesDetails" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		CENTRAL_PURCHASING_ACTIVITES_DETAILS details_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="com.camelot.centralPurchasing.domain.CentralPurchasingActivitesDetails">
+		<![CDATA[
+		insert into CENTRAL_PURCHASING_ACTIVITES_DETAILS (
+	 			central_purchasing_id,
+	 			sku_id,
+	 			item_id,
+	 			cid,
+	 			estimate_price,
+	 			central_purchasing_price,
+	 			original_price,
+	 			sign_up_num,
+	 			place_order_num,
+	 			paid_num,
+	 			per_perchase_max_num,
+	 			release_goods_max_num,
+	 			insert_time,
+	 			insert_by,
+	 			update_time,
+	 			update_by
+		   )values(
+				#{centralPurchasingId},
+				#{skuId},
+				#{itemId},
+				#{cid},
+				#{estimatePrice},
+				#{centralPurchasingPrice},
+				#{originalPrice},
+				#{signUpNum},
+				#{placeOrderNum},
+				#{paidNum},
+				#{perPerchaseMaxNum},
+				#{releaseGoodsMaxNum},
+				now(),
+				#{insertBy},
+				now(),
+				#{updateBy}
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.centralPurchasing.domain.CentralPurchasingActivitesDetails">
+		<![CDATA[
+			update CENTRAL_PURCHASING_ACTIVITES_DETAILS set 
+			activites_details_id = #{activitesDetailsId}
+		]]>
+		<if test="skuId != null">,sku_id = #{skuId}</if>
+		<if test="itemId != null">,item_id = #{itemId}</if>
+		<if test="cid != null">,cid = #{cid}</if>
+		<if test="estimatePrice != null">,estimate_price = #{estimatePrice}</if>
+		<if test="centralPurchasingPrice != null">,central_purchasing_price = #{centralPurchasingPrice}</if>
+		<if test="originalPrice != null">,original_price = #{originalPrice}</if>
+		<if test="signUpNum != null">,sign_up_num = #{signUpNum}</if>
+		<if test="placeOrderNum != null">,place_order_num = #{placeOrderNum}</if>
+		<if test="paidNum != null">,paid_num = #{paidNum}</if>
+		<if test="perPerchaseMaxNum != null">,per_perchase_max_num = #{perPerchaseMaxNum}</if>
+		<if test="releaseGoodsMaxNum != null">,release_goods_max_num = #{releaseGoodsMaxNum}</if>
+		<if test="updateTime != null">,update_time = now()</if>
+		<if test="updateBy != null">,update_by = #{updateBy}</if>
+		<![CDATA[
+		 	where activites_details_id = #{activitesDetailsId}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from CENTRAL_PURCHASING_ACTIVITES_DETAILS where activites_details_id = #{id}
+		]]>
+	</delete>
+	
+	<!-- 已报名人数加1 -->
+	<update id="plusSignUpNum">
+		update CENTRAL_PURCHASING_ACTIVITES_DETAILS 
+		set sign_up_num=(CASE WHEN sign_up_num IS NULL THEN #{num} ELSE sign_up_num+#{num} END) where ACTIVITES_DETAILS_ID=#{activitesDetailsId}
+	</update>
+	<!-- 已下单人数加1 -->
+	<update id="plusPlaceOrderNum">
+		update CENTRAL_PURCHASING_ACTIVITES_DETAILS 
+		set place_order_num=(CASE WHEN place_order_num IS NULL THEN #{num} ELSE place_order_num+#{num} END) where ACTIVITES_DETAILS_ID=#{activitesDetailsId}
+	</update>
+	<!-- 已付款人数加1 -->
+	<update id="plusPaidNum">
+		update CENTRAL_PURCHASING_ACTIVITES_DETAILS 
+		set paid_num=(CASE WHEN paid_num IS NULL THEN #{num} ELSE paid_num+#{num} END) where ACTIVITES_DETAILS_ID=#{activitesDetailsId}
+	</update>
+</mapper>

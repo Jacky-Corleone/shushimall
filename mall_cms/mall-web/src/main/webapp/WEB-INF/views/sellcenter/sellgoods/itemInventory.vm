@@ -1,0 +1,281 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<script type="text/javascript">
+$(function(){
+	$("#outerdiv").hide();
+});
+//到指定的分页页面
+	function topage(page){
+		$("input[name='page']").val(page);
+		$("#queryForm").submit();
+	}
+	//form提交，即条件查询
+	$(function(){
+		//加载左侧导航
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+    	$("#queryBtn").bind('click',function(){
+			var form = document.forms[0];
+			//校验
+			if($("#itemId").val() != ''&&!(/(^[1-9]\d*$)/.test($("#itemId").val()))){
+				alert("商品编码必须为数字");
+			}else if($("#skuId").val() != ''&&!(/(^[1-9]\d*$)/.test($("#skuId").val()))){
+				alert("SKU编码必须为数字");
+	//		}else if($("#productId").val() != ''&&!(/(^[1-9]\d*$)/.test($("#productId").val()))){
+	//			alert("商品货号必须为数字");
+			}else if($("#minInvetory").val().length > 7 || $("#maxInvetory").val().length > 7 || $("#minInvetory").val() > 9999999 || $("#maxInvetory").val() > 9999999){
+				alert("库存区间输入有误，库存最大值不正确");
+    		}else if($("#minInvetory").val() > $("#maxInvetory").val()){
+				alert("库存区间输入错误");
+			}else{
+			//初始化页码
+			$("input[name='page']").val("1");
+			$("#queryForm").submit();
+			//	form.submit();
+			}
+    	});
+		/*表单清空*/
+		$("#clean").bind('click',function(){
+			$("#queryForm")[0].reset();
+			$("#itemName").val('');
+			$("#itemId").val('');
+			$("#skuId").val('');
+		//	$("#productId").val('');
+			$("#minInvetory").val('');
+			$("#maxInvetory").val('');
+			$("#itemStatus").val(0);
+		});
+		/*点击回车查询*/
+		$("#queryForm").keydown(function() {
+           if (event.keyCode == "13") {//keyCode=13是回车键
+                $('#queryBtn').click();
+            }
+      	  });
+	//全选
+		$("#all").click(function() {
+			var flag = $(this).is(":checked"); 
+			$("[name=box]:checkbox").each(function() { 
+				$(this).prop("checked", flag); 
+			}) 
+		});
+		$("#confirm").bind('click',function(){
+		//选中的条目数组
+			var checkeds = $("input[name='box']:checked");
+			var ids = [];
+			var values = [];
+			//id数组====value数组
+			for(i=0;i < checkeds.length;i++){
+				ids.push(checkeds[i].title);
+				values.push($("#"+checkeds[i].title).val());
+			}
+			if(checkeds.length == 0){
+				alert("请选择要修改的条目");
+			}else if($("input[name='box']:checked")){
+			//选择条目的id
+				$.ajax({
+					url:'$request.contextPath/sellcenter/itemInventory/editInventory',
+					type:'post',
+					traditional: true,
+					dataType:'json',
+					data:{
+						"ids":ids,
+						"inventories":values
+					},
+					success:function(result){
+						//
+						alert(result.messager);
+					window.location.href="$request.contextPath/sellcenter/itemInventory/initItemInventory";
+					}
+				});
+			}
+		});
+	});
+	
+	function showPic(img){
+	alert(img);
+		$("#outerdiv").show();
+	}
+	
+	function toView(id)
+	{
+		window.location.href = '$request.contextPath/productController/details?id=' + id;
+	}
+	function clearNoNum(obj)
+	{
+		//先把非数字的都替换掉，除了数字和.
+		obj.value = obj.value.replace(/[^\d.]/g,"");
+		//必须保证第一个为数字而不是.
+		obj.value = obj.value.replace(/^\./g,"");
+		//保证只有出现一个.而没有多个.
+		obj.value = obj.value.replace(/\.{2,}/g,"");
+		//保证.只出现一次，而不能出现两次以上
+		obj.value = obj.value.replace(".","$#$").replace(/\./g,"").replace("$#$","");
+	}
+</script>
+<!--头部结束-->
+<div id="main">
+<!--中间部分开始-->
+	<!--左边部分开始-->
+	<div id="leftSeller"></div>
+	<!--左边部分结束-->
+<!--右边部分开始-->
+<div id="right">
+   <div class="right_top bg_06 border-4">
+	<form id="queryForm" action="$request.getContextPath()/sellcenter/itemInventory/initItemInventory" method="post">
+      <div class="right_top_l fl">
+        <ul class="list">
+			<input type="hidden" name="page" value="$!pager.page" />
+        <li class="wid_220">
+          <span class="font_wid">商品名称：</span><input name="itemName" value="$!{TradeInventoryInDTO.itemName}" id="itemName" class="input_Style2 wid_120 hei_30" type="text" />
+        </li>
+		<li style="width:160px;"></li>
+        <li class="wid_220">
+          <span class="font_wid">商品编码：</span><input name="itemId" value="$!{TradeInventoryInDTO.itemId}" id="itemId" type="text" class="input_Style2 wid_120 hei_30" number="true"/>
+        </li>
+       
+        <li class="wid_220">
+          <span class="font_wid">SKU编码：</span><input name="skuId" value="$!{TradeInventoryInDTO.skuId}" id="skuId" class="input_Style2 wid_120 hei_30" type="text" />
+        </li>
+
+       
+        <li style="width:380px;">
+          <span class="font_wid">库存区间：</span><input name="minInvetory" value="$!{TradeInventoryInDTO.minInvetory}" id="minInvetory" class="input_Style2 wid_120 hei_30" type="text" /><i class="demo-icons">-</i><input class="input_Style2 wid_120 hei_30" type="text" value="$!{TradeInventoryInDTO.maxInvetory}" id="maxInvetory" name="maxInvetory"/>        
+        </li>
+        #* 
+         <li class="wid_220">
+          <span class="font_wid">商品货号：</span><input name="productId" value="$!{TradeInventoryInDTO.productId}" id="productId" type="text" class="input_Style2 wid_120 hei_30"/>
+        </li>
+         *#
+        <li><span class="font_wid mar_l">商品状态：</span>
+		 <select class="input_Style2 wid_90 mar_r10 hei_35 " style="width:129px;" name="itemStatus" id="itemStatus"> 
+			<option value="0">--选择--</option>
+			<option value="1" #if(${TradeInventoryInDTO.itemStatus}==1) selected="true"#end>未发布</option>
+			<option value="2" #if(${TradeInventoryInDTO.itemStatus}==2) selected="true"#end>待审核</option>
+			<option value="3" #if(${TradeInventoryInDTO.itemStatus}==3) selected="true"#end>待上架</option>
+			<option value="4" #if(${TradeInventoryInDTO.itemStatus}==4) selected="true"#end>在售</option>
+			<option value="5" #if(${TradeInventoryInDTO.itemStatus}==5) selected="true"#end>已下架</option>
+			<option value="6" #if(${TradeInventoryInDTO.itemStatus}==6) selected="true"#end>锁定</option>
+			<option value="7" #if(${TradeInventoryInDTO.itemStatus}==7) selected="true"#end>申请解锁</option>
+			<option value="20" #if(${TradeInventoryInDTO.itemStatus}==20) selected="true"#end>审核驳回</option>
+		 </select></li>    
+      </ul>
+      </div>
+	  </form>
+      <div class="right_top_3 fr mar_t10">
+        <button id="queryBtn" type="button" class="button_4 but_cx3">
+         <a class="font_1c">查 询</a>
+        </button>
+		<button id="clean" type="reset" class="button_4 but_cx3">
+         <a class="font_1c">清 除</a>
+        </button>
+      </div>
+   </div>
+  <!-- right结束 -->
+
+  <div id="right_bot" class="right_bot border-4 mar_t10 bg_06">
+    <!-- 商品列表开头 -->
+    <div class="right_xinxi mar_l14 ">
+      <ul class="list_top bg_08 font_14b">
+        <li class="wid_230  hei_35"><span class="mar_r30"><input id="all" type="checkbox"/>全选</span>商品信息</li>
+        <li class="wid_90 font_cen hei_35">销售属性</li>
+        <li class="wid_80 font_cen hei_35">SKU编码</li>
+        <li class="wid_120 font_cen hei_35">商品编码</li>
+        <li class="wid_110 font_cen hei_35">所属类目</li>
+        <li class="wid_130  font_cen hei_35">销售价</li> 
+        <li class="wid_90 font_cen hei_35">库存</li>
+        <li class="wid_90 font_cen hei_35">商品状态</li>
+      </ul>
+      <!-- 类型选择 -->
+     
+      <!-- 商品信息 -->
+      <table class="information mar_t10" id="information " >
+        #foreach($TradeInventoryOutDTO in $pager.records)
+        <tr>
+          <td class="wid_120 border-1 border-12 hei_60" >
+            <input type="checkbox" name="box" title="${TradeInventoryOutDTO.skuId}"/>
+            <a href="javascript:void(0)" onclick="javascript:toView($!{TradeInventoryOutDTO.itemId})">
+				#foreach($skuPicture in ${TradeInventoryOutDTO.skuPicture})
+					<img src="$!imageServerAddr$!{skuPicture.picUrl}" width="75" height="50"/>
+					#break;
+				#end
+            </a>
+          </td >
+          <td class="wid_120 border-6 border-9"><a href="javascript:void(0)" onclick="javascript:toView($!{TradeInventoryOutDTO.itemId})">$!{TradeInventoryOutDTO.itemName}</a></td>
+		  <td class="wid_80 border-1 font_cen" style="display:none">$!{TradeInventoryOutDTO.itemId}</td>
+          <td class="wid_90 border-1 font_cen" >
+			#foreach($itemAttrName in ${TradeInventoryOutDTO.itemAttr})
+				    $itemAttrName.name :
+				#foreach($itemAttrValue in $itemAttrName.values)
+					$itemAttrValue.name 
+				#end
+			#end
+		  </td>
+          <td class="wid_80 border-1 font_cen">$!{TradeInventoryOutDTO.skuId}</td>
+          <td class="wid_120 border-1 font_cen">$!{TradeInventoryOutDTO.itemId}</td>
+          <td class="wid_110 border-1 font_cen">
+		  #foreach($itemCatCascadeDTO in ${TradeInventoryOutDTO.itemCatCascadeDTO})
+				    $itemCatCascadeDTO.cname /
+			#foreach($childCats in $itemCatCascadeDTO.childCats)
+				    $childCats.cname /
+    			#foreach($childCat in $childCats.childCats)
+    			    $childCat.cname
+    			#end
+			#end
+		  #end
+		  </td>
+          <td class="wid_130 border-1 font_cen ">
+			<ul>
+				#if(${TradeInventoryOutDTO.areaPrices})
+					#foreach($areaPrices in ${TradeInventoryOutDTO.areaPrices})
+						#if($areaPrices.minNum==1)
+							$!areaPrices.sellPrice
+						#end
+					#end
+				#else
+					0.00
+				#end
+			</ul>
+		  </td>
+          <td class="wid_90 border-1 ">
+			<input type="text" maxlength='6' id="${TradeInventoryOutDTO.skuId}" class="wid_40 mar_23 font_cen border-4" value="$!{TradeInventoryOutDTO.totalInventory}" onkeyup="clearNoNum(this)"/>
+		  </td>
+          <td class="wid_90 border-1 font_cen">
+			#if($!{TradeInventoryOutDTO.itemStatus} == 1)
+				未发布
+			#elseif($!{TradeInventoryOutDTO.itemStatus} == 2)
+				待审核
+			#elseif($!{TradeInventoryOutDTO.itemStatus} == 3)
+				待上架
+			#elseif($!{TradeInventoryOutDTO.itemStatus} == 4)
+				在售
+			#elseif($!{TradeInventoryOutDTO.itemStatus} == 5)
+				已下架
+			#elseif($!{TradeInventoryOutDTO.itemStatus} == 6)
+				锁定
+			#elseif($!{TradeInventoryOutDTO.itemStatus} == 7)
+				申请解锁
+			#elseif($!{TradeInventoryOutDTO.itemStatus} == 20)
+				审核驳回
+			#end
+		  </td>
+        </tr>
+		#end
+      </table>
+      <button type="button" class="button_2 shop_ok mar_tb10 fr " id="confirm">确 定</button>
+      <div class="clear"></div>
+    </div>
+	<div class="clear"></div>
+<!--又底边图标开始-->
+  </div>
+ #pageVelocity($pager)
+##&nbsp;&nbsp;
+<div id="outerdiv" style="position: fixed; top: 0px; left: 0px; z-index: 1999; width: 100%; height: 100%; display: block; background: rgba(0, 0, 0, 0.701961) !important;">
+	<div id="innerdiv" style="position: absolute; top: 65px; left: 504.5px;">
+		##<img id="bigimg" style="border: 5px solid rgb(255, 255, 255); width: 338px;" src="http://img30.360buyimg.com/ecc-b2b/jfs/t511/105/220625261/96330/ab51d286/54573231N358d9be6.png">
+	</div>
+</div>
+
+##
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div>
+<!--#main end -->

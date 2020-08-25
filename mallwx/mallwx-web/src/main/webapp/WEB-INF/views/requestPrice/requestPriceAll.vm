@@ -1,0 +1,318 @@
+#set($layout = "common/order.vm")
+#if($!num == "0")
+ <div  onclick="showItemDiv('queryInfo_0');"></div>
+    <div  id="queryInfo_0" >
+        <ul class="font_t pad_lr5">
+        <li class="hei_32"><p class="wid_25 fl font_right pad_r5">
+			供应商</P>
+			<input name="supplierName" id="supplierName" class="form-control wid_50 hei_20"  />
+		</li>
+        <li class="hei_32"><P class="wid_25 fl font_right pad_r5">物品名称</P>
+			<input class="form-control wid_50 hei_20" id="itemName" name="itemName" /></li>
+        <li class="hei_32"><P class="wid_25 fl font_right pad_r5">询价编号</P><input class="form-control wid_50 hei_20" id="inquiryNo"/></li>
+    </ul>
+        <div><button class="button_1 pad_lr5 hei_32 fr" id="queryInquiry" onclick="queryInquiry(0,'request');">询价查询</button></div>
+        <div class="clear"></div>
+    </div>
+    <div  id="queryDiv0">
+		#foreach($inquiry in $!pager.records)
+        <!-- 发货商城 -->
+        <div class="hei_32 border_2">
+             <p class="fl" style="font-weight:bold;"><span>询价编号：$!inquiry.inquiryNo</span></p>
+			 #if($!inquiry.status == "1")
+				<p class="fr font_e5">待发布</p>
+			#elseif($!inquiry.status == "2")
+				<p class="fr font_e5">报价中</p>
+			#elseif($!inquiry.status == "3")
+				<p class="fr font_e5">已接收</p>
+			#else
+				<p class="fr font_e5"></p>
+			#end
+			
+        </div><!-- 发货商城 -->
+		<!--物品信息展示-->
+		<div id="$!inquiry.inquiryNo"><p class="hei_32" >商品信息：</p>
+		#if($!inquiry.status == "2" || $!inquiry.status == "3")
+			<input type="checkbox"  value="null" onclick="checkAll('$!inquiry.inquiryNo',this);"/>全选
+		#end
+		#foreach($listDetail in $inquiry.inquiryMatDTOs )
+		<div class="mar_b10 bg_01 pad_lr5">
+            <!-- 发货信息 -->
+            <div class="border_2 shop_order pad_tb3" >
+                <p class="wid_87 shop_order_p">
+					#if($!inquiry.status == "2" || $!inquiry.status == "3")
+					<input type="checkbox" class="mar_l2" name="$!inquiry.inquiryNo" value="$listDetail.id" onclick="showNumInput('$!listDetail.id');"/>
+					#end 
+					$!listDetail.matDesc</p>
+				 #if($!inquiry.status == "2" || $!inquiry.status == "3")
+                        <p  class="wid_87 shop_order_p" name="$!listDetail.id" style="display:none;">
+							数    量：<input type="text" name = "number" onkeypress="number()" onkeyup="filterInput()" onchange="filterInput()" onbeforepaste="filterPaste()" onpaste="return false" class="hei_28"/>
+                            <input type="hidden" name = "detailid" value="$!listDetail.id"/>
+                            <input type="hidden" name = "ifPrice" value="$!listDetail.alternate5"/>
+                            <input type="hidden" name = "detailBeginDate"  value="$!date.format('yyyy-MM-dd', $!listDetail.beginDate)"/>
+                            <input type="hidden" name = "detailEndDate" value="$!date.format('yyyy-MM-dd HH:mm', $!listDetail.endDate)"/>
+                            <input type="hidden" name = "detailMatDesc" value="$!listDetail.matDesc"/>
+                            <input type="hidden" name = "detailStatus" value="$!listDetail.status"/>
+						</p>
+				 #end
+				 <p></p>
+				 <div id="$!listDetail.id" >								 
+					<p class="wid_87 shop_order_p">供应商：$!listDetail.alternate1</p>
+					<p class="wid_87 shop_order_p">销售属性：$!listDetail.alternate4</p>
+					 #if($!listDetail.status == "1")
+                         <p class="wid_87 shop_order_p">状   态：已接收</p>
+					 #else
+                         <p class="wid_87 shop_order_p">状   态：未接收</p>
+					 #end
+                     <p class="wid_87 shop_order_p">有效期(始)：$!date.format('yyyy-MM-dd', $!listDetail.beginDate)</p>
+                     <p class="wid_87 shop_order_p">有效期(止)：$!date.format('yyyy-MM-dd', $!listDetail.endDate)</p>
+					<p class="wid_87 shop_order_p">价   格：$!listDetail.matPrice</p>
+				</div>
+                <div class="clear"></div>
+            </div>
+            <!-- 发货信息 -->
+		#end
+        </div>
+            <p>&nbsp;</p>
+	    <!--物品信息展示end-->
+            <p>截至报价时间：$!date.format('yyyy-MM-dd HH:mm', $!inquiry.endDate)</p>
+            <!-- 按钮 -->
+            <div class="pad_tb5">
+				#if($!inquiry.status == "1")
+				<button class="button_3 pad_mlr5" onclick="updateInquiry('$!inquiry.inquiryNo','$!inquiry.status');">编辑</button>
+				<button class="button_3 pad_mlr5" onclick="commitnquiry('$!inquiry.inquiryNo','$!inquiry.status');">发布</button>
+				<button class="button_3 pad_mlr5" onclick="deleteInquiry('$!inquiry.inquiryNo','$!inquiry.status');">删除</button>
+				#end
+				#if($!inquiry.status == "2" )
+					<button class="button_3 pad_mlr5" onclick="commitRequestInquiry('$!inquiry.inquiryNo','$!inquiry.status','$!inquiry.inquiryNo');">接收价格</button>
+				#end
+				#if($!inquiry.status == "3" ||$!inquiry.status == "2")
+                    <button class="button_3 pad_mlr5" onclick="commitnquiryRe('$!inquiry.inquiryNo','$!inquiry.status');">重新发布</button>
+                    <button class="button_3 pad_mlr5" onclick="createOrderInfo('$!inquiry.inquiryNo','$!inquiry.status',this);">下单</button>
+				#end
+				<button class="button_3 pad_mlr5" onclick="lookInquiryInfo('$!inquiry.inquiryNo','requestPrice');">查看</button>
+				<div class="clear"></div>
+				</div>
+	</div>
+	#end
+	</div>
+#elseif($!num == "1")
+    <!-- 报价创建 -->
+    <form id="inquiryForm" method="post" onsubmit="return false;" action="$request.contextPath/requestPriceJavaController/addInquiry">
+		<!-- 表单 -->
+        <ul class="pass pad_t3">
+            <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5 mar_lr2">*</span>询价编码</p><input type="text" class="wid_50 input_3" id="inquiryNo" name="inquiryNo" value="$!inquiryNo" readOnly/></li>
+            <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5 mar_lr2">*</span>询价名称</p><input type="text" class="wid_50 input_3" id="inquiryName" maxlength="45" name="inquiryName"/></li>
+            <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5 mar_lr2">*</span>询价日期</p><input type="text" class="wid_50 input_3" id="beginDate1" name="beginDate1" value = "$!beginDate" readOnly/></li>
+            <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5 mar_lr2">*</span>截至报价日期</p><input type="date" class="wid_50 input_3 hei_20" id="endDate1" name="endDate1" value="$!date.format('yyyy-MM-dd HH:mm', $!endDate)" onchange="checkDate(this, '$!beginDate');"  />
+        </li>
+            <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5 mar_lr2">*</span>交货日期</p><input type="date" class="wid_50 input_3 hei_20" id="deliveryDate1" name="deliveryDate1" value="$!date.format('yyyy-MM-dd', $!deliveryDate)"  onchange="checkDate(this, '$!beginDate');" onblur="createItemLi();"/>
+				</li>
+            <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5 mar_lr2">*</span>采购方</p>
+				<input type="hidden"  id="createBy" name="createBy" value="$!uid" />
+				<input type="hidden"  id="printerId" name="printerId" value="$!uid" />
+				<input type="text" class="wid_50 input_3" id="uName"  value="$!uName" readOnly/></li>
+            <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5"></span>备注</p><input type="text" class="wid_50 input_3" maxlength="300" id="remarks" name="remarks"/></li>
+            <li id="uploadLi"><p class="wid_30 fl font_right pad_r5"><span class="font_e5"></span>附件</p><input type="file" class="wid_50 mar_t10" id="fileInput" name="file" onchange="startUpload();"/></li>
+			<input type="hidden"  id="annex" name="annex" value="" />
+        </ul><!-- 表单 end-->
+        <!-- table -->
+        <div>
+			<div id="itemList">
+			</div>
+			<div class="wid_100 hei_32 font_cen"
+				 onclick="showItemSearchDIV()">
+				<span>点击新增物品</span><i class="fa fa-plus-circle"></i>
+			</div>
+		</div>
+        <div class="font_cen" style="margin-top:10px;">
+            <span style="color:red;" class="errorMsg"></span></div>
+        <!-- table -->
+        <div class="font_right"><button class="hei_32 pad_lr10 button_1" id="button_save">保存</button></div>
+        <div class="clear"></div>
+
+</form>
+
+#elseif($!num == "2")
+<!-- 未报价 -->	
+  <div  onclick="showItemDiv('queryInfo_2');"></div>
+        <div  id="queryInfo_2" class="bg_01">
+            <ul class="font_t pad_lr5">
+            <li class="hei_32">
+             <p class="wid_25 fl font_right pad_r5">供应商</P>
+				<input name="supplierName" id="supplierName" class="form-control wid_50 hei_20"  />
+				</li>
+            <li class="hei_32">
+             <p class="wid_25 fl font_right pad_r5">物品名称</P>
+				<input class="form-control wid_50 hei_20" id="itemName" name="itemName"/></li>
+            <li class="hei_32">
+             <p class="wid_25 fl font_right pad_r5">询价编号</P><input class="form-control wid_50 hei_20" id="inquiryNo"/></li>
+        </ul>
+            <div><button class="button_1 pad_lr5 hei_32 fr" onclick="queryInquiry(2,'request');">询价查询</button>
+            
+              <button class="button_1 pad_lr5 hei_32 fr" id="reset"onclick="reset();">重置 </button>
+            </div>
+            <div class="clear"></div>
+        </div>
+        <div  id="queryDiv2">
+			#foreach($inquiry in $!pager.records)
+			<div class="mar_b10 bg_01 pad_lr5">
+            <!-- 发货商城 -->
+            <div class="hei_32 border_2">
+                 <p class="fl" style="font-weight:bold;"><span>询价编号：$!inquiry.inquiryNo</span></p>
+				 #if($!inquiry.status == "1")
+					<p class="fr font_e5">待发布</p>
+    			#elseif($!inquiry.status == "2")
+    				<p class="fr font_e5">报价中</p>
+    			#elseif($!inquiry.status == "3")
+    				<p class="fr font_e5">已接收</p>
+    			#else
+    				<p class="fr font_e5"></p>
+    			#end
+				
+            </div><!-- 发货商城 -->
+			<!--物品信息展示-->
+			#foreach($listDetail in $inquiry.inquiryMatDTOs )
+                <!-- 发货信息 -->
+                <div class="border_2 shop_order pad_tb3" ><p class="hei_32" >商品信息：</p>
+                    <p class="wid_87 shop_order_p">$listDetail.matDesc</p>
+                    <div class="fr lin_24">
+                        <p></p>
+                     </div>
+					 <div id="$!listDetail.supplierId" >								 
+						<p class="wid_87 shop_order_p">供应商：$!listDetail.alternate1</p>
+						<p class="wid_87 shop_order_p">销售属性：$!listDetail.alternate4</p>
+						 #if($!listDetail.status == "1")
+                             <p class="wid_87 shop_order_p">状   态：已接收</p>
+						 #else
+                             <p class="wid_87 shop_order_p">状   态：未接收</p>
+						 #end
+                         <p class="wid_87 shop_order_p">有效期(始)：$!date.format('yyyy-MM-dd', $!listDetail.beginDate)</p>
+                         <p class="wid_87 shop_order_p">有效期(止)：$!date.format('yyyy-MM-dd', $!listDetail.endDate)</p>
+						<p class="wid_87 shop_order_p">价   格：$!listDetail.matPrice</p>
+					</div>
+                    <div class="clear"></div>
+                </div>
+                <!-- 发货信息 -->
+		  <!--物品信息展示end-->
+          #end
+                <p>&nbsp;</p>
+                <p>截至报价时间：$!date.format('yyyy-MM-dd HH:mm', $!inquiry.endDate)</p>
+                <!-- 按钮 -->
+                <div class="pad_tb5">
+					#if($!inquiry.status == "1")
+    				<button class="button_3 pad_mlr5" onclick="updateInquiry('$!inquiry.inquiryNo','$!inquiry.status');">编辑</button>
+    				<button class="button_3 pad_mlr5" onclick="commitnquiry('$!inquiry.inquiryNo','$!inquiry.status');">发布</button>
+    				<button class="button_3 pad_mlr5" onclick="deleteInquiry('$!inquiry.inquiryNo','$!inquiry.status');">删除</button>
+    				#end
+					<button class="button_3 pad_mlr5" onclick="lookInquiryInfo('$!inquiry.inquiryNo','requestPrice');">查看</button>
+					<div class="clear"></div>
+					</div>
+		</div>
+		#end
+		</div>
+#elseif($!num == "3")
+<!-- 已报价 -->		
+  <div  onclick="showItemDiv('queryInfo_3');"></div>
+        <div  id="queryInfo_3" class="bg_01">
+            <ul class="font_t pad_lr5">
+            <li class="hei_32">
+             <p class="wid_25 fl font_right pad_r5">供应商</P>
+				<input name="supplierName" id="supplierName" class="form-control wid_50 hei_20"  />
+				</li>
+            <li class="hei_32">
+             <p class="wid_25 fl font_right pad_r5">物品名称</P>
+				<input class="form-control wid_50 hei_20" id="itemName" name="itemName"/></li>
+            <li class="hei_32">
+             <p class="wid_25 fl font_right pad_r5">询价编号</P><input class="form-control wid_50 hei_20" id="inquiryNo"/></li>
+        </ul>
+            <div><button class="button_1 pad_lr5 hei_32 fr" onclick="queryInquiry(3,'request');">询价查询</button>
+            
+             <button class="button_1 pad_lr5 hei_32 fr" id="reset"
+                                    onclick="reset();">重置
+                            </button>
+            
+            
+            </div>
+            <div class="clear"></div>
+        </div>
+        <div  id="queryDiv3">
+			#foreach($inquiry in $!pager.records)
+            <div class="mar_b10 bg_01 pad_lr5">
+            <!-- 发货商城 -->
+            <div class="hei_32 border_2">
+                 <p class="fl" style="font-weight:bold;"><span>询价编号：$!inquiry.inquiryNo</span></p>
+				 #if($!inquiry.status == "1")
+					<p class="fr font_e5">待发布</p>
+    			#elseif($!inquiry.status == "2")
+    				<p class="fr font_e5">报价中</p>
+    			#elseif($!inquiry.status == "3")
+    				<p class="fr font_e5">已接收</p>
+    			#else
+    				<p class="fr font_e5"></p>
+    			#end
+				
+            </div><!-- 发货商城 -->
+		<!--物品信息展示-->
+		<div id="$!inquiry.inquiryNo"><p class="hei_32" >商品信息：</p>
+		#if($!inquiry.status == "2" || $!inquiry.status == "3")
+			<input type="checkbox"  value="null" onclick="checkAll('$!inquiry.inquiryNo',this);"/>全选
+		#end
+		#foreach($listDetail in $inquiry.inquiryMatDTOs )
+            <div class="border_2 shop_order pad_tb3" >
+            <!-- 发货信息 -->
+                <p class="wid_87 shop_order_p">
+					#if($!inquiry.status == "2" || $!inquiry.status == "3")
+					<input type="checkbox"  name="$!inquiry.inquiryNo" value="$listDetail.id" onclick="showNumInput('$!listDetail.id');" />
+					#end 
+					$!listDetail.matDesc</p>
+				 #if($!inquiry.status == "2" || $!inquiry.status == "3")
+                        <p class="wid_87 shop_order_p" name="$!listDetail.id" style="display:none;">
+							数    量：<input type="text" name = "number" onkeypress="number()" onkeyup="filterInput()" onchange="filterInput()" onbeforepaste="filterPaste()" onpaste="return false" class="hei_28"/>
+                            <input type="hidden" name = "detailid" value="$!listDetail.id"/>
+                            <input type="hidden" name = "ifPrice" value="$!listDetail.alternate5"/>
+                            <input type="hidden" name = "detailBeginDate"  value="$!date.format('yyyy-MM-dd', $!listDetail.beginDate)"/>
+                            <input type="hidden" name = "detailEndDate" value="$!date.format('yyyy-MM-dd HH:mm', $!listDetail.endDate)"/>
+                            <input type="hidden" name = "detailMatDesc" value="$!listDetail.matDesc"/>
+                            <input type="hidden" name = "detailStatus" value="$!listDetail.status"/>
+						</p>
+				 #end
+				 <p></p>
+				 <div id="$!listDetail.id" >								 
+					<p class="wid_87 shop_order_p">供应商：$!listDetail.alternate1</p>
+					<p class="wid_87 shop_order_p">销售属性：$!listDetail.alternate4</p>
+					 #if($!listDetail.status == "1")
+                         <p class="wid_87 shop_order_p">状   态：已接收</p>
+					 #else
+                         <p class="wid_87 shop_order_p">状   态：未接收</p>
+					 #end
+                     <p class="wid_87 shop_order_p">有效期(始)：$!date.format('yyyy-MM-dd', $!listDetail.beginDate)</p>
+                     <p class="wid_87 shop_order_p">有效期(止)：$!date.format('yyyy-MM-dd', $!listDetail.endDate)</p>
+					<p class="wid_87 shop_order_p">价   格：$!listDetail.matPrice</p>
+				</div>
+                <div class="clear"></div>
+            </div>
+            <!-- 发货信息 -->
+		#end
+        </div>
+                <p>&nbsp;</p>
+                <p>截至报价时间：$!date.format('yyyy-MM-dd HH:mm', $!inquiry.endDate)</p>
+	    <!--物品信息展示end-->
+                <!-- 按钮 -->
+                <div class="pad_tb5">
+    				#if($!inquiry.status == "2")
+    					<button class="button_3 pad_mlr5" onclick="commitRequestInquiry('$!inquiry.inquiryNo','$!inquiry.status','$!inquiry.inquiryNo');">接收</button>
+					#end
+					#if($!inquiry.status == "3" || $!inquiry.status == "2")
+                        <button class="button_3 pad_mlr5" onclick="commitnquiryRe('$!inquiry.inquiryNo','$!inquiry.status');">重新询价</button>
+                        <button class="button_3 pad_mlr5" onclick="createOrderInfo('$!inquiry.inquiryNo','$!inquiry.status',this);">下单</button>
+    				#end
+    				<button class="button_3 pad_mlr5" onclick="lookInquiryInfo('$!inquiry.inquiryNo','requestPrice');">查看</button>
+    				<div class="clear"></div>
+				</div>
+		</div>
+		#end
+		</div>
+#else
+       空白
+#end

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.report.dao.ShopReportDao">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="shopReportMap" type="com.camelot.report.dto.ShopReportDTO">
+		<result property="shopId" column="shop_id"/>
+		<result property="shopName" column="shop_name"/>
+		<result property="sellerId" column="seller_id"/>
+		<result property="passTime" column="pass_time"/>
+		<result property="provinceCode" column="province_code"/>
+		<result property="provinceName" column="province_name"/>
+		<result property="zcode" column="zcode"/>
+		<result property="streetName" column="street_name"/>
+		<result property="mobile" column="mobile"/>
+		<result property="orderNum" column="orderNum"/>
+		<result property="saleNum" column="saleNum"/>
+		<result property="customerNum" column="customerNum"/>
+	</resultMap>
+	
+	<sql id="count_Tail">
+		select count(1) from report_sell_shop
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select	shop_id
+	 			,shop_name
+	 			,seller_id
+	 			,pass_time
+	 			,province_code
+	 			,province_name
+	 			,zcode
+	 			,street_name
+	 			,mobile
+	 			,orderNum
+	 			,saleNum
+	 			,customerNum
+		FROM 
+		report_sell_shop
+        ]]>
+	</sql>
+	
+	<sql id="where_fragement">
+        where 1=1 
+        <if test="entity!=null">
+            <if test="entity.shopName != null  and entity.shopName !=''">
+                <![CDATA[ and shop_name  LIKE CONCAT('%',#{entity.shopName},'%')]]>
+            </if>
+            <if test="entity.passTimeStart != null  and entity.passTimeStart !=''">
+                <![CDATA[ and DATE_FORMAT(pass_time,'%Y%m%d')  >= #{entity.passTimeStart} ]]>
+            </if>
+            <if test="entity.passTimeEnd != null  and entity.passTimeEnd !=''">
+                <![CDATA[ and DATE_FORMAT(pass_time,'%Y%m%d')  <= #{entity.passTimeEnd} ]]>
+            </if>
+        </if>
+    </sql>
+    
+    <sql id="order_fragement">
+        order by pass_time
+    </sql>
+    
+    <!-- mysql 分页 -->
+    <sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	
+	 <!-- 分页查询 -->
+    <select id="queryList" resultMap="shopReportMap">
+        <include refid="selectAllColumns"/>
+        <include refid="where_fragement"/>
+        <include refid="order_fragement"/>
+        <if test="page!=null">
+            <include refid="pagination_tail"/>
+        </if>
+    </select>
+    
+    <!-- 查询总数 -->
+    <select id="queryCount" resultType="long">
+        <include refid="count_Tail"/>
+        <include refid="where_fragement"/>
+    </select>
+</mapper>

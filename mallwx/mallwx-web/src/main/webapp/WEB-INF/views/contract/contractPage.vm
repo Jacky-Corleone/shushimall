@@ -1,0 +1,784 @@
+#set($layout = "common/blanklayout.vm")
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>年度协议</title>
+    <link href="$request.contextPath/assets/css/detail.css" rel="stylesheet" type="text/css"/>
+    <script src="$request.contextPath/assets/js/jquery-1.11.2.min.js"></script>
+    <script src="$request.contextPath/assets/js/jquery-finger-v0.1.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" src="$request.contextPath/assets/css/basic.css"/>
+    <script src="$request.contextPath/assets/js/iscroll.js"></script>
+    <script src="$request.contextPath/assets/js/zepto.js"></script>
+    <script src="$request.contextPath/assets/js/style.js"></script>
+    <script type="text/javascript" src="$request.contextPath/assets/js/ajaxfileupload.js"></script>
+    <script src="$request.contextPath/assets/js/modernizr-custom-v2.7.1.min.js"></script>
+    <script src="$request.contextPath/assets/js/contract/contract.js"></script>
+    <script src="$request.contextPath/assets/js/tab.js"></script>
+    <input type="hidden" id="userType" value="$register.userType">
+    <input type="hidden" id="userId" value="$register.uid">
+    <input type="hidden" id="sourcePage" value="$sourcePage">
+    <input id="contextPath" type="hidden" value="$request.contextPath">
+    <input id="gix" type="hidden" value="$gix">
+    <style>
+        .wrapper {
+            position: absolute;
+            z-index: 1;
+            top: 50px;
+            bottom: 50px;
+            left: 0;
+            width: 100%;
+            background: #ccc;
+            overflow: hidden;
+        }
+
+        .scroller {
+            position: absolute;
+            z-index: 1;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            width: 100%;
+            -webkit-transform: translateZ(0);
+            -moz-transform: translateZ(0);
+            -ms-transform: translateZ(0);
+            -o-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-text-size-adjust: none;
+            -moz-text-size-adjust: none;
+            -ms-text-size-adjust: none;
+            -o-text-size-adjust: none;
+            text-size-adjust: none;
+        }
+    </style>
+</head>
+<body class="po_re bg_02">
+<div id="main" class="po_re">
+	<input style="display:none" id="tabs1" type="text"/>
+	<input style="display:none" id="tabs2" type="text"/>
+	<input style="display:none" id="tabs3" type="text"/>
+	<input style="display:none" id="tabs0" type="text"/>
+	  #if($sourcePage=="seller")
+         <input type="hidden" value="2" id="searchType">
+      #elseif($sourcePage=="buyer")
+         <input type="hidden" value="3" id="searchType">
+      #end
+	
+    <!-- 中间内容 -->
+    <div class="content" id="wrapper1">
+        <div class="nTab">
+            <!-- 标题开始 -->
+            <div class="TabTitle bg_01">
+                <ul id="myTab0" class="myTab0">
+                    <li class="active" onclick="contractPageTabs(this,0);">协议管理</li>
+                    <li class="normal" onclick="contractPageTabs(this,1);">协议创建</li>
+                    <li class="normal" onclick="contractPageTabs(this,2);">待审核</li>
+                    <li class="normal" onclick="contractPageTabs(this,3);">待确认</li>
+                </ul>
+            </div>
+            <!-- 标题开始 end-->
+            <div class="clear"></div>
+            <!-- 内容开始 -->
+            <div class="TabContent">
+                <!-- 切换内容    1   -->
+                <div id="myTab0_Content0">
+                    <div>
+                        <div id="searchForm0" class="bg_01">
+                            <form id="contractSearchForm">
+                                <ul class="font_t pad_lr5">
+                                    <li class="hei_32">
+                                        <p class="wid_25 fl font_right pad_r5">
+                                            #if($sourcePage=="seller")
+                                                买方：
+                                            #elseif($sourcePage=="buyer")
+                                                卖方：
+                                            #end
+                                        </p>
+                                        <input id="companyName" class="form-control wid_50 hei_20" maxlength="45"
+                                               type="text" name="companyName"/>
+                                    </li>
+                                    <input type="hidden" name="printerId"/>
+                                    <input type="hidden" name="supplierId"/>
+                                    <li class="hei_32"><p class="wid_25 fl font_right pad_r5">商品名称</p><input
+                                            name="itemName" maxlength="45"
+                                            class="form-control wid_50 hei_20"/>
+                                    </li>
+                                    <li class="hei_32"><p class="wid_25 fl font_right pad_r5">协议名称</p><input
+                                            name="contractName" maxlength="45"
+                                            class="form-control wid_50 hei_20"/>
+                                    </li>
+                                </ul>
+                            </form>
+                            <div style="overflow:hidden;" class=" font_cen">
+
+                                <button class="button_1 pad_lr5 hei_32" onclick="searchContractInfoByCondition(0)">
+                                    协议查询
+                                </button>
+                                <button class="button_1 pad_lr5 hei_32" onclick="reset()">
+                                    重 置
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                  
+                    <!--协议遍历-->
+                    <div id="contractList">
+                        <!-- 表格 -->
+                        #foreach($contract in $conInfos)
+                            #if($contract.createBy==$register.uid&&($contract.createBy==$contract.printerId||$contract.createBy==$contract.supplierId))
+                                <!-- 发货商城 -->
+                                <div class="bg_01 pad_mlr5 mar_b10">
+                                    <div class="hei_32 border_2">
+                                        <p class="fl over_ell"><span>协议名称：$!contract.contractName</span>
+                                        </p>
+
+                                        <p class="fr font_e5">$!statusMap.get($contract.status)</p>
+                                    </div>
+                                    <!-- 发货商城 -->
+                                    <!-- 发货信息 -->
+                                    <div class="border_2 shop_order pad_tb5">
+                                        #foreach($contractMat in $contract.contractMatDTOs)
+                                            <div class="wid_50 fl shop_order_p">
+                                                <p class="fl over_ell">商品编号：
+                                                    <a href="$request.contextPath/product/toDetail?id=$!{contractMat.get('itemId')}&skuId=$!{contractMat.get('skuId')}">
+                                                        $!contractMat.get("skuId")
+                                                    </a>
+                                                </p>
+   												<div class="clear"></div>
+                                                <p class="fl over_ell">商品名称：
+                                                    <a href="$request.contextPath/product/toDetail?id=$!{contractMat.get('itemId')}&skuId=$!{contractMat.get('skuId')}">
+                                                        $!contractMat.get("itemName")
+                                                    </a>
+                                                </p>
+												   <div class="clear"></div>
+                                                <p class="fl over_ell">商品属性：$!{contractMat.get("salerAttr")}</p>
+                                                   <div class="clear"></div>
+                                                <p class="fl over_ell">协议类型：
+                                                 #if("1"==$!contract.protocolType)
+                                                 	单价
+                                                 #end
+                                                 #if("2"==$!contract.protocolType)
+                                                 	数量 ：$!contractMat.get("number")
+                                                 #end
+                                                 #if("3"==$!contract.protocolType)
+                                                 	总价格：￥$!contractMat.get("cost")
+                                                 #end
+                                                </p>
+                                                
+                                            </div>
+                                            <div class="fr lin_24">
+                                                <p>￥$!contractMat.get("matPrice")</p>
+                                            </div>
+                                        #end
+                                        <div class="clear"></div>
+                                    </div>
+                                    <!-- 发货信息 -->
+                                    <p class="hei_34">创建日期：$!date.format('yyyy-MM-dd',$contract.createDate)</p>
+                                    <!-- 按钮 -->
+                                    <div class="pad_tb5">
+                                        <input type="hidden" value="$contract.contractNo">
+                                        #if("未提交"==$statusMap.get($contract.status))
+                                            <button class="button_3 pad_mlr5"
+                                                    onclick="deleteContract('$contract.id','$contract.contractNo','$contract.contractName','$sourcePage')">
+                                                删除协议
+                                            </button>
+                                            <button class="button_3 pad_mlr5"
+                                                    onclick="modifyContract('$contract.id')">
+                                                修改协议
+                                            </button>
+                                            <button class="button_3 pad_mlr5"
+                                                    onclick="confirmContract('$contract.id','重新提交')">
+                                                提交确认
+                                            </button>
+                                        #end
+                                        #if("需要审批"==$statusMap.get($contract.status))
+                                            <button class="button_3 pad_mlr5"
+                                                    onclick="deleteContract('$contract.id','$contract.contractNo','$contract.contractName','$sourcePage')">
+                                                删除协议
+                                            </button>
+                                            <button class="button_3 pad_mlr5"
+                                                    onclick="modifyContract('$contract.id')">
+                                                修改协议
+                                            </button>
+                                            <button class="button_3 pad_mlr5"
+                                                    onclick="approveContract('$contract.id','重新提交')">
+                                                提交审批
+                                            </button>
+                                        #end
+                                        #if("审批驳回"==$statusMap.get($contract.status))
+                                            <button class="button_3 pad_mlr5"
+                                                    onclick="approveContract('$contract.id','重新提交')">提交审批
+                                            </button>
+                                            <button class="button_3 pad_mlr5"
+                                                    onclick="modifyContract('$contract.id')">
+                                                修改协议
+                                            </button>
+                                        #end
+                                        #if("确认驳回"==$statusMap.get($contract.status))
+                                            <button class="button_3 pad_mlr5"
+                                                    onclick="confirmContract('$contract.id','重新提交')">提交确认
+                                            </button>
+                                            <button class="button_3 pad_mlr5"
+                                                    onclick="modifyContract('$contract.id')">
+                                                修改协议
+                                            </button>
+                                        #end
+                                        #if("待发布"==$statusMap.get($contract.status))
+                                            <button class="button_3 pad_mlr5"
+                                                    onclick="confirmContract('$contract.id','发布')">发布协议
+                                            </button>
+                                        #end
+                                        #if("协议生效"==$statusMap.get($contract.status) && $sourcePage=="buyer")
+                                            <button class="button_3 pad_mlr5"  onclick="orderContract('$contract.id')">
+                                                协议下单
+                                            </button>
+                                            
+<!--                                             <button class="button_3 pad_mlr5" -->
+<!--                                                     onclick="modifyContract('$contract.id')"> -->
+<!--                                                 修改协议 -->
+<!--                                             </button> -->
+                                        #end
+                                        #if("协议生效(正在修改)"==$statusMap.get($contract.status))
+                                            <button class="button_3 pad_mlr5"
+                                                    onclick="orderContract('$contract.id')">
+                                                协议下单
+                                            </button>
+                                        #end
+                                        <button class="button_3 pad_mlr5"
+                                                onclick="showContractDetail('$contract.id')">
+                                            查看详情
+                                        </button>
+                                        <div class="clear"></div>
+                                    </div>
+                                </div>
+                            #elseif("待确认"==$statusMap.get($contract.status)||"确认驳回"==$statusMap.get($contract.status)||
+                                "待发布"==$statusMap.get($contract.status)||"协议生效"==$statusMap.get($contract.status))
+                                <!-- 发货商城 -->
+                                <div class="bg_01 pad_mlr5 mar_b10">
+                                    <div class="hei_32 border_2">
+                                        <p class="fl"><span>协议名称：$!contract.contractName</span>
+                                        </p>
+
+                                        <p class="fr font_e5">$!statusMap.get($contract.status)</p>
+                                    </div>
+                                    <!-- 发货商城 -->
+                                    <!-- 发货信息 -->
+                                    <div class="border_2 shop_order pad_tb5">
+                                        #foreach($contractMat in $contract.contractMatDTOs)
+                                            <div class="wid_50 fl shop_order_p">
+                                                <p>商品名称：
+                                                    <a href="$request.contextPath/product/toDetail?id=$!{contractMat.get('itemId')}&skuId=$!{contractMat.get('skuId')}">
+                                                        $!contractMat.get("itemName")
+                                                    </a>
+                                                </p>
+
+                                                <p>商品属性：$!{contractMat.get("salerAttr")}</p>
+                                            </div>
+                                            <div class="fr lin_24">
+                                                <p>￥$!contractMat.get("matPrice")</p>
+                                            </div>
+                                        #end
+                                        <div class="clear"></div>
+                                    </div>
+                                    <!-- 发货信息 -->
+                                    <p class="hei_34">创建日期：$!date.format('yyyy-MM-dd',$contract.createDate)</p>
+
+                                    <div class="pad_tb5">
+                                        <button class="button_3 pad_mlr5"
+                                                onclick="showContractDetail('$contract.id')">
+                                            查看详情
+                                        </button>
+                                                      #if("协议生效"==$statusMap.get($contract.status))
+                                            <button class="button_3 pad_mlr5"
+                                                    onclick="orderContract('$contract.id')">
+                                                协议下单
+                                            </button>
+                                        #end              
+                                        
+                                        
+                                        <div class="clear"></div>
+                                    </div>
+                                </div>
+                            #end
+                        #end
+                    </div>
+                </div>
+                <!-- 切换内容    1   -->
+                <!-- 切换内容    2   -->
+                <div id="myTab0_Content1" class="none bg_01">
+                    <!-- 表单 -->
+                    <form id="contractCreateForm">
+                        <ul class="pass pad_t3">
+                            <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5">*</span>协议序号</p>
+                                <input name="contractOrderNo" type="text" class="wid_50 form-control hei_20"
+                                       maxlength="75" id="contractOrderNo"/></li>
+                            <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5">*</span>协议名称</p><input
+                                    name="contractName" type="text" class="wid_50 form-control hei_20" maxlength="45"
+                                    id="contractName"/></li>
+                            <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5">*</span>协议开始日期</p><input
+                                    name="beginDate" type="date" class="wid_50 form-control hei_20" id="beginDate"/>
+                            </li>
+                            <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5">*</span>协议终止日期</p><input
+                                    name="endDate" type="date" class="wid_50 form-control hei_20" id="endDate"/></li>
+                                        <li>
+                                <p class="wid_30 fl font_right pad_r5"><span
+                                        class="font_e5">*</span>协议类型</p>
+
+                                <div style="width:60%" class="fl">
+                                    <select id="protocolTypeId" class="wid_30 form-control"
+                                            name="protocolType" onchange="empty();createItemLi();" >
+                                        <option value="1">单价</option>
+                                        <option value="2">数量</option>
+                                        <option value="3">总价值</option>
+                                    </select>
+                                </div>
+                            </li>
+                            #if($sourcePage=="seller")
+                                <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5">*</span>买方</p><input
+                                        onclick="getCompany(1,'company')" name="printerName" id="partBName"
+                                        type="text" class="wid_50 form-control hei_20" readonly="true"/>
+                                    <input type="hidden" name="printerId" id="partBId">
+                                </li>
+                            #elseif($sourcePage=="buyer")
+                                <li><p class="wid_30 fl font_right pad_r5"><span class="font_e5">*</span>卖方</p><input
+                                        onclick="getCompany(1,'company')" name="supplierName" id="partBName"
+                                        type="text" class="wid_50 form-control hei_20" readonly="true"/>
+                                    <input type="hidden" name="supplierId" id="partBId">
+                                </li>
+                            #end
+
+                            <li>
+                                <p class="wid_30 fl font_right pad_r5"><span
+                                        class="font_e5">*</span>账期</p>
+
+                                <div style="width:60%" class="fl">
+                                    <input type="radio" checked="checked" value="0" name="paymentType"
+                                           onclick="radioChange()"/>
+                                    <select id="choseDay" class="wid_30 form-control"
+                                            name="paymentDays">
+                                        <option value=""></option>
+                                        <option value="7">7</option>
+                                        <option value="15">15</option>
+                                        <option value="30">30</option>
+                                        <option value="45">45</option>
+                                        <option value="60">60</option>
+                                        <option value="75">75</option>
+                                        <option value="90">90</option>
+                                        <option value="120">120</option>
+                                        <option value="180">180</option>
+                                    </select>
+                                    <span style="padding-left: 4%;padding-right:4%">天</span>
+                                </div>
+                            </li>
+                            <li>
+                                <p class="wid_30 fl font_right pad_r5" style="height: 50px;"><span
+                                        class="font_e5"></span></p>
+
+                                <div class="fl" style="width:60%">
+                                    <input type="radio" value="1" onclick="radioChange()" name="paymentType"/>
+                                    <select name="paymentMonth" id="choseMonth" disabled="true"
+                                            class="wid_30 form-control">
+                                        <option value=""></option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                    </select>
+                                    <span style="padding-left: 4%;padding-right:4%">月</span>
+                                </div>
+                                <!--创建完毕:0;协议需要审批:1;审批完毕:2;确认完毕:4;-->
+                            </li>
+                        
+                            <li id="uploadLi">
+                                <p class="wid_30 fl font_right pad_r5">附件</p>
+                       
+                                <input type="file" class="wid_50 form-control hei_20" id="fileInput" name="file"
+                                       onchange="startUpload();"/>
+                            </li>
+                              
+           					<div class="clear"></div>
+                            <li><p class="wid_30 fl font_right pad_r5">备注</p><input maxlength="45"
+                                                                                    type="text"
+                                                                                    class="wid_50 form-control"
+                                                                                    name="remark"/></li>
+                            <li><p class="wid_30 fl font_right pad_r5">需要审批</p>
+
+                                <p><input type="checkbox" name="status" value="7"
+                                          onclick="showApproveList(this)"/>
+                                    是</p>
+                            </li>
+
+                            <li style="display: none;" id="approveBy">
+                                <p class="wid_30 fl font_right pad_r5">选择审批人</p>
+                                <select id="approveList" class="wid_55 form-control" name="approveBy" disabled="disabled">
+                                	#foreach($childUserListPost in $approveList)
+                                		<option value="$childUserListPost.userId">$childUserListPost.username</option>
+                                	#end
+                                </select>
+                            </li>
+                            <div class="clear"></div>
+                                     <input type="hidden" id="annexcc" name="annexcc"/>
+                                       <input type="hidden" id="annex" name="annex"/>
+                        </ul>
+                    </form>
+                    <!-- 表单 end-->
+                    <!-- table -->
+                    <div>
+                        <div id="itemList">
+                        </div>
+                        <div class="wid_100 hei_32 font_cen"
+                             onclick="showItemSearchDIV()">
+                            <span>点击新增商品</span><i class="fa fa-plus-circle"></i>
+                        </div>
+
+                    </div>
+                    <!-- table -->
+                    <div class="font_right">
+                        <button class="hei_32 pad_lr10 button_1" onclick="addContractInfo()">保存</button>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <!-- 切换内容    2   -->
+                <!-- 切换内容    3   -->
+                <div id="myTab0_Content2" class="none">
+                    <div>
+                    ##                        <div class="fr mar_lr5" style="padding-top:4%"></div>
+                    ##                        <div class="clear"></div>
+                        <div id="searchForm2" class="bg_01">
+                            <form id="contractSearchForm">
+                                <ul class="font_t pad_lr5">
+                                    #if($sourcePage=="seller")
+                                        <li class="hei_32"><p class="wid_25 fl font_right pad_r5"><a href="#">买方</a></p>
+                                            <input
+                                                    name="printerName"
+                                                    class="form-control wid_50 hei_20"
+                                                    onclick="getCompany(0,'company')"
+                                                    readonly="true"/>
+                                        </li>
+                                    #elseif($sourcePage=="buyer")
+                                        <li class="hei_32"><p class="wid_25 fl font_right pad_r5"><a href="#">卖方</a></p>
+                                            <input
+                                                    name="supplierName"
+                                                    class="form-control wid_50 hei_20"
+                                                    onclick="getCompany(0,'company')"
+                                                    readonly="true"/>
+                                        </li>
+                                    #end
+                                    <input type="hidden" name="printerId"/>
+                                    <input type="hidden" name="supplierId"/>
+                                    <li class="hei_32"><p class="wid_25 fl font_right pad_r5"><a href="#">商品名称</a></p>
+                                        <input
+                                                name="itemName"
+                                                class="form-control wid_50 hei_20"/>
+                                    </li>
+                                    <li class="hei_32"><p class="wid_25 fl font_right pad_r5"><a href="#">协议名称</a></p>
+                                        <input
+                                                name="contractName"
+                                                class="form-control wid_50 hei_20"/>
+                                    </li>
+                                </ul>
+                            </form>
+                            <div style="overflow:hidden;" class=" font_cen">
+                                <button class="button_1 pad_lr5 hei_32" onclick="searchContractInfoByCondition(1)">
+                                    协议查询
+                                </button>
+                                <button class="button_1 pad_lr5 hei_32" onclick="reset()">
+                                    重置
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 表格 -->
+                    <div id="contractApproveList">
+
+                    </div>
+                    <!-- 表格 -->
+                </div>
+                <!-- 切换内容    3   -->
+                <!-- 切换内容    4   -->
+                <div id="myTab0_Content3" class="none">
+                    <div>
+                        <div id="searchForm3" class="bg_01">
+                            <form id="contractSearchForm">
+                                <ul class="font_t pad_lr5">
+                                    #if($sourcePage=="seller")
+                                        <li class="hei_32">
+                                            <p class="wid_25 fl font_right pad_r5">买方</p>
+                                            <input
+                                                    name="printerName"
+                                                    class="form-control wid_50 hei_20"
+                                                    onclick="getCompany(0,'company')"
+                                                    readonly="true"/>
+                                        </li>
+                                    #elseif($sourcePage=="buyer")
+                                        <li class="hei_32">
+                                            <p class="wid_25 fl font_right pad_r5">卖方</p><input
+                                                name="supplierName"
+                                                class="form-control wid_50 hei_20"
+                                                onclick="getCompany(0,'company')"
+                                                readonly="true"/>
+                                        </li>
+                                    #end
+                                    
+                                    <input type="hidden" name="companyName" id="companyName"/>
+                                    <input type="hidden" name="printerId"/>
+                                    <input type="hidden" name="supplierId"/>
+                                    <li class="hei_32"><p class="wid_25 fl font_right pad_r5">商品名称</p><input
+                                            name="itemName"
+                                            class="form-control wid_50 hei_20"/>
+                                    </li>
+                                    <li class="hei_32"><p class="wid_25 fl font_right pad_r5">协议名称</p><input
+                                            name="contractName"
+                                            class="form-control wid_50 hei_20"/>
+                                    </li>
+                                </ul>
+                            </form>
+                            <div style="overflow:hidden;" class=" font_cen">
+                                <button class="button_1 pad_lr5 hei_32" onclick="searchContractInfoByCondition(2)">
+                                    协议查询
+                                </button>
+                                <button class="button_1 pad_lr5 hei_32" onclick="reset()">
+                                    重置
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 表格 -->
+                    <div id="contractConfirmList">
+
+                    </div>
+                    <!-- 表格 -->
+                </div>
+                <!-- 切换内容    4   -->
+            </div>
+        </div>
+    </div>
+    <!-- 中间内容 end-->
+    <!-- 公司选择弹出层 Start-->
+    <div id="Idiv" class="bombbox">
+        <div class="bombbox_bg">
+            <div style="text-align: center;width:100%;border-bottom: 1px solid #eee;">
+               #* <p class="fl po_re wid_100 hei_32">
+                    <input style="padding: 5px 5%;height:20px; line-height: 20px;border-radius: 0px; box-shadow: none; background:none;" name="company" onblur="if(this.value=='')value='请输入要查询的公司名称';"
+                                                          onfocus="if(this.value=='请输入要查询的公司名称')value='';"
+                                                          value='请输入要查询的公司名称'
+                                                          type="text" class="wid_95"/>
+                    <i class="fa-search font_1_2 fa-user2 po_ab" style="padding-top: 3%" onclick="searchCompany()"></i>
+                </p>*#
+
+
+                <div class="purchase">
+                    <div class="fl po_ab " style="left: 46px;right:35px;top:0;bottom: 0;">
+                        <div class="po_ab form-contro3" style="">
+                            <input type="text" placeholder="请输入要查询的公司名称" id="searchInput" name="company" class="form-contro2 po_ab" style="left:20px;top:5px;width:75%;"/>
+                        </div>
+                        <i onclick="" class="fa-search font_1_2 fa-user2 po_ab" style="top:0px;"></i>
+                        <i onclick="searchCompany()" class="font_1_2 po_ab" style="right: 12px;">搜索</i>
+                    </div>
+                </div><!-- 头部 -->
+
+
+                <input type="hidden" id="IdivOperate">
+            </div>
+            <div class="clear"></div>
+            <div id="company" class="wrapper">
+                <div class="scroller">
+                    <div id="pullDowncompany">
+                        <span class="pullDownIcon"></span><span id="pullDownLabelcompany"
+                                                                class="pullDownLabel">下拉刷新...</span>
+                    </div>
+                    <div class="pad_lr5 bg_01" id="partBDetailcompany">
+
+                    </div>
+                    <div id="pullUp">
+                        <span class="pullUpIcon"></span><span class="pullUpLabel"
+                                                              id="pullUpLabelcompany">上拉加载更多...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        <div style="width:100%;position: fixed;z-index: 999999;bottom: 0;left:0;">
+            <button style="float:left;width:100%" class="button_r pad_lr5" id="companyCloseButton"
+                    onclick="closeDiv(this)">
+                <span style="font-weight:bold;font-size:16px;">取消</span>
+            </button>
+
+        </div>
+    </div>
+    <!-- 公司选择弹出层 End-->
+
+    <!-- 协议详情弹出层 Start -->
+    <div id="contractDetailsDIV" class="bombbox">
+        <div class="bombbox_bg" style="overflow: auto">
+            <div style="text-align:center;float:left;width:100%;border-bottom: 1px solid #eee">
+                <span style="font-size:20px;font-weight:bold; line-height: 32px;">协议详情</span>
+            </div>
+            <div class="clear"></div>
+            <div id="contractDetailList" style="padding-bottom: 10%">
+
+            </div>
+        </div>
+        <div style="width:100%;position: fixed;z-index: 999999;bottom: 0;left:0;">
+            <button style="float:left;width:100%" class="button_r pad_lr5" id="infoButton" onclick="closeDiv(this)">
+                <span style="font-weight:bold;font-size:16px;">取消</span>
+            </button>
+        </div>
+
+    </div>
+    <!-- 协议详情弹出层 End -->
+    <!-- 协议下单弹出层 Start -->
+    <div id="orderContractDIV" class="bombbox">
+        <div class="bombbox_bg" style="overflow: auto">
+            <div style="float:left;width:100%;border-bottom: 1px solid #eee">
+                <span style="float:left;font-size:20px;font-weight:bold; line-height: 32px;margin-right:5%;">协议下单</span>
+            </div>
+            <div class="clear"></div>
+            <form action="$request.contextPath/orderWx/getShopCart" id="contractOrderForm" method="post">
+                <input type="hidden" name="orderType" id="orderType"/>
+                <input type="hidden" name="contractNo" id="orderContractNo"/>
+            </form>
+            <div id="orderContract">
+
+            </div>
+        </div>
+
+        <div style="width:100%;position: fixed;z-index: 999999;bottom: 0;left:0;background:white;margin:auto">
+            <div style="padding-left:22%">
+                <button class="hei_32 pad_lr10 button_2" id="orderCloseButton" onclick="closeOrderDiv(this)">
+                    <span style="font-weight:bold;font-size:16px;">取消</span>
+                </button>
+                <button class="hei_32 pad_lr10 button_1" onclick="orderItem()">
+                    <span style="font-weight:bold;font-size:16px;">确定</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- 协议下单弹出层 End -->
+    <!-- 商品搜索弹出层 Start -->
+    <div id="itemSearchDIV" class="bombbox">
+        <!-- 头部 -->
+        <div class="bombbox_bg" style="overflow: auto">
+            #*<div class="purchase hei_50 bg_02" style="top:0px;position:fixed">
+                <p class="fl mar_lr4 font_cen"><i class="fa fa-list-ul font_1_5"
+                                                  onclick="toggleMenu();return false;"></i>
+                </p>
+
+                <p class="fl po_re wid_67"><input id="keyWord" onchange="changeKeyWord();" value="$!content"
+                                                  type="text" class="form-contro2 wid_95"/>
+                    <i class="fa-search font_1_2 fa-user2 po_ab" style="padding-top: 5%"></i>
+                </p>
+            </div>
+            <!-- 头部 -->*#
+
+
+                <div class="purchase">
+                    <p class="fl mar_lr4 font_cen" style="line-height: 14px;  padding-top: 12px;" onclick="toggleMenu();">
+                        <i class="fa fa-list-ul font_1_5" ></i>
+                        <br/>
+                        <i class="font_7_5" style="margin-left: -4px;">频道</i>
+                    </p>
+                    <div class="fl po_ab " style="left: 46px;right:35px;top:0;bottom: 0;">
+                        <div class="po_ab form-contro3" style="">
+                            <input type="text" id="keyWord" onchange="changeKeyWord();" class="form-contro2 po_ab" value="$!content" style="left:20px;top:5px;width:75%;"/>
+                        </div>
+                        <i onclick="" class="fa-search font_1_2 fa-user2 po_ab" style="top:0px;"></i>
+                        <i onclick="changeKeyWord()" class="font_1_2 po_ab" style="right: 12px;">搜索</i>
+                    </div>
+                </div><!-- 头部 -->
+
+
+
+
+            <div id="navigation" class=""
+                 style="z-index:9999;position:fixed;top:50px; #if($showMenu == $0)display:none;#end">
+                <ul id="list">
+                    #foreach($item1 in $itemList)
+                        <li><a href="#" onclick="showItem(this,2);return false;" categoryCid="$item1.categoryCid"><span
+                                class="font_e5 mar_r2">|</span>$item1.categoryCName</a>
+                            <ul class="myHide" isItem2 parentId="$item1.categoryCid">
+                                #foreach($item2 in $item1.children)
+                                    <li><a href="#" onclick="return false;"
+                                           class="font_e5 font_8_5">$item2.categoryCName</a></li>
+                                    <li class="border_2" isItem3 parentId="$item2.categoryCid">
+                                        <a>
+                                            #foreach($item3 in $item2.children)
+                                                <span style=""
+                                                      onclick="loadItem('$item3.categoryCid')">$item3.categoryCName</span>
+                                            #end
+                                        </a>
+                                    </li>
+                                #end
+                            </ul>
+                        </li>
+                    #end
+                </ul>
+            </div>
+            <div class="clear"></div>
+            <div id="itemSearchResult" style="overflow: auto;padding:18% 0 18% 0; ">
+
+            </div>
+        </div>
+        <div style="width:100%;position: fixed;z-index: 999999;bottom: 0;left:0;background:white;margin:auto">
+            <div style="padding-left:22%">
+                <button class="hei_32 pad_lr10 button_2" onclick="closeItemSearchDIV()">
+                    <span style="font-weight:bold;font-size:16px;">取消</span>
+                </button>
+                <button class="hei_32 pad_lr10 button_1" onclick="createItemLi()">
+                    <span style="font-weight:bold;font-size:16px;">确定</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- 商品搜索弹出层 End -->
+    <!-- 确认提示框 -->
+    <div id="confirmDIV" class="bombbox">
+        <div class="bombbox_bg">
+            <div style="float:left;width:100%;border-bottom: 1px solid #eee">
+                <span style="float:left;font-size:20px;font-weight:bold; line-height: 32px;margin-right:5%;">操作提醒</span>
+            </div>
+            <div class="clear"></div>
+            <div id="confirmContent">
+            </div>
+            <div style="width:100%;position: fixed;z-index: 999;bottom: 0;left:0;">
+                <button style="float:left;width:100%;background: red" class="button_r pad_lr5"
+                        onclick="closeMessageDiv(this)">
+                    <span style="font-weight:bold;font-size:16px;">确定</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="item">
+
+        <a href="#">
+
+
+        </a>
+
+        <div class="delete"></div>
+
+    </div>
+    <!-- 确认提示框 -->
+
+    <!-- 商品搜索弹出层 End -->
+
+</div>
+    #parse("common/footer.vm")
+</body>
+<script>
+    var uType = $("#userType").val();
+</script>
+</html>

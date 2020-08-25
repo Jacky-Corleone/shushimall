@@ -1,0 +1,673 @@
+<script type="text/javascript">
+$(function(){
+	//初始化验证
+	initValidPluginBusiness();
+	//初始化页面
+	initBusiness();
+
+	/* 暂存：营业执照信息 */
+	$("#businessBtn").click(function(){
+		//营业执照信息 营业执照有效期至
+		if($("#businessLicenceIndate").val() == '长期有效'){
+			$("#businessLicenceIndate").val('');
+		}
+		//收集数据：营业执照信息
+		collectDataBusiness();
+		//暂存操作
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			url:"$request.contextPath/information/registerSeller/stagingInformation",
+			data:$("#businessForm").serializeArray(),
+			success: function(data){
+				alert(data.result);
+			}
+		});
+	});
+
+	//下拉菜单:营业执照所在地/公司所在地
+	$("#businessLicence_provinces").change(function(){
+		/* $("#businessLicence_area").empty().append($("<option>").text("请选择").val("")); */
+		optionItems("$request.contextPath/information/register/queryAddress",$("#businessLicence_provinces").val(),"businessLicence_city","");
+	});
+	/* $("#businessLicence_city").change(function(){
+		optionItems("$request.contextPath/information/register/queryAddress",$("#businessLicence_city").val(),"businessLicence_area","");
+	}); */
+	$("#company_provinces").change(function(){
+		/* $("#company_area").empty().append($("<option>").text("请选择").val("")); */
+		optionItems("$request.contextPath/information/register/queryAddress",$("#company_provinces").val(),"company_city","");
+	});
+	/* $("#company_city").change(function(){
+		optionItems("$request.contextPath/information/register/queryAddress",$("#company_city").val(),"company_area","");
+	}); */
+	//营业执照有效期:长期有效
+	$("#timeState").change(function(){
+		setTimeStateChange();
+	});
+	//企业是否有融资需求
+	$("#isFinancingCheckbox").change(function(){
+		if($('#isFinancingCheckbox').is(':checked')){
+			$("#isFinancing").val('1');
+			$("#financingNum_li").show();
+		}else{
+			$("#isFinancing").val('0');
+			$("#financingNum_li").hide();
+		}
+		$("#financingNum").focus();
+		$("#financingNum").blur();
+	});
+	
+	    //是否三证合一   
+		$('input:radio[name="isSanzhengRadio"]').click(function(){
+		   $('input:radio[name="isSanzhengRadio"]').each(function(){
+			     if($(this).attr("checked")&&$(this).val()==1){
+			        $("#isSanzheng").val('1');
+					$("#xinYong_li").show();
+					$("#isSanzhengHide").hide();//注册号(营业执照号) 隐藏
+					$("#hideOrganizationDiv").hide();//隐藏组织机构代码信息页面
+					$("#hideTaxForm").hide();//隐藏税务登记证信息页面
+			    }else if($(this).attr("checked")&&$(this).val()==0){
+			        $("#isSanzheng").val('0');
+					$("#xinYong_li").hide();
+					$("#isSanzhengHide").show();//注册号(营业执照号) 显示
+					$("#hideOrganizationDiv").show();//显示组织机构代码信息页面
+					$("#hideTaxForm").show();//隐藏税务登记证信息页面
+			    }
+			    $("#unifiedCreditCode").focus();
+				$("#unifiedCreditCode").blur();
+	        })
+		})
+	
+});
+
+/*初始化页面*/
+function initBusiness(){
+	//证件类型
+	if("$!userBusinessDTO.idCardType"!=null && "$!userBusinessDTO.idCardType"!=""){
+		$("#idCardType").val("$!userBusinessDTO.idCardType");
+	}
+	//营业执照有效期至-长期有效
+	if("$!userBusinessDTO.neverExpires"==null || "$!userBusinessDTO.neverExpires"==""){
+
+	}else if("$!userBusinessDTO.neverExpires"=="2"){
+	 	$("#timeState").attr("checked",'true');
+	}else if("$!userBusinessDTO.neverExpires"=="1"){
+		$("#businessLicenceIndate").val("$!date.format('yyyy-MM-dd',$!userBusinessDTO.businessLicenceIndate)");
+	}else if("$!userBusinessDTO.businessLicenceIndate"==null || "$!userBusinessDTO.businessLicenceIndate"==""){
+		$("#timeState").attr("checked",'true');
+	}else {
+		$("#businessLicenceIndate").val("$!date.format('yyyy-MM-dd',$!userBusinessDTO.businessLicenceIndate)");
+	}
+	setTimeState();
+	//公司电话
+	if("$!userBusinessDTO.companyPhone"!=null && "$!userBusinessDTO.companyPhone"!="" ){
+		var companyPhone = "$!userBusinessDTO.companyPhone";
+		var strs = companyPhone.split("-");
+		if(strs.length>0){
+			$("#area").val(strs[0]);
+		}
+		if(strs.length>1){
+			$("#phone").val(strs[1]);
+		}
+	}
+	//经营范围
+	$("input[name='businessScope']").val("$!userBusinessDTO.businessScope".split(","));
+	//营业执照所在地
+	if("$!userBusinessDTO.businessLicenceAddress" != null && "$!userBusinessDTO.businessLicenceAddress" != "" ){
+		initAddress("$!userBusinessDTO.businessLicenceAddress","businessLicence_provinces","businessLicence_city","businessLicence_area");
+	}
+	//公司所在地
+	if("$!userBusinessDTO.companyAddress" !=null && "$!userBusinessDTO.companyAddress" != "" ){
+		initAddress("$!userBusinessDTO.companyAddress","company_provinces","company_city","company_area");
+	}
+	//企业是否有融资需求
+	if("$!userBusinessDTO.isFinancing"=="1" ){
+		$("#isFinancingCheckbox").attr("checked",'true');
+		$("#financingNum_li").show();
+	}
+	//是否三证合一	        
+	if("$!userBusinessDTO.isSanzheng"=="1" ){
+	    $('input:radio[name="isSanzhengRadio"]').each(function(){
+	         if($(this).val()==1){
+	            $(this).attr("checked",'true');
+	            $("#xinYong_li").show();
+	            $("#isSanzhengHide").hide();//注册号(营业执照号) 隐藏
+	            $("#hideOrganizationDiv").hide();//隐藏组织机构代码信息页面
+				$("#hideTaxForm").hide();//隐藏税务登记证信息页面
+	         }
+	    })
+	}else if("$!userBusinessDTO.isSanzheng"=="0" ){
+		$('input:radio[name="isSanzhengRadio"]').each(function(){
+	         if($(this).val()==0){
+	            $(this).attr("checked",'true');
+	            $("#xinYong_li").hide();
+	             $("#isSanzhengHide").show();//注册号(营业执照号) 显示
+	            $("#hideOrganizationDiv").show();//隐藏组织机构代码信息页面
+				$("#hideTaxForm").show();//隐藏税务登记证信息页面
+	         }
+	    })
+	}
+}
+
+/*收集数据：营业执照信息*/
+function collectDataBusiness(){
+	//营业执照有效期至-长期有效
+	if($('#timeState').is(':checked')){
+		$("#neverExpires").val(2);
+	} else {
+		$("#neverExpires").val(1);
+	}
+	//经营范围
+	var str = "";
+	$("input[name='businessScope']:checked").each(function(){
+		str += $(this).val()+",";
+	});
+	$("#businessScope").val(str);
+	//电话号码
+	$("#companyPhone").val($("#area").val()+"-"+$("#phone").val());
+	//营业执照所在地/公司所在地
+    buildLicenceAddr();
+	//公司所在地信息
+    buildCompanyAddr();
+	//企业是否有融资需求
+	if($('#isFinancingCheckbox').is(':checked')){
+		$("#isFinancing").val('1');
+	} else {
+		$("#isFinancing").val('0');
+	}
+}
+
+/*营业执照有效期:长期有效*/
+function setTimeState(){
+	if($('#timeState').is(':checked')) {
+		$("#businessLicenceIndate").val("长期有效").attr("disabled",false);
+		$("#businessLicenceIndate").unbind("click");
+	}else{
+		$("#businessLicenceIndate").attr("placeholder","");
+		$("#businessLicenceIndate").bind("click",function(){
+			WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});
+		});
+	}
+}
+
+
+/*营业执照有效期:长期有效*/
+function setTimeStateChange(){
+	if($('#timeState').is(':checked')) {
+		$("#businessLicenceIndate").val("长期有效").attr("disabled",false);
+		$("#businessLicenceIndate").unbind("click");
+	}else{
+		$("#businessLicenceIndate").val("").attr("placeholder","");
+		$("#businessLicenceIndate").bind("click",function(){
+			WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});
+		});
+	}
+}
+
+/*初始化校验控件*/
+function initValidPluginBusiness(){
+	$("#businessForm").validate({
+		rules: {
+			"userBusinessDTO.companyName":{
+                companyName:true,
+				required: true
+			},
+			"userBusinessDTO.registeredCapital":{
+                registeredCapital:true,
+				required: true
+			},
+			"userBusinessDTO.artificialPersonName":{
+                //artificialPersonName:true,
+				required: true,
+                maxlength:100
+			},
+			"userBusinessDTO.idCardNum":{
+                idCardNum:true,
+				required: true
+			},
+			"userBusinessDTO.businessLicenceId":{
+                businessLicenceId:true,
+                maxlength:20,
+				required: true
+			},
+			"userBusinessDTO.unifiedCreditCode":{
+                unifiedCreditCode:true,
+                maxlength:18,
+				required: true
+			},
+			"userBusinessDTO.businessLicenceIndate":{
+				required: true
+			},
+			"businessLicence_provinces":{
+				required: true
+			},
+			"businessLicence_city":{
+				required: true
+			},
+			/* "businessLicence_area":{
+				required: true
+			}, */
+			"userBusinessDTO.businessLicencAddressDetail":{
+                required: true
+			},
+			"userBusinessDTO.businessLicenceDate":{
+				required: true
+			},
+			"area":{
+                area:true,
+				required: true
+			},
+			"phone":{
+				required: true
+			},
+			"userBusinessDTO.linkman":{
+                linkman:true,
+				required: true
+			},
+			"userBusinessDTO.linkmanPhone":{
+                linkmanPhone:true,
+				required: true
+			},
+			"company_provinces":{
+				required: true
+			},
+			"company_city":{
+				required: true
+			},
+			/* "company_area":{
+				required: true
+			}, */
+			"userBusinessDTO.companyDeclinedAddress":{
+                companyDeclinedAddress:true,
+				required: true
+			},
+            "userBusinessDTO.financingNum":{
+                required: function(){return $("#isFinancingCheckbox").is(":checked");}
+            }
+		}
+	});
+   
+    jQuery.validator.addMethod("companyName", function(value, element) {
+        var chrnum = /^[\u4e00-\u9fa5a-zA-Z0-9_\-\—\\(\\)\\（\\）|\w]{4,40}$/;
+        return this.optional(element) || (chrnum.test(value));
+    }, "请填写工商局注册的全称。4-40位字符，可由中英文、数字及”_”、”-”、()、（）组成");
+	
+	
+	
+
+    jQuery.validator.addMethod("registeredCapital", function(value, element) {
+        // var chrnum=/^(([\u4e00-\u9fa5]*[\+]?\d+(\.\d{0,9})?)|([\+]?\d+(\.\d{0,9})?[\u4e00-\u9fa5]*)|([\+]?\d+(\.\d{0,9})?)|([\u4e00-\u9fa5]*))$/;
+        var chrnum = /^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)|([^A-Za-z]))|([^A-Za-z])$/;
+        return this.optional(element) || (chrnum.test(value));
+    }, "企业注册资本由数字、小数点和中文组成");
+
+    /*jQuery.validator.addMethod("artificialPersonName", function(value, element) {
+        var chrnum = /^[\u4e00-\u9fa5a-zA-Z(\S)]{2,20}$/;
+        return this.optional(element) || (chrnum.test(value));
+    }, "输入2-20个字符，可由中文、英文和空格组成");*/
+
+    jQuery.validator.addMethod("idCardNum", function(value, element) {
+       //  var chrnum = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/;
+        var chrnum= /^[A-Za-z0-9]{1,50}$/;
+        return this.optional(element) || (chrnum.test(value));
+    }, "由15-18位数字或者数字字母组成");
+
+    jQuery.validator.addMethod("businessLicenceId", function(value, element) {
+        var chrnum = /^[0-9-\u4e00-\u9fa5a-zA-Z]{2,20}$/;
+        return this.optional(element) || (chrnum.test(value));
+    }, "营业执照允许输入最多20个字符,最少2个字符");
+     jQuery.validator.addMethod("unifiedCreditCode", function(value, element) {
+        var chrnum = /^[0-9a-zA-Z]{18}$/;
+        return this.optional(element) || (chrnum.test(value));
+    }, "统一社会信用代码仅允许输入18位数字和字母");
+//    jQuery.validator.addMethod("businessLicencAddressDetail", function(value, element) {
+//        var chrnum = /^[\u4e00-\u9fa5|\w]{0,100}$/;
+//        return this.optional(element) || (chrnum.test(value));
+//    }, "请详细填写营业执照地址，如：苏州街20号汇丰大厦A座11层");
+
+    jQuery.validator.addMethod("area", function(value, element) {
+        var chrnum = /^\d{3,4}$/;
+        return this.optional(element) || (chrnum.test(value));
+    }, "请填写公司电话，以便于我们联系，如：0527-88001100！");
+
+    //jQuery.validator.addMethod("phone", function(value, element) {
+    //    var chrnum = /^\d{7,8}$/;
+    //    return this.optional(element) || (chrnum.test(value));
+    //}, "请填写公司电话，以便于我们联系，如：0527-88001100！");
+
+    jQuery.validator.addMethod("linkman", function(value, element) {
+        var chrnum = /^[\u4e00-\u9fa5a-zA-Z]{2,20}$/;
+        return this.optional(element) || (chrnum.test(value));
+    }, "输入2-20个字符，可由中文和英文组成");
+
+    jQuery.validator.addMethod("linkmanPhone", function(value, element) {
+        var chrnum = /^[1]([3|5|7|8][0-9]{1}|59|58|88|89)[0-9]{8}$/;
+        return this.optional(element) || (chrnum.test(value));
+    }, "请正确填写手机号，如：13010008976");
+
+    jQuery.validator.addMethod("companyDeclinedAddress", function(value, element) {
+        var chrnum = /^[\u4e00-\u9fa5\-|\w]{0,100}$/;
+        return this.optional(element) || (chrnum.test(value));
+    }, "请详细填写公司地址，如：苏州街20号汇丰大厦A座11层");
+
+    jQuery.validator.addMethod("financingNum", function(value, element) {
+        var chrnum = /^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)|([^A-Za-z]))|([^A-Za-z])$/;
+        return this.optional(element) || (chrnum.test(value));
+    }, "融资金额由数字、小数点和中文组成");
+
+
+}
+
+//组装营业执照所在地信息
+function buildLicenceAddr(){
+    $("#businessLicenceAddress").val($("#businessLicence_provinces").val()+","+$("#businessLicence_city").val()/* +","+$("#businessLicence_area").val() */);
+}
+
+//组装公司地址所在地信息
+function buildCompanyAddr(){
+    $("#companyAddress").val($("#company_provinces").val()+","+$("#company_city").val()/* +","+$("#company_area").val() */);
+}
+</script>
+
+<!--营业执照信息 start -->
+<form id="businessForm" method="post">
+<div class="bg_07 border-6" >
+<div class="approve_buyer" id="approve_buyer">
+	<h1 class="font_18 mar_20">营业执照信息：</h1>
+	<input name="extendId" type="hidden" value='$!extendId'/>
+	<input name="stagingType" type="hidden" value="1"/>
+	<ul>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>公司名称：</span>
+			<span class="userInfo_class_show">$!userBusinessDTO.companyName</span>
+			<div class="userInfo_class_hide">
+				<input id="companyName" name="userBusinessDTO.companyName" value="$!userBusinessDTO.companyName"
+					type="text" class="input_Style1 wid_250" placeholder="输入公司名称..." maxlength="50"/>
+			</div>
+		</li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>注册资本：</span>
+			<span class="userInfo_class_show">$!userBusinessDTO.registeredCapital 万元</span>
+			<div class="userInfo_class_hide">
+				<input id="registeredCapital" name="userBusinessDTO.registeredCapital" value="$!userBusinessDTO.registeredCapital"
+					type="text" class="input_Style1 wid_250" placeholder="输入注册资本..." maxlength="20"/>万元
+			</div>
+		</li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>法定代表人姓名：</span>
+			<span class="userInfo_class_show">$!userBusinessDTO.artificialPersonName</span>
+			<div class="userInfo_class_hide">
+				<input id="artificialPersonName" name="userBusinessDTO.artificialPersonName" value="$!userBusinessDTO.artificialPersonName"
+					type="text" class="input_Style1 wid_250" placeholder="输入法定代表人姓名..." maxlength="100"/>
+			</div>
+		</li>
+		<li></li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>证件类型：</span>
+			<span class="userInfo_class_show">$!userBusinessDTO.idCardType</span>
+			<div class="userInfo_class_hide">
+				<select id="idCardType" name="userBusinessDTO.idCardType" class="input_Style1 wid_260">
+					<option value="" selected="selected"> 请选择 </option>
+					<option value="内地居民身份证" >内地居民身份证</option>
+					<option value="香港身份证">香港身份证</option>
+					<option value="台湾身份证">台湾身份证</option>
+					<option value="澳门身份证">澳门身份证</option>
+					<option value="军人证件">军人证件</option>
+					<option value="外籍身份证">外籍身份证</option>
+					<option value="护照（中国）">护照（中国）</option>
+					<option value="护照（外国）">护照（外国）</option>
+				</select>
+			</div>
+		</li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>证件号码：</span>
+			<span class="userInfo_class_show">$!userBusinessDTO.idCardNum</span>
+			<div class="userInfo_class_hide">
+				<input id="idCardNum" name="userBusinessDTO.idCardNum" value="$!userBusinessDTO.idCardNum"
+					type="text" class="input_Style1 wid_250" placeholder="输入证件号码..." maxlength="50"/>
+			</div>
+		</li>
+	</ul>
+	<ol>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>经营范围：</span>
+			<span class="userInfo_class_show">$!userBusinessDTO.businessScope</span>
+			<div class="userInfo_class_hide">
+			<div class="regist_item_ifo">
+				<i><input name="businessScope" type="checkbox" value="书刊印刷" />书刊印刷</i>
+				<i><input name="businessScope" type="checkbox" value="包装印刷" />包装印刷</i>
+				<i><input name="businessScope" type="checkbox" value="数字印刷" />数字印刷</i>
+				<i><input name="businessScope" type="checkbox" value="商业印刷" />商业印刷</i>
+				<i><input name="businessScope" type="checkbox" value="报业印刷" />报业印刷</i>
+				<i><input name="businessScope" type="checkbox" value="标签印刷" />标签印刷</i>
+				<i><input name="businessScope" type="checkbox" value="票据印刷" />票据印刷</i>
+				<i><input name="businessScope" type="checkbox" value="特种印刷" />特种印刷</i>
+				<i><input name="businessScope" type="checkbox" value="广告设计" />广告设计</i>
+				<i><input name="businessScope" type="checkbox" value="专项印刷" />专项印刷</i>
+				<i><input name="businessScope" type="checkbox" value="其他" />其他</i>
+			</div>
+			</div>
+			<input id="businessScope" name="userBusinessDTO.businessScope" type="hidden" />
+		</li>
+	</ol>
+	<ul>
+		<li>
+			<span class="buyer_left"><i class="demo-icons font_fs">*</i>营业执照所在地：</span>
+			<span class="userInfo_class_show">$!fianalBusinessLicenceAddress</span>
+			<div class="userInfo_class_hide">
+				<select id="businessLicence_provinces" name="businessLicence_provinces" class="input_Style1 wid_80">
+					<option value="" selected="selected"> 请选择 </option>
+					#foreach($address in $addressList)
+					    <option value="$!address.code"> $!address.name </option>
+					#end
+				</select>
+				<i>-</i>
+				<select id="businessLicence_city" name="businessLicence_city" class="input_Style1 wid_80">
+					<option value="" selected="selected"> 请选择 </option>
+				</select>
+				<!-- <i>-</i> -->
+				<!-- <select id="businessLicence_area" name="businessLicence_area" class="input_Style1 wid_80">
+					<option value="" selected="selected"> 请选择 </option>
+				</select> -->
+			</div>
+			<input id="businessLicenceAddress" name="userBusinessDTO.businessLicenceAddress" type="hidden" />
+		</li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>营业执照详细地址：</span>
+			<span class="userInfo_class_show">$!userBusinessDTO.businessLicencAddressDetail</span>
+			<div class="userInfo_class_hide">
+				<input name="userBusinessDTO.businessLicencAddressDetail" type="text" maxlength="30" class="input_Style1 wid_250"
+					placeholder="输入营业执照地址，如：苏州街20号汇丰大厦A座11层." value="$!userBusinessDTO.businessLicencAddressDetail" />
+			</div>
+		</li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>成立日期：</span>
+			<span class="userInfo_class_show">$!date.format('yyyy-MM-dd',$!userBusinessDTO.businessLicenceDate)</span>
+			<div class="userInfo_class_hide">
+				<input id="businessLicenceDate" name="userBusinessDTO.businessLicenceDate" value="$!date.format('yyyy-MM-dd',$!userBusinessDTO.businessLicenceDate)"
+					readonly="readonly" type="text" class="input_Style1 wid_250" placeholder="输入成立日期..." maxlength="50" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+			</div>
+		</li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>公司电话：</span>
+			<span class="userInfo_class_show">$!userBusinessDTO.companyPhone</span>
+			<div class="userInfo_class_hide">
+				<input id="area" name="area" type="text" class="input_Style1 wid_60" placeholder="输入区号" maxlength="4"/>
+				<i>-</i>
+				<input id="phone" name="phone" type="text" class="input_Style1 wid_160" placeholder="输入公司电话..."/>
+			</div>
+			<input id="companyPhone" name="userBusinessDTO.companyPhone" type="hidden" />
+		</li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>联系人：</span>
+			<span class="userInfo_class_show">$!userBusinessDTO.linkman</span>
+			<div class="userInfo_class_hide">
+				<input id="linkman" name="userBusinessDTO.linkman" value="$!userBusinessDTO.linkman" type="text"
+					class="input_Style1 wid_250" placeholder="输入联系人..." maxlength="10"/>
+			</div>
+		</li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>联系人手机：</span>
+			<span class="userInfo_class_show">$!userBusinessDTO.linkmanPhone</span>
+			<div class="userInfo_class_hide">
+				<input id="linkmanPhone" name="userBusinessDTO.linkmanPhone" value="$!userBusinessDTO.linkmanPhone"
+					type="text" class="input_Style1 wid_250" placeholder="输入联系人手机..." maxlength="50"/>
+			</div>
+		</li>
+		<li>
+			<span class="buyer_left"><i class="demo-icons font_fs">*</i>公司所在地：</span>
+			<span class="userInfo_class_show">$!finalCompanyAddress</span>
+			<div class="userInfo_class_hide">
+				<select id="company_provinces" name="company_provinces" class="input_Style1 wid_80">
+					<option value="" selected="selected"> 请选择 </option>
+					#foreach($address in $addressList)
+					    <option value="$!address.code"> $!address.name </option>
+					#end
+				</select>
+				<i>-</i>
+				<select id="company_city" name="company_city" class="input_Style1 wid_80">
+					<option value="" selected="selected"> 请选择 </option>
+				</select>
+				<!-- <i>-</i>
+				<select id="company_area" name="company_area" class="input_Style1 wid_80">
+					<option value="" selected="selected"> 请选择 </option>
+				</select> -->
+			</div>
+			<input id="companyAddress" name="userBusinessDTO.companyAddress" type="hidden" />
+		</li>
+		<li>
+			<span class="buyer_left"><i class="demo-icons font_fs">*</i>公司详细地址：</span>
+			<span class="userInfo_class_show">$!userBusinessDTO.companyDeclinedAddress</span>
+			<div class="userInfo_class_hide">
+				<input name="userBusinessDTO.companyDeclinedAddress" type="text" maxlength="30" class="input_Style1 wid_250"
+					placeholder="输入公司详细地址..." value="$!userBusinessDTO.companyDeclinedAddress" />
+			</div>
+		</li>
+		<div class="clear"></div>
+		<li>
+			<span class="font_span">企业是否有融资需求：</span>
+			<span class="userInfo_class_show">#if("$!userBusinessDTO.isFinancing"=="1") (有) #else (无) #end</span>
+			<div class="userInfo_class_hide">
+				<i><input id="isFinancingCheckbox" name="isFinancingCheckbox" type="checkbox" value="1"/></i>
+				<input id="isFinancing" name="userBusinessDTO.isFinancing" type="hidden" />
+			</div>
+		</li>
+		<li id="financingNum_li" style="display: none">
+			<span class="font_span">期望融资额度：</span>
+			<span class="userInfo_class_show">$!userBusinessDTO.financingNum 万元</span>
+			<div class="userInfo_class_hide">
+				<input id="financingNum" name="userBusinessDTO.financingNum" placeholder="输入期望融资额度..."
+					type="text" class="input_Style1 wid_130"  value="$!userBusinessDTO.financingNum"/>万元
+			</div>
+		</li>
+		<div class="clear"></div>
+		<li>
+			<span class="font_span_sanzheng">是否三证合一（营业执照、组织机构代码、税务证明）：</span>
+			<span class="userInfo_class_show">#if("$!userBusinessDTO.isSanzheng"=="1") (是) #else (否) #end</span>
+			<div class="userInfo_class_hide">
+				<i><input  name="isSanzhengRadio" type="radio" value="1"/>是
+				<input  name="isSanzhengRadio" type="radio" value="0" />否</i>
+				<input id="isSanzheng" name="userBusinessDTO.isSanzheng" type="hidden" value="$!userBusinessDTO.isSanzheng" />
+			</div>
+		</li>
+		<div class="clear"></div>
+		<li id="xinYong_li" style="display: none">
+			<span class="font_span">统一社会信用代码：</span>
+			<span class="userInfo_class_show">$!userBusinessDTO.unifiedCreditCode</span>
+			<div class="userInfo_class_hide">
+				<input id="unifiedCreditCode" name="userBusinessDTO.unifiedCreditCode" 
+					type="text" class="input_Style1 wid_130"  value="$!userBusinessDTO.unifiedCreditCode"/>
+			</div>
+		</li>
+		
+		<li id="isSanzhengHide">
+			<span class="font_span"><i class="demo-icons font_fs">*</i>注册号(营业执照号)：</span>
+			<span class="userInfo_class_show">$!userBusinessDTO.businessLicenceId</span>
+			<div class="userInfo_class_hide">
+				<input id="businessLicenceId" name="userBusinessDTO.businessLicenceId" value="$!userBusinessDTO.businessLicenceId"
+					type="text" class="input_Style1 wid_250" placeholder="输入注册号（营业执照号）..." maxlength="20"/>
+			</div>
+		</li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>营业执照有效期至：</span>
+			<span class="userInfo_class_show">
+                #if($!userBusinessDTO.businessLicenceIndate)
+                    $!date.format('yyyy-MM-dd HH:mm:ss ',$!userBusinessDTO.businessLicenceIndate)
+                #else
+                                                 长期有效
+                #end
+			</span>
+			<div class="userInfo_class_hide">
+				<input id="businessLicenceIndate" name="userBusinessDTO.businessLicenceIndate" value="$!userBusinessDTO.businessLicenceIndate"
+					type="text" readonly="readonly" maxlength="20" class="input_Style1 wid_180" />
+				<i><input id="timeState" name="userBusinessDTO.timeState" type="checkbox" value="1" /></i>长期有效
+			</div>
+			<input id="neverExpires" name="userBusinessDTO.neverExpires" type="hidden" />
+		</li>
+		
+		<div class="clear"></div>
+		<span style="color: red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;提示:&nbsp;上传图片仅支持JPG、JPEG、PNG、BMP格式，上传图片大小不得超过1M</span>
+		<div class="clear"></div>
+		<div class="fl">
+			<li>
+				<p class="font_span"><i class="demo-icons font_fs">*</i>营业执照副本电子版：</p>
+				<img id="businessLicencePicSrcImg" src="$!imageServerAddr$!userBusinessDTO.businessLicencePicSrc"
+					alt="" width="55" height="55" class="mar_lr10 fl po_re_img" title="点击查看大图">
+				<div class="userInfo_class_hide">
+				<p class="hei_40 fl registere_class_hide z-upload">
+					<button type="button" class="button_4 font_12 border-1 button_small">上传图片</button>
+					<input type="file" id="businessLicencePicSrcFile" class="file-img" name="file"
+						onchange="startUpload('businessLicencePicSrcFile','businessLicencePicSrcImg','businessLicencePicSrc')">
+				</p>
+				</div>
+				<input id="businessLicencePicSrc" name="userBusinessDTO.businessLicencePicSrc" type="hidden" value="$!userBusinessDTO.businessLicencePicSrc" />
+			</li>
+			<div class="clear"></div>
+			<li>
+				<p class="font_span"><i class="demo-icons font_fs">*</i>法人身份证（正面）：</p>
+				<img id="artificialPersonPicSrcImg" src="$!imageServerAddr$!userBusinessDTO.artificialPersonPicSrc"
+					alt="" width="55" height="55" class="mar_lr10 fl po_re_img" title="点击查看大图">
+				<div class="userInfo_class_hide">
+				<p class="hei_40 fl registere_class_hide z-upload">
+					<button type="button" class="button_4 font_12 border-1 button_small">上传图片</button>
+					<input type="file" id="artificialPersonPicSrcFile" class="file-img" name="file"
+						onchange="startUpload('artificialPersonPicSrcFile','artificialPersonPicSrcImg','artificialPersonPicSrc')">
+				</p>
+				</div>
+				<input id="artificialPersonPicSrc" name="userBusinessDTO.artificialPersonPicSrc" type="hidden" value="$!userBusinessDTO.artificialPersonPicSrc"/>
+			</li>
+			<div class="clear"></div>
+			<li style="height:55px;">
+				<p class="font_span"><i class="demo-icons font_fs">*</i>法人身份证（反面）：</p>
+				<img id="artificialPersonPicBackSrcImg" src="$!imageServerAddr$!userBusinessDTO.artificialPersonPicBackSrc"
+					alt="" width="55" height="55" class="mar_lr10 fl po_re_img" title="点击查看大图">
+				<div class="userInfo_class_hide">
+				<p class="hei_40 fl registere_class_hide z-upload">
+					<button type="button" class="button_4 font_12 border-1 button_small">上传图片</button>
+					<input type="file" id="artificialPersonPicBackSrcFile" class="file-img" name="file"
+						onchange="startUpload('artificialPersonPicBackSrcFile','artificialPersonPicBackSrcImg','artificialPersonPicBackSrc')">
+				</p>
+				</div>
+				<input id="artificialPersonPicBackSrc" name="userBusinessDTO.artificialPersonPicBackSrc" type="hidden" value="$!userBusinessDTO.artificialPersonPicBackSrc"/>
+			</li>
+			<div class="clear"></div>
+		</div>
+		#if("$!pageState"!="view")
+		<div class="fl mar_l170">
+			<p><img src="$request.contextPath/assets/images/businessLicencePic.jpg" width="150" height="80" class="po_re_img"/></p>
+			<p><img src="$request.contextPath/assets/images/artificialPersonPic.jpg" width="150" height="80" class="po_re_img"/></p>
+			<p><img src="$request.contextPath/assets/images/artificialPersonPicBack.jpg" width="150" height="80" class="po_re_img"/></p>
+		</div>
+		#end
+	</ul>
+	#if("$!pageState"=="register")
+	<div class="button_2 hei_40 font_14b" style="margin:20px auto" id="businessBtn">暂 存</div>
+	#end
+</div></div>
+</form>
+<!--营业执照信息end-->
+<script type="text/javascript">
+
+   
+
+</script>

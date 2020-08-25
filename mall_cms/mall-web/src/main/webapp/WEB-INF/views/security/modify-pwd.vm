@@ -1,0 +1,386 @@
+#set($staticPath="$request.contextPath/assets")
+#if($!userType == "seller")
+#set($layout = "/seller_layout.vm")
+#else
+#set($layout = "/buyer_layout.vm")
+#end
+<link href="$staticPath/css/register.css" rel="stylesheet" type="text/css"/>
+<link href="$staticPath/css/basic.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="$staticPath/plugin/common/checkPwd.js"></script>
+<script type="text/javascript">
+	$(function(){
+		if("$!userType" == "seller"){
+			$("#leftSeller").load("$request.contextPath/leftSeller");
+		} else {
+			$("#leftBuyer").load("$request.contextPath/leftBuyer");
+		}
+		
+		passwordCheck.initEvent.initPage();
+	});
+	
+	var passwordCheck = 
+	{
+			initEvent:
+			{
+				//初识化
+				initPage:function()
+				{
+					//初识化新密码输入框
+					this.initNewPwdInp();
+					//初识化重复新密码输入框
+					this.initReNewPwdInp();
+					//初识化提交按钮
+					this.initSubmitBtn();
+				},
+				initNewPwdInp:function()
+				{
+					$('#loginpwd_id').keydown(passwordCheck.newPwdkeydown).keyup(passwordCheck.newPwdkeyup).focus(passwordCheck.newPwdfocusOn).blur(passwordCheck.newPwdfocusOut);
+				},
+				initReNewPwdInp:function()
+				{
+					$('#pwd_id').focus(passwordCheck.reNewPwdfocusOn).blur(passwordCheck.reNewPwdfocusOut);
+				},
+				initSubmitBtn:function()
+				{
+					$('#btn_submit_modifypwd').click(passwordCheck.sumitBtnClick);
+				}
+			},
+			
+			newPwdkeydown:function()
+			{
+				
+			},
+			
+			newPwdkeyup:function()
+			{
+				$('#loginpwd_id').checkPwdStrong();
+			},
+			
+			newPwdfocusOut:function()
+			{
+				$('#loginpwd_id').checkPwdOut();
+			},
+			
+			newPwdfocusOn:function()
+			{
+				
+			},
+			
+			reNewPwdfocusOn:function()
+			{
+				$('#pwd_id').reNewPwdfocusOn();
+			},
+			
+			reNewPwdfocusOut:function()
+			{
+				$('#pwd_id').checkPwdToo();
+			},
+			
+			sumitBtnClick:function()
+			{
+				if($('#loginpwd_id').checkPwdOut() && $('#pwd_id').checkPwdToo() && checkCaptcha())
+				{
+					var logname = "$!userinfo.loginname";
+					var backUrl = "$!backUrl";
+					var userType = "$!userType";
+					$("#logname_id").val(logname);
+					$("#backUrl_id").val(backUrl);
+					$("#userType_id").val(userType);
+					$("#from_info_pwd").submit();
+				}
+			}
+	};
+	
+	function verifyOldPwd(thiz){
+		var oldpwd = $(thiz).val();
+		$.ajax({
+		url: "$request.contextPath/security/checkLoginPwd",
+		type: "post",
+		data: {"pwd":oldpwd},
+		dataType: "json",
+		success: function(data){
+		//console.info(data);
+			if(data.success){
+				$("#icon_oldpwd_hint").removeClass("fa-exclamation-circle font_fe").addClass("fa-check-circle font_7a").show();
+			}else{
+				$("#oldpwd_span").html("<span style='color: red'>密码错误</span>");
+			}
+		}
+	});
+	}
+</script>
+<div id="main">
+<!--中间部分开始-->
+
+<!-- left start -->
+#if($!userType == "seller")
+<div id="leftSeller" class="border-4"></div>
+#else
+<div id="leftBuyer" style="width: 198px; float: left;">&nbsp;</div>
+#end
+<!-- left end -->
+
+<!--右边部分开始-->
+<div id="right">
+   <h3>安全信息设置>登录密码修改</h3>
+   <div class="Info border-4 register_content">
+      <form action="$request.contextPath/security/modifypwd" method="post" id="from_info_pwd">
+            <input type="hidden" name="logname" id="logname_id"/>
+            <input type="hidden" name="backUrl" id="backUrl_id" value='$!backUrl'/>
+            <input type="hidden" name="userType" id="userType_id" value='$!userType'/>
+        	<div class="register_box_mid" style="margin-top:40px; width: 640px;">
+                <!--如需增加可循环dl开始-->
+            	<dl>
+                    <dt><i class="demo-icons font_fs">*</i>当前密码：</dt>
+                    <dd style="border:none; width: 470px;" class="po_re">
+                    	<input name="oldpwd" id="oldpwd_id" type="password" maxlength="25" class="input_Style1 wid_180" onBlur="verifyOldPwd(this)"/>
+                    	<i id="icon_oldpwd_hint" style="display: none;" class="fa-exclamation-circle font_16 font_fe"></i><!--前面图标若信息正确就用此图标--> 
+                    	<i id="oldpwd_span" class="msg_span"></i>
+                	<!--表示密码长度的div -->
+                    </dd>
+                </dl>
+                <!--如需增加可循环dl开始-->
+            	<dl>
+                    <dt><i class="demo-icons font_fs">*</i>新密码：</dt>
+                    <dd style="border:none; width: 470px;" class="po_re">
+                    	<input name="loginpwd" id="loginpwd_id" type="password" maxlength="25" class="input_Style1 wid_180" onfocus="$(this).checkPwdIn()" onKeyUp="$(this).checkPwdStrong()" onBlur="$(this).checkPwdOut()" />
+                    	<i id="icon_pwd1_hint" style="display: none;" class="fa-check-circle font_16 font_7a"></i><!--前面图标若信息正确就用此图标--> 
+                    	<i id="loginpwd_span" class="msg_span"></i>
+                		<!--表示密码长度的div -->
+                        <div class="password_length" style="margin-top: 5px;">
+                            <span id="pwd_level_1" class="bg_09 font_12" style="display:none">弱</span><!--密码长度为短就用第一个span -->
+                            <span id="pwd_level_2" class="bg_10 font_12" style="display:none">中</span><!--密码长度为中就用到第一个和第二个span -->
+                            <span id="pwd_level_3" class="bg_11 font_12" style="display:none">强</span><!--密码长度为高就用到第一个和第二个和第三个span -->
+                        </div><!-- password_length end -->
+                    </dd>
+                </dl>
+                <!--如需增加可循环dl结束-->
+            	<dl>
+                    <dt><i class="demo-icons font_fs">*</i>确认密码：</dt>
+                    <dd style="border:none; width: 470px;" class="po_re">
+                    	<input name="pwd" id="pwd_id" type="password" maxlength="25" class="input_Style1 wid_180" />
+                    	<i id="icon_pwd_hint" style="display: none;" class="fa-check-circle font_16 font_7a"></i><!--前面图标若信息正确就用此图标--> 
+                    	<i id="pwd_span"></i>               
+                    </dd>
+                </dl>
+            	<dl>
+                    <dt><i class="demo-icons font_fs">*</i>绑定手机/邮箱：</dt>
+                    <dd style="border:none; width: 470px;"><select id="select_contact_id" class="wid_180 hei_30 input_Style2" ></select>
+                    </dd>
+                </dl>
+            	<dl>
+                    <dt><i class="demo-icons font_fs">*</i>校验码：</dt>
+                    <dd style="border:none; width: 470px;"><input name="captcha" type="text" id="captcha_id" class="input_Style2 hei_30" maxlength="10" style="width: 70px"/>
+                    
+                    
+                    <!--
+					<span class="button_3 hei_35 font_16" style="width: 110px; margin: 0px; vertical-align: middle">
+						<a id="captcha_send" href="javascript:void(0);" onclick="sendCaptcha()" class="font_fe">发送验证码</a>
+					</span>
+                    --> 
+						
+                    <button id="captcha_send" onclick="sendCaptcha()" class="button_4" style="color: #747474; vertical-align: middle;height: 34px; line-height: 34px;" type="button" >获取验证码</button>
+        			<input type="hidden" id="checked">
+                    <input type="hidden" id="code_key" name="codeKey">
+                    <span id="captcha_span" style="color: red; margin-left: 10px;"></span>
+                    </dd>
+                </dl>
+                    <div class="clear"></div>
+                    <div id="btn_submit_modifypwd" class="button_1 hei_40 font_16" style="width: 280px;">提 交</div>
+            </div><!--register_box-->
+        </form>
+   </div> <!--Info end--> 
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->
+
+<script type="text/javascript">
+
+$(function(){
+	
+	var mobile = "$!userinfo.userMobile";
+	var eamil = "$!userinfo.userEmail";
+	var options;
+	if(mobile != ''){
+		options += "<option value='"+2+"'>"+mobile+"</option>";
+	}
+	if(eamil != ''){
+		options += "<option value='"+1+"'>"+eamil+"</option>";
+	}
+	$("#select_contact_id").html(options);
+	if("$!msg" == 1){
+		$("#icon_oldpwd_hint").show();
+		$("#oldpwd_span").html("密码错误");
+		$("#oldpwd_span").css("color","red");
+	}
+	
+	//校验验证码
+	$('#captcha_id').blur(function()
+	{
+		var val = $(this).val();
+		if(val.length == 6)
+		{
+			var codeKey = $('#code_key').val();
+			var data = {code:captcha,codeKey:codeKey};
+			$.ajax({
+				url:"$request.contextPath/captcha/check",
+				type:"post",
+				data:data,
+				dataType: "json",
+				success:function(data){
+					if(!data.message){
+						$("#captcha_span").html("验证码不正确");
+						$('#checked').val('');
+					} else {
+						$("#captcha_span").html("");
+						$('#checked').val('true');
+					}
+				}
+			});
+		}
+	});
+	
+});
+
+$("#oldpwd_id").focusin(function() {
+	$("#icon_oldpwd_hint").hide();
+	$("#oldpwd_span").html("");
+});
+
+function checkPwd(val){
+	$.ajax({
+		type: "post",
+		url: "$request.contextPath/user/checkPwd",
+		data: {"pwd":val},
+		dataType: "json",
+		success: function(data){
+			if(data.success){
+				$("#oldpwd_span").html("");
+			}else{
+				$("#oldpwd_span").html("登录密码输入有误！");
+			}
+			return data.success;
+		}
+	});
+}
+
+function sendCaptcha(){
+	var oldpwd = $("#oldpwd_id").val();
+    //发送验证码过程中不允许切换绑定手机/邮箱
+    $("#select_contact_id").attr("disabled","disabled");
+	
+	if( oldpwd == "" ){
+		$("#oldpwd_span").html("请输入当前密码");
+		return false;
+	}
+	var newPwd = $("#loginpwd_id").val();
+	var repNewPwd = $("#pwd_id").val();
+	if(newPwd == ""){
+		$("#loginpwd_span").html("请输入新密码");
+		return false;
+	}
+	
+	if( newPwd != repNewPwd ){
+		$("#pwd_span").html("两次密码不同，请重新输入");
+		return false;
+	}
+	$.ajax({
+		url: "$request.contextPath/user/checkPwd",
+		type: "post",
+		data: {"pwd":oldpwd},
+		dataType: "json",
+		success: function(data){
+			if(data.success){
+				var contact = $("#select_contact_id option:selected").html();
+				var selected = $("#select_contact_id").val();
+				var smsType = '';
+				if(selected == 1){
+        			smsType = "EMAIL_UP_LOGIN_PWD";	
+        		}else if(selected == 2){
+        			smsType = "UPLOGINPWD";	
+        		}
+				$("#captcha_send").attr("disabled", "disabled");
+				$("#icon_oldpwd_hint").removeClass("fa-exclamation-circle font_fe").addClass("fa-check-circle font_7a").show();
+				$("#oldpwd_span").html("");
+				$("#captcha_send").html("重新发送(90)");
+				sand_timer();
+				$.ajax({
+					timeout:90000,
+					url:"$request.contextPath/captcha/send",
+					type:"post",
+					data: {"contact":contact, "type":selected, "oldpwd":oldpwd, "which":1, 'smsType':smsType},
+					success:function(data){
+						if(data.isOK == 2){
+							$("#code_key").val(data.codeKey);
+						} else if(data.isOK == 1) {
+							window.clearInterval(timer);//去掉定时器 
+							time = 90;
+							$("#captcha_send").removeAttr("disabled");
+							
+							if(data.message!=''){
+            					alert(data.message);
+            				}else{
+            					alert("验证码发送失败");
+            				}
+							
+							$("#captcha_send").html("重新发送");
+						} 
+					}
+				});
+			}else{
+				$("#oldpwd_span").html("密码错误");
+			}
+		}
+	});
+}
+
+function checkCaptcha(){
+		var captcha = $("#captcha_id").val();
+		var captchaFormat = /^[a-zA-Z0-9]{6}$/;
+		if(!captchaFormat.test(captcha)){
+			$("#captcha_span").html("验证码不正确");
+			return false;
+		}
+		var codeKey = $('#code_key').val();
+		var data = {code:captcha,codeKey:codeKey};
+		$.ajax({
+            async: false,
+			url:"$request.contextPath/captcha/check",
+			type:"post",
+			data:data,
+			dataType: "json",
+			success:function(data){
+				if(!data.message){
+					$("#captcha_span").html("验证码不正确");
+					$('#checked').val('');
+				} else {
+					$("#captcha_span").html("");
+					$('#checked').val('true');
+				}
+			}
+		});
+		return $('#checked').val() == 'true' ;
+	}
+
+var time = 90;
+var timer;
+function sand_timer(){
+	timer = window.setInterval(showalert, 1000); 
+}
+
+function showalert()
+{
+	time--;
+	if(time > 0){
+		$("#captcha_send").html("重新发送(" + time + ")");
+	} else {
+		$("#captcha_send").html("发送验证码");
+		$("#captcha_send").removeAttr("disabled");
+		window.clearInterval(timer);//去掉定时器 
+		time = 90;
+        //验证码发送成功后允许切换绑定手机/邮箱
+        $("#select_contact_id").removeAttr("disabled");
+	}
+}
+	
+</script>

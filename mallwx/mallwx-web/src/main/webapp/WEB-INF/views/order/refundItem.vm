@@ -1,0 +1,575 @@
+#set($layout = "common/order.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>退款</title>
+#parse("common/scriptAndCss.vm")
+<script type="text/javascript" src="$request.contextPath/assets/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/refund/calculate.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/common/loadMsg.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	
+	var itemName = $("#itemName").val();
+	if(itemName.length>10){
+		var itemName1 = itemName.substring(0,10)+"...";
+		$("#itemName").val(itemName1);
+		$("#itemName").click(function(){
+			alert(itemName)
+		});
+	}
+	
+	changeIconToRed(2);
+	var oldPic = $("input[name='oldPic']");
+	if(oldPic){
+		imgcount = oldPic.length;
+	}
+	if($("#returnGoodId").val()==null||$("#returnGoodId").val()==''){
+		var num=$("#numId").val();
+		var refNum=$("#itemNumId").val()-num;
+		var paymentPrice=$("#paymentPriceId").val();
+		var refundFreight=$("#refundFreightId").val();
+		if(num==""||num==null){
+			$("#amountId").val($("#itemNumId").val());
+			var price=$("#amountId").val()*$("#payPriceId").val();
+			if(price<=paymentPrice){
+				$("#refundMoneyId").val(price);
+			}else{
+				$("#refundMoneyId").val(paymentPrice);
+			}
+		}else{
+			$("#amountId").val(refNum);
+		}
+		//退款金额=商品总金额/总数量*退款数量;
+		var unitPrice='';
+		var haveRefundMoney=$("#totalfundMoneyId").val();//单个商品已退款金额
+		if(num!=''&&$("#itemNumId").val()-num==$("#amountId").val()){
+			unitPrice=numSub($("#itemAllPayTotal").val(),haveRefundMoney);
+			unitPrice=numAdd(unitPrice,refundFreight);
+		}else{
+			unitPrice =numDiv($("#itemAllPayTotal").val(),$("#itemNumId").val())*$("#amountId").val(); 
+		    unitPrice=calPrice(unitPrice);
+		}
+		if(Number(unitPrice)<=Number(paymentPrice)){
+			$("#refundMoneyId").val(unitPrice);
+		}else{
+			$("#refundMoneyId").val(paymentPrice);
+		}
+	}
+		
+});
+var imgcount=0;
+var sccount=0;
+function startUpload(){
+	if(imgcount>4){
+        alert("最多只能上传5张图片");
+        return false;
+    }
+	//判断图片格式
+    var fileInput = $("#fileInput").val();
+    var extStart = fileInput.lastIndexOf(".");
+    var ext = fileInput.substring(extStart,fileInput.length).toUpperCase();
+    if(ext!=".JPG" && ext!=".jpg" && ext!=".BMP"&&ext!=".bmp"&& ext!=".PNG"&&ext!=".PNG"&& ext!=".JPEG" && ext!=".jpeg"&&ext!=".gif"&&ext!=".GIF"){
+        alert("图片限于JPG,BMP,PNG,JPEG格式");
+        return false;
+    }
+    $.ajaxFileUpload({
+        url: '$request.getContextPath()/orderWx/upload?size=1024000', //用于文件上传的服务器端请求地址
+        secureuri: false, //是否需要安全协议，一般设置为false
+        fileElementId: 'fileInput', //文件上传域的ID
+        dataType: 'text', //返回值类型 一般设置为json
+        type:"post",
+        success: function (data, status){  //服务器成功响应处理函数
+        	console.info(JSON.stringify(data));
+        	var dataStr = data;
+        	if(dataStr.indexOf("<pre>") != -1){
+        		dataStr = dataStr.replace("<pre>","")
+        	}
+        	if(dataStr.indexOf("<pre style=\"word-wrap: break-word; white-space: pre-wrap;\">") != -1){
+        		dataStr = dataStr.replace("<pre style=\"word-wrap: break-word; white-space: pre-wrap;\">","")
+        	}
+        	if(dataStr.indexOf("</pre>") != -1){
+        		dataStr = dataStr.replace("</pre>","")
+        	}
+        	var data = eval("("+dataStr+")");
+        	if(data.success){
+                sccount=sccount+1;
+                var trid="trid"+sccount;
+                appendtable(data.url,trid);
+            }else{
+                alert(data.msg);
+                $("#fileInput").replaceWith('<input type="file" id="fileInput" class="input_3 wid_95 mar_r2" name="file" onchange="startUpload();" />');
+            }
+        },
+        error: function (data, status, e){//服务器响应失败处理函数
+        	console.info(JSON.stringify(data));
+        	alert(JSON.stringify(data));
+        	alert(status);
+        	alert(e);
+            alert("亲系统繁忙，请稍后再试");
+            $("#fileInput").replaceWith('<input type="file" id="fileInput" class="input_3 wid_95 mar_r2" name="file" onchange="startUpload();" />');
+        }
+    });
+}
+
+function appendtable(url,id){
+    var imgtable=$("#imgtable");
+    var urlqd='$!imageServerAddr';
+    
+    /**
+    var div=$("<div>").attr("id",id).attr("class","shop_order  mar_l4 fl wid_29 mar_t10");//创建div
+    var p=$("<p>").attr("class","shop_order_img"); //创建<p>
+    var p1=$("<p>").attr("class","lin_24");; //创建<p>
+    var img=$("<img>").attr("src",urlqd+url).attr("width","75px").attr("height","75px");
+    var input=$("<input>").attr("value",url).attr("type","hidden");
+	p.append(img);
+	p.append(input);
+	div.append(p);
+    var a=$("<a>").text("删除").attr("href","javascript:cancleimg('"+id+"')");
+    p1.append(a);
+    div.append(p1);
+    imgtable.append(div);
+    */
+    
+    var td=$("<td>").attr("id",id).attr("align","center");
+    var div=$("<div>").attr("class","shop_order mar_l4 wid_29 mar_t10").attr("style","float:center");//创建div
+    var p=$("<p>").attr("class","shop_order_img"); //创建<p>
+    var p1=$("<p>").attr("class","lin_24");; //创建<p>
+    var img=$("<img>").attr("src",urlqd+url).attr("width","75px").attr("height","75px");
+    var input=$("<input>").attr("value",url).attr("type","hidden");
+	p.append(img);
+	p.append(input);
+	div.append(p);
+    var a=$("<a>").text("删除").attr("href","javascript:cancleimg('"+id+"')");
+    p1.append(a);
+    div.append(p1);
+    td.append(div);
+    
+ 	if(imgcount == 0){
+ 		 var tr=$("<tr>").attr("id","tr_one").attr("align","center");
+ 		 imgtable.append(tr);
+    }else if(imgcount == 3){
+    	var tr=$("<tr>").attr("id","tr_two").attr("align","center");
+		 imgtable.append(tr);
+    }
+ 	
+   if(imgcount < 3){
+		 $("#tr_one").append(td);
+   }else{
+	   $("#tr_two").append(td);
+   }
+    
+    
+    
+    imgcount=imgcount+1;
+    $("#fileInput").replaceWith('<input type="file" id="fileInput" class="input_3 wid_95 mar_r2" name="file" onchange="startUpload();" />');
+    if(imgcount > 4){
+    	$("#fileInput").attr("disabled","disabled");
+    }
+}
+//清除指定tr
+function cancleimg(id){
+	var pid = $("#" + id).parent().attr('id');
+    $("#"+id).remove();
+    
+    if(pid == 'tr_one' && imgcount > 3){
+    	$("#tr_one").append($("#tr_two")[0].firstChild);
+    	if(imgcount == 4){
+    		$("#tr_two").remove();
+    	}
+    }
+    
+    imgcount=imgcount-1;
+    if(imgcount < 5){
+    	$("#fileInput").removeAttr("disabled");
+    }
+    
+    if(imgcount == 0){
+    	$("#tr_one").remove();
+    }else if(imgcount == 3){
+    	$("#tr_one").append($("#tr_two").html());
+    	$("#tr_two").remove();
+    }
+}
+
+function refundAgreementSubmit(m_a,returnGoodId){
+	$("#subId").loadingMsg();
+	var orderId = $("#orderId").val();
+	
+	var returnResult = $("#returnResult").val();//退款原因
+	if(returnResult!=null && $.trim(returnResult)==""){
+		toast("请选择退款原因");
+		$("#subId").hideMsg();
+		return;
+	}
+	var returnMoney=$("#refundMoneyId").val();
+	if(returnMoney==null||$.trim(returnMoney)==""){
+		toast("请填写退款金额");
+		$("#subId").hideMsg();
+		return;
+	}
+
+	var remark = $("#remark").val();//退款说明
+	if(remark!=null && $.trim(remark)==""){
+		toast("请填写退款说明");
+		$("#subId").hideMsg();
+		return;
+	}
+	
+	var imgtable=$("#imgtable input");
+    var picUrl="";
+    if(imgtable){
+        $(imgtable).each(function(){
+            if($(this).val()){
+                picUrl=picUrl+$(this).val()+";";
+            }
+        });
+    }
+    
+    var oldPic = $("input[name='oldPic']");
+    $(oldPic).each(function(){
+        if($(this).val()){
+            picUrl=picUrl+$(this).val()+";";
+        }
+    });
+    
+	
+	var skuId=$("#skuId").val();//skuId
+	var amountNum=$("#amountId").val();//退款数量
+	var refundMoney=$("#refundMoneyId").val();//退款金额
+	var haveRefundMoney=$("#totalMoneyId").val();//已退款金额
+	var refundFreight=$("#refundFreightId").val();
+	var totalfundMoneyId=numSub($("#totalfundMoneyId").val(),refundFreight);//单个商品退款总金额
+	var totalMoney=$("#itemAllPayTotal").val();
+	var refundPriceTotal=$!refundPriceTotal;
+	var refundNum=$("#numId").val();
+	
+	if(m_a == '2'){
+		//新增
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			timeout : 1000*60*5, //超时时间设置，单位毫秒
+			url: "$request.getContextPath()/orderWx/refundAgreementSubmitWx",
+			data: {
+				orderId: orderId,
+				returnResult: returnResult,
+				remark:remark,
+				picUrl:picUrl,
+				skuId:skuId,
+				amountNum:amountNum,
+				refundMoney:refundMoney,
+				haveRefundMoney:haveRefundMoney,
+				refundNum:refundNum,
+				totalfundMoney:totalfundMoneyId
+			},
+			success: function(data){
+				if(data.success){
+					window.location.href = "$request.getContextPath()/orderWx/refundSubmitSucc?returnId="+data.resultMessage+"&skuId="+skuId;
+				}else{
+					toast("申请退款失败："+data.errorMessages);
+					$("#subId").hideMsg();
+				}
+			}
+		});
+	}else if(m_a == '1'){
+		//修改
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "$request.getContextPath()/orderWx/updateRefundAgreementWx",
+			data: {
+				orderId: orderId,
+				returnId: returnGoodId,
+				returnResult: returnResult,
+				remark:remark,
+				refundGoods:refundMoney,
+				picUrl:picUrl,
+				num:amountNum,
+				refundNum:refundNum,
+				totalfundMoney:totalfundMoneyId
+			},
+			success: function(data){
+				if(data.success){
+					window.location.href = "$request.getContextPath()/orderWx/refundSubmitSucc?returnId="+data.resultMessage+"&skuId="+skuId;
+				}else{
+					alert("申请退款失败："+data.errorMessages);
+					$("#subId").hideMsg();
+				}
+			}
+		});
+	}
+}
+function refundAmount(obj,value,price){
+	var totalPrice=$("#paymentPriceId").val();
+	var num=$("#numId").val();
+	var refundFreight=$("#refundFreightId").val();
+	var refNum=value-num;
+	if($(obj).val()<=0){
+		toast("退款数量不能为0！");
+		$(obj).val(refNum);
+	}else if($(obj).val()>refNum){
+		if(num==""||num==null){
+			toast("退款数量不能大于购买数量！");
+		}else{
+			toast("您已退款"+num+"件商品,退款数量不能大于剩余商品数量！");
+		}
+		$(obj).val(refNum);
+	}
+	//退款金额=商品总金额/总数量*退款数量;
+	var unitPrice='';
+	var haveRefundMoney=$("#totalfundMoneyId").val();//已退款金额
+    if(num!=''&&$("#itemNumId").val()-num==$("#amountId").val()){
+		unitPrice=numSub($("#itemAllPayTotal").val(),haveRefundMoney);
+		unitPrice=numAdd(unitPrice,refundFreight);
+	}else{
+		unitPrice =numDiv($("#itemAllPayTotal").val(),$("#itemNumId").val())*$("#amountId").val(); 
+	    unitPrice=calPrice(unitPrice);
+	}
+	if(Number(unitPrice)<Number(totalPrice)){
+		$("#refundMoneyId").val(unitPrice);
+	}else{
+		$("#refundMoneyId").val(totalPrice);
+	}
+}
+
+function amount(th){
+    var regStrs = [
+        ['^0(\\d+)$', '$1'], //禁止录入整数部分两位以上，但首位为0
+        ['[^\\d\\.]+$', ''], //禁止录入任何非数字和点
+        ['\\.(\\d?)\\.+', '.$1'], //禁止录入两个以上的点
+        ['^(\\d+\\.\\d{2}).+', '$1'] //禁止录入小数点后两位以上
+    ];
+    for(i=0; i<regStrs.length; i++){
+        var reg = new RegExp(regStrs[i][0]);
+        th.value = th.value.replace(reg, regStrs[i][1]);
+    }
+};
+function checkMoney(obj,freight){
+	var num=$("#numId").val();
+	var unitPrice='';
+	var refundFreight=$("#refundFreightId").val();
+	var haveRefundMoney=$("#totalfundMoneyId").val();//已退款金额
+    if(num!=''&&$("#itemNumId").val()-num==$("#amountId").val()){
+		unitPrice=numSub($("#itemAllPayTotal").val(),haveRefundMoney);
+		unitPrice=numAdd(unitPrice,refundFreight);
+	}else{
+		unitPrice =numDiv($("#itemAllPayTotal").val(),$("#itemNumId").val())*$("#amountId").val(); 
+	    unitPrice=calPrice(unitPrice);
+	}
+	var totalMoney=numAdd(unitPrice,freight);
+	var paymentPrice=$("#paymentPriceId").val();
+	if(numAdd(Number($("#totalMoneyId").val()),Number($(obj).val()))<=Number(paymentPrice)){//退款金额小于订单总金额
+		if($(obj).val()>totalMoney){
+			toast("您的退款金额最大不能大于此商品的支付金额和运费之和")
+			if(Number(unitPrice)<=Number(paymentPrice)){
+				$(obj).val(unitPrice);
+			}else{
+				$(obj).val(paymentPrice);
+			}
+		}else if($(obj).val()==""||$(obj).val()==null||$(obj).val()=="undefined"){
+			toast("请填写退款金额！");
+			if(unitPrice<=paymentPrice){
+				$(obj).val(unitPrice);
+			}else{
+				$(obj).val(paymentPrice);
+			}
+		}else if($(obj).val()==0){
+			toast("您的退款金额不能为0！");
+			if(Number(unitPrice)<=Number(paymentPrice)){
+				$(obj).val(unitPrice);
+			}else{
+				$(obj).val(paymentPrice);
+			}
+		 }
+	}else{
+		toast("订单退款总金额不允许超过支付总金额，请修改后重新提交，如有疑问请与卖家联系。"); 
+		 if(Number(unitPrice)<=Number(paymentPrice)){
+				$(obj).val(unitPrice);
+			}else{
+				$(obj).val(paymentPrice);
+			}
+		}
+}
+//申请仲裁
+function complain(){
+	window.location.href = "$request.getContextPath()/orderWx/gocomplainadd?tradeReturnid=$!{orderId}";
+}
+//计算退款金额/保留两位小数进上去
+function calPrice(unitPrice){
+	return (Math.round(Number(unitPrice.toFixed(3))*100+0.4)/100).toFixed(2);
+	#*var bb = unitPrice+"";  
+    var dian = bb.indexOf('.');  
+    var price = "";  
+    if(dian == -1){  
+        price =  unitPrice.toFixed(2);  
+    }else{  
+        var cc = bb.substring(dian+1,bb.length);  
+        if(cc.length >=3){  
+            price =  (Number(unitPrice.toFixed(2))+0.01)*100000000000/100000000000;//js小数计算小数点后显示多位小数  
+        }else{  
+            price =  unitPrice.toFixed(2);  
+        }  
+    }  
+    return price;*#
+}
+</script>
+</head>
+<body>
+<!--包住整个页面的DIV id="content" start -->
+<div id="main">
+    <!--中间内容开始 -->
+    <div class="content" id="wrapper">
+        <div class="stepflex">
+            <dl class="normal doing">
+                <dt class="s-num num-bg-2"><i class="fa-check"></i></dt>
+                <dd class="s-text">退款原因、金额<s></s><b></b></dd>
+            </dl>
+            <dl class="last ">
+                <dt class="s-num num-bg-1">2</dt>
+                <dd class="s-text">退款处理<s></s><b></b></dd>
+            </dl>
+            <dl class="last">
+                <dt class="s-num num-bg-1">3</dt>
+                <dd class="s-text">退款完成<s></s><b></b></dd>
+            </dl>
+            <div class="clear"></div>
+        </div>
+        <div class="td_l">
+           <dl class="hei_34">
+             <dd class="fl font_right wid_35 mar_r2">退款原因<i class="font_e3">※</i></dd>
+             <dt class="fl wid_57">
+             	<select class="input_3 wid_95 mar_r2" id="returnResult">
+             		<option value="">请选择退款原因</option>
+					<option value="不想买了" #if($!returnResult=="不想买了") selected="selected" #end>不想买了</option>
+					<option value="信息填写错误重新买" #if($!returnResult=="信息填写错误重新买") selected="selected" #end>信息填写错误重新买</option>
+					<option value="卖家缺货" #if($!returnResult=="卖家缺货") selected="selected" #end>卖家缺货</option>
+					<option value="未收到货" #if($!returnResult=="未收到货") selected="selected" #end>未收到货</option>
+					<option value="收到商品破损" #if($!returnResult=="收到商品破损") selected="selected" #end> 收到商品破损</option>
+					<option value="商品错发／漏发" #if($!returnResult=="商品错发／漏发") selected="selected" #end>商品错发／漏发</option>
+					<option value="商品需要维修" #if($!returnResult=="商品需要维修") selected="selected" #end>商品需要维修</option>
+					<option value="收到商品与描述不符" #if($!returnResult=="收到商品与描述不符") selected="selected" #end>收到商品与描述不符</option>
+					<option value="商品质量问题" #if($!returnResult=="商品质量问题") selected="selected" #end>商品质量问题</option>
+             	</select>
+             </dt>
+           </dl>
+           
+            <input type="hidden" id="totalMoneyId" value="$!totalMoney"/>
+			<input type="hidden" id="paymentPriceId" value="$!tradeOrdersDTO.paymentPrice"/>
+			<input type="hidden" id="numId" value="$!num"/>
+			<input type="hidden" id="orderId" value="$!tradeOrdersDTO.orderId"/>
+			<!--单个商品的退款总金额 -->
+			<input type="hidden" id="totalfundMoneyId" value="$!fundMoney"/>
+			<!--单个商品退款运费-->
+			<input type="hidden" id="refundFreightId" value="$!refundFreight"/>
+			
+           #foreach($entityItem in $!jsonObject.items)
+	          <div class="clear"></div>
+	          <dl class="hei_34 mar_t10">
+	            <dd class="fl font_right wid_35 mar_r2 ">商品名称<i class="font_e3">※</i></dd>
+	            <dt class="fl wid_55">
+	            	<input class="input_3 mar_r2" id="itemName" value="$!entityItem.itemName" readonly="readonly" style="border: 0"> 
+	            	<input type="hidden" id="itemId" value="$!entityItem.itemId"/>
+					<input type="hidden" id="skuId"  value="$!entityItem.skuId"/>
+					<input type="hidden" id="payPriceId" value="$!entityItem.payPrice"/>
+					<input type="hidden" id="payPrice" value="$!entityItem.payPrice">
+					<input type="hidden" id="refundPriceTotal" value="$!{refundPriceTotal}">
+					<input type="hidden" value="$!entityItem.num" id="itemNumId"/>
+					<input type="hidden" value="$!returnGoodId" id="returnGoodId"/>
+					<!--商品支付总金额，优惠分摊之后的，商品支付总金额 -->
+					<input type="hidden" value="$!entityItem.payPriceTotal" id="itemAllPayTotal" class="js_refundItems"/>
+	            </dt>
+	          </dl>
+	          
+	          <div class="clear"></div>
+	           <dl class="hei_34 mar_t10">
+	            <dd class="fl font_right wid_35 mar_r2 ">购买数量<i class="font_e3">※</i></dd>
+	            <dt class="fl wid_55">
+	            	<input class="input_3 wid_50 mar_r2" id="num" value="$!entityItem.num" readonly="readonly" style="border: 0">
+	            </dt>
+	          </dl>
+	          
+	          <div class="clear"></div>
+	          <dl class="hei_34 mar_t10">
+	            <dd class="fl font_right wid_35 mar_r2 ">退款数量<i class="font_e3">※</i></dd>
+	            <dt class="fl wid_55">
+	            	<input class="input_3 wid_50 mar_r2" id="amountId" 
+	            		#if($!returnGoodId != '')
+             				value="$!{returnCount}" 
+             			#else
+             				value=""
+             			#end
+	            		onblur="refundAmount(this,$!entityItem.num,$!entityItem.payPrice);" onkeyup="value=value.replace(/[^\d]/g,'')">
+	            </dt>
+	          </dl>
+			#end
+           <div class="clear"></div>
+           <dl class="hei_34 mar_t10">
+             <dd class="fl font_right wid_35 mar_r2 ">需退款的金额<i class="font_e3">※</i></dd>
+             <dt class="fl wid_55">
+             	<input class="input_3 wid_50 mar_r2" id="refundMoneyId" 
+             			#if($!returnGoodId != '')
+             				value="$!{refundGoods}" 
+             			#else
+             				value=""
+             			#end
+             		   onblur="checkMoney(this,$!tradeOrdersDTO.freight)" onKeyUp="amount(this)">元
+             </dt>
+           </dl>
+           <div class="clear"></div>
+           <dl class="min-hei mar_t15">
+             <dd class="fl font_right hei_34 wid_35 mar_r2">退款说明<i class="font_e3">※</i></dd>
+             <dt class="fl wid_57"><textarea class="input_3 wid_95 hh_100" id="remark" placeholder="不能超过300字">$!{remark}</textarea></dt>
+           </dl>
+            <div class="clear"></div>
+           <dl class="hei_34 mar_t15">
+             <dd class="fl font_right wid_35 mar_r2">上传凭证</dd>
+             <dt class="fl wid_57"><input type="file" class="input_3 wid_95 mar_r2" name="file" id="fileInput" onchange="startUpload()" /> </dt>
+           </dl>
+           <div class="clear"></div>
+           <div class="">
+				<table id="imgtable" class="imgtable" align="center">
+					#if($!picList)
+						#foreach($picInfo in $!picList)
+							<div id="trid$!picInfo.id" class="shop_order  mar_l4 fl wid_29 mar_t10" >
+								<p class="shop_order_img">
+								<img src="$!ftpServerDir$!picInfo.picUrl" width="75px" height="75px">
+								<input value="$!picInfo.picUrl" type="hidden" name = "oldPic">
+								</p>
+								<p class="lin_24">
+								<a href="javascript:cancleimg('trid$!picInfo.id')">删除</a>
+								<span class="pad_l5">上传成功&nbsp;&nbsp;&nbsp;</span>
+								</p>
+							</div>
+						#end
+					#end
+				</table>
+		   </div>
+		   <div class="clear"></div>
+           <div class="fr wid_65 font_7_5 mar_t10 lin_16 mar_b20">最多上传5张，单张大小不超过1M，格式为png、bmp、jpg或gif。</div>
+           <div class="clear"></div>
+           <div class="fr wid_65 font_7_5 mar_t10 lin_16 mar_b20">一个商品仅支持退款（或售后）一次，请核实退款金额。</div>
+           <div class="clear"></div>
+           
+           <div class="font_cen">
+              #if($!returnGoodId != '')
+             	 <button class="button_2 hei_34 pad_lr5" id="subId" onclick="refundAgreementSubmit('1','$!returnGoodId')" loadMsg="正在提交...">提交退款申请</button>
+        	  #else
+        		 <button class="button_2 hei_34 pad_lr5" id="subId" onclick="refundAgreementSubmit('2','')" loadMsg="正在提交...">立即申请退款</button>
+        	  #end
+           </div>
+        </div>
+        
+    </div> <!--中间内容 end -->
+   
+</div>
+<!-- 底部 -->
+#parse("common/footer.vm")
+<!-- 底部 -->
+<!--包住整个页面的DIV id="content" end -->
+</body>
+</html>

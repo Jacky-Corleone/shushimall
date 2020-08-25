@@ -1,0 +1,123 @@
+#set($layout = "/none_layout.vm")
+  <div id="right_bot" class="right_bot border-4 mar_t10 bg_06" style=" margin-left: auto; margin-right: auto; ">
+    <!-- 商品列表开头 -->
+    <div class="right_xinxi mar_l14 ">
+      <ul class="list_top bg_08 font_14b">
+        
+        <li style="width:250px" class="font_cen hei_40">商品信息</li>
+        <li style="width:100px" class="font_cen hei_40">销售属性</li>
+        <li style="width:120px;" class="font_cen hei_40">SKU编码</li>
+        <li style="width:120px;" class="font_cen hei_40">商品编码</li>
+        <li style="width:130px;" class="font_cen hei_40">所属类目</li>
+        <li style="width:130px" class="font_cen hei_40">销售价</li> 
+        <li style="width:100px" class="font_cen hei_40">商品状态</li>
+      
+      </ul>
+      <!-- 类型选择 -->
+     
+      <!-- 商品信息 -->
+      <table class="information border-1" style="width: 100%;" id="information ">
+        #foreach($TradeInventoryOutDTO in $pager.records)
+        <tr>
+        	
+          <td class="wid_20 border-6 hei_60" >
+            <input type="radio" name="box" title="${TradeInventoryOutDTO.skuId}"/>
+            <input id="${TradeInventoryOutDTO.itemId}" type="hidden"/>
+            <input id="${TradeInventoryOutDTO.cid}" type="hidden"/>
+		  </td>
+          <td class="wid_100 border-6 hei_60" id="${TradeInventoryOutDTO.skuId}_1">
+            <a href="javascript:void(0)" onclick="javascript:toView($!TradeInventoryOutDTO.itemId)">
+				#foreach($skuPicture in ${TradeInventoryOutDTO.skuPicture})
+					<img src="$!imageServerAddr$!skuPicture.picUrl" width="75" height="50"/>
+					#break;
+				#end
+            </a>
+          </td >
+          <td class="wid_120 border-6 border-9" id="$!{TradeInventoryOutDTO.skuId}_2"><a href="javascript:void(0)" onclick="javascript:toView($!{TradeInventoryOutDTO.itemId})">$!{TradeInventoryOutDTO.itemName}</a></td>
+		  <td class="wid_80 border-1 font_cen" style="display:none">$!TradeInventoryOutDTO.itemId</td>
+          <td class="wid_90 border-1 font_cen" id="$!{TradeInventoryOutDTO.skuId}_3">
+			#foreach($itemAttrName in ${TradeInventoryOutDTO.itemAttr})
+				    $itemAttrName.name :
+				#foreach($itemAttrValue in $itemAttrName.values)
+					$itemAttrValue.name 
+				#end
+			#end
+		  </td>
+          <td class="wid_80 border-1 font_cen">$!{TradeInventoryOutDTO.skuId}</td>
+          <td class="wid_120 border-1 font_cen">$!{TradeInventoryOutDTO.itemId}</td>
+          <td class="wid_110 border-1 font_cen">
+		  #foreach($itemCatCascadeDTO in ${TradeInventoryOutDTO.itemCatCascadeDTO})
+				    $itemCatCascadeDTO.cname /
+			#foreach($childCats in $itemCatCascadeDTO.childCats)
+				    $childCats.cname /
+    			#foreach($childCat in $childCats.childCats)
+    			    $childCat.cname
+    			#end
+			#end
+		  #end
+		  </td>
+          <td class="wid_130 border-1 font_cen ">
+			<ul>
+				#if(${TradeInventoryOutDTO.areaPrices})
+					#foreach($areaPrices in ${TradeInventoryOutDTO.areaPrices})
+						#if($areaPrices.minNum==1)
+							$!areaPrices.sellPrice
+						#end
+					#end
+				#else
+					0.00
+				#end
+			</ul>
+		  </td>
+         ## <td class="wid_90 border-1 ">
+		##	<input type="text" maxlength='6' id="${TradeInventoryOutDTO.skuId}" class="wid_40 mar_23 font_cen border-4" value="$!{TradeInventoryOutDTO.totalInventory}" onkeyup="clearNoNum(this)"/>
+		  ##</td>
+          <td class="wid_90 border-1 font_cen">
+			#if($!{TradeInventoryOutDTO.itemStatus} == 1)
+				未发布
+			#elseif($!{TradeInventoryOutDTO.itemStatus} == 2)
+				待审核
+			#elseif($!{TradeInventoryOutDTO.itemStatus} == 3)
+				待上架
+			#elseif($!{TradeInventoryOutDTO.itemStatus} == 4)
+				在售
+			#elseif($!{TradeInventoryOutDTO.itemStatus} == 5)
+				已下架
+			#elseif($!{TradeInventoryOutDTO.itemStatus} == 6)
+				锁定
+			#elseif($!{TradeInventoryOutDTO.itemStatus} == 7)
+				申请解锁
+			#elseif($!{TradeInventoryOutDTO.itemStatus} == 20)
+				审核驳回
+			#end
+		  </td>
+        </tr>
+		#end
+      </table>
+     
+	 <div class="page ml14px">
+		 <ul>
+		 	<li class="lastPage" style="width: auto; line-height: inherit;">
+		 		<a href="javascript:topage(1)">首页</a>
+		 	</li>
+		 	<li class="lastPage" style="width: auto; line-height: inherit;">
+		 		<a href="javascript:topage($pager.previewPage)">上一页</a>
+		 	</li>
+		 	#foreach($pageNo in [$!pager.startPageIndex .. $!pager.endPageIndex])
+		 	<li style="width: auto; line-height: inherit;">
+		 		<a #if($pageNo==$pager.page) class="curr" #end href="javascript:topage($pageNo)">$pageNo</a>
+		 	</li>
+		 	#end
+		 	<li class="nextPage" style="width: auto; line-height: inherit;">
+		 		<a href="javascript:topage($pager.nextPage)">下一页</a>
+		 	</li>
+		 	<li class="nextPage" style="width: auto; line-height: inherit;">
+		 		<a href="javascript:topage($pager.totalPage)">末页</a>&nbsp;共$pager.totalPage页
+		 	</li>
+		 	<li class="nextPage" style="width: auto; line-height: inherit;">
+		 		，第<input class="input_Style2 wid_20 hei_26" value="$pager.page" onkeyup="value=this.value.replace(/\\D+/g,'')" onkeydown="enter_press_page(event.keyCode||event.which);" id="pageNum"/>页
+		 		 <span class="cursor font_fe" id="toPageNum" onclick="page_num()">[跳转]&nbsp;&nbsp;</span>
+		 	</li>
+		 </ul>
+	 </div>
+    </div>

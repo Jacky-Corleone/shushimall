@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.tradecenter.dao.InvoiceDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="invoiceDTOMap" type="com.camelot.tradecenter.dto.InvoiceDTO" >
+		<id property="id" column="id" />
+		<result property="invoice" column="invoice" />
+		<result property="invoiceTitle" column="invoice_title" />
+		<result property="companyName" column="company_name" />
+		<result property="taxpayerCode" column="taxpayer_code" />
+		<result property="registeredAddress" column="registered_address" />
+		<result property="registeredPhone" column="registered_phone" />
+		<result property="bankName" column="bank_name" />
+		<result property="bankAccount" column="bank_account" />
+		<result property="normalContent" column="normal_content" />
+		<result property="consigneeName" column="consignee_name" />
+		<result property="consigneeMobile" column="consignee_mobile" />
+		<result property="provinceId" column="province_id" />
+		<result property="cityId" column="city_id" />
+		<result property="countyId" column="county_id" />
+		<result property="fullAddress" column="full_address" />
+		<result property="detailAddress" column="detail_address" />
+		<result property="buyerId" column="buyer_id" />
+		<result property="businessLicensePicUrl" column="businessLicensePicUrl" />
+		<result property="taxRegistrationCertificatePicUrl" column="taxRegistrationCertificatePicUrl" />
+		<result property="generalTaxpayerPicUrl" column="generalTaxpayerPicUrl" />
+		<result property="createTime" column="create_time" />
+	</resultMap>
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			invoice_.id
+ 			,invoice_.invoice
+ 			,invoice_.invoice_title
+ 			,invoice_.company_name
+ 			,invoice_.taxpayer_code
+ 			,invoice_.registered_address
+ 			,invoice_.registered_phone
+ 			,invoice_.bank_name
+ 			,invoice_.bank_account
+ 			,invoice_.normal_content
+ 			,invoice_.consignee_name
+ 			,invoice_.consignee_mobile
+ 			,invoice_.province_id
+ 			,invoice_.city_id
+ 			,invoice_.county_id
+ 			,invoice_.full_address
+ 			,invoice_.detail_address
+ 			,invoice_.buyer_id
+ 			,invoice_.create_time
+		FROM 
+		invoice invoice_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.id != null and entity.id !=''">
+				<![CDATA[ and invoice_.id = #{entity.id} ]]>
+			</if>
+			<if test="entity.invoice != null and entity.invoice !=''">
+				<![CDATA[ and invoice_.invoice = #{entity.invoice} ]]>
+			</if>
+			<if test="entity.invoiceTitle != null and entity.invoiceTitle !=''">
+				<![CDATA[ and invoice_.invoice_title = #{entity.invoiceTitle} ]]>
+			</if>
+			<if test="entity.companyName != null and entity.companyName !=''">
+				<![CDATA[ and invoice_.company_name = #{entity.companyName} ]]>
+			</if>
+			<if test="entity.taxpayerCode != null and entity.taxpayerCode !=''">
+				<![CDATA[ and invoice_.taxpayer_code = #{entity.taxpayerCode} ]]>
+			</if>
+			<if test="entity.registeredAddress != null and entity.registeredAddress !=''">
+				<![CDATA[ and invoice_.registered_address = #{entity.registeredAddress} ]]>
+			</if>
+			<if test="entity.registeredPhone != null and entity.registeredPhone !=''">
+				<![CDATA[ and invoice_.registered_phone = #{entity.registeredPhone} ]]>
+			</if>
+			<if test="entity.bankName != null and entity.bankName !=''">
+				<![CDATA[ and invoice_.bank_name = #{entity.bankName} ]]>
+			</if>
+			<if test="entity.bankAccount != null and entity.bankAccount !=''">
+				<![CDATA[ and invoice_.bank_account = #{entity.bankAccount} ]]>
+			</if>
+			<if test="entity.normalContent != null and entity.normalContent !=''">
+				<![CDATA[ and invoice_.normal_content = #{entity.normalContent} ]]>
+			</if>
+			<if test="entity.consigneeName != null and entity.consigneeName !=''">
+				<![CDATA[ and invoice_.consignee_name = #{entity.consigneeName} ]]>
+			</if>
+			<if test="entity.consigneeMobile != null and entity.consigneeMobile !=''">
+				<![CDATA[ and invoice_.consignee_mobile = #{entity.consigneeMobile} ]]>
+			</if>
+			<if test="entity.provinceId != null and entity.provinceId !=''">
+				<![CDATA[ and invoice_.province_id = #{entity.provinceId} ]]>
+			</if>
+			<if test="entity.cityId != null and entity.cityId !=''">
+				<![CDATA[ and invoice_.city_id = #{entity.cityId} ]]>
+			</if>
+			<if test="entity.countyId != null and entity.countyId !=''">
+				<![CDATA[ and invoice_.county_id = #{entity.countyId} ]]>
+			</if>
+			<if test="entity.fullAddress != null and entity.fullAddress !=''">
+				<![CDATA[ and invoice_.full_address = #{entity.fullAddress} ]]>
+			</if>
+			<if test="entity.detailAddress != null and entity.detailAddress !=''">
+				<![CDATA[ and invoice_.detail_address = #{entity.detailAddress} ]]>
+			</if>
+			<if test="entity.buyerId != null and entity.buyerId !=''">
+				<![CDATA[ and invoice_.buyer_id = #{entity.buyerId} ]]>
+			</if>
+			<if test="entity.createTime != null and entity.createTime !=''">
+				<![CDATA[ and date_format(invoice_.create_time,'%Y-%m-%d') = date_format(#{entity.createTime},'%Y-%m-%d') ]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="invoiceDTOMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where invoice_.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 根据订单ID查询发票信息 -->
+	<select id="queryByOrderId" resultMap="invoiceDTOMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where invoice_.id = (select invoice_id from trade_order_invoice where order_id=#{orderId})
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="invoiceDTOMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		invoice invoice_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 查询用户最近使用的发票信息 -->
+	<select id="queryRecentInvoice" parameterType="long" resultMap="invoiceDTOMap">
+		<include refid="selectAllColumns"/>
+		<![CDATA[
+		where invoice_.buyer_id = #{buyerId}
+		order by invoice_.create_time desc
+		limit 0,1
+		]]>
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="add" useGeneratedKeys="true" keyProperty="id">
+		<![CDATA[
+		insert into invoice (
+		    	invoice
+		    	,invoice_title
+		    	,company_name
+	 			,taxpayer_code
+	 			,registered_address
+	 			,registered_phone
+	 			,bank_name
+	 			,bank_account
+	 			,normal_content
+	 			,consignee_name
+	 			,consignee_mobile
+	 			,province_id
+	 			,city_id
+	 			,county_id
+	 			,full_address
+	 			,detail_address
+	 			,buyer_id
+	 			,create_time
+		   )values(
+		    	#{invoice}
+		    	,#{invoiceTitle}
+		    	,#{companyName}
+		    	,#{taxpayerCode}
+		    	,#{registeredAddress}
+		    	,#{registeredPhone}
+		    	,#{bankName}
+		    	,#{bankAccount}
+		    	,#{normalContent}
+		    	,#{consigneeName}
+		    	,#{consigneeMobile}
+		    	,#{provinceId}
+		    	,#{cityId}
+		    	,#{countyId}
+		    	,#{fullAddress}
+		    	,#{detailAddress}
+		    	,#{buyerId}
+		    	,now()
+		   )
+		]]>
+	</insert>
+	
+	<!-- 添加订单发票信息 -->
+	<insert id="addTradeOrderInvoice">
+		<![CDATA[
+		insert into trade_order_invoice (
+		    	order_id
+	 			,invoice_id
+	 			,create_time
+	 			,update_time
+		   )values(
+		    	#{orderId}
+		    	,#{invoiceId}
+		    	,now()
+		    	,now()
+		   )
+		]]>
+	</insert>
+	
+	<!-- 修改订单发票信息 -->
+	<update id="updateTradeOrderInvoice">
+		update trade_order_invoice set
+			update_time = now()
+			,invoice_id = #{invoiceId}
+		where
+			order_id = #{orderId}
+	</update>
+</mapper>

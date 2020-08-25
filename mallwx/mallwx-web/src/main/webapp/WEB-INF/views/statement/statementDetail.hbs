@@ -1,0 +1,42 @@
+{{#each rows}}
+    <div class="bg_01" style="margin-bottom: 10px;-webkit-box-shadow:0 0 5px rgb(165, 165, 165);
+        -moz-box-shadow:0 0 5px rgb(165, 165, 165);
+        box-shadow:0 0 5px rgb(165, 165, 165);">
+<!-- 中间内容 -->
+<p class="pad_lr5 hei_34 mar_t10 border_2">
+    <span class="fl font_5 font_1_2">对账单号:{{statementInfo.statementId}}</span><span
+        class="fr font_5 font_1_2">{{stamp2Date statementInfo.createDate}}</span>
+</p>
+<dl class="border_2 pad_tb5 lin_24 pad_lr5">
+    {{#each orders}}
+        {{#if this}}
+            <div class="border_bt000">
+        <dt class="fl wid_75">
+        <p class="font_1_2 one wid_75" style="text-decoration:underline;" onclick="orderDetail('{{orderId}}')">订单号:{{orderId}}</p>
+        <p class="font_5 mar_t10">创建时间:{{stamp2Date createTime}}</p>
+        </dt>
+        <dd class="fr font_right ">
+            <p class=" font_1_2">￥{{paymentPrice}}</p>
+            <p class="font_3 mar_t10">
+                {{getOrderStatus state}}
+            </p>
+        </dd>
+        <div class="clear"></div>
+            </div>
+        {{/if}}
+    {{/each}}
+</dl>
+<div class="font_right lin_24 mar_t10 mar_r2">
+    {{#if statementInfo.amount}}
+    <p class="font_1_2">总计：{{statementInfo.amount}}</p>
+    {{/if}}
+    {{#if statementInfo.paidAmount}}
+    <p class="font_1_2">已付：{{statementInfo.paidAmount}}</p>
+    {{/if}}
+    {{#if statementInfo.npaidAmount}}
+    <p class="font_2">(未付：{{statementInfo.npaidAmount}})</p>
+    {{/if}}
+</div>
+<!--中间结束 -->
+    </div>
+{{/each}}

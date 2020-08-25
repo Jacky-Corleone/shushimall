@@ -1,0 +1,29 @@
+#set($layout = "common/blanklayout.vm")
+##<div id="floorinner$!{floor.idDTO}" class="h_zero" style="overflow: hidden;">
+<h3 class="font_1_5 font_w"><span class="font_e5 mar_r2">$!{floorcount}F</span>${floor.titleDTO}</h3>
+<div class="sale_shop" >
+	#foreach($good in $floor.goods)
+    <!-- 一条信息 -->
+    <dl freshUrl="$good.url" style="" onclick="toProductDetail(this);return false;">
+        <dt class=""><img src="${imgUrlPre}${good.picSrc}"></dt>
+        <dd>
+            <p class="two">$good.title</p>
+        
+            #if($!good.hasPrice == 1)
+    				<strong class="font_e5">#if($!good.guidePrice > 0) ￥$!good.guidePrice #end</span></strong>
+    		#else
+				#if($!logging_status == "true")
+					 <strong class="font_e5">欢迎询价</strong>
+				#else
+					 <strong class="font_e5">欢迎询价</strong>
+				#end
+				#end	
+            	
+            	
+            	
+        </dd>
+    </dl>
+    <!-- 一条信息 end-->
+	#end
+</div>
+##</div>

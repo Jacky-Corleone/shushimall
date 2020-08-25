@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.goodscenter.dao.ItemPictureDAO">
+	<resultMap id="itemPictureMapper" type="com.camelot.goodscenter.domain.ItemPicture">
+			<result property="pictureId" column="picture_id" />
+			<result property="itemId" column="item_id" />
+			<result property="pictureUrl" column="picture_url" />
+			<result property="sortNumber" column="sort_number" />
+			<result property="pictureStatus" column="picture_status" />
+			<result property="sellerId" column="seller_id" />
+			<result property="created" column="created" />
+			<result property="modified" column="modified" />
+			<result property="shopId" column="shop_id" />
+	</resultMap>
+	
+	<select id="queryPage" resultType="map">
+		select * from item_picture
+	</select>
+	
+	<select id="findById" resultMap="itemPictureMapper" >
+		select * from item_picture
+		where id = #{id}
+	</select>
+	
+	<insert id="add">
+		insert into item_picture(
+				item_id,
+				picture_url,
+				sort_number,
+				picture_status,
+				seller_id,
+				created,
+				modified,
+				shop_id
+		)values(
+				#{itemId},
+				#{pictureUrl},
+				#{sortNumber},
+				1,
+				#{sellerId},
+				now(),
+				now(),
+				#{shopId}
+		)
+	</insert>
+	
+	<update id="update">
+		update item_picture set
+				picture_id = #{pictureId},
+				item_id = #{itemId},
+				picture_url = #{pictureUrl},
+				sort_number = #{sortNumber},
+				picture_status = #{pictureStatus},
+				seller_id = #{sellerId},
+				created = #{created},
+				modified = now(),
+				shop_id = #{shopId}
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from item_picture
+		<if test=" codes != null and codes.size() > 0 ">
+			where id in
+			<foreach collection="codes" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test=" codes == null or codes.size() == 0 ">
+			where 1 = 3
+		</if>
+	</delete>
+	
+	<select id="findAll" resultType="map">
+		select * from item_picture
+	</select>
+	
+	
+	<select id="queryItemPicsById" resultMap="itemPictureMapper">
+		select * 
+		from 
+		item_picture t 
+		where t.item_id=#{itemId}
+	</select>
+	
+	<delete id="deleteItemPicture">
+		<![CDATA[
+			DELETE FROM item_picture WHERE item_picture.item_id=#{itemId}
+		]]>
+	</delete>
+</mapper>

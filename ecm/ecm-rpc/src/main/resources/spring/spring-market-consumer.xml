@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+	<!-- 集采活动 -->
+	<dubbo:reference id="centralPurchasingServiceImpl"
+		registry="qingdaoRegistry" owner="zhangfan"
+		interface="com.camelot.maketcenter.service.CentralPurchasingExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<!-- 积分商城 -->
+	<dubbo:reference id="integralConfigService"
+		registry="qingdaoRegistry" owner="zhangfan"
+		interface="com.camelot.maketcenter.service.IntegralConfigExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<!--用户信息调用 -->
+    <dubbo:reference id="promotionService" registry="qingdaoRegistry"
+        owner="camelot" interface="com.camelot.maketcenter.service.PromotionService"
+        version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    <dubbo:reference id="promotionInfoExportService" registry="qingdaoRegistry"
+        owner="camelot" interface="com.camelot.maketcenter.service.PromotionInfoExportService"
+        version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    <dubbo:reference id="promotionFrExportService" registry="qingdaoRegistry"
+        owner="camelot" interface="com.camelot.maketcenter.service.PromotionFrExportService"
+        version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    <dubbo:reference id="promotionMdExportService" registry="qingdaoRegistry"
+        owner="camelot" interface="com.camelot.maketcenter.service.PromotionMdExportService"
+        version="1.0" protocol="dubbo" timeout="100000" init="true" />
+     <!-- 优惠券 -->
+	<dubbo:reference id="couponsExportService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.maketcenter.service.CouponsExportService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />	
+</beans>

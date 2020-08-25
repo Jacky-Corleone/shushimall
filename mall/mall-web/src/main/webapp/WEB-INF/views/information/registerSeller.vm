@@ -1,0 +1,409 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/configuration_layout.vm")
+
+<link href="$staticPath/plugin/jquery-validation/1.11.1/jquery.validateA.css" type="text/css" rel="stylesheet" />
+
+<script type="text/javascript" src="$staticPath/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/jquery-validation/1.11.1/messages_zh.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<script type="text/javascript" src="$staticPath/js/jquery-migrate-1.1.0.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/fancyzoom/jquery.shadow.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/fancyzoom/jquery.ifixpng.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/fancyzoom/jquery.fancyzoom.js"></script>
+
+<style>
+	.userInfo_class_hide{
+		display:none;
+	}
+	.shopInfo_class_hide{
+		display:none;
+	}
+</style>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	//初始化页面
+	$(".information").html("欢迎认证卖家");
+	changeShow('userInfo_class_hide','userInfo_class_show');
+	changeShow('shopInfo_class_hide','shopInfo_class_show');
+	//初始化验证
+	initValidPlugin();
+
+	//卖家认证提交
+	$("#configurationBtn").click(function(){
+	
+		//收集数据：营业执照信息
+		collectDataBusiness();
+		//开户行支行所在地
+		$("#bankBranchIsLocated").val($("#account_provinces").val()+","+$("#account_city").val()+","+$("#account_area").val());
+		//收集数据：卖家店铺运营申请（给发货退货地址的省、市、地区的名称赋值）
+		collectDataShopApply();
+		//
+		if($('#timeState').is(':checked')){
+			$("#businessLicenceIndate").val('长期有效');
+		}
+    
+        //是否三证合一  如果是 就没有  组织机构代码信息   和  税务登记证信息
+        var isSanzhengFlag=false;
+        $('input:radio[name="isSanzhengRadio"]').each(function(){
+			     if($(this).attr("checked")&&$(this).val()==1){//是 三证合一
+			       isSanzhengFlag=true;
+			     }
+        })
+			     
+		//数据校验-框架校验
+		var businessIsValid = $("#businessForm").valid();
+		if(!isSanzhengFlag){//非  三证合一   才验证
+		   var organizationIsValid = $("#organizationForm").valid();
+		   var taxIsValid = $("#taxForm").valid();
+		}
+		
+		
+		var accountIsValid = $("#accountForm").valid();
+		var manageIsValid = $("#manageForm").valid();
+		var shopIsValid = $("#shopApplyForm").valid();
+	
+		if(isSanzhengFlag){ //是 三证合一
+		   if(!businessIsValid || !accountIsValid || !manageIsValid || !shopIsValid){
+			return true;
+		   }
+		}else {
+		   if(!businessIsValid || !organizationIsValid || !taxIsValid || !accountIsValid || !manageIsValid || !shopIsValid){
+			return true;
+		   }
+		}
+	
+		
+
+		//模块图片非空校验开始-----------------------------------------------------------------------------------
+		//1营业执照信息 模块图片非空校验
+		if($("#businessLicencePicSrc").val() == '' || $("#businessLicencePicSrc").val() == null || $("#businessLicencePicSrc").val() == undefined){
+			alert("请上传营业执照副本电子版图片!");
+			return false;
+		}
+		if($("#artificialPersonPicSrc").val() == '' || $("#artificialPersonPicSrc").val() == null || $("#artificialPersonPicSrc").val() == undefined){
+			alert("法人身份证（正面）图片!");
+			return false;
+		}
+		if($("#artificialPersonPicBackSrc").val() == '' || $("#artificialPersonPicBackSrc").val() == null || $("#artificialPersonPicBackSrc").val() == undefined){
+			alert("请上传法人身份证（反面）图片!");
+			return false;
+		}
+		
+		if(!isSanzhengFlag){//非  三证合一   才验证
+		   //2组织机构代码信息 模块图片非空校验
+			if($("#organizationPicSrc").val() == '' || $("#organizationPicSrc").val() == null || $("#organizationPicSrc").val() == undefined){
+				alert("请上传组织机构代码证电子版图片!");
+				return false;
+			}
+			//3公司税务登记证信息 模块图片非空校验
+			if($("#taxRegistrationCertificatePicSrc").val() == '' || $("#taxRegistrationCertificatePicSrc").val() == null || $("#taxRegistrationCertificatePicSrc").val() == undefined){
+				alert("请上传税务登记证电子版图片!");
+				return false;
+			}
+			if($("#taxpayerCertificatePicSrc").val() == '' || $("#taxpayerCertificatePicSrc").val() == null || $("#taxpayerCertificatePicSrc").val() == undefined){
+				alert("请上传纳税人资格证电子版图片!");
+				return false;
+		   }
+		}
+		
+		
+		//4出金账户信息 模块图片非空校验
+		if($("#bankAccountPermitsPicSrc").val() == '' || $("#bankAccountPermitsPicSrc").val() == null || $("#bankAccountPermitsPicSrc").val() == undefined){
+			alert("请上传银行开户许可证电子版图片!");
+			return false;
+		}
+		//6卖家店铺运营申请 模块非空图片校验
+		if($("#marketingAuthDiv").attr("class") == ""){
+			if($("#marketingAuth").val() == '' || $("#marketingAuth").val() == null || $("#marketingAuth").val() == undefined){
+				alert("请上传销售授权书扫描件图片!");
+				return false;
+			}
+		}
+		//模块图片非空校验结束-----------------------------------------------------------------------------------
+
+
+		/*
+		//数据校验-JS校验
+		var required_bl = true;
+		var required_val = "";
+		var businessLicenceIndate = $("#businessLicenceIndate").val();
+		var companyPhone = $("#companyPhone").val();
+		var businessLicencePicSrc = $("#businessLicencePicSrc").val();
+		var artificialPersonPicSrc = $("#artificialPersonPicSrc").val();
+		var artificialPersonPicBackSrc = $("#artificialPersonPicBackSrc").val();
+		var organizationPicSrc = $("#organizationPicSrc").val();
+		var taxRegistrationCertificatePicSrc = $("#taxRegistrationCertificatePicSrc").val();
+		var taxpayerCertificatePicSrc = $("#taxpayerCertificatePicSrc").val();
+		var bankAccountPermitsPicSrc = $("#bankAccountPermitsPicSrc").val();
+		if(!$('#timeState').is(':checked') && (businessLicenceIndate==null || businessLicenceIndate=="" || businessLicenceIndate==undefined)){
+			required_bl = false;
+			required_val = "营业执照有效期";
+		}else if(businessLicencePicSrc==null || businessLicencePicSrc=="" || businessLicencePicSrc==undefined){
+			required_bl = false;
+			required_val = "营业执照副本电子版";
+		}else if(artificialPersonPicSrc==null || artificialPersonPicSrc=="" || artificialPersonPicSrc==undefined){
+			required_bl = false;
+			required_val = "法人身份证（正面）";
+		}else if(artificialPersonPicBackSrc==null || artificialPersonPicBackSrc=="" || artificialPersonPicBackSrc==undefined){
+			required_bl = false;
+			required_val = "法人身份证（反面）";
+		}else if(!isSanzhengFlag &&(organizationPicSrc==null || organizationPicSrc=="" || organizationPicSrc==undefined)){
+			required_bl = false;
+			required_val = "组织机构代码电子版";
+		}else if(!isSanzhengFlag &&(taxRegistrationCertificatePicSrc==null || taxRegistrationCertificatePicSrc=="" || taxRegistrationCertificatePicSrc==undefined)){
+			required_bl = false;
+			required_val = "税务登记证电子版";
+		}else if(!isSanzhengFlag &&(taxpayerCertificatePicSrc==null || taxpayerCertificatePicSrc=="" || taxpayerCertificatePicSrc==undefined)){
+			required_bl = false;
+			required_val = "纳税人资格证电子版";
+		}else if(bankAccountPermitsPicSrc==null || bankAccountPermitsPicSrc=="" || bankAccountPermitsPicSrc==undefined){
+			required_bl = false;
+			required_val = "银行开户许可证电子版";
+		}
+		if( !required_bl ){
+			alert(required_val+",不能为空值!");
+			return false;
+		}
+
+		//卖家店铺运营申请：经营类目id/经营品牌id
+		var cids = $("#addCategoryCids").val();
+		var bids = $("#selectedBrand").children();
+		if(!cids || cids.length==0){
+			alert("请选择您要经营的品类信息");
+			return false;
+		}
+		if(bids=="" || bids==null || bids.length==0){
+			alert("请选择您要经营的品牌信息");
+			return false;
+		}
+		*/
+		//营业执照信息 营业执照有效期至
+		if($('#timeState').is(':checked')){
+			$("#businessLicenceIndate").val('');
+		}
+
+		//提交
+		$("#configurationBtn").loadingMsg();
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			url:"$request.contextPath/information/registerSeller/submintInformation",
+			data:$("#registerSellerDiv").find("input,select,radio,checkbox").serializeArray(),
+			success: function(result){
+				$("#configurationBtn").hideMsg();
+				window.location.href="$request.contextPath/information/progressSeller/initProgress";
+			},
+			error:function(result){
+				$("#configurationBtn").hideMsg();
+			}
+		});
+		if($('#timeState').is(':checked')){
+			$("#businessLicenceIndate").val('长期有效');
+		}
+	});
+	//图片查看
+	$('.po_re_img').fancyzoom({
+		Speed:400,
+		showoverlay:false,
+		imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+	});
+});
+
+/*工具方法：上传图片*/
+function startUpload(fileElementId, showImg, urlInput){
+	//判断图片格式
+	var fileInput = $("#"+fileElementId).val();
+	var extStart = fileInput.lastIndexOf(".");
+	var ext = fileInput.substring(extStart,fileInput.length).toUpperCase();
+	if(ext!=".JPG" && ext!=".jpg" && ext!=".JPEG" && ext!=".jpeg" && ext!=".PNG" && ext!=".png" && ext!=".BMP" && ext!=".bmp"){
+		//销售授权书扫描件支持图片和压缩文件
+		if(fileElementId == "marketingAuthFile"){
+			if(ext!=".RAR" && ext!=".ZIP" && ext!=".7Z"){
+				alert("图片限于jpg,jpeg,png,bmp格式，附件限于rar,zip,7z格式");
+    			return false;
+			}else{
+				//上传文件
+				startFileUpload(urlInput);
+				return false;
+			}
+		}else{
+    		alert("图片限于jpg,jpeg,png,bmp格式");
+    		return false;
+		}
+	}
+	$.ajaxFileUpload({
+		url: '$request.getContextPath()/fileUpload/fixedUpload?date='+new Date(), //用于文件上传的服务器端请求地址
+		secureuri: false, //是否需要安全协议，一般设置为false
+		fileElementId: fileElementId, //文件上传域的ID
+		dataType: 'json', //返回值类型 一般设置为json
+		type:"post",
+		data: {size:1000000},
+		success: function (data, status){  //服务器成功响应处理函数
+			if(!data.success){
+				alert(data.msg);
+				return false;
+			}
+			if(fileElementId == "marketingAuthFile"){
+				var fileShowContainer = urlInput + "FileShowContainer";
+				$("#"+fileShowContainer).html('<img id="marketingAuthImg" src="" alt="销售授权书扫描件" width="55" height="55" class="mar_lr10 fl po_re_img" title="点击查看大图">');
+			}
+			$("#"+showImg).attr("src","$!imageServerAddr"+data.url);
+			$("#"+urlInput).val(data.url);
+			$("#"+fileElementId).val("");
+
+			//图片查看
+			$('.po_re_img').fancyzoom({
+				Speed:400,
+				showoverlay:false,
+				imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+			});
+		},
+		error: function (data, status, e){//服务器响应失败处理函数
+		}
+	});
+};
+
+//文件上传
+function startFileUpload(urlInput){
+	var fileElementId = urlInput + "File";
+	var showImg = urlInput + "Img";
+	var fileShowContainer = urlInput + "FileShowContainer";
+    var fileName = $("#"+fileElementId)[0].files[0].name;
+    var maxSize = 3145728;// 3M
+	//alert($("#"+fileElementId)[0].files[0].size);
+    if ($("#"+fileElementId)[0].files[0].size > maxSize) {
+        alert("上传文件过大！");
+        return false;
+    }
+    $.ajaxFileUpload({
+        url: '$request.getContextPath()/fileUpload/uploadzise', //用于文件上传的服务器端请求地址
+        secureuri: false, //是否需要安全协议，一般设置为false
+        fileElementId: fileElementId, //文件上传域的ID
+        dataType: 'json', //返回值类型 一般设置为json
+        type:"post",
+		data: {size: maxSize},
+        success: function (data, status){  //服务器成功响应处理函数
+            if(data.success){
+				var imageUrl = '$!imageServerAddr'+data.url;
+				$("#"+fileShowContainer).html("<div class='fl' title=" + fileName + "><a href='" + imageUrl + "'><img src='$staticPath/images/zip.png' style='width:32px;height:32px'></a><div>");
+        		$("#"+urlInput).val(data.url);
+            }else{
+                alert(data.msg);
+            }
+        },
+        error: function (data, status, e){//服务器响应失败处理函数
+            alert("亲系统繁忙，请稍后再试");
+        }
+    });
+}
+
+/**
+ * 省市区数据填充
+ * parentCode 父级编码
+ * opitonId 需要填充数据的下拉列表框的id
+ * selectVal 默认选中的值
+ * name 服务器返回的数据中，作为下拉框option的text的字段名，默认为"name"
+ * code 服务器返回的数据中，作为下拉框option的value的字段名，默认为"code"
+ */
+function optionItems(url, parentCode, optionId,selectVal, name, code){
+	$.ajax({
+		url:url,
+		type:"post",
+		data:{
+			parentCode:parentCode
+		},
+		dataType: "json",
+		success:function(data){
+			var optionItem = $("#"+optionId);
+			optionItem.empty();
+			optionItem.append($("<option>").text("请选择").val(""));
+			$.each(data, function (n, address) {
+				if(!name){
+					name = "name";
+				}
+				if(!code){
+					code = "code";
+				}
+				var option = $("<option>").text(address[name]).val(address[code]);
+				if(address.code == selectVal){
+					option.attr("selected",true);
+				}
+				optionItem.append(option);
+			});
+		}
+	});
+}
+/**
+ * 省市区数据-初始化
+ * address 地址编码：32,3201,320103
+ * provinces 下拉框ID：省份
+ * city 下拉框ID：市
+ * area 份下拉框ID：区
+ */
+function initAddress(address,provinces,city,area){
+	var strs = address.split(",");
+	for(var i=0;i<strs.length;i++){
+		if(i==0){
+			$("#"+provinces).val(strs[i]);
+		}else if(i==1){
+			optionItems("$request.contextPath/information/register/queryAddress",strs[i-1],city,strs[i]);
+		}else if(i==2){
+			optionItems("$request.contextPath/information/register/queryAddress",strs[i-1],area,strs[i]);
+		}
+	}
+}
+/*更改编辑样式*/
+function changeShow(showClass,hideClass){
+    $("."+showClass).show();
+	$("."+hideClass).hide();
+}
+//初始化校验控件
+function initValidPlugin(){
+	//验证：特殊字符
+	jQuery.validator.addMethod("specialCharValidate", function(value, element) {
+			var pattern = new RegExp("[`~!@%#$^&*()=|{}':;',　\\[\\]<>/? \\.；：%……+￥（）【】‘”“'。，、？]");
+			return this.optional(element)||!pattern.test(value) ;
+	}, "不能有特殊字符");
+	//验证：只能为字母和中文
+	jQuery.validator.addMethod("chrchinese", function(value, element) {
+		var chinese = /[a-zA-Z\u4e00-\u9fa5]+$/;
+		return this.optional(element) || (chinese.test(value));
+	}, "只能输入字母和中文");
+	//验证：数字和字母
+	jQuery.validator.addMethod("chrnum", function(value, element) {
+		var chrnum = /^([a-zA-Z0-9]+)$/;
+		return this.optional(element) || (chrnum.test(value));
+	}, "只能输入数字和字母");
+}
+</script>
+
+<div id="registerSellerDiv" method="post">
+	<input id="userId" name="userId" type="hidden" value="$!userId"/>
+	<!--营业执照信息 start -->
+	#parse("/information/sellerBusiness.vm")
+	<!--营业执照信息end-->
+
+	<!--组织机构代码信息 start -->
+	#parse("/information/sellerOrganization.vm")
+	<!--组织机构代码信息end-->
+
+	<!--税务登记证信息 start -->
+	#parse("/information/sellerTax.vm")
+	<!--税务登记证信息end-->
+
+	<!--出金账户信息 start -->
+	#parse("/information/sellerAccount.vm")
+	<!--出金账户信息end-->
+
+	<!--经营信息 start -->
+	#parse("/information/sellerManage.vm")
+	<!--经营信息end-->
+
+	<!--卖家店铺运营申请 start -->
+	#parse("/information/sellerShopApply.vm")
+	<!--卖家店铺运营申请end-->
+
+</div>

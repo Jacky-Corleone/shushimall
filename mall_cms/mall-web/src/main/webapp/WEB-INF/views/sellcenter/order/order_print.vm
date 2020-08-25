@@ -1,0 +1,105 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/none_layout.vm")
+<html>
+<head>
+    <title>舒适100</title>
+    <link rel="icon" href="$request.contextPath/assets/images/favicon.ico" mce_href="$request.contextPath/assets/images/favicon.ico" type="image/x-icon">
+    <script type="text/javascript" src="$staticPath/js/jquery-1.11.2.min.js"></script>
+    <script language="javascript" type="text/javascript" src="$staticPath/js/js.js"></script>
+    <script type="text/javascript" src="$staticPath/js/common.js"></script>
+    <script language="javascript" type="text/javascript" src="$staticPath/js/tab.js"></script>
+    <script language="javascript" type="text/javascript" src="$staticPath/plugin/printArea/printArea.js"></script>
+    <script type="text/javascript">
+        $(function(){
+            $("#printBtn").click(function(){
+                $("div.PrintArea").printArea();
+            });
+        });
+    </script>
+</head>
+<body>
+<div style="width:100%; min-height:500px; background:#fff; padding:60px 0; font-family: Microsoft Yahei, Arial" class="PrintArea">
+    <table width="80%" align="center" cellpadding="0" cellspacing="0" style="font-size:12px;">
+        <tr style="border-bottom:1px solid #333;">
+            <td height="50" align="left" ><img name="" src="$!imageServerAddr$!{logoDTO.picUrl}" alt="" /></td>
+            <td>&nbsp;</td>
+            <td height="25" align="left"  style="color:#ea8080; text-align:right"><span style="font-size:24px;letter-spacing:4px;">发货清单</span>（客户留存）</td>
+        </tr>
+        <tr>
+            <td height="25">订单编号：$!tradeOrdersDTO.orderId</td>
+            <td height="25"><span style="margin-left:20px;">订购日期：$date.format('yyyy-MM-dd HH:mm:ss', $!tradeOrdersDTO.createTime)</span></td>
+            <td height="25">商品总数：$!orderTotalNum</td>
+        </tr>
+        <tr>
+            <td height="25">买家用户名：$!buyerUserName</td>
+            <td height="25"><span style="margin-left:20px;">买家ID：$!tradeOrdersDTO.buyerId</span></td>
+            <td height="25">店铺名称：$!shopName</td>
+        </tr>
+        <tr>
+            <td height="25">收货人姓名：$!tradeOrdersDTO.name</td>
+            <td height="25"><span style="margin-left:20px;">收货人联系方式：$!tradeOrdersDTO.mobile</span></td>
+            <td height="25">&nbsp;</td>
+        </tr>
+        <tr>
+            <td height="25" colspan="3">收货地址：$!tradeOrdersDTO.fullAddress</td>
+        </tr>
+    </table>
+    <table width="80%" align="center" cellpadding="0" cellspacing="0" style="font-size:12px;">
+        <tr>
+            <td height="30">总金额：￥$!tradeOrdersDTO.paymentPrice</td>
+            <td height="30">运费：￥#if($!tradeOrdersDTO.freight || $!tradeOrdersDTO.freight==0)$!tradeOrdersDTO.freight #else 0.00 #end</td>
+            <td height="30">优惠：#if($!tradeOrdersDTO.totalDiscount || $!tradeOrdersDTO.totalDiscount==0)￥$!tradeOrdersDTO.totalDiscount #else ￥0.00 #end</td>
+            <td height="30">应付：￥$!tradeOrdersDTO.paymentPrice</td>
+            <td height="30">已付：#if($!tradeOrdersDTO.paid==2) ￥$!tradeOrdersDTO.paymentPrice #else ￥0.0 #end(已退：￥$!totalMoney)</td>
+        </tr>
+        <tr>
+            <td height="30">发货人：$!sellerUserName</td>
+            <td height="30">联系方式：$!sellerMobile</td>
+            <td  height="30" colspan="3">发货时间：$!date.format('yyyy-MM-dd HH:mm:ss', $!tradeOrdersDTO.deliverTime)</td>
+        </tr>
+    </table>
+    <table width="80%" border="0" align="center" cellpadding="0" cellspacing="0"  style="font-size:12px;margin-top:20px;border-collapse:collapse;">
+        <tr>
+            <td height="30" style="border:1px solid #333;"><strong>&nbsp;&nbsp;序号</strong></td>
+            <td height="30" style="border:1px solid #333;"><strong>&nbsp;&nbsp;商品编号</strong></td>
+            <td height="30" style="border:1px solid #333;"><strong>&nbsp;&nbsp;商品名称</strong></td>
+            <td height="30" style="border:1px solid #333;"><strong>&nbsp;&nbsp;数量</strong></td>
+            <td height="30" style="border:1px solid #333;"><strong>&nbsp;&nbsp;单价</strong></td>
+            <td height="30" style="border:1px solid #333;"><strong>&nbsp;&nbsp;小计</strong></td>
+        </tr>
+        #foreach($entity in $!tradeOrdersDTO.items)
+        #if($entity.num!=0)
+            <tr>
+                <td height="30" style="border:1px solid #333;">&nbsp;&nbsp;$!velocityCount</td>
+                <td height="30" style="border:1px solid #333;">&nbsp;&nbsp;$entity.itemId</td>
+                <td height="30" style="border:1px solid #333;">
+                    #foreach($array in $!orderItems)
+                        #if($!array.skuId == $!entity.skuId)
+                            &nbsp;&nbsp;
+                            <a href="$request.getContextPath()/productController/details?id=$!entity.itemId&skuId=$!entity.skuId" target="_blank">
+                                $!array.itemName 
+                            </a>
+                                                                                 （$!entity.skuString）
+                        #end
+                    #end
+                </td>
+                <td height="30" style="border:1px solid #333;">&nbsp;&nbsp;$entity.num</td>
+                <td height="30" style="border:1px solid #333;">&nbsp;&nbsp;$entity.payPrice</td>
+                <td height="30" style="border:1px solid #333;">&nbsp;&nbsp;#set($itemTotalPrice = $entity.num * $entity.payPrice) $!itemTotalPrice</td>
+            </tr>
+           #end 
+        #end
+    </table>
+    <div style="width:80%; height:auto; line-height:20px; font-size:12px; margin:20px auto;">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:10px; font-size:12px;">
+            <tr>
+                <td width="60"><img name="" src="$staticPath/images/tdcode.png" width="60" height="60" alt="" /></td>
+                <td style="margin-top:10px; vertical-align:bottom; padding-left:10px;">更多优惠，请关注舒适100官方微信</td>
+                ##<td style="vertical-align:bottom; color:#ea8080; font-weight:bold;"  align="right">舒适100，采购好管家！</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<center><button type="button" id="printBtn">打印</button></center>
+</body>
+</html>

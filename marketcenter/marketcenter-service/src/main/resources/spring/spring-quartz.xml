@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+     http://www.springframework.org/schema/beans 
+     http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <bean id="couponExpireRemindJob" class="com.camelot.maketcenter.job.CouponExpireRemindJob"></bean>
+    <!-- 优惠券即将过期提醒 -->
+    <bean id="couponExpireRemindJobBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="couponExpireRemindJob"/>
+        </property>
+        <property name="targetMethod">
+            <value>remindCouponExpire</value>
+        </property>
+    </bean>
+    <bean id="couponExpireRemindJobCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="couponExpireRemindJobBean" />
+       	<property name="cronExpression" value="0 0 10 * * ?" /> <!--每天 早晨10:00-->
+        <!--<property name="cronExpression" value="0 1/2 * * * ?" />--> <!--开发测试  每2分钟运行一次,起点1分-->
+        <property name="group" value="App_TRIGGER_GROUP" />
+    </bean>
+    <!-- 任务调度管理器 -->
+    <!--<bean id="clusterQuartzScheduler" class="com.camelot.openplatform.util.SchedulerFactoryBeanProxy">-->
+    <bean id="clusterQuartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="schedulerName" value="APP_SCHEDULER"/>
+        <!-- Job接受applicationContext的成员变量名 -->
+        <property name="applicationContextSchedulerContextKey" value="applicationContext" />
+        <!-- 是否覆盖已有的任务 -->
+        <property name="overwriteExistingJobs" value="true" />
+        <property name="triggers">
+            <list>
+            	<!-- 优惠券即将过期提醒 -->
+            	<ref bean="couponExpireRemindJobCronTriggerBean" />
+            </list>
+        </property>
+        <!--<property name="startFlag" value="${quartz.enable}" />-->
+    </bean>
+    
+</beans>

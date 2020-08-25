@@ -1,0 +1,155 @@
+#set($staticPath="$request.contextPath/assets")
+#set($rootPath="$request.scheme://"+"$request.serverName:"+"$request.serverPort")
+#set($layout = "/seller_layout.vm")
+<script type="text/javascript">
+$(function(){
+	//加载左侧菜单
+	$("#leftSeller").load("$request.contextPath/leftSeller");
+})
+//条件查询
+function submitGoodsForm(){
+	$.ajax({
+		url  : '',
+		type : 'post',
+		dataType : 'json',
+		data : $("#searchForm").serializeObject(),//表单序列化提交
+		error : function(request){
+				$.messager.alert('提示','数据加载失败...','info');
+		},
+		success : function(data){
+			//填充列表
+			$.messager.alert('提示','数据加载成功','info');
+		}
+	});
+}
+function addNewGoods(){
+	$.cookie('clicked_menu', "$rootPath$request.contextPath/sellcenter/sellProduct/itemAddSelect", {path:'/'});
+	window.location.href="$request.contextPath/shop/addNew";
+}
+</script>
+<div id="main">
+<!--中间部分开始-->
+<div id="leftSeller" class="border-4">
+</div><!--left end -->
+<!--右边部分开始-->
+<div id="right">
+   <div class="right_top bg_06 border-4">
+      <div class="right_top_2 fl">
+        <ul class="list">
+        <li class="wid_220">
+          <span class="font_wid">商品名称：</span><input class="input_Style2 wid_120 hei_30" type="text" />
+        </li>
+        <li class="wid_220">
+          <span class="font_wid">商品编码：</span><input type="text" class="input_Style2 wid_120 hei_30"/>
+        </li>
+       
+        <li class="wid_220">
+          <span class="font_wid">SKU编码：</span><input class="input_Style2 wid_120 hei_30" type="text" />
+        </li>
+
+       
+        <li class="wid_400">
+          <span class="font_wid">库存区间：</span><input class="input_Style2 wid_120 hei_30" type="text" /><i class="demo-icons">-</i><input class="input_Style2 wid_120 hei_30" type="text" />        
+        </li>
+         <li class="wid_220">
+          <span class="font_wid">商品货号：</span><input type="text" class="input_Style2 wid_120 hei_30"/>
+        </li>
+        
+        <li><span class="font_wid mar_l">商品状态：</span><select class="input_Style2 wid_90 mar_r10 hei_35 "> <option>在售</option><option >待审核</option><option>待上架</option></select></li>    
+      </ul>
+      </div>
+      <div class="right_top_3 fr mar_t10">
+         <button type="button" class="button_4 but_cx2">
+        <a class="font_1c">查 询</a>
+      </button>
+      </div>
+   </div>
+  <!-- right结束 -->
+
+  <div id="right_bot" class="right_bot border-4 mar_t10 bg_06">
+    <!-- 商品列表开头 -->
+    <div class="right_xinxi mar_l14 ">
+      <ul class="list_top bg_08 font_14b">
+        <li class="wid_260 font_cen hei_35">商品信息</li>
+        <li class="wid_80 font_cen hei_35">SKU编码</li>
+        <li class="wid_120 font_cen hei_35">商品编码</li>
+        <li class="wid_120 font_cen hei_35">所属类目</li>
+        <li class="wid_90  hei_35"><select class="wid_90 "><option>销售价</option><option>平均售价</option></select></li> 
+        <li class="wid_90 font_cen hei_35">30天销量</li>
+        <li class="wid_90 font_cen hei_35">库存</li>
+        <li class="wid_90 font_cen hei_35">商品状态</li>
+      </ul>
+      <!-- 类型选择 -->
+     
+      <!-- 商品信息 -->
+      <table class="information mar_t10" id="information ">
+        <tr>
+          <td class="wid_260 border-1 ">
+            <input type="checkbox" class="mar_lr5" />
+            <img src="./images/shop_img2.png" width="75" height="50"/>
+            <span>佳能2014新款喷墨打印机</span>
+          </td>
+          <td class="wid_80 border-1 font_cen">1001011</td>
+          <td class="wid_120 border-1 font_cen">办公设备/打印机/喷墨打印机</td>
+          <td class="wid_120 border-1 font_cen">85.0</td>
+          <td class="wid_90 border-1 font_cen ">34</td>
+          <td class="wid_90 border-1 font_cen">34</td>
+         <td class="wid_90 border-1 "><input type="text" class="wid_40 mar_23 font_cen border-4" value="54" /></td>
+          <td class="wid_90 border-1 font_cen">在售</td>
+        </tr>
+        <tr>
+          <td class="wid_260 border-1 ">
+            <input type="checkbox" />
+            <img src="./images/shop_img1.png" width="75" height="50"/>
+            <span>佳能2014新款喷墨打印机</span>
+          </td>
+          <td class="wid_80 border-1 font_cen">1001011</td>
+          <td class="wid_120 border-1 font_cen">办公设备/打印机/喷墨打印机</td>
+          <td class="wid_120 border-1 font_cen">85.0</td>
+          <td class="wid_90 border-1 font_cen ">34</td>
+          <td class="wid_90 border-1 font_cen">34</td>
+          <td class="wid_90 border-1 "><input type="text" class="wid_40 mar_23 font_cen border-4" value="54" /></td>
+          <td class="wid_90 border-1 font_cen">待审核</td>
+        </tr>
+        <tr>
+          <td class="wid_260 border-1 ">
+            <input type="checkbox" />
+            <img src="./images/shop_img2.png" width="75" height="50"/>
+            <span>佳能2014新款喷墨打印机</span>
+          </td>
+          <td class="wid_80 border-1 font_cen">1001011</td>
+          <td class="wid_120 border-1 font_cen">办公设备/打印机/喷墨打印机</td>
+          <td class="wid_120 border-1 font_cen">85.0</td>
+          <td class="wid_90 border-1 font_cen ">34</td>
+          <td class="wid_90 border-1 font_cen">34</td>
+          <td class="wid_90 border-1 "><input type="text" class="wid_40 mar_23 font_cen border-4" value="54" /></td>
+          <td class="wid_90 border-1 font_cen">待上架</td>
+        </tr>
+        <tr>
+          <td class="wid_260 border-1 ">
+            <input type="checkbox" />
+            <img src="./images/shop_img2.png" width="75" height="50"/>
+            <span>佳能2014新款喷墨打印机</span>
+          </td>
+          <td class="wid_80 border-1 font_cen">1001011</td>
+          <td class="wid_120 border-1 font_cen">办公设备/打印机/喷墨打印机</td>
+          <td class="wid_120 border-1 font_cen">85.0</td>
+          <td class="wid_90 border-1 font_cen ">34</td>
+          <td class="wid_90 border-1 font_cen">34</td>  
+          <td class="wid_90 border-1 "><input type="text" class="wid_40 mar_23 font_cen border-4" value="54" /></td>
+          <td class="wid_90 border-1 font_cen">待下架</td>
+        </tr>
+      </table>
+      <button type="button" class="button_2 shop_ok mar_tb10 fr ">确 定</button>
+      <div class="clear"></div>
+       
+    </div>
+   
+  </div>
+      
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->   
+    
+
+

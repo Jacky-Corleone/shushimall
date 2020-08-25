@@ -1,0 +1,78 @@
+#set($layout = "common/order.vm")
+
+#foreach($entity in $pager.records)
+	<div class="pad_lr5 bg_01 mar_b10">
+		<!-- 订单号 -->
+		<div class="hei_32 border_2">
+			<p class="fl wid_57">
+				<span>订单号:$!{entity.orderId}</span>
+			</p>
+			<p class="fr wid_35 font_right">
+				#if($entity.approveStatus=='0')
+					待审核
+				#elseif($entity.approveStatus=='1')
+					审核通过
+				#elseif($entity.approveStatus=='2')
+					<font color="#F00"  title="点击此处查看驳回原因" onclick="showDiv('rejectReasonId','$!entity.rejectReason')">审核驳回</font>
+				#end			
+			</p>
+			<input type="hidden" id="totalItem" value="$!{totalItem}">
+		</div>
+		<!-- 订单号 -->
+		#foreach($entityItem in $!entity.items)
+			#foreach($json in $!jsonArray)
+				#if($!entity.orderId == $!json.orderId)
+					#foreach($jsonItem in $!json.items)
+						#if($!entityItem.skuId == $!jsonItem.skuId)
+							<!-- 商品信息 -->
+							<div class="border_2 shop_order pad_tb5">
+								<p class="fl shop_order_img">
+									<a href="$request.contextPath/product/toDetail?id=$!entityItem.itemId&skuId=$!entityItem.skuId">
+										<img src="$!imageServerAddr$!jsonItem.skuPicUrl" width="75px" height="75px"/>
+									</a>
+								</p>
+								<div class="wid_50 fl shop_order_p">
+									<p>
+										<a href="$request.contextPath/product/toDetail?id=$!item.itemId&skuId=$!item.skuId">
+											$!{jsonItem.itemName}
+										</a>
+									</p>
+									<p>
+										商品属性：
+										#foreach($itemAttrName in $!jsonItem.itemAttr)
+                           				    $itemAttrName.name :
+                               					#foreach($itemAttrValue in $itemAttrName.values)
+                                  					$itemAttrValue.name 
+												#end
+                                        #end
+									</p>
+								</div>
+								<div class="fl lin_24">
+									<p>￥$!jsonItem.payPrice</p>
+									<p class="font_66">x$!jsonItem.num</p>
+								</div>
+								
+								<div class="clear"></div>
+							</div>
+							<!-- 商品信息 -->
+						#end
+					#end
+				#end
+			#end
+		#end
+		<p class="hei_34">下单时间：$!date.format('yyyy-MM-dd HH:mm:ss ',$!entity.createTime )&nbsp;&nbsp;&nbsp;&nbsp;<span class="fr">总价：$entity.paymentPrice</span></p>
+		<!-- 按钮 -->
+		<div class="pad_tb5">
+			#if($!entity.locked == 1)
+				<button class="button_3 pad_mlr5" id="orderDetail" onclick="orderDetailApprove('$!{entity.orderId}')">订单详情</button>
+				#if("$!{status}"!="")  <!-- 待审核 -->
+					<button class="button_3 pad_mlr5" onclick="approveSubmit('$entity.orderId','1','$entity.parentOrderId')">审核通过</button>
+					<button class="button_3 pad_mlr5" onclick="approveReject('$entity.orderId','2')">审核驳回</button>
+				#end
+			#end
+			<div class="clear"></div>
+		</div>
+	</div>
+#end
+
+

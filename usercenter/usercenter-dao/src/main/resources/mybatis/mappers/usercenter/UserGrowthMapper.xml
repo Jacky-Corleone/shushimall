@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.usercenter.dao.UserGrowthDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="userGrowthMap" type="com.camelot.usercenter.dto.UserGrowthDTO">
+				<result property="id" column="id"/>
+				<result property="userId" column="user_id"/>
+				<result property="type" column="type"/>
+				<result property="growthValue" column="growth_value"/>
+				<result property="createTime" column="create_time"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    						<!-- 一些公共变量设置  -->
+    <!-- =========================================================== -->
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.id != null  and entity.id !=''">
+				<![CDATA[ and user_growth.id  = #{entity.id} ]]>
+			</if>
+			<if test="entity.userId != null  and entity.userId !=''">
+				<![CDATA[ and user_growth.user_id  = #{entity.userId} ]]>
+			</if>
+			<if test="entity.growthValue != null  and entity.growthValue !=''">
+				<![CDATA[ and user_growth.growth_value  = #{entity.growthValue} ]]>
+			</if>
+			<if test="entity.type != null  and entity.type !=''">
+				<![CDATA[ and user_growth.type  = #{entity.type} ]]> 
+			</if>
+			<if test="entity.createTime != null  and entity.createTime !=''">
+				<![CDATA[ and user_growth.create_time  = #{entity.createTime} ]]> 
+			</if>
+		</if>
+	</sql>
+	<sql id="selectAll">
+		<![CDATA[
+			select 
+			id,
+			user_id,
+			growth_value,
+			type,
+			create_time
+			from 
+			user_growth
+		]]>
+	</sql>
+	<sql id="pagination_tail">
+		limit #{pager.pageOffset} , #{pager.rows}
+	</sql>
+	
+	<!--总条数 -->
+	<select id="selectCount" resultType="long">
+		select count(1) from user_growth
+		<include refid="where_fragement" />
+	</select>
+	<!--分页查询 -->
+	<select id="selectList" resultMap="userGrowthMap">
+		<include refid="selectAll"/>
+		<include refid="where_fragement" />
+		 order by user_growth.create_time desc
+		<if test="pager!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	<!-- 插入记录 -->
+	<insert id="addUserGrowthInfo" parameterType="object">
+		<![CDATA[
+		insert into user_growth (
+		    	 user_id
+		    	 ,type
+		    	 ,growth_value
+		    	 ,create_time
+		   )values(
+		    	#{userId}
+		    	,#{type}
+		    	,#{growthValue}
+		    	,now()
+		   )
+	    ]]>	
+	</insert>
+	
+
+	
+
+	
+	
+	
+</mapper>

@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 
+<typeAlias alias="shopCustomerService" type="com.camelot.tradecenter.entity.dto.ShopCustomerService" />
+ -->
+<mapper namespace="com.camelot.storecenter.dao.ShopCustomerServiceMybatisDAO">
+
+    <!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+    <resultMap id="shopCustomerServiceMap" type="shopCustomerService">
+        <result property="id" column="id"/>
+        <result property="shopId" column="shop_id"/>
+        <result property="stationId" column="station_id"/>
+        <result property="number" column="number"/>
+        <result property="operator" column="operator"/>
+        <result property="createdDt" column="created_dt"/>
+        <result property="lastUpdDt" column="last_upd_dt"/>
+        <result property="deletedFlag" column="deleted_flag"/>
+        <result property="add1" column="add1"/>
+        <result property="add2" column="add2"/>
+    </resultMap>
+    
+    <resultMap id="shopCustomerMap" type="com.camelot.storecenter.dto.ShopCustomerServiceDTO">
+        <result property="id" column="id"/>
+        <result property="shopId" column="shop_id"/>
+        <result property="stationId" column="station_id"/>
+        <result property="number" column="number"/>
+        <result property="operator" column="operator"/>
+        <result property="createdDt" column="created_dt"/>
+        <result property="lastUpdDt" column="last_upd_dt"/>
+        <result property="deletedFlag" column="deleted_flag"/>
+        <result property="add1" column="add1"/>
+        <result property="add2" column="add2"/>
+        <result property="shopName" column="shop_name"/>
+    </resultMap>
+
+    <!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+    <!-- mysql 分页 -->
+    <sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+    <!-- mysql 查询总数 -->
+    <sql id="count_Tail">
+		select count(1) from 
+	</sql>
+
+    <sql id="selectAllColumns">
+		<![CDATA[
+
+		select
+ 			id
+ 			,shop_id
+ 			,station_id
+ 			,number
+ 			,operator
+ 			,created_dt
+ 			,last_upd_dt
+ 			,deleted_flag
+ 			,add1
+ 			,add2
+		FROM
+		shop_customer_service shop_customer_service_
+
+        ]]>
+	</sql>
+	
+	
+	<sql id="selectShopAndCustors">
+	select 
+	shopInfo.shop_id,shopInfo.shop_name,
+	shop_customer_service_.*
+	from shop_info shopInfo left join shop_customer_service shop_customer_service_ on shopInfo.shop_id=shop_customer_service_.shop_id where shopInfo.status='5'
+	</sql>
+	
+	<sql id="where_fragement1">
+	<if test="entity!=null">
+	        <if test="entity.shopName != null  and entity.shopName !=''">
+				<![CDATA[ and shopInfo.shop_name  LIKE '%${entity.shopName}%' ]]>
+			</if>
+			<if test="entity.shopId != null  and entity.shopId !=''">
+				<![CDATA[ and shopInfo.shop_id  LIKE '%${entity.shopId}%' ]]>
+			</if>
+			<if test="entity.stationId != null  and entity.stationId !=''">
+                <![CDATA[ and shop_customer_service_.station_id   LIKE '%${entity.stationId}%']]>
+            </if>
+            <if test="entity.customerNum != null  and entity.customerNum !=''">
+                <![CDATA[ and shop_customer_service_.number   LIKE '%${entity.customerNum}%']]>
+            </if>
+	</if>
+	</sql>
+	
+	
+	
+
+    <sql id="where_fragement">
+        where 1=1
+        <if test="entity!=null">
+            <if test="entity.id != null  and entity.id !=''">
+                <![CDATA[ and shop_customer_service_.id  =#{entity.id}]]>
+            </if>
+            <if test="entity.shopId != null  and entity.shopId !=''">
+                <![CDATA[ and shop_customer_service_.shop_id =#{entity.shopId}]]>
+            </if>
+            <if test="entity.stationId != null  and entity.stationId !=''">
+                <![CDATA[ and shop_customer_service_.station_id =#{entity.stationId}]]>
+            </if>
+            <if test="entity.number != null  and entity.number !=''">
+                <![CDATA[ and shop_customer_service_.number  =#{entity.number}]]>
+            </if>
+            <if test="entity.operator != null  and entity.operator !=''">
+                <![CDATA[ and shop_customer_service_.operator  LIKE CONCAT('%',#{entity.operator},'%')]]>
+            </if>
+            <if test="entity.createdDt != null  and entity.createdDt !=''">
+                <![CDATA[ and shop_customer_service_.created_dt  LIKE CONCAT('%',#{entity.createdDt},'%')]]>
+            </if>
+            <if test="entity.lastUpdDt != null  and entity.lastUpdDt !=''">
+                <![CDATA[ and shop_customer_service_.last_upd_dt  LIKE CONCAT('%',#{entity.lastUpdDt},'%')]]>
+            </if>
+            <if test="entity.deletedFlag != null  and entity.deletedFlag !=''">
+                <![CDATA[ and shop_customer_service_.deleted_flag  =#{entity.deletedFlag}]]>
+            </if>
+            <if test="entity.add1 != null  and entity.add1 !=''">
+                <![CDATA[ and shop_customer_service_.add1  LIKE CONCAT('%',#{entity.add1},'%')]]>
+            </if>
+            <if test="entity.add2 != null  and entity.add2 !=''">
+                <![CDATA[ and shop_customer_service_.add2  LIKE CONCAT('%',#{entity.add2},'%')]]>
+            </if>
+        </if>
+    </sql>
+
+    <!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+    <select id="getAll" resultMap="shopCustomerServiceMap">
+        <include refid="selectAllColumns"/>
+    </select>
+    <select id="get" resultMap="shopCustomerServiceMap" parameterType="long">
+        <include refid="selectAllColumns"/>
+        <![CDATA[
+		where shop_customer_service_.id = #{id}
+		]]>
+    </select>
+    <!-- 根据id查询 -->
+    <select id="selectById" resultMap="shopCustomerServiceMap" parameterType="long">
+        <include refid="selectAllColumns"/>
+        <![CDATA[
+		where shop_customer_service_.id = #{id}
+		]]>
+    </select>
+    
+    
+    <!-- 根据id查询 -->
+    <select id="selectShopAndCustomer" resultMap="shopCustomerMap">
+        <include refid="selectShopAndCustors"/>
+        <include refid="where_fragement1"/>
+        <if test="page!=null">
+            <include refid="pagination_tail"/>
+        </if>
+    </select>
+    
+    <select id="selectShopAndCustomerCount" resultType="long">
+    <include refid="count_Tail"/>
+    shop_info shopInfo left join shop_customer_service shop_customer_service_ on shopInfo.shop_id=shop_customer_service_.shop_id where shopInfo.status='5'
+    <include refid="where_fragement1"/>
+    </select>
+
+    <!-- 分页查询 -->
+    <select id="selectListByCondition" resultMap="shopCustomerServiceMap">
+        <include refid="selectAllColumns"/>
+        <include refid="where_fragement"/>
+        <if test="page!=null">
+            <include refid="pagination_tail"/>
+        </if>
+    </select>
+
+    <select id="selectCountByCondition" resultType="long">
+        <include refid="count_Tail"/>
+        shop_customer_service shop_customer_service_
+        <include refid="where_fragement"/>
+    </select>
+
+    <insert id="insert" parameterType="shopCustomerService">
+		
+		<![CDATA[
+
+		insert into shop_customer_service
+		  (
+				shop_id
+				,station_id
+				,number
+				,operator
+				,created_dt
+				,last_upd_dt
+				,deleted_flag
+				,add1
+				,add2
+		   )
+		values
+		  (
+				#{shopId}
+				,#{stationId}
+				,#{number}
+				,#{operator}
+				,#{createdDt}
+				,#{lastUpdDt}
+				,#{deletedFlag}
+				,#{add1}
+				,#{add2}
+		   )
+
+        ]]>
+	</insert>
+
+
+    <!-- 根据id，修改记录 -->
+    <update id="update" parameterType="shopCustomerService">
+		<![CDATA[
+
+		update shop_customer_service set
+   			id = #{id}
+   			,shop_id = #{shopId}
+   			,number = #{number}
+   			,operator = #{operator}
+   			,created_dt = #{createdDt}
+   			,last_upd_dt = #{lastUpdDt}
+   			,deleted_flag = #{deletedFlag}
+   			,add1 = #{add1}
+   			,add2 = #{add2}
+		 where id = #{id}
+
+        ]]>
+	</update>
+
+    <delete id="delete" parameterType="long">
+		<![CDATA[
+
+		delete from shop_customer_service where id = #{id}
+
+        ]]>
+	</delete>
+    <sql id="updateSelective_set">
+        <set>
+            <if test="shopCustomerService.shopId!= null">
+                shop_id = #{shopCustomerService.shopId},
+            </if>
+            <if test="shopCustomerService.stationId!= null">
+                station_id = #{shopCustomerService.stationId},
+            </if>
+            <if test="shopCustomerService.number!= null">
+                number = #{shopCustomerService.number},
+            </if>
+            <if test="shopCustomerService.operator!= null">
+                operator = #{shopCustomerService.operator},
+            </if>
+            <if test="shopCustomerService.createdDt!= null">
+                created_dt = #{shopCustomerService.createdDt},
+            </if>
+            <if test="shopCustomerService.lastUpdDt!= null">
+                last_upd_dt = #{shopCustomerService.lastUpdDt},
+            </if>
+            <if test="shopCustomerService.deletedFlag!= null">
+                deleted_flag = #{shopCustomerService.deletedFlag},
+            </if>
+            <if test="shopCustomerService.add1!= null">
+                add1 = #{shopCustomerService.add1},
+            </if>
+            <if test="shopCustomerService.add2!= null">
+                add2 = #{shopCustomerService.add2},
+            </if>
+        </set>
+    </sql>
+    <sql id="updateAll_set">
+        <set>
+            shop_id = #{shopCustomerService.shopId},
+            number = #{shopCustomerService.number},
+            operator = #{shopCustomerService.operator},
+            created_dt = #{shopCustomerService.createdDt},
+            last_upd_dt = #{shopCustomerService.lastUpdDt},
+            deleted_flag = #{shopCustomerService.deletedFlag},
+            add1 = #{shopCustomerService.add1},
+            add2 = #{shopCustomerService.add2},
+        </set>
+    </sql>
+    <update id="updateSelective" parameterType="shopCustomerService">
+        update shop_customer_service
+        <include refid="updateSelective_set"/>
+        where id = #{shopCustomerService.id}
+    </update>
+
+    <update id="updateAllWithDateTimeCheck">
+        update shop_customer_service
+        <include refid="updateAll_set"/>
+        where id = #{shopCustomerService.id}
+        and LAST_UPD_DT = #{prevUpdDt}
+    </update>
+
+    <update id="updateSelectiveWithDateTimeCheck">
+        update shop_customer_service
+        <include refid="updateSelective_set"/>
+        <![CDATA[
+		 	where id = #{shopCustomerService.id}
+		 	and LAST_UPD_DT = #{prevUpdDt}
+		]]>
+    </update>
+    <sql id="searchByCondition_fragement">
+        <include refid="selectAllColumns"/>
+        where 1=1
+        <if test="shopCustomerService != null">
+            <if test="shopCustomerService.shopId != null">
+                and shop_id = #{shopCustomerService.shopId}
+            </if>
+            <if test="shopCustomerService.number != null">
+                and number = #{shopCustomerService.number}
+            </if>
+            <if test="shopCustomerService.operator != null">
+                and operator = #{shopCustomerService.operator}
+            </if>
+            <if test="shopCustomerService.createdDt != null">
+                and created_dt = #{shopCustomerService.createdDt}
+            </if>
+            <if test="shopCustomerService.lastUpdDt != null">
+                and last_upd_dt = #{shopCustomerService.lastUpdDt}
+            </if>
+            <if test="shopCustomerService.deletedFlag != null">
+                and deleted_flag = #{shopCustomerService.deletedFlag}
+            </if>
+            <if test="shopCustomerService.add1 != null">
+                and add1 = #{shopCustomerService.add1}
+            </if>
+            <if test="shopCustomerService.add2 != null">
+                and add2 = #{shopCustomerService.add2}
+            </if>
+        </if>
+    </sql>
+    <select id="searchByCondition" resultMap="shopCustomerServiceMap" >
+        <include refid="selectAllColumns"/>
+        <include refid="where_fragement"/>
+
+    </select>
+
+
+    <update id="updateSelectiveByIdList">
+        update shop_customer_service
+        <include refid="updateSelective_set"/>
+        where id in
+        <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <update id="updateAllByIdList">
+        update shop_customer_service
+        <include refid="updateAll_set"/>
+        where id in
+        <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+
+</mapper>

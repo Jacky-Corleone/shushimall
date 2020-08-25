@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.payment.dao.AccountInfoDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="accountInfoMap" type="accountInfo">
+			<result property="id" column="id"/>
+			<result property="subAccNo" column="sub_acc_No"/>
+			<result property="subAccNm" column="sub_acc_nm"/>
+			<result property="bindingAccNo" column="binding_acc_no"/>
+			<result property="bindingAccNm" column="binding_acc_nm"/>
+			<result property="bankName" column="bank_name"/>
+			<result property="bankBranchJointLine" column="bank_branch_joint_line"/>
+			<result property="accType" column="acc_type"/>
+			<result property="transferType" column="transfer_type"/>
+			<result property="sameBank" column="same_bank"/>
+			<result property="accStatus" column="acc_status"/>
+			<result property="accStatusText" column="acc_status_text"/>
+			<result property="attemptTime" column="attempt_time"/>
+			<result property="userId" column="user_id"/>
+			<result property="dealFlag" column="deal_flag"/>
+			<result property="createdId" column="created_id"/>
+			<result property="created" column="created"/>
+			<result property="modified" column="modified"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,sub_acc_No
+ 			,sub_acc_nm
+ 			,binding_acc_no
+ 			,binding_acc_nm
+ 			,bank_name
+ 			,bank_branch_joint_line
+ 			,acc_type
+ 			,transfer_type
+ 			,same_bank
+ 			,acc_status
+ 			,user_id
+ 			,deal_flag
+ 			,created_id
+ 			,created
+		FROM 
+		account_info account_info_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.subAccNo != null  and entity.subAccNo !=''">
+				<![CDATA[ and account_info_.sub_acc_No  = #{entity.subAccNo} ]]>
+			</if>
+			<if test="entity.subAccNm != null  and entity.subAccNm !=''">
+				<![CDATA[ and account_info_.sub_acc_nm  LIKE CONCAT('%',#{entity.subAccNm},'%') ]]>
+			</if>
+			<if test="entity.accType != null  and entity.accType !=''">
+				<![CDATA[ and account_info_.acc_type  = #{entity.accType} ]]>
+			</if>
+			<if test="entity.accStatus != null  and entity.accStatus !=''">
+				<![CDATA[ and account_info_.acc_status  = #{entity.accStatus} ]]>
+			</if>
+			<if test="entity.userId != null  and entity.userId !=''">
+				<![CDATA[ and account_info_.user_id = #{entity.userId} ]]>
+			</if>
+			<if test="entity.dealFlag != null">
+				<![CDATA[ and account_info_.deal_flag=#{entity.dealFlag}]]>
+			</if>
+			<if test="entity.createdBegin != null  and entity.createdBegin !=''">
+				<![CDATA[ and account_info_.created >DATE_FORMAT(#{entity.createdBegin},'%Y-%m-%d') ]]>
+			</if>
+			<if test="entity.createdEnd != null  and entity.createdEnd !=''">
+				<![CDATA[ and account_info_.created <DATE_FORMAT(#{entity.createdEnd},'%Y-%m-%d')]]>
+			</if>
+		</if>
+	</sql>
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+    <select id="queryList"  resultMap="accountInfoMap">
+		<include refid="selectAllColumns" />
+		<include refid="where_fragement"></include>
+	</select>
+	
+	<select id="selectBySubAccNo" resultMap="accountInfoMap">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where account_info_.sub_acc_no = #{subAccNo}
+		]]>
+	</select>
+	<select id="selectByUId" resultMap="accountInfoMap">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+			where account_info_.acc_status <3 and account_info_.user_id=#{uid} and account_info_.acc_type =#{accountType}
+		]]>
+	</select>
+	<select id="selectAccByStatus" resultMap="accountInfoMap">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+			where account_info_.acc_status =#{accStatus} and account_info_.attempt_time<6
+			and account_info_.created BETWEEN DATE_ADD(NOW(), INTERVAL -60 MINUTE) AND DATE_ADD(NOW(), INTERVAL - 5 MINUTE)
+		]]>
+	</select>
+	
+	<select id="selectByUIds" resultMap="accountInfoMap">
+		<include refid="selectAllColumns" />
+		where account_info_.acc_status=2 and account_info_.user_id in
+		<foreach collection="listUId" item="uid"  separator=","  open="(" close=")">  
+		  #{uid}
+		</foreach> 
+		 <if test="accountTypes !=null">
+		 	  and account_info_.acc_type in
+			 <foreach collection="accountTypes" item="accType"  separator=","  open="(" close=")">  
+			  #{accType}
+			</foreach> 
+		</if>
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="accountInfo" useGeneratedKeys="true" keyProperty="id">
+		<selectKey keyProperty="subAccNo" order="BEFORE" resultType="String">
+			SELECT get_account_sub_no(#{accType})
+		</selectKey>	
+		<![CDATA[
+		insert into account_info (
+	    	 sub_acc_no
+	    	 ,sub_acc_nm
+	    	 ,binding_acc_no
+	    	 ,binding_acc_nm
+	    	 ,bank_name
+	    	 ,bank_branch_joint_line
+ 			 ,acc_type
+ 			 ,transfer_type
+ 			 ,same_bank
+	    	 ,acc_status
+	    	 ,user_id
+	    	 ,created_id
+	    	 ,created
+		)values(
+	    	#{subAccNo}
+	    	,#{subAccNm}
+	    	,#{bindingAccNo}
+	    	,#{bindingAccNm}
+	    	,#{bankName}
+	    	,#{bankBranchJointLine}
+	    	,#{accType}
+	    	,#{transferType}
+    		,#{sameBank}
+	    	,0
+	    	,#{userId}
+	    	,#{createdId}
+	    	,now()
+	  )
+	    ]]>	
+	</insert>
+	<update id="update" parameterType="accountInfo">
+		UPDATE account_info  account_info_
+		   SET account_info_.modified=now(),
+		   account_info_.attempt_time=account_info_.attempt_time+1
+		   	<if test="dealFlag !=null">
+		   		,account_info_.deal_flag=#{dealFlag}
+		   	</if>
+	   		<if test="accStatus !=null">
+		   		,account_info_.acc_status=#{accStatus}
+		   	</if>
+		   	<if test="accStatusText !=null">
+		   		,account_info_.acc_status_text=#{accStatusText}
+		   	</if>
+		 where account_info_.sub_acc_no = #{subAccNo}
+	</update>
+</mapper>

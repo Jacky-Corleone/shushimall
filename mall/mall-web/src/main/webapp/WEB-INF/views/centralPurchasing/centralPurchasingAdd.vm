@@ -1,0 +1,476 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<link href="$request.contextPath/assets/plugin/kindeditor/themes/default/default.css" rel="stylesheet" />
+<link href="$request.contextPath/assets/plugin/jquery-validation/1.11.1/jquery.validate.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="$request.getContextPath()/assets/js/jquery-migrate-1.1.0.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/centralPurchasing/centralPurchase_valid.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/jquery-validation/1.11.1/jquery.validate.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/jquery-validation/1.11.1/messages_zh.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.shadow.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.ifixpng.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.fancyzoom.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/common/loadMsg.js"></script>
+<script type="text/javascript">
+var path = "$request.getContextPath()";
+var imageServerAddr = "$!imageServerAddr";
+var isView = "$!isView";
+$(document).ready(function(){
+	$("#estimatePrice2").focusout(function(){
+	 	var flag1 =  $("#estimatePrice1").val();
+    	var flag2 =  $("#estimatePrice2").val();
+    	if(parseFloat(flag2)<=parseFloat(flag1)){
+    		alert("预估价不合法！");
+    	}
+	 });
+	 $("#perPerchaseMaxNum").focusout(function(){
+	 	var num = new Number($(this).val());
+	 	if(num==0){
+	 		$(this).val(1);
+	 	}else{
+	 		$(this).val(num);
+	 	}
+	 });
+	 $("#releaseGoodsMaxNum").focusout(function(){
+	 	var num = new Number($(this).val());
+	 	if(num==0){
+	 		$(this).val(1);
+	 	}else{
+	 		$(this).val(num);
+	 	}
+	 });
+	$(".estimatePrice").hide();
+	var $estimatePrice = '$!queryCentralPurchasingDTO.estimatePrice';
+	if($estimatePrice){
+		$("#estimatePrice").val($estimatePrice);
+		var $array = $estimatePrice.split("-");
+		var $estimatePrice1 = $array[0];
+		$("#estimatePrice1").val($estimatePrice1);
+		if($array.length==2){
+			var $estimatePrice2 = $array[1];
+			$(".estimatePrice").show();
+			$(":radio:eq(1)").prop("checked",true);
+			$("#estimatePrice2").val($estimatePrice2);
+		}else{
+			$(":radio:eq(0)").prop("checked",true);
+		}
+	}else{
+		$(":radio:eq(0)").prop("checked",true);
+	}
+		
+		$(":radio").change(function(){
+			if($(this).val()==1){
+				$(".estimatePrice").show();
+			}else{
+				$(".estimatePrice").hide();
+			}
+		});
+	//加载左侧菜单
+	$("#leftSeller").load(path + "/leftSeller");
+	if(isView){
+		$("input").prop("disabled",true);
+		$("#keyword").prop("disabled",false);
+	}
+	//图片悬浮层展示
+	$(".imgUl li").mouseover(function(){
+		$(this).find(".c-upload").show();
+	});
+	$(".imgUl li").mouseout(function(){
+		$(this).find(".c-upload").hide();
+	});
+	 
+	$("#selectSkuId").live("click",function(){
+	 	//加载弹出层
+		$("#skuList").show();
+		var url = $("#queryForm").attr("action");
+		var searchFormObj = $('#queryForm').serialize();
+		$.ajax({
+			url : url,
+			type : "post",
+			data : searchFormObj,
+			dataType:"text",
+			cache : false,
+			success : function(html) {
+				$("#skuList .goodList").html(html);
+			},
+			error:function(e){
+				alert(e);
+			}
+		});
+	});
+});
+
+//图片上传实现类
+function fileChange(fileElementId, showImg,urlInput,showElementId){
+	if(!isView){
+	$.ajaxFileUpload({
+		url: path + '/fileUpload/fixedUpload?date='+new Date(), //用于文件上传的服务器端请求地址
+		secureuri: false, //是否需要安全协议，一般设置为false
+		fileElementId: fileElementId, //文件上传域的ID
+		dataType: 'json', //返回值类型 一般设置为json
+		data:{
+			size:1048576
+		},
+		type:"post",
+		success: function (data, status){  //服务器成功响应处理函数
+			if(data.success){
+				if(!data.url || data.url==null || data.url==""){
+					alert("图片上传失败，请重新上传！");
+					$("#"+showImg).attr("src","");
+					return;
+				}
+				$("#"+showImg).attr("src",imageServerAddr+data.url);
+				$("#"+urlInput).val(data.url);
+				$("#"+fileElementId).val("");
+				if(showElementId != ""){
+					$("#"+showElementId).show();
+				}
+			}else{
+				alert(data.msg);
+			}
+		},
+		error: function (data, status, e){//服务器响应失败处理函数
+		}
+	});
+	}
+}
+function getSku() {
+	var $this = $("input:radio:checked[name='box']");
+	var skuId = $this.attr("title");
+	var $html;
+	if(!skuId){
+		$html = '<span id="selectSkuId" class="font_fe font_14b" style="cursor:pointer;">'+
+					'<i class="font_fs mar_l2">*</i><label class="button_small" style="margin:0;">选择商品</label>'+
+				'</span>';
+	}else{
+		$("#skuId").val(skuId);
+		$("#itemId").val($this.next().attr("id"));
+		$("#detail_cid").val($this.next().next().attr("id"));
+		var $html = $("#"+skuId+"_1").html()
+				+ $("#"+skuId+"_2").html()
+				+ $("#"+skuId+"_3").html()
+				+ "<span id='selectSkuId' class='font_fe font_14b' style='cursor:pointer;'>"
+				+ "<label class='button_small' style='margin:0;'>修改商品</label></span>";
+	}
+		$(".item-show").html($html);
+	$("#skuList").hide();
+}
+function toView(id)
+{
+	window.location.href = '$request.contextPath/productController/details?id=' + id;
+}
+function page_num(){
+	var pageNumVal=$("#pageNum").val();
+	if(pageNumVal == ''){
+		topage(1);
+		$("#pageNum").val(1);
+	}else if(parseInt(pageNumVal)>=parseInt($pager.totalPage)){
+		topage($pager.totalPage);
+	}else{
+		topage(pageNumVal);
+	}
+}
+function enter_press_page(e){
+	if(e == 13|| e == 32){
+		page_num();
+	}
+}
+function topage(page){
+	$("input[name='page']").val(page);
+	var url = $("#queryForm").attr("action");
+	var searchFormObj = $('#queryForm').serialize();
+	$.ajax({
+		url : url,
+		type : "post",
+		data : searchFormObj,
+		dataType:"text",
+		cache : false,
+		success : function(html) {
+			$("#skuList .goodList").html(html);
+		},
+		error:function(e){
+			
+		}
+	});
+}
+
+function saveActivity(v){
+	if(!isView){
+		$("#btnSubmit"+v).loadingMsg();
+		$("#activityStatus").val(v);
+		//校验
+		var isValid = $("#centralPurchasing").valid();
+		if(isValid){
+			if(checkTime()){
+				checkSkuUnique(v);
+			}else{
+				$("#btnSubmit"+v).hideMsg();
+			}
+		}else{
+			$("#btnSubmit"+v).hideMsg();
+		}
+		return;
+	}
+}
+
+function checkTime(){
+	var activitySignUpTime = $("#activitySignUpTime").val();
+	var activitySignUpEndTime = $("#activitySignUpEndTime").val();
+	var activityBeginTime = $("#activityBeginTime").val();
+	var activityEndTime = $("#activityEndTime").val();
+	if(activityEndTime > activityBeginTime && activityBeginTime >= activitySignUpEndTime
+			&& activitySignUpEndTime > activitySignUpTime){
+		return true;
+	}else{
+		if (activityBeginTime < activitySignUpEndTime) {
+			alert("活动开始时间应晚于报名结束时间，请重新填写");
+		}
+		return false;
+	}
+}
+
+function checkSkuUnique(v){
+		var activitySignUpTime = $("#activitySignUpTime").val();
+		var activityEndTime = $("#activityEndTime").val();
+		var skuId = $("#skuId").val();
+		var activitesDetailsId =  $("input[name='activitesDetailsId']").val();
+		$.ajax({
+			url : "$request.contextPath/centralPurchasing/checkSkuUnique",
+			type : "post",
+			data : {
+				skuId:skuId,
+				activitySignUpTime:activitySignUpTime,
+				activityEndTime:activityEndTime,
+				activitesDetailsId:activitesDetailsId
+			},
+			dataType:"json",
+			success : function(data) {
+				if(data.success){
+					$.ajax({
+						type: "POST",
+						dataType:"text",
+						url: $("#centralPurchasing").attr("action"),
+						data:$("#centralPurchasing").serialize(),
+						success: function(data){
+							window.location.href = path + "/centralPurchasing/activityList";
+						},
+						error : function(e){
+							$("#btnSubmit"+v).hideMsg();
+						}
+					});
+				}else{
+					$("#btnSubmit"+v).hideMsg();
+					alert("该时间段内，该商品已参加集采活动，请重新选择");
+				}
+			},
+			error : function(e) {
+				$("#btnSubmit"+v).hideMsg();
+				return false;
+			}
+		});
+	}
+</script>
+<div id="main">
+<!--中间部分开始-->
+<div id="leftSeller" class="border-4">
+</div><!--left end -->
+
+<!--右边部分开始-->
+<div id="right" class="bg_06 border-4">
+ <form id="centralPurchasing" name="centralPurchasing" method="post"
+ #if($!queryCentralPurchasingDTO.activitesDetailsId)
+  action="$request.contextPath/centralPurchasing/activityUpdate"
+  #else
+  action="$request.contextPath/centralPurchasing/activitySave"
+  #end
+  >
+	<div class="add_newshop bg_06 mar_lr10">
+	    <input type="hidden" id="detail_cid" name="cid" value="$!cid">
+	    <input type="hidden" name="activitesDetailsId" value="$!queryCentralPurchasingDTO.activitesDetailsId">
+		<input type="hidden"  id="activityStatus" name="activityStatus" value="$!queryCentralPurchasingDTO.activityStatus">
+    <div class="shop_xinxi mar_t20"><!-- 添加基本信息 -->
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" ><span class="font_12 mar_l10 ">基本信息</span></p>
+      <ul class="add_xx mar_t10 mar_l10 ">
+        <ul class="add_xx mar_t10 mar_l10 ">
+        <li class="#if($!queryCentralPurchasingDTO.activitesDetailsId)wid_460#else wid_920 #end mar_tb10" style="clear: both;"><i class="font_fs mar_l2">*</i>活动名称 : 
+        	<input name="activityName" id="activityName" value="$!queryCentralPurchasingDTO.activityName" 
+        		class="wid_300 input_Style2 hei_30" maxlength="50" type="text" />
+        </li>
+		#if($!queryCentralPurchasingDTO.activitesDetailsId)
+            <li class="wid_460 mar_tb10">
+    			活动编号: <input readOnly="readOnly" value="$!queryCentralPurchasingDTO.activitesDetailsId" class="wid_300 input_Style2 hei_30" type="text" />
+            </li>
+		#end
+        <li class="wid_460 mar_tb10"><i class="font_fs mar_l2">*</i>报名开始时间: 
+			<input id="activitySignUpTime" name="activitySignUpTime" value="$!date.format('yyyy-MM-dd HH:mm:ss',$!queryCentralPurchasingDTO.activitySignUpTime)" type="text" readonly="readonly" maxlength="20" 
+      		 	class="jcDate wid_110 hei_30 input_Style2 wid_150 " 
+      		 	readOnly="readOnly"
+      		 	#if(!$!isView)
+				onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:true,maxDate:'#F{$dp.$D(\'activitySignUpEndTime\')}'});" 
+				#end
+				/>
+        </li>
+        <li class="wid_460 mar_tb10"><i class="font_fs mar_l2">*</i>报名结束时间: 
+			<input id="activitySignUpEndTime" name="activitySignUpEndTime" value="$!date.format('yyyy-MM-dd HH:mm:ss',$!queryCentralPurchasingDTO.activitySignUpEndTime)" type="text" readonly="readonly" maxlength="20" 
+      		 	class="jcDate wid_110 hei_30 input_Style2 wid_150 "
+				readOnly="readOnly"
+      		 	#if(!$!isView)
+				onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:true,minDate:'#F{$dp.$D(\'activitySignUpTime\')||\'%y-%M-%d %H:%m:%s\'}',maxDate:'#F{$dp.$D(\'activityBeginTime\')}'});" 
+				#end
+				/>
+        </li>
+        <li class="wid_460 mar_tb10"><i class="font_fs mar_l2">*</i>活动开始时间: 
+			<input id="activityBeginTime" name="activityBeginTime" value="$!date.format('yyyy-MM-dd HH:mm:ss',$!queryCentralPurchasingDTO.activityBeginTime)" type="text" readonly="readonly" maxlength="20" 
+      		 	class="jcDate wid_110 hei_30 input_Style2 wid_150 "
+				readOnly="readOnly"
+      		 	#if(!$!isView)
+				onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:true,minDate:'#F{$dp.$D(\'activitySignUpEndTime\')||\'%y-%M-%d %H:%m:%s\'}',maxDate:'#F{$dp.$D(\'activityEndTime\')}'});" 
+				#end
+				/>
+        </li>
+        <li class="wid_460 mar_tb10"><i class="font_fs mar_l2">*</i>活动结束时间: 
+			<input id="activityEndTime" name="activityEndTime" value="$!date.format('yyyy-MM-dd HH:mm:ss',$!queryCentralPurchasingDTO.activityEndTime)" type="text" readonly="readonly" maxlength="20" 
+      		 	class="jcDate wid_110 hei_30 input_Style2 wid_150 "
+				readOnly="readOnly"
+      		 	#if(!$!isView)
+				onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:true,minDate:'#F{$dp.$D(\'activityBeginTime\')||\'%y-%M-%d %H:%m:%s\'}'});" 
+				#end
+				/>
+        </li>
+      </ul> 
+      </ul> 
+    </div><!-- 添加基本信息 end -->
+    <div class="clear"></div>
+
+    <div class="shop_xinxi mar_t20"><!-- 添加活动图片 -->
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" ><span class="font_12 mar_l10 ">活动图片</p>
+      <label style="color: red">仅支持JPG、JPEG、PNG、BMP格式，大小不得超过1M，建议图片尺寸：260*230</label>
+      <ul class="shop_add_img imgUl">
+	        <li class="po_re border-1">
+	        	<img src="$!imageServerAddr$!queryCentralPurchasingDTO.activityImg" alt="" id="pic_2" height="80" width="80">
+	        	<div style="display: none;" class="c-upload none">
+	              <span>图片上传</span>
+	              #if(!$!isView)
+	              <input id="fileupload_2" class="file-img cursor" name="file" onchange="fileChange('fileupload_2','pic_2','picUrls_2','')" type="file">
+	              #end
+	            </div>
+	        </li>
+	         <input id="picUrls_2" name="activityImg" value="$!queryCentralPurchasingDTO.activityImg" type="hidden"> 
+      </ul> 
+    </div><!-- 添加商品属性 end -->
+	<div class="clear"></div>
+    <div class="shop_xinxi mar_t20">
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" ><span class="font_12 mar_l10 ">活动商品</p>
+      <ul class="add_sx mar_l10">
+      	
+      	<li class="wid_460 mar_tb10 item-show" style="width: auto; height: auto;">
+      	
+      		#if($!tradeInventoryOutDTO)
+      			#foreach($skuPicture in $!tradeInventoryOutDTO.skuPicture)
+	                <a href="javascript:void(0)" onclick="javascript:toView($!tradeInventoryOutDTO.itemId)">
+	                	<img class="showimg" style="height: 100px;width: 100px;padding-left: 10px"  src="$!imageServerAddr$!skuPicture.picUrl" >
+	                </a>
+	                #break
+	            #end
+	            <label style="width: 120px;">
+                <a href="javascript:void(0)" onclick="javascript:toView($!tradeInventoryOutDTO.itemId)">
+	            	$!tradeInventoryOutDTO.itemName
+	            </a>
+	            </label>
+      			#foreach($itemAttrName in $!tradeInventoryOutDTO.itemAttr)
+	        		$!itemAttrName.name:
+	      			#foreach($itemAttrValue in $!itemAttrName.values)
+	        			$!itemAttrValue.name
+	        		#end
+	        	#end
+	        	#if(!$isView)
+				<span id="selectSkuId" class="font_fe font_14b" style="cursor:pointer;">
+					<label class="button_small" style="margin:0;">修改商品</label>
+				</span>
+				#end
+        	#else
+				<span id="selectSkuId" class="font_fe font_14b" style="cursor:pointer;">
+					<i class="font_fs mar_l2">*</i><label class="button_small" style="margin:0;">选择商品</label>
+				</span>
+			#end
+        </li>
+        <input type="hidden" name="skuId" id="skuId"
+							value="$!queryCentralPurchasingDTO.skuId" title="选择商品">
+		<input type="hidden" name="itemId" id="itemId"
+							value="$!queryCentralPurchasingDTO.itemId" title="选择商品">
+      	<li class="wid_460 mar_tb20">预&nbsp;&nbsp;&nbsp;估&nbsp;&nbsp;&nbsp;价: 
+        	<input id="radio0" type="radio" name="chooseEstimatePriceType" value="0"><label>单值</label>
+			<input id="radio1" type="radio" name="chooseEstimatePriceType" value="1"><label>区间</label>
+			<input id="estimatePrice1" class="wid_100 input_Style2 hei_30" onkeyup='numInput(this,2)' type="text" />
+			<label class="estimatePrice">至</label>
+			<input id="estimatePrice2" class="estimatePrice wid_100 input_Style2 hei_30" onkeyup='numInput(this,2)' type="text" />
+			<label id="estimatePriceError">元</label>
+			<input id="estimatePrice" name="estimatePrice"
+				type="hidden" />
+        </li>
+      	<li class="wid_460 mar_tb10">单用户最大采购量: 
+        	<input name="perPerchaseMaxNum" id="perPerchaseMaxNum" value="$!queryCentralPurchasingDTO.perPerchaseMaxNum" 
+        		class="wid_300 input_Style2 hei_30" maxlength='12' onkeyup='numInput(this,0)' type="text" />
+        </li>
+      	<li class="wid_460 mar_tb10">集采商品活动数量: 
+        	<input name="releaseGoodsMaxNum" id="releaseGoodsMaxNum" value="$!queryCentralPurchasingDTO.releaseGoodsMaxNum" 
+        		class="wid_300 input_Style2 hei_30" maxlength='12' onkeyup='numInput(this,0)' type="text" />
+        </li>
+      </ul> 
+    </div><!-- 添加运费模版 end -->
+    <div class="clear"></div>
+    #if(!$!isView)
+	<div class="shop_xinxi mar_t20">
+      <p class="mar_tb10">
+        	<input type="button" class="button_2 hei_35 font_14b" loadMsg="正在发布..." id="btnSubmit1" onclick="saveActivity(1)" value="立即发布"/> 
+         	<input type="button" class="button_2 hei_35 font_14b" loadMsg="正在保存..." id="btnSubmit0" onclick="saveActivity(0)" value="保存"/>
+        </p>
+    </div><!-- 其他信息 end -->
+    #end 
+  </div>
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->
+</form>
+
+<div id="skuList" class="po_fai price none" style="display:none;width:100%;">
+    <div class="po_fai_bg"></div>
+    <div class="po_main pad_t10" style="left: 32%; width: 80%;z-index:1000;">
+    <div class=" hei_32 bg_05 pad_l10 font_14b">
+		<i class="demo-icons fa-times-circle font_16 fr mar_r10 no" style="cursor:pointer;"></i>
+		选择商品
+	</div>
+    <div class="clear"></div>
+    <div class="register_content">
+          <div class="register_box_mid" >
+				<form id="queryForm" action="$request.getContextPath()/centralPurchasing/initItemInventory" method="post">
+				      <div class="right_top_l fl" style="width:100%">
+					        <ul class="list">
+								<input type="hidden" name="page" value="$!pager.page" />
+					        <li class="wid_220" style="width:auto">
+					          <span class="font_wid">商品名称：</span><input name="itemName" value="$!{TradeInventoryInDTO.itemName}" id="itemName" class="input_Style2 wid_120 hei_30" type="text" />
+					        </li>
+					        <li class="wid_220"  style="width:auto">
+					          <span class="font_wid">商品编码：</span><input name="itemId" value="$!{TradeInventoryInDTO.itemId}" id="itemId" type="text" class="input_Style2 wid_120 hei_30" number="true"/>
+					        </li>
+					       
+					        <li class="wid_220"  style="width:auto">
+					          <span class="font_wid">SKU编码：</span><input name="skuId" value="$!{TradeInventoryInDTO.skuId}" id="skuId" class="input_Style2 wid_120 hei_30" type="text" />
+					        </li>
+					        <li class="wid_220"  style="width:auto;float: right;margin-right: 80px;">
+								<button id="queryBtn" type="button" onclick="topage(1)" class="button_4 but_cx3">
+						         	<a class="font_1c">查 询</a>
+						        </button>
+					        </li>
+					      </ul>
+					      
+				      </div>
+				</form>
+				<div class="goodList" style="height:200px;overflow-y: auto;width:auto;clear:both"></div>
+				 <button type="button" class="button_2 shop_ok mar_tb10 fr " onclick="getSku()" id="confirm">确 定</button>
+     			 <div class="clear"></div>
+            </div>
+    </div>
+    </div>
+</div>

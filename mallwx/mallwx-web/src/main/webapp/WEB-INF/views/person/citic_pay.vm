@@ -1,0 +1,71 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "common/blanklayout.vm")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <base href="${request.getContextPath()}/"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>支付</title>
+    <link href="$staticPath/css/detail.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" src="$staticPath/css/detail.js" />
+    <link rel="stylesheet" type="text/css" src="$staticPath/css/style.js" />
+    <script type="text/javascript" src="$staticPath/js/iscroll.js"></script>
+    <script type="text/javascript" src="$staticPath/js/zepto.js"></script>
+    <script type="text/javascript" src="$staticPath\js\jquery-1.11.2.min.js"></script>
+    <script>
+        function confirmPay(){
+            $("#outOrderNo").val($("input[name='outTradeNo']").val() );
+            //验证支付密码
+            $.ajax({
+                url:"person/validatePayPassword",
+                data:{"paypassword":$("#password").val()},
+                type:"post",
+                dataType:"json",
+                success:function(res){
+                    if(res.success){
+                        $("#formCitic").submit();
+                    }else{
+                        $("#mag").html("密码错误，请重新输入！");
+                        $("#password").val("");
+                    }
+                }
+            });
+            return false;
+        }
+        function cancelPay(){
+            window.location="./";
+        }
+    </script>
+</head>
+<body>
+<div id="main" class="po_ab">
+    <form id="formCitic" action="person/payCitic" method="post">
+        <input type="hidden" name="outOrderNo" id="outOrderNo">
+    <!-- 中间内容 -->
+    <div class="content" id="wrapper">
+        <div class="pad_lr5 bg_01">
+            <div class="hei_50 wid_60">
+                <img src="assets/images/logo_zf.png" />
+            </div>
+            <ul class="pass pad_lr20 ">
+                <h3 class="hei_50 font_cen"><span id="mag" style="color: #c80000"></span></h3>
+                <li><p class="font_1_2 fl">订单号：</p><p class="font_e3 fl font_1_2"><span class="font_2">$!orderNo</span></p></li>
+                <li><p class="font_1_2 fl">应付金额（元）：￥</p><p class="font_e3 fl font_1_2"><span class="font_2">$!totalPrice</span></p></li>
+                <li><p class="font_1_2 fl">支付密码：</p><input type="password" id="password" name="password" class=" wid_48 input_3"/></li>
+                <h3 class="hei_50 font_cen"><span id="mag" style="color: #c80000"></span></h3>
+            </ul>
+            <div class="font_cen">
+                <button class="button_1 hei_34 pad_lr10" onclick="confirmPay() ;return false;">确认</button>
+                <button class="button_1 hei_34 pad_lr10" onclick="cancelPay(); return false;">取消</button>
+            </div>
+        </div>
+    </div>
+    </form>
+    $!formHtml
+<!-- 中间内容 end-->
+</div>
+</body>
+</html>

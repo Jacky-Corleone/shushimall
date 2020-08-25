@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.storecenter.dao.ShopRenovationDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="shopRenovationMap" type="com.camelot.storecenter.dto.ShopRenovationDTO">
+				<result property="id" column="id"/>
+				<result property="moduleName" column="module_name"/>
+				<result property="price" column="price"/>
+				<result property="pictureUrl" column="picture_url"/>
+				<result property="moduleGroup" column="module_group"/>
+				<result property="modultType" column="modult_type"/>
+				<result property="status" column="status"/>
+				<result property="created" column="created"/>
+				<result property="modified" column="modified"/>
+				<result property="skuId" column="sku_id"/>
+				<result property="position" column="position"/>
+				<result property="templatesId" column="templates_id"/>
+				<result property="chainUrl" column="chain_url"/>
+                <result property="hasPrice" column="hasPrice"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,module_name
+ 			,price
+ 			,picture_url
+ 			,module_group
+ 			,modult_type
+ 			,status
+ 			,created
+ 			,modified
+ 			,sku_id
+ 			,position
+ 			,templates_id
+ 			,chain_url
+ 			,hasPrice
+		FROM 
+		shop_renovation shop_renovation_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where status=1
+		<if test="entity!=null">
+			<if test="entity.id != null  and entity.id !=''">
+				<![CDATA[ and shop_renovation_.id  =  #{entity.id} ]]>
+			</if>
+			<if test="entity.moduleName != null  and entity.moduleName !=''">
+				<![CDATA[ and shop_renovation_.module_name  =  #{entity.moduleName} ]]>
+			</if>
+			<if test="entity.price != null  and entity.price !=''">
+				<![CDATA[ and shop_renovation_.price  =  #{entity.price} ]]>
+			</if>
+			<if test="entity.pictureUrl != null  and entity.pictureUrl !=''">
+				<![CDATA[ and shop_renovation_.picture_url  =  #{entity.pictureUrl} ]]>
+			</if>
+			<if test="entity.moduleGroup != null  and entity.moduleGroup !=''">
+				<![CDATA[ and shop_renovation_.module_group  =  #{entity.moduleGroup} ]]>
+			</if>
+			<if test="entity.modultType != null  and entity.modultType !=''">
+				<![CDATA[ and shop_renovation_.modult_type  =  #{entity.modultType} ]]>
+			</if>
+			<if test="entity.created != null  and entity.created !=''">
+				<![CDATA[ and shop_renovation_.created  =  #{entity.created} ]]>
+			</if>
+			<if test="entity.modified != null  and entity.modified !=''">
+				<![CDATA[ and shop_renovation_.modified  =  #{entity.modified} ]]>
+			</if>
+			<if test="entity.skuId != null  and entity.skuId !=''">
+				<![CDATA[ and shop_renovation_.sku_id  =  #{entity.skuId} ]]>
+			</if>
+			<if test="entity.position != null  and entity.position !=''">
+				<![CDATA[ and shop_renovation_.position  =  #{entity.position} ]]>
+			</if>
+			<if test="entity.templatesId != null  and entity.templatesId !=''">
+				<![CDATA[ and shop_renovation_.templates_id  =  #{entity.templatesId} ]]>
+			</if>
+            <if test="entity.hasPrice != null">
+                <![CDATA[ and shop_renovation_.hasPrice  =  #{entity.hasPrice} ]]>
+            </if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="shopRenovationMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where shop_renovation_.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="selectListByCondition" resultMap="shopRenovationMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectCountByCondition" resultType="long">
+		<include refid="count_Tail" />
+		shop_renovation shop_renovation_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="com.camelot.storecenter.dto.ShopRenovationDTO">
+		<![CDATA[
+		insert into shop_renovation (
+		    	 module_name
+		    	 ,price
+		    	 ,picture_url
+		    	 ,module_group
+		    	 ,modult_type
+		    	 ,status
+		    	 ,created
+		    	 ,modified
+		    	 ,sku_id
+		    	 ,position
+		    	 ,templates_id
+		    	 ,chain_url
+		    	 ,hasPrice
+		   )values(
+		    	#{moduleName}
+		    	,#{price}
+		    	,#{pictureUrl}
+		    	,#{moduleGroup}
+		    	,#{modultType}
+		    	,1
+		    	,now()
+		    	,now()
+		    	,#{skuId}
+		    	,#{position}
+		    	,#{templatesId}
+		    	,#{chainUrl}
+		    	,#{hasPrice}
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.storecenter.dto.ShopRenovationDTO">
+		<![CDATA[
+		update shop_renovation set
+   			module_name = #{moduleName}
+   			,price = #{price}
+   			,picture_url = #{pictureUrl}
+   			,module_group = #{moduleGroup}
+   			,modult_type = #{modultType}
+   			,status = #{status}
+   			,modified = now()
+   			,sku_id = #{skuId}
+   			,position = #{position}
+   			,templates_id = #{templatesId}
+   			,chain_url=#{chainUrl}
+   			,hasPrice=#{hasPrice}
+		 where id = #{id}
+		]]>
+	</update>
+	
+	<delete id="deleteTid" parameterType="com.camelot.storecenter.dto.ShopRenovationDTO">
+		<![CDATA[
+		delete from shop_renovation where templates_id = #{templatesId} and modult_type=#{modultType} and  position = #{position}
+		]]>
+	</delete>
+</mapper>

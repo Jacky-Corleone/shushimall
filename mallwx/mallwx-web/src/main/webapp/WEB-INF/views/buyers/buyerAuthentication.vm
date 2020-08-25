@@ -1,0 +1,394 @@
+#set($layout="common/order.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>买家认证</title> 
+#parse("common/scriptAndCss.vm")
+<link href="assets/css/detail.css" rel="stylesheet" type="text/css"/>
+<script src="$request.contextPath/assets/js/jQueryDoCookie.js" type="text/javascript"></script>
+<script type="text/javascript" src="assets/plugin/common/captcha.js"></script>
+<script type="text/javascript">
+var ctx = "$request.contextPath";
+$(document).ready(function() {
+    changeIconToRed(2);
+});
+$(document).ready(function(){
+	//隐藏融资金额
+	$("#financingNumLi").hide();
+	//加载省
+	getAddress(0, "province");
+	$("#province").change( function() {
+		$('#city option:first').siblings().remove();
+		$('#area option:first').siblings().remove();
+		getAddress($("#province").val(), "city");		
+	});
+	//获取区/县
+	$("#city").change( function() {
+		$('#area option:first').siblings().remove();
+		getAddress($("#city").val(), "area");		
+	});
+	
+});
+
+function getAddress(addressId, domId){
+	$.ajax({
+	   type: "POST",
+	   dataType: "json",
+	   url: "$request.contextPath/orderWx/query",
+	   data: {
+			id: addressId
+	   },
+	   success: function(data){
+		   $(data).each(function(i,obj){
+				$("#"+domId).append('<option value="'+obj.code+'">'+obj.name+'</option>');
+		   });
+	   }
+	});
+}
+//提交认证
+function submitAddress(){
+	var linkMan = $('#linkMan').val().trim();//联系人姓名
+	if(linkMan==null || linkMan==""){
+		$("#errorMsg").html("请填写联系人姓名");
+		return false;
+	}
+	
+	var departMentVal = $('#departMentVal').val();//所在部门
+	if(departMentVal==null || departMentVal==""){
+		$("#errorMsg").html("请选择所在部门");
+		return false;
+	}
+	
+	var linkPhoneNum = $('#linkPhoneNum').val();//固定电话
+	var regTelNum = /^[0-9]*]*$/;
+	var regTel = /^(0[0-9]{2,3}\-)?([2-9][0-9]{6,7})+(\-[0-9]{1,4})?$/;
+	if( linkPhoneNum != null && linkPhoneNum != "" ){
+		//if( !regTelNum.test(linkPhoneNum) && !regTel.test(linkPhoneNum)){
+		//	$("#errorMsg").html("固定电话格式有误！");
+		//	return false;
+		//}
+	}else{
+		$("#errorMsg").html("请填写固定电话！");
+		return false;
+	}
+	
+	var userEmail = $('#enterpriseMailInput').val();//邮箱
+	regTel = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/;
+	if( userEmail != null && userEmail != "" ){
+		if( !regTel.test(userEmail) ){
+			$("#errorMsg").html("请输入正确的邮箱!");
+			return false;
+		}else{
+			//验证邮箱
+			if($("#enterpriseMailInput").val() != '' && $("#enterpriseMailInput").val() != null && $("#enterpriseMailInput").val() != undefined){
+				if($("#enterpriseMailCaptchaInput").val() != "111111"){
+					var enterpriseMailCaptchaBoolean = checkSynchronizedCaptcha("enterpriseMailCaptchaKey","enterpriseMailCaptchaInput",1,0);
+					if(enterpriseMailCaptchaBoolean == false){
+						return ;
+					}
+				}
+			}
+		}
+	}
+	
+	var companyName = $('#companyName').val();//公司名称
+	if(companyName==null || companyName==""){
+		$("#errorMsg").html("请输入公司名称");
+		return false;
+	}
+	
+	var province = $("#province").val();//省
+	if(province==null || province=="" || province=="请选择"){
+		$("#errorMsg").html("请选择省");
+		return false;
+	}
+	
+	var city = $("#city").val();//市
+	if(city==null || city=="" || city=="请选择"){
+		$("#errorMsg").html("请选择市");
+		return false;
+	}
+	var area = $("#area").val();//县、区
+	if(area==null || area=="" || area=="请选择"){
+		$("#errorMsg").html("请选择区");
+		return false;
+	}
+	
+	var companyDeclinedAddress = $("#companyDeclinedAddress").val();//县、区
+	if(companyDeclinedAddress==null || companyDeclinedAddress==""){
+		$("#errorMsg").html("请输入详细地址");
+		return false;
+	}
+	
+	$("#companyAddress").val( province +","+ city +","+ area);
+	
+	var businessScope = getButtonValues();//经营范围
+	if(businessScope==null || businessScope==""){
+		$("#errorMsg").html("请选择经营范围");
+		return false;
+	}else{
+		$("#businessScope").val(businessScope);
+	}
+	
+	//是否融资
+	if($("#isFinancingCheckbox").is(':checked')){
+		$("#isFinancing").val('1');
+		//如果需要融资则验证融资额度
+		var financingNum = $("#financingNum").val();
+		regTel = /^[1-9][0-9]{0,8}$/;
+		if( financingNum != null && financingNum != "" ){
+			if( !regTel.test(financingNum) ){
+				$("#errorMsg").html("融资额度为最多不超过9位的正整数");
+				return false;
+			}
+		}else{
+			$("#errorMsg").html("请输入期望融资额度");
+			return false;
+		}
+	}else{
+		$("#isFinancing").val('0');
+	}
+	modifyBuyerWx();
+	return false;
+}
+
+function modifyBuyerWx(){
+	$.ajax({
+		   type: "POST",
+		   dataType: "json",
+		   url: "$request.contextPath/information/register/submitEnterpriseWx",
+		   data: $("#wx_submitEnterprise").serialize(),
+		   success: function(data){
+			   if( data.errorMessages == '操作成功!'){
+				   $("#errorMsg").html("提交中，请等待...");
+				 	//跳转页面   网络原因，提交到后台修改数据刷新页面，回显时候数据不刷新，状态不修改，做延时处理0.8m
+				   setTimeout(function(){
+					   $("#errorMsg").html("操作成功");
+					   setTimeout(function(){
+						   window.location.href = "$request.contextPath/buyerAuthentication";
+					 	},100);
+				 	},800);
+			   }else{
+				   alert(data.errorMessages);
+			   }
+		   },
+		   error: function(XMLHttpRequest, textStatus, errorThrown){
+			   alert("系统繁忙,稍后再试......");
+		   }
+		});
+}
+
+//点击经营范围触发事件
+function chooseAttr(_this) {
+	if($(_this).attr("_selected") == "true"){
+		$(_this).attr("_selected","false").removeClass("border_e3").addClass("border_ee");
+	}else{
+		$(_this).attr("_selected", "true").removeClass("border_ee").addClass("border_e3");
+	}
+}
+
+function getButtonValues(){
+	//找到所有_selected为true的button拼接成字符串
+	var businessScope ='';
+	var attrs = $(".js_attr");
+	var _length = attrs.length;
+	for ( var i = 0; i < _length; i++) {
+		var _attr = $(attrs[i]);
+		var selected = _attr.attr("_selected");
+		if (selected === "true") {
+			if(businessScope == null || businessScope ==''){
+				businessScope = _attr.html();
+			}else{
+				businessScope += "," +  _attr.html();
+			}
+		}
+	}
+	return businessScope;
+}
+
+function showOrHideFinancingNum(){
+	if($("#isFinancingCheckbox").is(':checked')){
+		$("#financingNumLi").show();
+	}else{
+		$("#financingNumLi").hide();
+		$("#financingNum").val('');
+	}
+}
+
+//发送邮箱验证码
+function sendCode(){
+	var userEmail = $('#enterpriseMailInput').val();//邮箱
+	regTel = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/;
+	if( userEmail != null && userEmail != "" ){
+		if( !regTel.test(userEmail) ){
+			$("#errorMsg").html("请输入正确的邮箱!");
+			return false;
+		}else{
+			$.ajax({
+				   type: "POST",
+				   dataType: "json",
+				   url: "$request.contextPath/information/register/verifyEnterpriseEmailWx",
+				   data: {
+					   userEmail: userEmail
+				   },
+				   success: function(data){
+					   if(data.result =='1'){
+						   //发送验证码方法
+						   sendCaptcha('enterpriseMailCaptchaKey','sendEnterpriseMailCaptchaButton','enterpriseMailInput',1,1,1);
+					   }else{
+						   alert(data.result);
+					   }
+				   },
+				   error: function(XMLHttpRequest, textStatus, errorThrown){
+					   alert("系统繁忙,稍后再试......");
+				   }
+				});
+		}
+	}else{
+		alert("请输入邮箱!");
+		return false;
+	}
+}
+
+</script>
+</head>
+<body>
+	##parse("common/headerWx.vm")
+	<div id="main" class="po_re">
+			<!-- 中间内容 -->
+			<div class="content" id="wrapper">
+				<div class="news bg_01">
+					<form action="" id="wx_submitEnterprise" method="post">
+			
+						<!-- 	页面必须的其他数据     start	 -->
+						<input id="keyEnterpriseRegisterDuplicateRedis" name="keyEnterpriseRegisterDuplicateRedis" type="hidden" value="$!keyEnterpriseRegisterDuplicateRedis"/>
+						<input name="userId" id="userId" type="hidden" value="$!userId" />
+						<input name="type" id="type" type="hidden" value="buyer" />
+						<input name="userBusinessDTO.businessScope" id="businessScope" type="hidden" value="" />
+						<input id="isFinancing" name="userBusinessDTO.isFinancing" type="hidden" value=""/>
+						<input id="companyAddress" name="userBusinessDTO.companyAddress" type="hidden" value=""/>
+						<!-- 	页面必须的其他数据     end	 -->
+						
+						<ul class="pass mar_t10">
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5">用户名</p><input
+								id="contactName" type="text" class="wid_60 input_3" readonly="readonly" style="border:0px;"
+								name="contactName" placeholder="姓名" maxlength="20" value="$!userDTO.uname"/></li>
+								
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5"><span class="font_e5 mar_lr2">*</span>联系人姓名</p>
+							<input type="text" class="wid_60 input_3" id="linkMan" name="linkMan" placeholder="请输入联系人姓名" 
+								maxlength="20" value="$!userDTO.linkMan"/></li>
+								 
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5"><span class="font_e5 mar_lr2">*</span>所在部门</p>
+								<select id="departMentVal" class="wid_63 input_3" name="departMentVal">
+									<option value="" selected="selected">请选择</option>
+										#foreach($departMent in $departMents)
+										<option value="$!departMent"> $!departMent.label </option>
+										#end
+								</select>
+							</li>
+							
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5"><span class="font_e5 mar_lr2">*</span>固定电话</p><input
+								 id="linkPhoneNum" name="linkPhoneNum" type="text" class="wid_60 input_3"
+								 placeholder="请输入固定电话" maxlength="20" value="$!userDTO.linkPhoneNum"/></li>
+									
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5">手机</p><input
+								id="userMobile" type="text" class="wid_60 input_3" readonly="readonly" style="border:0px;"
+								name="userMobile" placeholder="请输入手机号码" maxlength="11" value="$!userDTO.umobile"/></li>
+								
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5">邮箱</p><input
+								id="enterpriseMailInput" name="userEmail" type="text" class="wid_60 input_3"
+							    placeholder="请输入邮箱" maxlength="50" value="$!userDTO.userEmail"/></li>
+								
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5">邮箱验证码</p>
+								<input id="enterpriseMailCaptchaKey" type="hidden" />
+								<input id="enterpriseMailCaptchaInput" name="enterpriseMailCaptchaInput" 
+									type="text" class="wid_30 input_3" placeholder="请输入邮箱验证码" maxlength="6"/>
+								<button id="sendEnterpriseMailCaptchaButton" type="button" onclick="sendCode()" class="button_2 wid_10 hei_32 pad_lr5">发送验证码</button>
+							</li>	
+								
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5"><span class="font_e5 mar_lr2">*</span>公司名称</p><input
+								id="companyName" type="text" class="wid_60 input_3" maxlength="30"
+								name="userBusinessDTO.companyName" placeholder="请输入公司名称"  value="$!userInfoDTO.userBusinessDTO.companyName"/></li>
+							
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5">公司所在地</p></li>
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5"><span class="font_e5 mar_lr2">*</span>省</p><select
+								id="province" class="wid_63 input_3" name="business_provinces"><option>请选择</option></select></li>
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5"><span class="font_e5 mar_lr2">*</span>市</p><select
+								id="city" class="wid_63 input_3" name="business_city"><option>请选择</option></select></li>
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5"><span class="font_e5 mar_lr2">*</span>区</p><select
+								id="area" class="wid_63 input_3" name="business_area"><option>请选择</option></select></li>
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5"><span class="font_e5 mar_lr2">*</span>详细地址</p><input
+								id="companyDeclinedAddress" type="text" class="wid_60 input_3"
+								name="userBusinessDTO.companyDeclinedAddress" placeholder="请输入公司详细地址" maxlength="256" /></li>
+							
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5"><span class="font_e5 mar_lr2">*</span>经营范围</p></b>
+							</li>
+							<li class="hei_32"><p class="wid_11 fl font_right pad_r5">&nbsp;</p></b>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" onclick="chooseAttr(this);return false;">书刊印刷</button>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" onclick="chooseAttr(this);return false;">包装印刷</button>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" onclick="chooseAttr(this);return false;">数字印刷</button>
+							</li>
+							<li class="hei_32"><p class="wid_11 fl font_right pad_r5">&nbsp;</p></b>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" onclick="chooseAttr(this);return false;">专项印刷</button>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" onclick="chooseAttr(this);return false;">商业印刷</button>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" onclick="chooseAttr(this);return false;">报业印刷</button>
+							</li>
+							<li class="hei_32"><p class="wid_11 fl font_right pad_r5">&nbsp;</p></b>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" onclick="chooseAttr(this);return false;">标签印刷</button>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" onclick="chooseAttr(this);return false;">票据印刷</button>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" onclick="chooseAttr(this);return false;">特种印刷</button>
+							</li>
+							<li class="hei_32"><p class="wid_11 fl font_right pad_r5">&nbsp;</p></b>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" onclick="chooseAttr(this);return false;">广告设计</button>
+								<button name="check_businessScope" class="button_bor js_attr border_ee" _selected="false" onclick="chooseAttr(this);return false;">其他</button>
+							</li>
+							
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5">企业人数</p></b> 
+								<select id="companyPeoNum" name="companyPeoNum" class="wid_63 input_3" >
+									<option value="" selected="selected">请选择</option>
+										#foreach($companyPeopleNum in $companyPeopleNums)
+											<option value="$!companyPeopleNum"> $!companyPeopleNum.label </option>
+										#end
+								</select>
+							</li>
+							
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5">经营规模</p></b> 
+								<select id="businessScale" name="businessScale" class="wid_63 input_3" >
+									<option value="" selected="selected">请选择</option>
+									#foreach($businessScale in $businessScales)
+									<option value="$!businessScale"> $!businessScale.label </option>
+									#end
+								</select>
+							</li>
+							
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5">公司性质</p></b> 
+								<select id="companyQualt" name="companyQualt" class="wid_63 input_3" >
+									<option value="" selected="selected">请选择</option>
+									#foreach($companyQualt in $companyQualts)
+									<option value="$!companyQualt">$!companyQualt.label</option>
+									#end
+								</select>
+							</li>
+							
+							<li class="hei_32"><p class="wid_27 fl font_right pad_r5">是否融资需求</p>
+								<input id="isFinancingCheckbox" name="isFinancingCheckbox" type="checkbox" value="1" onclick="showOrHideFinancingNum()"/>
+							</li>
+							
+							<li id="financingNumLi" class="hei_32"><p class="wid_27 fl font_right pad_r5">期望融资额度</p>
+								<input id="financingNum" name="userBusinessDTO.financingNum" type="text" class="wid_30 input_3" placeholder="请输入融资金额" />万元
+							</li>
+						</ul>
+					</form>
+					<div class='font_cen'>
+						<button class="button_1 pad_lr10 hei_34 wid_87"
+							onclick="return submitAddress()">提交买家认证</button>
+					</div>
+					<dd style="color:red;" id="errorMsg"></dd>
+				</div>
+			</div>
+			<!-- 中间内容 end-->
+	</div>
+	#parse("common/footer.vm")
+</body>
+</html>

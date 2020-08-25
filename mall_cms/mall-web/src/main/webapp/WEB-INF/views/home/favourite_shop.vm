@@ -1,0 +1,143 @@
+#set($layout = "/mini_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<link href="$staticPath/css/manage_style.css" rel="stylesheet" type="text/css" />
+<link href="$staticPath/css/Details.css" rel="stylesheet" type="text/css"/>
+<style type="text/css">
+.Center_Search_list{
+  padding-left: 5px;
+  width:70px;
+  float:left;
+  background:#fafafa;
+  height:32px;
+  overflow:hidden;
+  float:left;
+  line-height:32px;
+  text-align:center;
+  line-height:32px;
+  border: 1px solid #eee;
+  outline: none;
+  font-family: "微软雅黑"
+}
+.Center_Search_list  option{ background-color: #fff; border: none; }
+</style>
+<script type="text/javascript">
+	function delShopFavourite(id){
+		var result = confirm("确定删除?");
+		if(result){
+			var ids = [id];
+			$.ajax({
+				url: "$request.contextPath/favourite/delShop",
+				type:"post",
+				data:{ "ids[]": ids },
+				dataType: "json",
+				success: function(data){
+					if( data.success ){
+						location.href = "$request.contextPath/favourite/shops";
+					}
+				}
+			});
+		}
+	}
+	function topage(page){
+		$("#page").val(page);
+		$("#favourite_form").submit();
+	}
+	$(function(){	
+		//搜索店铺/商品
+		$("#shopSearch").bind("click",function(){
+			var type = $("#searchType").val();
+			if(type=="g"){
+				//商品搜索
+				$("#shopSearchForm").attr("action", "$request.getContextPath()/searchController/searchItem");
+			}else if(type=="s"){
+				//店铺搜索
+				$("#shopSearchForm").attr("action", "$request.getContextPath()/searchController/searchShop");
+			}
+			$("#shopSearchForm").submit();
+		});
+		$("#keyword").keydown(function(e){
+			if(e.keyCode==13){
+				$("#shopSearch").trigger("click");
+			}
+		});
+		});	
+</script>
+<div class="clear"></div>
+<!--导航菜单start-->
+#parse("/common/search.vm")
+#parse("/common/index_head.vm")
+<!--导航菜单end-->
+
+
+
+<div class=" bg_06 border-4 " id="main">
+	<p class="hei_45 wid_1160 border-3 pad_l10">
+		<i class="font_14b font_fe">收藏的店铺</i>
+		<!--
+		<i class="mar_l18 font_82">印刷类10</i>
+		<i class="mar_l18 font_82">女装3</i>
+		<i class="mar_l18 font_82">鞋类3</i>
+		-->
+	</p>
+	<div class="collect_Shop">
+		<dl>
+			<!-- 店铺列表 -->
+			#foreach( $shop in $pager.records )
+				<dd class="border-6">
+					<!-- 店铺信息描述 -->
+            		<div class="collect_Shop_left">
+            			<!--放logo的位置-->
+            			<div class="photograph att_pro">
+            				<a href="$request.contextPath/shopItemListIndexController/toIndex?shopId=$shop.shopId">
+            					<img src="$!imageServerAddr$shop.logoUrl" width="90" height="90"/>
+            				</a>
+            			</div>
+            			<ul class="po_re">
+            				<li class="font_14b" style="width:130px;overflow:hidden; white-space:nowrap; text-overflow:ellipsis; height: 24px;" title="$!shop.shopName">
+            					<a href="$request.contextPath/shopItemListIndexController/toIndex?shopId=$shop.shopId">$shop.shopName</a>
+            				</li>
+                      		<li>用户名：$shop.sellerName</li>
+                      		<span class="po_ab pa_05">
+                      			<i class=" demo-icons  font_14 fa-trash"></i>
+                      			<a href="javascript:delShopFavourite($shop.id);">删除</a>
+                      		</span>
+                    	</ul>
+            		</div>
+
+            		<!-- 店铺商品信息开始 -->
+            		#foreach($product in $shop.items)
+                		<ul>
+                			<li class="att_pro">
+                				<a href="$request.contextPath/productController/details?id=$product.itemId" class="att_new"><img src="$!imageServerAddr$product.pictureUrl" class="border-4"/></a>
+                    		</li>
+                    		<li class=" font_fe font_14b font_cen">￥ $product.guidePrice</li>
+                		</ul>
+            		#end
+
+            	</dd>
+			#end
+
+        </dl>
+        <div class="clear"></div>
+	</div>
+	<!--main end -->
+	<form id="favourite_form" action="$request.contextPath/favourite/shops" method="post">
+	<input type="hidden" id="page" name="page" value="$!pager.page" />
+    <!-- 分页 start -->
+	#pageVelocity($pager)
+    <!-- 分页 end -->
+	</form>
+
+
+	<div class="clear"></div>
+	<div id="recommend" style="width: 1200px; min-height: 250px;"></div>
+
+</div>
+
+
+
+<!-- <script type="text/javascript">
+	$(document).ready(function(){
+		$("#recommend").load("$request.contextPath/recommend");
+	});
+</script> -->

@@ -1,0 +1,335 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/sonhome/category_layout.vm")
+<link type="text/css" href="$staticPath/css/scnav.css" rel="stylesheet"/>
+<script type="text/javascript" src="$staticPath/js/adver_main.js"></script>
+<script type="text/javascript" src="$staticPath/js/scnav.js"></script>
+<script type="text/javascript">
+
+$(document).ready(function(){
+	$("#noticeArea").load("$request.contextPath/sonHome/noticeFragement?themId=$!mallThemeDTO.id");
+	$("#left_categoryid").load("$request.contextPath/sonHome/allCategory?type=show&cid=$!mallThemeDTO.cId&themId=$!mallThemeDTO.id");
+	$("#categParentName").parent().attr("href","$request.contextPath/sonHome/categoryes?cid=$!mallThemeDTO.cId&themId=$!mallThemeDTO.id")
+	$("#loginArea").load("$request.contextPath/sonHome/loginFragement?type=buyer");
+//	$("#noticeArea").load("$request.contextPath/noticeFragement");
+	// 冲销all_classify.js 中的click方法
+	setTimeout(function(){
+		$(".Nav_left").unbind("mouseleave");
+		$(".Nav_left").unbind("mouseenter");
+	},100);
+	
+	// 商城首页头部广告词
+	/*$.getJSON("$request.contextPath/sonHome/topBunner?themId=$!mallThemeDTO.id",function(data){
+		if(data){
+			$("#top_banner").find("img").attr("src","$!imageServerAddr"+data.adSrc);
+			//console.log(data.adURL);
+			$("#top_banner").find("a").click(function(){
+				adVisit(data.id,data.adURL,1);
+			});
+			$("#top_banner").slideDown("slow");
+			if(data.close=="2"){
+				$("#top_banner .fa-times-circle").hide();
+			}
+		}
+	});*/
+	
+	// 猜你喜欢
+	$("#guessLove").load("$request.contextPath/sonHome/guessLove?themId=$!mallThemeDTO.id");
+});
+// 广告点击量统计
+function adVisit(id,url,type){
+	$.ajax({
+		url: "$request.contextPath/adVisit",
+		type: "post",
+		data: {
+			"id": id,
+			"type": type
+		}
+	});
+	var url = ( url != "" && url != null ) ? ( url.indexOf("http") != -1 ? url : ( "http://" + url ) ) : "/";
+	window.open(url);
+}
+
+
+    $(function () {
+        var myFn = function () {
+            olKey++;
+			imgKey++;
+            if (olKey > $('.banner_ul ol li').length-1) {
+                olKey = 0;
+            }
+            if (imgKey > $('.banner_ul ul li').length-1) {
+                imgKey = 0;
+                $('.banner_ul ul').css('left', '0px');
+            }
+			$('.banner_ul ol li').eq(olKey).addClass('current').siblings().removeClass('current');
+			var move = imgKey * -670;
+            $('.banner_ul ul').stop().animate({'left': move + 'px'}, 500);
+        }
+        var timer01 = null;
+        timer01 = setInterval(myFn, 3000);
+        $('.banner_ul').hover(function (e) {
+            clearInterval(timer01);
+        }, function () {
+            timer01 = setInterval(myFn, 3000);
+        });
+        // var myLi = $('.banner_ul ul li:eq(0)').clone(true);
+        // var myTag = $(myLi);
+        // $('.banner_ul ul').append(myTag);
+        var olKey = 0;
+        var imgKey = 0;
+        $('.banner_ul ol li').mouseover(function (e) {
+            $(this).addClass('current').siblings().removeClass('current');
+            var move = $(this).index() * -670;
+            $('.banner_ul ul').stop().animate({'left': move + 'px'}, 500);
+            olKey = $(this).index();
+            imgKey = $(this).index();
+        });
+        var aLiLength=$('.banner_ul ol li a').length;
+        var objW=($('.banner_ul ol').width()/2)-(aLiLength*34)/2;
+        $('.banner_ul ol').css({'margin-left':objW+'px'});
+    })
+</script>
+<!--2016-01-05 start-->
+<body class="bg_06" style="min-width:1200px;">
+<div class="content_content">
+    <div class="keyin_content">
+        <!--top_left左侧二级类目-->
+        <div class="content_content_left fl" id="left_categoryid"></div>
+        <!--top_right-->
+        <div class="content_content_right fl" id="content_content_right"><div>           
+        <!--轮播图内容-->
+        <div class="banner_ul Banner_ul fl">
+			<ul>
+            #foreach($banner in $banners)
+    			<!--轮播图片的图标 开始 -->
+                #if($velocityCount < 6)
+                <li class="fl main_flash">
+                    <a onclick="adVisit('$!banner.id','$!banner.bannerLink',2)" class="cursor lbp" style="display: block;" title="$!bunner.title">
+                        <img src="$!imageServerAddr$banner.bannerUrl" />
+                    </a>
+                </li>
+				#end
+				<!--轮播图片的图标 结束 -->
+    		#end
+        	</ul>
+            <ol>
+            #foreach($banner in $banners)
+                #if($velocityCount < 6)
+                    #if($velocityCount == 1)
+                        <li class="fl current">
+                            <a href="javascript:void(0);"></a>
+                        </li>
+                    #else
+                        <li class="fl" id="${velocityCount} - 1">
+                            <a href="javascript:void(0);"></a>
+                        </li>
+                     #end
+                #end
+            #end
+            </ol>
+        </div>
+        <div class="content_content_right_top_right fl" id="content_right">
+            <div class="top_right_new" style="width:100%">
+                <h2>公告<i class="fr"> <a href="$request.contextPath/notice/sonhomeList?themId=$!mallThemeDTO.id&cid=$!mallThemeDTO.cId" style="color:#747474;">更多&gt;</a></i></h2>
+                  <div class="left_notic">
+                       <ul class="ul01" id="noticeArea">
+                         	<img src="$staticPath/images/loading-2.gif" style="margin: 68px auto auto 130px;">
+                       </ul>
+                  </div>
+            </div>
+            <div class="news_bottom">
+                <h2 style="color:#bd000f;">推荐专区</h2>
+                <ul style="width:280px">
+                #foreach($weekAd in $weekAdes)
+                #if($velocityCount<= 2 )
+                    <li>
+                        <a onclick="adVisit('$!weekAd.id','$!weekAd.adURL',1)" class="cursor" title="$!weekAd.title">
+                            <img src="$!imageServerAddr$weekAd.adSrc" width="280px" height="80px"/>
+                        </a>
+                    </li>
+                 #end
+            #end
+            </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+<div class="clear"></div>
+<!--center_content start-->
+    <div class="content_con mar">
+        <div class="center_content wid">
+        <div id="boutique">
+            <!--精品推荐 start-->
+            <div class="cont_title po_re">
+                <h1 class="po_ab bg_06">精品<i class="fa fa-circle round" style="font-size:12px;"></i>推荐</h1>
+            </div>
+            <div class="wid cont_content" id="guessLove" >
+            </div>
+         </div>
+            <!--精品推荐 end-->
+            
+            <div class="clear"></div>
+            
+            
+            <!--特色产品 start-->
+			#if($floors && $floors.size() > 0 )
+    			<div id="floors">
+                    #foreach($floor in $floors)
+    					<div class="cont_title po_re">
+                            <h1 class="po_ab bg_06" name="f$velocityCount">
+								#set( $floorTitleLength = $!floor.titleDTO.length() )
+								#set( $floorTitleLengthSub1 = $!floor.titleDTO.length() - 1 )
+								#set( $floorTitleLengthSub2 = $!floor.titleDTO.length() - 2 )
+								#if($floorTitleLength > 2)
+									$!{floor.titleDTO.substring(0,2)}
+									<i class="fa fa-circle round" style="font-size:12px;"></i>
+									#if($floorTitleLength == 3)
+										$!{floor.titleDTO.substring($floorTitleLengthSub1,$floorTitleLength)}
+									#else
+										$!{floor.titleDTO.substring($floorTitleLengthSub2,$floorTitleLength)}
+									#end
+								#else
+									$!{floor.titleDTO}
+								#end
+							</h1>
+                        </div>
+        				<div class="wid cont_content" id="floor$velocityCount" name="floor$velocityCount">
+        					<div style="width: 100%; height: 380px; line-height: 380px;">
+        						<img style="margin: 10px auto auto 600px;" src="$staticPath/images/loading-4.gif">
+                                <script type="text/javascript">
+                                    $(document).ready(function(){
+                                    	$("#floor$velocityCount").load("$request.contextPath/sonHome/floor?fid=$floor.idDTO&num=$velocityCount");
+                                    })
+                                </script>
+        					</div>
+        				</div>
+						<div class="clear"></div>
+                     #end
+				</div>
+				<!-- 楼层导航功能条 -->
+        		<div id="leftBar" style="">
+            		#foreach($floor in $floors)
+            			<div>
+            	    		<a href="javascript:void(0);" class="border-5" code="$velocityCount">
+            	      			<span class="floor_s">${velocityCount}F</span>
+            	      			<span class="floor_h">${floor.titleDTO}</span>
+            	    		</a>
+            			</div>
+            		#end
+        		</div>
+             #end
+            <div class="clear"></div>  
+            #if($shipStores!=[])
+	            <!--旗舰店 start-->
+	            <div class="cont_title po_re">
+	                <h1 class="po_ab bg_06"><i class="fa fa-circle round" style="font-size:12px;"></i>旗舰店<i class="fa fa-circle round" style="font-size:12px;"></i></h1>
+	            </div>
+	            <div class="wid cont_content">
+	                <ol class="bg_06 box_shadow pad_tb10" style="height:270px;">
+	                    #foreach($shipStore in $shipStores)
+	            		#if($velocityCount<= 4 )
+	            			<li #if ($velocityCount==1) style="border-left:none;" #end >
+	                           <div class="ol_div">
+	            				<a onclick="adVisit('$!shipStore.id','$!shipStore.adURL',1)" class="cursor" title="$!shipStore.title">
+	            					<img src="$!imageServerAddr$shipStore.adSrc" width="266" height="200"/>
+	            					<a href="javascript:void(0);" onclick="adVisit('$!shipStore.id','$!shipStore.adURL',1)"><span class="ol_span">#if($shipStore.logoUrl) <img src="$!imageServerAddr$shipStore.logoUrl"  width="65" height="26">#end</span></a>
+	            				</a>
+	            			  </div>
+	            			  <p class="ol_p cursor over_ell" title="$!shipStore.shopName" onclick="adVisit('$!shipStore.id','$!shipStore.adURL',1)">$!shipStore.shopName</p>
+	              		   </li>
+	            		#end
+	        	     #end
+	                </ol>
+	            </div><!--旗舰店 end-->
+            #end
+            <div class="clear"></div>
+            <!--小广告位 start-->
+            #if($!bottomAdvs!=[])
+	            <div class="wid cont_content">
+	                <ol class="bg_06 mar_t20 ad_ol box_shadow" style="height:70px;">
+		                #foreach($bottomAdv in $bottomAdvs)
+			        		#if($velocityCount<= 10 )
+			        			<li #if ($velocityCount==1) style="border-left:none;" #end >
+			                        <a href="javascript:void(0);" onclick="adVisit('$!bottomAdv.id','$!bottomAdv.adURL',10)"><img src="$!imageServerAddr$bottomAdv.adSrc" width="100" height="50"></a>
+			                    </li>
+			                #end
+		                #end
+	                </ol>
+	            </div><!--小广告位 end-->
+	          #end  
+            <div class="clear"></div>
+            <!--论坛 start-->
+            <div class="cont_title po_re">
+                <h1 class="po_ab bg_06">论<i class="fa fa-circle round" style="font-size:12px;"></i>坛</h1>
+            </div>
+            <div class="wid cont_content">
+                <div class="bg_06 mar_t15 box_shadow" style="height:500px;">
+                    <ul id="forum_ul">
+                        <li class="pad_lt10 border-11 border-14" >
+                            <script type="text/javascript" src="http://123.56.245.51/api.php?mod=js&bid=4"></script>
+                        </li>
+                        <li class="pad_lt10 border-11 border-14" >
+                            <script type="text/javascript" src="http://123.56.245.51/api.php?mod=js&bid=15"></script>
+                        </li>
+                        <li class="pad_lt10 border-14" >
+                            <h1 class="bg_06 font_00 font_16">置顶<i class="fa fa-circle round" style="font-size:12px;"></i>精华帖</h1>
+                                <script type="text/javascript" src="http://123.56.245.51/api.php?mod=js&bid=16"></script>       
+                        </li>
+                        <li class="pad_lt10 border-14 border-11" style="width:530px;" >
+                            <script type="text/javascript" src="http://123.56.245.51/api.php?mod=js&bid=19"></script>
+                        </li>
+                        <li class="pad_lt10 border-11 border-14 border-15" style="width:305px;" >
+                            <script type="text/javascript" src="http://123.56.245.51/api.php?mod=js&bid=17"></script>
+                            <script type="text/javascript" src="http://123.56.245.51/api.php?mod=js&bid=18"></script>
+                        </li>
+                        <li class="pad_lt10 border-14" style="width:330px;" >
+                            <script type="text/javascript" src="http://123.56.245.51/api.php?mod=js&bid=20"></script>
+                        </li>
+                    </ul>
+                </div>
+            </div><!--论坛 end-->             
+        </div>
+    </div>
+    #if($!bottomAd)
+    	<!--欢迎进入 start-->
+    	    <div class="cont_content mar_t10 welcome">
+    	        <div onclick="adVisit('$!bottomAd.id','$!bottomAd.adURL',3)" style="min-width:1200px; height:250px; background:url($!imageServerAddr$!bottomAd.adSrc) no-repeat center center; cursor:pointer;"></div>
+    	        <div class="welcome_div">
+    	            ##<p class="p01" onclick="adVisit('$!bottomAd.id','$!bottomAd.adURL',3)">$!bottomAd.title</p>
+    	            ##<p class="p02">让你感受不一样的视觉盛宴</p>
+    	            ##<button class="but_max font_24" onclick="adVisit('$!bottomAd.id','$!bottomAd.adURL',3)">欢迎加入</button>
+    	        </div>
+    	    </div><!--欢迎进入 end-->
+    #end
+<!--center_content end-->
+  
+<div class="clear"></div>
+</div>
+</body>
+<script language="javascript">
+var LR_username='$!userId';
+var LR_userdata="舒适100";
+function openZoosUrl_UserDefine(){
+    //你们的判断登录跳转功能，也可以在这里进行判断
+    if( '$!userId' ==  ''){
+        alert("你目前处于非登陆状态，请先登录再联系客服！");
+        this.location.href="$request.contextPath/user/login";
+        return true;
+    }
+    $.ajax({
+        type: "post",
+        dataType: "json",
+        url:"$request.contextPath/shopCart/ifLogin_shopCustomer",
+        success: function(data){
+            if(data.ifLogin_shopCustomer == false){
+                alert("你目前处于非登陆状态，请先登录再联系客服！");
+                this.location.href="$request.contextPath/user/login";
+                return true;
+            }
+        }
+    });
+}
+</script>
+

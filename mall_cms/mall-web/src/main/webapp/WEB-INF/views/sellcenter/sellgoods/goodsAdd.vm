@@ -1,0 +1,1096 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<link href="$request.contextPath/assets/plugin/kindeditor/themes/default/default.css" rel="stylesheet" />
+<link href="$request.contextPath/assets/plugin/jquery-validation/1.11.1/jquery.validate.css" type="text/css" rel="stylesheet" />
+<style type="text/css">
+    #areaPriceTable tr td {border:#ddd 1px solid;}
+    #leo {  
+            position: absolute;  
+            border: 1px solid grey;  
+            opacity: 0.8;  
+            background: #fafafa;  
+        }
+    .tab_area{height:30px;width:548px;margin:auto;border-bottom:1px solid #c11208;padding-left:10px}
+    .tab_area li{
+    	float:left;
+    	cursor:pointer;
+    	list-style:none;
+    	background:#fff;
+    	font-weight:bold;
+    	padding:0;
+    }
+    .current{
+    	border-left:1px solid #c11208;
+    	border-top:1px solid #c11208;
+    	border-right:1px solid #c11208;
+    	border-bottom:1px solid #fff;
+    }
+    .showCity{min-width:50px;line-height:40px;margin:left;text-align:center;padding:0 5px;float:left}
+</style>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/jquery-migrate-1.1.0.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/jquery-validation/1.11.1/jquery.validate.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/jquery-validation/1.11.1/messages_zh.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.shadow.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.ifixpng.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.fancyzoom.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/common/loadMsg.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/ueditor/ueditor.all.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/ueditor/lang/zh-cn/zh-cn.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/goodscenter/itemValidate.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/goodscenter/good_add.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/goodscenter/item_sku.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/goodscenter/item_attr.js"></script>
+
+<script type="text/javascript">
+var path = "$request.getContextPath()";
+var initItemId = "$!itemDTO.itemId";
+var isView = "$!doType" == "view" //是否是查看功能
+var doType = "$!doType";
+var plstItemId = "$!plstItemId";
+var attributesStr = "$!itemDTO.attributesStr";
+var attrSaleStr = "$!itemDTO.attrSaleStr";
+var itemDTOJsonStr = '$!itemDTOJson';
+var itemId = "$!itemDTO.itemId";
+var imageServerAddr = "$!imageServerAddr";
+var brand = "$!itemDTO.brand";
+var shopCid = "$!itemDTO.shopCid";
+var addSource="$!addSource";
+/* function GlobalVar(){
+	var areaNum = 0; //阶梯价中地区行标识
+	var cityAreaPriceNum = 0; //销售数量价格标识
+	var sellPriceDivNum = 0; //阶梯价弹出层标识
+	var areaPriceJson = "";
+	var areaPriceObj = {}; //添加商品对应的阶梯价
+	var productPicNum = 10;//商品图片的数量
+	var titleMap = {}; //选中的销售属性集合
+	var valueMap = {};//选中的销售属性值集合
+	var sellAttrOneMap = {}; //选中的sku集合
+	var skuArePriceTemp = {};
+	var saleCategoryAttr = "";//缓存选中的销售属性，主要在销售属性添加时使用。
+	var initItemId = "$!itemDTO.itemId";
+	var datajson = {
+		getMaxValueValidate:function(){
+			return 9999999;
+		},
+		areaNumIncrease:function(){
+			return ++areaNum;
+		},
+		addAreaPriceObj:function(prop,val){
+			areaPriceObj[prop] = val;
+		},
+		getAreaPriceObj:function(){
+			return areaPriceObj;
+		}
+	}
+	return datajson;
+} */
+	var ue = UE.getEditor('editor',{
+		serverUrl:'$request.contextPath/ueditor/exec',
+		imageUrlPrefix:"$!imageServerAddr"
+	});
+	ue.addListener('ready',function(){
+		ue.setContent($("#editor1").val());
+		var imgObjs = $("#ueditor_0").contents().find("img");
+		imgObjs.each(function () {
+           if($(this).attr("src") != "" && $(this).attr("src").indexOf("http://") < 0){
+        	   $(this).attr("src","$!imageServerAddr"+$(this).attr("src"));
+           }
+           if($(this).attr("_src") != "" && $(this).attr("_src").indexOf("http://") < 0){
+        	   $(this).attr("_src","$!imageServerAddr"+$(this).attr("_src"));
+           }
+        });
+        if(isView){
+			UE.getEditor('editor').setDisabled('fullscreen');
+		}
+	});
+	var specificationUE = UE.getEditor('editor2',{
+		serverUrl:'$request.contextPath/ueditor/exec',
+		imageUrlPrefix:"$!imageServerAddr"
+	});
+	specificationUE.addListener('ready',function(){
+		specificationUE.setContent($("#editor3").val());
+		var imgObjs = $("#ueditor_1").contents().find("img");
+		imgObjs.each(function () {
+           if($(this).attr("src") != "" && $(this).attr("src").indexOf("http://") < 0){
+        	   $(this).attr("src","$!imageServerAddr"+$(this).attr("src"));
+           }
+           if($(this).attr("_src") != "" && $(this).attr("_src").indexOf("http://") < 0){
+        	   $(this).attr("_src","$!imageServerAddr"+$(this).attr("_src"));
+           }
+        });
+        if(isView){
+			UE.getEditor('editor2').setDisabled('fullscreen');
+		}
+	});
+	var afterServiceUE = UE.getEditor('editor4',{
+		serverUrl:'$request.contextPath/ueditor/exec',
+		imageUrlPrefix:"$!imageServerAddr"
+	});
+	afterServiceUE.addListener('ready',function(){
+		afterServiceUE.setContent($("#editor5").val());
+		var imgObjs = $("#ueditor_2").contents().find("img");
+		imgObjs.each(function () {
+           if($(this).attr("src") != "" && $(this).attr("src").indexOf("http://") < 0){
+        	   $(this).attr("src","$!imageServerAddr"+$(this).attr("src"));
+           }
+           if($(this).attr("_src") != "" && $(this).attr("_src").indexOf("http://") < 0){
+        	   $(this).attr("_src","$!imageServerAddr"+$(this).attr("_src"));
+           }
+        });
+        if(isView){
+			UE.getEditor('editor4').setDisabled('fullscreen');
+		}
+	});
+	
+	$(function(){
+		$("#area_province").click(function(){
+			closeAll();
+			$("#dl_province").show();
+			$(this).attr("class","current");
+		});
+		
+		$("#area_city").click(function(){
+			closeAll();
+			$("#dl_city").show();
+			$(this).attr("class","current");
+		});
+	});
+	
+	//加载点击的省份下的城市列表
+	function showCityDl(id,name){
+		closeAll();
+		$("#area_city").attr("class","current");
+		$("#dl_city").html("");
+		$("#dl_area").html("");
+		$.ajax({
+			url:"$request.contextPath/address/query",
+			type:"POST",
+			data:{"id":id},
+			dataType:"JSON",
+			success:function(d){
+				var citys = "";
+				$.each(d,function(idx,ele){
+					citys +="<dd class='showCity'><a href=\"javascript:addAreaShow('"+ele.code+"','"+ele.name+"')\" >"+ele.name+"</a></dd>";
+				});
+				$("#dl_city").html(citys);
+			}
+		});
+		$("#dl_city").show();
+	}
+	
+	//添加区域
+	function addAreaShow(c,n){
+		var areas = $("input[name='area_value']");
+		var names = $("input[name='area_name']");
+		var areaValue = "";
+		var areaName = "";
+		$.each(areas,function(idx,ele){
+			if($(ele).val()==c){
+				removeArea(c)
+			}
+		});
+		$("#area_show").append("<dd class=\"showCity city"+c+"\">"+n+"<span><a style=\"color:red\" href=\"javascript:removeArea('"+c+"')\" > x</a></span></dd> <input class=\"city"+c+"\" type = \"hidden\" name = \"area_value\"  value=\""+c+"\"/><input class=\"city"+c+"\" type = \"hidden\" name = \"area_name\"  value=\""+n+"\"/>");
+	}
+	
+	function fanhz(){
+		
+		var areaValue = "";
+		var areaName = "";
+		
+		$(".ecity").each(function(){
+    		var citys = $(this).children(".citys");
+    		citys.find(".J_City:checked").each(function(){
+				areaName += "," + $(this).next("label").html();
+				areaValue += "," + $(this).val();
+			});
+    	});
+		
+		if(areaName.length>1){
+			areaName = areaName.substring(1);
+			areaValue = areaValue.substring(1);
+		}else{
+			alert("请选择地区");
+			return;
+		}
+		
+		//判断地区是否被选中过
+		var nowarray = areaValue.split(",");
+		var repAreStr = "";
+		$("input[id^='areaId_']").each(function(i, n){
+			if($(this).attr("id") != bufferAreaIdIdVal && $(this).val() != "") {
+				var me = $(this).val().split(",");
+				for(var i = 0; i < me.length; i++) {
+					for(var k = 0; k < nowarray.length; k++) {
+						if(nowarray[k] == me[i]) {
+							repAreStr += $(".J_City[value='"+me[i]+"']").next("label").html() + "、";
+						}
+					}
+				}
+				
+			}
+		});
+		if(repAreStr != ""){
+    		alert("区域:"+repAreStr+"已经被选择过!");
+    		return;
+		}
+		
+		showSelectArea(areaValue,areaName)
+		$("#area_show").html("");
+	}
+	
+	
+	//删除要关闭掉的城市
+	function removeArea(c){
+		$(".city"+c).remove();
+	}
+	
+	//关闭所有地址选择框
+	function closeAll(){
+		$("#dl_province").hide();
+		$("#dl_city").hide();
+		$("#area_city").attr("class","");
+		$("#area_province").attr("class","");
+	}
+	//查看商品详细属性
+	function viewDetail(itemId){
+		window.location.href="$request.contextPath/productController/details?id="+itemId;
+	}
+	
+//	function showAreaDl(id){
+//		closeAll();
+//		$("#area_area").attr("class","current");
+//		$("#dl_area").html("");
+//		$.ajax({
+//			url:"$request.contextPath/address/query",
+//			type:"POST",
+//			data:{"id":id},
+//			dataType:"JSON",
+//			success:function(d){
+//				var areas = "";
+//				$.each(d,function(idx,ele){
+//					//areas +="<dd class='showCity'><a href=\"javascript:showSelectArea('"+ele.code+"','"+ele.name+"')\" >"+ele.name+"</a></dd>";
+//				});
+//				$("#dl_area").html(areas);
+//			}
+//		});
+//		$("#dl_area").show();
+//	}
+	//选择商品弹出框关闭事件
+	function closeTip(){
+		$("#itemNameId").val("");
+		$("#itemCoding").val("");
+	}
+	
+//*************省市选择相关 top add by fuyu 20160301*******************
+$(document).ready(function(){
+	// 下拉箭头事件
+	$(".trigger").click(function(){
+		var citys = $(this).parent().next(".citys");
+		$(this).parent().parent().toggleClass(function(){
+			if($(this).hasClass("showCityPop")){
+				citys.hide();
+			}else{
+				$(".citys").hide();
+				$(".ecity").removeClass("showCityPop");
+				citys.show();
+			}
+			return "showCityPop";
+		});
+	});
+	//选择省事件
+	$(".J_Province").change(function(){
+		var cked = $(this).prop("checked");
+		var citys = $(this).parent().next(".citys");
+		citys.find(".J_City").prop("checked", cked);
+		handleChange();
+	});
+	//城市选择事件
+	$(".J_City").change(function(){
+		var gareas = $(this).parent().parent().prev(".gareas");
+		handleChange();
+	});
+	//关闭按钮事件
+	$(".close_button").click(function(){
+		$(".citys").hide();
+		$(".ecity").removeClass("showCityPop");
+		//showCityPop
+	});
+	initProvinceCitys("");
+});
+
+//当省市复选框发生改变的时候触发一次
+function handleChange(){
+	$(".ecity").each(function(){
+		var gareas = $(this).children(".gareas");
+		var citys = $(this).children(".citys");
+		var citysNum = citys.find(".J_City").length;
+		var checkedNum = citys.find(".J_City:checked").length; //已经选择数量
+		if(citysNum > 0) {
+			gareas.find(".J_Province").prop("checked", citysNum == checkedNum); //如果全部选中了则选中省 否则取消
+		}
+		gareas.find(".check_num").html(checkedNum > 0 ? "("+checkedNum+")" : "");
+	});
+}
+
+//省市初始化、回显
+function initProvinceCitys(ids){
+	$(".province-list .citys").hide();
+	$(".province-list .ecity").removeClass("showCityPop");
+	$(".province-list .check_num").html("");
+	$(".province-list input:checkbox").prop("checked", false);
+	$(ids.split(",")).each(function(i, id){
+		$("#J_City_" + id).prop("checked",true);
+	});
+	handleChange();
+}
+//*************省市选择相关 end*******************
+</script>
+<div id="main">
+<!--中间部分开始-->
+<div id="leftSeller" class="border-4">
+</div><!--left end -->
+
+<!--右边部分开始-->
+<div id="right" class="bg_06 border-4">
+ <form id="itemForm" name="itemForm" 
+ 	action="$request.contextPath/sellcenter/sellProduct/save" method="post">
+ 	<input type="hidden" value="$!directsale" id="directsale">
+  <div class="add_newshop bg_06 mar_lr10">
+     <input type="file" id="fileInput" style="display:none;" name="file" onchange="fileChange()"  />
+     <input type="hidden" name="itemId" id="itemId" value="$!itemDTO.itemId" />
+     <input type="hidden" name="itemStatus" id="itemStatus" value="" />
+     <input type="hidden" name="attributesStr" id="attributesStr" value="$!itemDTO.attributesStr" />
+     <input type="hidden" name="attrSaleStr" id="attrSaleStr" value="$!itemDTO.attrSaleStr" />
+     <input type="hidden" name="itemPics" id="itemPics" value="" />
+     <input type="hidden" name="operator" id="operator" value="$!operator" />
+     <input type="hidden" name="hasPrice" id="hasPrice" value="" />
+     <input type="hidden" name="plstItemId" id="plstItemId" value="$!plstItemId" />
+     <input type="hidden" name="subNum" id="subNumId" />
+     <input type="hidden" id="hideCheckId"></div>
+     <div class="hide" id="allAttributesDiv"></div>
+     <div class="hide"id="allAttrSalesDiv"></div>
+     <div class="hide"id="selectAttrSku"></div>
+     <input type="hidden" name="describeUrl" id="describeUrl" value=""/>
+     <input type="hidden" name="specification" id="specification" value=""/>
+     <input type="hidden" name="afterService" id="afterService" value=""/>
+     <input type="hidden" name="housetype" id="housetype" value=""/>
+     <div id="hideAddSorceId"></div>
+    <div class="shop_xinxi mar_t20 mar_lr10"><!-- 添加基本信息 -->
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" ><span class="font_12 mar_l10 ">基本信息</span></p>
+      <ul class="add_xx mar_t10 mar_l10 ">
+        <ul class="add_xx mar_t10 mar_l10 ">
+       <li class="wid_460 mar_tb10 ">
+          <i class="font_fs mar_l2">*</i>平台类目 : 
+          #if(!$!plstItemId)
+          	<select class="input_Style2 hei_30 wid_95" id="itemCategoryLevelOne">
+        		<option>一级分类</option>
+        		 #foreach( $itemCatCascadeDTO in $itemCatCascadeDTOList) 
+                   	 <option #if($!itemCatCascadeDTO.cid == $!oneLevelId) selected="selected" #end value="$!itemCatCascadeDTO.cid">$!itemCatCascadeDTO.cname</option>
+				 #end
+        	</select>
+        	<select class="input_Style2 hei_30 wid_95" id="itemCategoryLevelTwo">
+        		<option>二级分类</option>
+        		 #foreach( $itemCatCascadeDTO in $ItemCatCascadeLevelTwoList) 
+                   	 <option #if($!itemCatCascadeDTO.cid == $!twoLevelId) selected="selected" #end value="$!itemCatCascadeDTO.cid">$!itemCatCascadeDTO.cname</option>
+				 #end
+        	</select>
+        	<select class="input_Style2 hei_30 wid_90" id="itemCategoryLevelThree" name="cid">
+        		<option value="">三级分类</option>
+        		#foreach( $itemCatCascadeDTO in $ItemCatCascadeLevelThreeList) 
+                   	 <option #if($!itemCatCascadeDTO.cid == $!itemDTO.cid) selected="selected" #end value="$!itemCatCascadeDTO.cid">$!itemCatCascadeDTO.cname</option>
+				 #end
+        	</select>
+          #else
+	          	<select class="input_Style2 hei_30 wid_95">
+	        		<option value="$!itemCatCascadeDTO.cid">$!itemCatCascadeDTO.cname</option>
+	        	</select>
+	        	<select class="input_Style2 hei_30 wid_95">
+	        		<option value="$!twoItemCatCascadeDTO.cid">$!twoItemCatCascadeDTO.cname</option>
+	        	</select>
+	        	<select class="input_Style2 hei_30 wid_90" name="cid">
+	        		<option value="$!threeItemCatCascadeDTO.cid">$!threeItemCatCascadeDTO.cname</option>
+	        	</select>
+          #end
+        </li>
+        <li class="wid_460 mar_tb10">
+          <i class="font_fs mar_l2">*</i> 店铺类目 : 
+          <select class="input_Style2 hei_30 wid_95" id="shopCategoryLevelOne">
+				<option value="">一级分类</option>
+				#foreach($shopCategoryDTO in $shopCategoryDTOList) 
+                   	 <option #if($!shopCatLevelOneId == $!shopCategoryDTO.cid) selected="selected" #end value="$!shopCategoryDTO.cid"> $!shopCategoryDTO.cname</option>
+				 #end
+			</select>
+        	<select class="input_Style2 hei_30 wid_95" id="shopCategoryLevelTwo" name="shopCid">
+        		<option value="">二级分类</option>
+        	</select>
+        </li>
+        <li class="wid_460 mar_tb10"><i class="font_fs mar_l2">*</i>商品名称 : 
+        	<input name="itemName" id="itemName" value="$!itemDTO.itemName" 
+        		class="wid_300 input_Style2 hei_30" maxlength="50" type="text" />
+        </li>
+       	#if($!directsale == 1)
+        <li class="wid_460 mar_tb10">产品编号: 
+        	<input name="productId" id="productId" value="$!itemDTO.productId" 
+        		class="wid_300 input_Style2 hei_30" maxlength="19" type="text" />
+        </li>
+        #else
+        <li class="wid_460 mar_tb10" style="display:none;">产品编号: 
+        	<input name="productId" id="productId" value="" 
+        		class="wid_300 input_Style2 hei_30" maxlength="19" type="text" />
+        </li>
+        #end
+        <li class="wid_460 mar_20 mar_tb10">广告语 : <input type="text" name="ad" id="ad" maxlength="50" value="$!itemDTO.ad" class="wid_300  input_Style2 hei_30" /></li>
+        
+        <li class="wid_460 mar_tb10" style="display:none" id="goodTypeId">
+        <i class="font_fs mar_l2">*</i> 商品类型: 
+        <select class="input_Style2 hei_30 wid_95" name="addSource" id="addSource" style="width:120px">
+				<option  value="">请选择</option>
+				<option #if($!addSource == '4') selected="selected" #end value="4">基础服务商品</option>
+				<option #if($!addSource == '5') selected="selected" #end value="5">增值服务商品</option>
+				<option #if($!addSource == '6') selected="selected" #end value="6">辅助材料商品</option>
+		</select>
+       </li>
+       </ul> 
+      </ul> 
+    </div><!-- 添加基本信息 end -->
+    <div class="clear"></div>
+
+    <div class="shop_xinxi mar_t20 mar_lr10"><!-- 添加商品属性 -->
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" ><span class="font_12 mar_l10 ">商品属性
+      		<input class="messageInput" type="text" name="attributesStrShow" readonly="readonly" />
+      </span></p>
+      <ul class="add_sx mar_l10">
+        <li class="mar_t10"><i class="font_fs mar_l2">*</i>
+        	#if(!$!plstItemId)
+	        	品牌：<select class="input_Style2 hei_30 wid_95" id="brandId" name="brand">
+	        			<option value="">请选择</option>
+	        		</select>
+        	#else
+        		品牌：<select class="input_Style2 hei_30 wid_95" name="brand">
+	        			<option value="$!itemBrandDTO.brandId">$!itemBrandDTO.brandName</option>
+	        		</select>
+        	#end
+        </li>
+        <div id="platformAttributeDiv" class="mar_l10">
+        </div>
+      </ul> 
+    </div><!-- 添加商品属性 end -->
+	<div class="clear"></div>
+    <div class="shop_xinxi mar_t20 mar_lr10"><!-- 添加运费模版 -->
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" ><span class="font_12 mar_l10 ">商品运费
+			<input class="messageInput" type="text" name="shopFreightTemplateIdStrShow" readonly="readonly" />
+	  </span></p>
+      <ul class="add_sx mar_l10">
+        <li class="mar_t10"><i class="font_fs mar_l2">*</i>
+			模版：
+        	<select class="input_Style2 hei_30 wid_95" id="shopFreightTemplateId" name="shopFreightTemplateId">
+				<option value="">请选择</option>
+				#foreach( $shopFreightTemplateDTO in $shopFreightTemplateList) 
+					<option #if($!shopFreightTemplateDTO.id == $!itemDTO.shopFreightTemplateId) selected="selected" #end value="$!shopFreightTemplateDTO.id">$!shopFreightTemplateDTO.templateName</option>
+				#end
+			</select>
+        </li>
+		<div id="shopFreightTemplateDiv" class="mar_l10">
+        </div>
+      </ul> 
+    </div><!-- 添加运费模版 end -->
+    <div class="clear"></div>
+     <!-- 添加商品信息 -->
+    <div class="shop_xinxi mar_t20 po_re mar_lr10 ">
+      <div class="diloge_dijia" style="display:none;z-index:2;" id="showPriDivOne">
+          <table id="areaAllTable" class="areaTable border-4">
+	            <tr class="hei_35 font_cen bg_05">
+		            <th width="60" height="35" class="border-4">编号</th>
+		            <th class="wid_220 border-4" >采购量</th>
+		            <th width="120" class="border-4"><font class="ftred font_fs">*</font>销售价(元)</th>
+		            <th width="60" class="border-4">编辑</th>
+		            <th width="190" class="border-4">适用范围</th>
+	            </tr>
+	              #if(!$!itemDTO.itemId)
+		            <tr class="diloge_td">
+			            <p></p>
+			            <td class="wid_60 font_cen">1</td>
+			            <td colspan="3" class="border-1" width="400" id="areaPriceTD_0">
+			              <ul class="cg-ul mar_t10" id="areaPriceUl_0">
+			                  <li class="wid_220 fl">
+			                      <input type="text" value="1" id="0_0_minNum" validateType="minNum" maxlength="7" onkeyup="numInput(this,0)" name="sellPrices[0].minNum" placeholder=""  class="wid_80 input_Style2 hei_30">
+			                      ~
+			                      <input type="text" title="采购量必须以9999999结束" id="0_0_maxNum" maxlength="7" validateType="maxNum" onkeyup="numInput(this,0)" name="sellPrices[0].maxNum" placeholder="最大值" class="wid_80 input_Style2 hei_30">
+			                  </li>
+			                  <li class=" fl">
+			                      <input type="text" validateType="sellPrice" onkeyup="numInput(this)" maxlength="12" class="wid_80 input_Style2 hei_30" id="0_0_sellPrice" name="sellPrices[0].sellPrice" placeholder="">
+			                  	  <input type="hidden" id="0_0_areaId" validatetype="area" name="sellPrices[0].areaId" value="0" />
+	    						  <input type="hidden" id="0_0_areaName" name="sellPrices[0].areaName" value="全国" />
+			                  </li>
+			                  <li class=" fr mar_20 mar_t10" style="width:35px;">
+			                      <i class="demo-icons fa-trash font_16 cursor" onclick="removeElement('areaPriceUl_0')">
+			                          <a href="javascript:;"  class="font_fe"></a>
+			                      </i>
+			                  </li>
+			              </ul>
+			              <div class="clear" id="areaPriceAfterDiv_0"></div>
+			              <div class="hei_35">
+			                   <i class="demo-icons fa-plus font_14b font_fa mar_l14 cursor" onclick="addAreaPrice('','areaPriceAfterDiv_0','areaPriceTD_0',0,'')"></i>
+			              </div><!--点击+加号  增加上面一个UL end-->
+			           </td>
+			            <th width="190 font_cen " id="china_all">
+			            	全国
+			            	<br/>
+			            	<div id="city_ignore"></div>
+			            	<input type="hidden" id="areaId_0" name="" value="0" />
+	    					<input type="hidden" id="areaName_0" name="" value="全国" />
+			            </th>
+		           </tr>
+	            #end
+          </table>
+           <div class="hei_35 font_cen font_18 font_1c cursor">
+          	#if("$!doType" != "view")
+          		<a onclick="addArea('','areaAllTable','')" style='font-size:14px'>点击此处维护区域价</a>
+          	#end
+          </div>
+          <div class="hei_60 bg_08 ">
+          	#if("$!doType" != "view")
+	          <span class="pad_l10" style="margin-right:250px;">
+	          		点击"+"增加阶梯价
+              </span>
+               <button type="button" class="font_14 button_2 hei_32 " id="areaPriceSaveBtn" onclick="confirmLadder();">确定</button>
+                &nbsp;&nbsp;<button type="button" class="font_14 button_2 hei_32  but_qx" id="btnCancel" onclick="comboxDivHide('showPriDivOne')">取消</button>
+          	#else
+          	 <span class="pad_l10" style="margin-right:350px;">
+	          		阶梯价查看
+              </span>
+              <button style="display:none" type="button" class="font_14 button_2 hei_32  but_qx" id="areaPriceSaveBtn">确定</button>
+          	   <button type="button" class="font_14 button_2 hei_32  but_qx" id="btnCancel" onclick="comboxDivHide('showPriDivOne')">取消</button>
+          	#end
+          </div>
+      </div>
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05">
+      	<span class="font_12 mar_l10">
+      		商品信息 
+      		<input class="messageInput" type="text" name="itemSellPriceShow" readonly="readonly" />
+      	</span>
+      	</p>
+        <div class="mar_t10">
+        	<input type="checkbox" #if($!itemDTO.hasPrice == 2) checked="checked" #end id="hasPriceCheck" />暂无报价
+        </div>
+        
+        <div class=" wid_440 fl mar_t10" style="min-height:30px;">
+	      <p class="wid_80 hei_35 font_right fl"><i class="font_fs mar_l2">*</i>销售价：</p>
+	      <table class="wid_130 fl" style="border-collapse: collapse;" id="areaPriceTable">
+	        <tr class="bg_05">
+	          <td class="wid_60 font_cen hei_24">订购量</td>
+	          <td class="wid_60 font_cen hei_24">销售价(元)</td>
+	        </tr>
+	      </table>
+	      <p class=" wid_100 fl bianji wid_130 hei_35 mar_l10 font_1c cursor" id="editPOne" onclick="bianji();">
+	      	#if("$!doType" != "view")
+	      		编辑地域价与阶梯价
+	      	#else
+	      		查看地域价与阶梯价
+	      	#end
+	      </p>
+	       <div class="shop_xinxi mar_t20 po_re" style="margin-top:-18px" id="itemSalePriceId"></div>
+	     </div>
+	     <div class="clear"></div>
+	     <div class="hei_45 wid_440 fl mar_t10">
+	        <p class="wid_80 hei_35 font_right fl"><i class="font_fs mar_l2">*</i>市场指导价：</p>
+	        <input type="text" name="marketPrice" id="marketPrice" value="$!itemDTO.marketPrice" maxlength="12" onkeyup="numInput(this)" class="wid_140 input_Style2 hei_30" /><i class="mar_l10">元</i>
+	     </div>
+	     <div class="hei_45 wid_440 fl mar_t10">
+	        <p class="wid_80 hei_35 font_right fl">库存量：</p>
+	        <input type="text" name="inventory" id="inventory" value="$!itemDTO.inventory" readonly="readonly" class="wid_140 input_Style2 hei_30" />
+	     </div>
+	     <div class="hei_45 wid_440 fl mar_t10">
+	        <p class="wid_80 hei_35 font_right fl"><i class="font_fs mar_l2">*</i>底价：</p>
+	        <input type="text" name="marketPrice2" id="marketPrice2" value="$!itemDTO.marketPrice2" maxlength="12" onkeyup="numInput(this)" class="wid_140 input_Style2 hei_30" /><i class="mar_l10">元</i>
+	     </div>
+	     <div class="hei_45 wid_440 fl mar_t10">
+        	<p class="wid_80 hei_35 font_right fl"><i class="font_fs mar_l2">*</i>报价：</p>
+	      	<input type="text" name="guidePrice" id="guidePrice" value="$!itemDTO.guidePrice" maxlength="12" onkeyup="numInput(this)" class="wid_140 input_Style2 hei_30" /><i class="mar_l10">元</i>
+    	 </div>
+	     <div class="hei_45 wid_440 fl mar_t10">
+	        <p class="wid_80 hei_35 font_right fl">商品产地：</p>
+	        <input type="text" name="origin" maxlength="50" value="$!itemDTO.origin" class="wid_140 input_Style2 hei_30" />
+	     </div>
+		 <div class="hei_45 wid_440 fl mar_t10">
+	        <p class="wid_80 hei_35 font_right fl"><i id="weightRequired" class="font_fs mar_l2" style="display:none">*</i>商品毛重：</p>
+	        <input type="text" id="weight" name="weight" value="$!itemDTO.weight" class="wid_140 input_Style2 hei_30" maxlength="9" onkeyup="numInput(this,2)" />
+	        <i class="mar_l10">
+	        	<select class="input_Style2 hei_30 wid_60" name="weightUnit" id="weightUnit">
+        			<option #if($!itemDTO.weightUnit == 'kg') selected="selected" #end value="kg">kg</option>
+        			<option #if($!itemDTO.weightUnit == 'g') selected="selected" #end value="g">g</option>
+        			<option #if($!itemDTO.weightUnit == 'mg') selected="selected" #end value="mg">mg</option>
+        			<option #if($!itemDTO.weightUnit == 'μg') selected="selected" #end value="μg">μg</option>
+        		</select>
+	        </i>
+	     </div>
+		 <div class="hei_45 wid_440 fl mar_t10">
+	        <p class="wid_80 hei_35 font_right fl"><i id="volumeRequired" class="font_fs mar_l2" style="display:none">*</i>商品体积：</p>
+	        <input type="text" id="volume" name="volume" value="$!itemDTO.volume" class="wid_140 input_Style2 hei_30" maxlength="9" onkeyup="numInput(this,2)" /><i class="mar_l10">m³</i>
+	     </div>
+   <!-- 复制 end -->
+      
+    </div><!-- 添加商品信息 end -->
+
+     <div class="clear"></div>
+    <!-- 添加商品销售属性 -->
+    <div class="shop_xinxi mar_t20 mar_lr10" >
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" id="saleAttrId" style="display:none">
+      	<span class="font_12 mar_l10 "><i class="font_fs mar_l2">*</i>销售属性
+      		<input type="text"    class="messageInput"   name="itemSellCategoryShow" readonly="readonly" />
+      	</span>
+      </p>
+      <div id="shopCategoryDiv" style="display:none">
+      </div>
+      <p class="hei_30mar_l10 mar_tb10 cursor" id="addSaleAttrId" style="display:none">
+      #if("$!doType" != "view")
+      	<a class="cursor" onclick="addSellAttr('shopCategoryDiv')">+添加属性</a>
+      #end
+      </p>
+	  
+	  <!--选择普通商品开始 -->
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" id="packageGoodId" style="display:none">
+    	<span class="font_12 mar_l10 ">选择普通商品
+    		<input type="text" class="messageInput"   name="itemSellCategoryShow" readonly="readonly" />
+    	</span>
+      </p>
+      <div class="mar_t10" id="addPackageGoodId" style="display:none">
+		  <p  class="hei_32">
+			<i class="font_fs mar_l2">*</i>选择普通商品：
+			<label class="button_small hei_24 cursor font_14b" id="selectNormal">选择商品</label>
+		  </p>
+		  <p id="selectItemId" class="pad_l10">
+    	  </p>
+      </div>
+	  <div class="clear"></div>
+	  <div id="groupSkuId">
+	  </div>
+	  <div class="clear"></div>
+      <table class="select_sx mar_l10 bg_05 mar_tb20" id="skuTable" style="display: none;">
+       <tr id="skuDefaultTr">
+          <td class="wid_180" id="skuSellAreaPriceTd">
+			<div class="mar_tb10 pad_l10">
+          	  <P class="hei_30">
+				<i class="font_fs">*</i>销售价
+          			#if("$!doType" != "view")
+          				<span class="mar_l10  font_1c cursor" onclick="skuUserAll('skuSellPrice')">
+          					应用到全部SKU
+          				</span>
+          			#else
+          				<span class="mar_l10  font_1c ">
+          					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          				</span>
+			 
+					#end
+			  </P>
+              	 <table class="wid_130 fl" id="skuAreaPriceQGTable">
+    		        <tr class="bg_06">
+    		          <td class="wid_60 font_cen hei_24">订购量</td>
+    		          <td class="wid_60 font_cen hei_24">销售价(元)</td>
+    		        </tr>
+    		      </table>
+			</div>
+		      <p class=" wid_100 fl wid_130 hei_35 mar_l10 font_1c cursor bianji1" onclick="copySpuAreaPrice();">
+		      #if("$!doType" != "view")
+		      		编辑地域价与阶梯价
+		      	#else
+		      		查看地域价与阶梯价
+		      	#end
+	          </p> 
+	          <div class="shop_xinxi mar_t20 po_re" id="skuSalePriceId"></div>
+          </td>
+          <td class="wid_180 pad_l10"><i class="font_fs">*</i>底价(元)
+          	#if("$!doType" != "view")
+          		<span class="mar_l10  font_1c cursor" onclick="skuUserAll('cost')">应用到全部SKU</span>
+          		<br>
+          		<input class="wid_120 border-1 hei_24" id="costPrice" maxlength="12" onkeyup='numInput(this)' name="costPrice"  value=""  type="text" />
+          	#end
+          </td>
+         
+          <td class="wid_180 "><i  class="font_fs mar_l2 pad_l10">*</i>库存
+          		#if("$!doType" != "view")
+          			<span class="mar_l10 font_1c cursor" onclick="skuUserAll('skuInventory')">应用到全部SKU</span>
+          			<br>
+          			<input type="text" maxlength="7" onkeyup='numInput(this,0)' onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))" id="skuAllInventory" name="skuAllInventory" class="wid_120 hei_24 border-1 mar_l10" value="" />
+          		#end
+          </td>
+           <!-- 商品编号 -->
+            #if($!directsale == 1)
+          <td class="wid_180 pad_l10"><i class="font_fs mar_l2 pad_l10">*</i>商品编号
+          </td>
+           #end
+          #if("$!doType" != "view")
+          	<td class="wid_110 font_cen">操作</td>
+          #end
+        </tr>
+      </table>
+	  
+	  <!--选择基础服务商品开始 -->
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" id="baseServiceId" style="display:none">
+  	  <span class="font_12 mar_l10 ">选择基础服务商品
+  		<input type="text" class="messageInput"   name="itemSellCategoryShow" readonly="readonly" />
+  	  </span>
+     </p>
+	<div class="mar_t10" id="addBaseId" style="display:none">
+    	 <p  class="hei_32">
+    		<i class="font_fs mar_l2">&nbsp;</i> 基础服务商品：
+			<label class="button_small hei_24 cursor font_14b" id="selectBase">选择商品</label>
+    	 </p>
+ 	 </div>
+ 	 <div class="clear"></div>
+ 	 <!-- 基础服务-->
+ 	 <div id="baseAddService" class="pad_l10">
+ 	 </div>
+	 <div class="clear"></div>
+	 
+	 <!--选择增值服务商品开始 -->
+ 	<p class="font_16 hei_32 mar_t10 pad_l10 bg_05" id="addbaseServiceId" style="display:none">
+ 	 <span class="font_12 mar_l10 ">选择增值服务商品
+ 		<input type="text" class="messageInput"   name="itemSellCategoryShow" readonly="readonly" />
+ 	 </span>
+    </p>
+	<div class="clear"></div>
+	<div class="mar_t10" id="addserviceId" style="display:none">
+	<p class="hei_32" ><i class="font_fe mar_l2">&nbsp</i>
+		增值服务商品：
+	 <label class="button_small hei_24 cursor font_14b" id="selectAdd">选择商品</label>
+	 </p>
+	 </div>
+	 <div class="clear"></div>
+	 <!-- 增值服务-->
+	 <div id="valueaddId" >
+	 </div>
+	 <div class="clear"></div>
+	 
+	 <!--选择辅助材料商品开始 -->
+	 <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" id="auxiliaryId" style="display:none">
+ 	 <span class="font_12 mar_l10 ">选择辅助材料商品
+ 		<input type="text" class="messageInput"   name="itemSellCategoryShow" readonly="readonly" />
+ 	 </span>
+    </p>
+	
+	<div class="mar_t10" id="auxiliaryserviceId" style="display:none">
+		<p class="hei_32" >
+		<i class="font_fe mar_l2">&nbsp</i>
+		辅助材料商品：
+	 <label class="button_small hei_24 cursor font_14b" id="selectAux">选择商品</label>
+	 </p>
+	 </div>
+	 <div class="clear"></div>
+	 <!-- 辅助材料-->
+	 <div id="materialId" >
+	 </div>
+    </div><!-- 添加商品信息 end -->
+    <div class="clear"></div>
+    <div class="shop_xinxi mar_t20 mar_lr10"><!-- 添加商品 -->
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" >
+      	<span class="font_12 mar_l10 "><i class="font_fs mar_l2">*</i>基本信息
+      		<input class="messageInput" type="text"  maxlength="25" name="itemPicShow" readonly="readonly" />
+      	</span>
+      </p>
+      <p class="hei_32 mar_l10"><i class="font_fe mar_l2">最少上传一张；单张图片小于1M；允许的图片格式有JPG、JPEG、PNG、BMP；
+      	    尺寸需小于800*800，大于该尺寸时将自动缩放，可能会导致图片失真。</i></p>
+      <ul class="shop_add_img imgUl">
+      	 #if($!itemDTO.itemId || $!plstItemId) 
+	      	#foreach($picStr in $!itemDTO.picUrls)
+	      			<li class="po_re border-1"><img src="$!imageServerAddr$!picStr" alt="" id="pic_$!velocityCount" width="80" height="80" />
+	      				<div class="c-upload none">
+	      					 #if("$!doType" != "view")
+					          	<span>图片上传</span>
+				           		<input id="fileupload_$!velocityCount" type="file" class="file-img cursor" name="file" onchange="fileChange('fileupload_$!velocityCount','pic_$!velocityCount','picUrls_$!velocityCount','')">
+					         #else
+					         	<!-- <p class="po_ab cursor findImg" href="$!picStr">图片查看</p> -->
+					         	<span class="findImg cursor" href="$!imageServerAddr$!picStr">图片查看</span>
+					         #end
+				        </div>
+	      			</li>
+	      			<input type="hidden" id="picUrls_$!velocityCount" value="$!picStr" />
+	      	#end
+	      	#if("$!doType" != "view")
+		      	#foreach($ie in $!picList)
+		      		<li class="po_re border-1"><img src="" alt="" id="pic_$ie"   width="80" height="80">
+					    <div class="c-upload none">
+				           <span>图片上传</span>
+				           <input id="fileupload_$ie" type="file" class="file-img cursor" name="file" onchange="fileChange('fileupload_$ie','pic_$ie','picUrls_$ie','')">
+				        </div>
+		      		</li>
+		      		  <input id="picUrls_$ie" type="hidden" value="" />
+		      	#end
+	      	#end
+      	 #else
+	      	 <li class=" border-1 po_re">
+		          <img src="" alt="" id="pic_1" width="80" height="80">
+		          <div class="c-upload none">
+		            <span>图片上传</span>
+		            <input id="fileupload_1" type="file" class="file-img cursor" name="file" onchange="fileChange('fileupload_1','pic_1','picUrls_1','')">
+		          </div>
+	      	 </li>
+	        <li class="po_re border-1">
+	        	<img src="" alt="" id="pic_2"   width="80" height="80">
+	        	<div class="c-upload none">
+	              <span>图片上传</span>
+	              <input id="fileupload_2" type="file" class="file-img cursor" name="file" onchange="fileChange('fileupload_2','pic_2','picUrls_2','')">
+	            </div>
+	        </li>
+	        <li class="po_re border-1"><img src="" alt="" id="pic_3"   width="80" height="80">
+	        	<div class="c-upload none">
+	              <span>图片上传</span>
+	              <input id="fileupload_3" type="file" class="file-img cursor" name="file" onchange="fileChange('fileupload_3','pic_3','picUrls_3','')">
+	            </div>
+	        </li>
+	        <li class="po_re border-1"><img src="" alt="" id="pic_4" width="80" height="80" />
+	        	<div class="c-upload none">
+	              <span>图片上传</span>
+	              <input id="fileupload_4" type="file" class="file-img cursor" name="file" onchange="fileChange('fileupload_4','pic_4','picUrls_4','')">
+	            </div>
+	        </li> 
+	         <input id="picUrls_1" type="hidden" value="" />
+	         <input id="picUrls_2" type="hidden" value="" />
+	         <input id="picUrls_3" type="hidden" value="" />
+	         <input id="picUrls_4" type="hidden" value="" /> 
+      	 #end
+      </ul>
+    </div><!-- 添加商品 end -->
+	<div class="clear"></div>
+	 <div class="shop_xinxi mar_t20 mar_lr10">
+		 <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" >SKU图片
+	      	<span class="font_12 mar_l10">
+	      		<input class="messageInput" type="text" name="skuPicShow" readonly="readonly" />
+	      	<span>
+	      </p>
+	      <!-- sku begin -->
+	      <div id="skuPicDiv">
+	      </div>
+     </div>
+    <div class="clear"></div>
+    <div class="shop_xinxi mar_t20 mar_lr10"><!-- 商品详情 -->
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" >
+      <span class="font_12 mar_l10 ">
+      <i class="font_fs mar_l2">*</i>
+      	  商品详情 <input class="messageInput" type="text" name="itemDetailShow" readonly="readonly" />
+      </span></p>　
+      <p class="hei_32 mar_l10"><i class="font_fe mar_l2">提示：建议上传的图片大小限制为3M，尺寸宽度小于1160，否则系统会自动压缩和宽度调整可能会使图片失真。</i></p>
+      <li class="explain li mar_l10">
+          <textarea id="editor" name="content" style="width:700px;height:300px;">$!itemDTO.describeUrl</textarea>
+          <textarea id="editor1" style="display:none">$!itemDTO.describeUrl</textarea>
+      </li>
+    </div><!-- 商品详情 end -->
+    
+    <div class="shop_xinxi mar_t20 mar_lr10"><!-- 商品规格 -->
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" >
+      <span class="font_12 mar_l10 ">
+    	  商品规格 <input class="messageInput" type="text" name="itemspecificationShow" readonly="readonly" />
+      </span></p>　
+      <p class="hei_32 mar_l10"><i class="font_fe mar_l2">提示：建议上传的图片大小限制为3M，尺寸宽度小于1160，否则系统会自动压缩和宽度调整可能会使图片失真。</i></p>
+      <li class="explain li mar_l10">
+      <textarea id="editor2"  style="width:700px;height:300px;">$!itemDTO.specification</textarea>
+      <textarea id="editor3" style="display:none">$!itemDTO.specification</textarea>
+    </li>
+  </div><!-- 商品规格 end -->
+	
+	<div class="shop_xinxi mar_t20 mar_lr10"><!-- 服务支持 -->
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" >
+      <span class="font_12 mar_l10 ">
+      	  服务支持 ## 非必填<input class="messageInput" type="text" name="itemDetailShow" readonly="readonly" />
+      </span></p>　
+      <p class="hei_32 mar_l10"><i class="font_fe mar_l2">提示：建议上传的图片大小限制为3M，尺寸宽度小于980，否则系统会自动压缩和宽度调整可能会使图片失真。</i></p>
+      <li class="explain li mar_l10">
+          <textarea id="editor4"  style="width:700px;height:300px;">$!itemDTO.afterService</textarea>
+          <textarea id="editor5" style="display:none">$!itemDTO.afterService</textarea>
+      </li>
+    </div><!-- 服务支持 end -->
+ 
+    <div class="shop_xinxi mar_t20 mar_lr10"><!-- 其他信息 -->
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05"><span class="font_12 mar_l10 ">其他信息</span></p>
+      <p class="mar_l10"><span class="hei_30">
+      		关键字：</span><br>
+      			<textarea rows="3" cols="33" class="input_Style2" 
+      				maxlength="200" name="keywords" id="keywords">$!itemDTO.keywords</textarea>
+      </p>
+      <p class="mar_l10"><span class="hei_30"><i class="font_fs mar_l2">*</i>包装清单：</span><br><input type="text" name="packingList" value="$!itemDTO.packingList" maxlength="200" class="hei_30 input_Style2"  /></p>
+	
+		
+		
+		
+      <p class="mar_l10 hei_30 mar_tb10">定时上架：<input type="checkbox" id="timeState" #if("$!itemDTO.timingListing" != "") checked="checked" #end name="timeState"/>设定 
+      	 <input id="timingListingDate" name="timingListingDate" value="$!date.format('yyyy-MM-dd HH:mm:ss',$!itemDTO.timingListing)" type="text" readonly="readonly" maxlength="20" 
+      	 	class="jcDate wid_110 hei_30 input_Style2 wid_150 "
+			#if("$!doType" != "view") onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:true});"  #end />
+		<input type="hidden" name="timingList" id="timingListing"/>	
+      </p>
+   #if($itemDTO.addSource !=1)
+      <p class="mar_l10 hei_30 mar_tb10">可否被搜索：
+		<input type="radio" name="searched" value="1" #if($itemDTO.searched!=2) checked #end>是
+		<input type="radio" name="searched" value="2" #if($itemDTO.searched==2) checked #end>否
+	  </p>
+      <p class="mar_l10"><span class="hei_30">户型：</span>
+        #foreach($roomtype in $housetypes)
+			<label style="cursor:pointer;">
+  			<input type="checkbox" name="housetype" value="$roomtype.id" 
+			#if($itemDTO.housetype.contains($roomtype.id.toString())) checked #end/>$roomtype.name
+            </label>
+	    #end
+      </p>
+   #end
+      <p class="mar_l10 mar_tb10">商品发布后等待平台审核，审核通过后在预设定时间上架。</p>
+      <p class="mar_tb10">
+        <input type="button" class="button_2 hei_35 font_14b" onclick="cancle($!page,$!rows)" value="取消" />
+        #if("$!doType" != "view")
+        	<input type="button" class="button_2 hei_35 font_14b" loadMsg="正在提交..." id="btnSubmit" onclick="saveGood(2,'btnSubmit',$!page,$!rows)" value="确定"/> 
+         	<input type="button" class="button_2 hei_35 font_14b" loadMsg="正在保存..." id="btnSave" onclick="saveGood(1,'btnSave',$!page,$!rows)" value="保存"/>
+        #end
+        </p>
+    </div><!-- 其他信息 end -->
+  </div>
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->
+<!-- 城市 -->
+<div class="po_fai all_chain" style="display:none;z-index:3;">
+    <div class="po_fai_bg"></div>
+    <div class="po_main pad_t10 " style="height:360px;">
+      <div class=" hei_32 bg_05 pad_l10 "><i id="city_close" class="demo-icons fa-times-circle font_16 fr mar_r10 xx"></i>请选择要设置地域价的地区</div> 
+      <div class="city_shi">
+
+			<div class=" dcity clearfix">
+        	<div class="province-list">
+        		
+        		#foreach($province in $provinceCitys)
+        			#foreach($key in $province.keySet())  
+        		<div class="ecity" >
+        			<span class="gareas">
+        				<input type="checkbox" class="J_Province" id="J_Province_$!{key.code}" value="$!{city.code}">
+        				<label for="J_Province_$!{key.code}">$key.name$!{key.id}</label>
+        				<span class="check_num"></span>
+        				<img src="$request.getContextPath()/assets/images/trigger.gif" class="trigger">
+        			</span>
+        			<div class="citys">
+            			#foreach($city in $!province.get($key))
+        				<span class="areas">
+        					<input type="checkbox" class="J_City" id="J_City_$!{city.code}" value="$!{city.code}">
+        					<label for="J_City_$!{city.code}">$city.name</label>
+        				</span>
+    						#set($r = $velocityCount % 8)
+    						#if($r == 0) <br/>#end
+            			#end
+        				<p style="text-align:right;">
+        					<input type="button" class="close_button" value="关闭">
+        				</p>
+        			</div>
+        		</div>
+                    #end
+        		#end
+        	</div>
+        	</div>
+
+		<hr/>
+   		<div style="width:100%;height:100px;float:left;padding-left:10px">
+   			<div style="width:100%;height:50px;float:left;padding-left:450px">
+   				<input type="hidden" class="qk" id="area_codes"/>
+   				<input type="hidden" class="qk" id="area_names"/>
+   				<input type="button" class="font_14 button_2 hei_32 " onclick="javascript:fanhz();" value="确定" />
+   			</div>
+   		</div>
+      </div>
+    </div>
+</div><!-- 城市 end -->
+</form>
+
+<!-- 加载弹出层 -->
+<div class="po_fai" id="skuLoadMessage" style="display:none;z-index:10000">
+    <div class="po_fai_bg"></div>
+    <div class="po_main1">
+      <div class="tit bg_05 hei_30 pad_l10">提示</div>
+    <ul>
+        <li><img src="$request.contextPath/assets/images/loading.gif" alt="" />&nbsp;&nbsp;sku列表生成中,请稍后...   </li>
+    </ul>
+  </div>
+</div>
+
+<!-- 阶梯价加载弹出曾 -->
+<div class="po_fai" id="sellPriceLoadMessage" style="display:none;z-index:10000">
+    <div class="po_fai_bg"></div>
+    <div class="po_main1">
+      <div class="tit bg_05 hei_30 pad_l10">提示</div>
+    <ul>
+        <li><img src="$request.contextPath/assets/images/loading.gif" alt="" />&nbsp;&nbsp;阶梯价生成中,请稍候...</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 运费模版加载弹出层 -->
+<div class="po_fai" id="shopFreightTemplateLoadMessage" style="display:none;z-index:10000">
+    <div class="po_fai_bg"></div>
+    <div class="po_main1">
+      <div class="tit bg_05 hei_30 pad_l10">提示</div>
+    <ul>
+        <li><img src="$request.contextPath/assets/images/loading.gif" alt="" />&nbsp;&nbsp;运费模版加载中,请稍后...   </li>
+    </ul>
+  </div>
+</div>
+<div id="skuList" class="po_fai price none" style="display:none;width:100%;">
+<div class="po_fai_bg"></div>
+<div class="po_main pad_t10" style="left: 32%; width: 80%;z-index:1000;">
+<div class=" hei_32 bg_05 pad_l10 font_14b">
+	<i class="demo-icons fa-times-circle font_16 fr mar_r10 no" style="cursor:pointer;" onclick="closeTip();"></i>
+	选择商品
+</div>
+<div class="clear"></div>
+<div class="register_content">
+      <div class="register_box_mid" >
+			<form id="queryForm" action="$request.getContextPath()/sellcenter/sellProduct/querySaleGoods" method="post">
+			      <!--记录选中商品类型-->
+  				  <input type="hidden" id="checkedItemType" name="checkedItemType" value="$!checkedItemType"/>
+				  <!--普通商品  -->
+  				  <input type="hidden" id="gene_checkedItemIds" name="gene_checkedItemIds" value="$!gene_checkedItemIds"/>  
+  				  <input type="hidden" id="gene_checkedItemNames" name="gene_checkedItemNames" />  
+  				  <input type="hidden" id="gene_attrSaleStrList" name="gene_attrSaleStrList" />  
+  				  <input type="hidden" id="gene_skuInfoList" name="gene_skuInfoList" />  
+				   <!--基础服务商品   -->
+  				  <input type="hidden" id="basis_checkedItemIds" name="basis_checkedItemIds" value="$!basis_checkedItemIds"/>  
+  				  <input type="hidden" id="basis_checkedItemNames" name="basis_checkedItemNames" />  
+  				  <input type="hidden" id="basis_attrSaleStrList" name="basis_attrSaleStrList" />  
+  				  <input type="hidden" id="basis_skuInfoList" name="basis_skuInfoList" />  
+                  <!--增值服务商品   -->
+				  <input type="hidden" id="added_checkedItemIds" name="added_checkedItemIds" value="$!added_checkedItemIds"/>  
+  				  <input type="hidden" id="added_checkedItemNames" name="added_checkedItemNames" />  
+  				  <input type="hidden" id="added_attrSaleStrList" name="added_attrSaleStrList" />  
+  				  <input type="hidden" id="added_skuInfoList" name="added_skuInfoList" />  
+                  <!--辅助材料商品   -->
+				  <input type="hidden" id="aux_checkedItemIds" name="aux_checkedItemIds" value="$!aux_checkedItemIds"/>  
+  				  <input type="hidden" id="aux_checkedItemNames" name="aux_checkedItemNames" />  
+  				  <input type="hidden" id="aux_attrSaleStrList" name="aux_attrSaleStrList" />  
+  				  <input type="hidden" id="aux_skuInfoList" name="aux_skuInfoList" />  
+  				
+			      <div class="right_top">
+				        <ul class="list">
+							<input type="hidden" name="page" value="$!pager.page" />
+							<input type="hidden" name="addSource" id="itemTypeId"/>
+							<input type="hidden" name="echoItem"  id="echoItemId"/>
+						<li class="wid_220" style="width:auto">
+				        <span class="font_wid">商品名称：</span><input name="itemName" value="$!{itemInDTO.itemName}" id="itemNameId" class="close input_Style2 wid_120 hei_30" type="text" />
+				        </li>
+				        <li class="wid_220"  style="width:auto">
+				          <span class="font_wid">商品编码：</span><input name="id" value="$!{itemInDTO.itemId}" id="itemCoding" type="text" class="close input_Style2 wid_120 hei_30" number="true"/>
+				        </li>
+				        <li class="wid_220"  style="width:auto;float: right;margin-right: 80px;">
+							<button id="queryBtn" type="button" onclick="topage(1)" class="button_4 but_cx3">
+					         	<a class="font_1c">查 询</a>
+					        </button>
+				        </li>
+				      </ul>
+			      </div>
+			</form>
+			<div class="goodList" style="height:300px;overflow-y: auto;width:auto;clear:both"></div>
+			<button type="button" class="button_2 shop_ok mar_tb10 fr" id="confirmButton" onclick="cofirmSku('');"  id="confirm">确 定</button>
+ 			 <div class="clear"></div>
+        </div>
+</div>
+</div>
+</div>
+
+

@@ -1,0 +1,217 @@
+#set($layout = "/none_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<link href="$staticPath/css/product.css" rel="stylesheet" type="text/css" />
+<link href="$staticPath/css/basic.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$staticPath/js/tab.js"></script>
+<script type="text/javascript" src="$staticPath/js/all_classify.js"></script>
+<link type="text/css" href="$staticPath/css/basic.css" rel="stylesheet"/>
+<script type="text/javascript" src="$staticPath/js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="$staticPath/js/jquery.cookie.js"></script>
+<script type="text/javascript" src="$staticPath/js/xiaoguo.js"></script>
+<script type="text/javascript" src="$staticPath/js/js.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/requestPrice/requestPrice.js"></script>
+<style type="text/css">
+
+	.anniu{ z-index: 5;}
+	.left{ left: 10px;}
+	.right{ right: 10px;}
+</style>
+<script type="text/javascript">
+	function choseCategory(cid){
+		var itemName = $("#searchItemName").val();
+		//location.href="$request.contextPath/requestPriceController/productsListPrice?cid="+cid + "&itemName=" + encodeURIComponent(itemName);
+		$("#itemName").val(itemName);
+		$("#cid").val(cid);
+		$("#searchListForm").attr("action","$request.contextPath/requestPriceController/productsListPrice");
+		var form = document.getElementById("searchListForm");
+		form.submit();
+		
+	}
+    function searchItemInfo(obj){
+    	var itemName = $("#searchItemName").val();
+    	var cid = "$!cid";
+        //location.href="$request.contextPath/requestPriceController/productsListPrice?cid="+cid + "&itemName=" + encodeURIComponent(itemName);
+        $("#itemName").val(itemName);
+		$("#cid").val(cid);
+		$("#searchListForm").attr("action","$request.contextPath/requestPriceController/productsListPrice");
+		var form = document.getElementById("searchListForm");
+		form.submit();
+    }
+	function topage(page){
+		var form = document.getElementById("categoryItemsForm");
+		form.page.value=page;
+		form.submit();
+	}
+	$(document).ready(function(){
+		var cid = "$!cid";
+		var itemName = "$!itemName"; 
+		$("#searchItemName").val(itemName);
+		$("#categoryItemsForm").attr("action","$request.contextPath/requestPriceController/productsListPrice?cid=" + cid + "&itemName=" + itemName);
+		
+		var ids = cid.split(":");
+		for(var i=0; i<ids.length; i++){
+			var id = ids[i];
+			if( i == 0 ){
+				$(".myTab0_Content"+id).show();
+				$("[cid='" + id + "']").addClass("active");
+			}else if( i== 2 || ids.length < 3 ){
+				$("[cid='" + id + "']").parent().find("li").removeClass("font_fe font_14b");
+				$("[cid='" + id + "']").addClass("font_fe font_14b");
+			}
+		}
+		
+		var nTabWidth = $(".nTab").width();
+		var ulWidth = 0;
+		$("#myTab0 li").each(function(i,obj){
+			ulWidth += ( $(obj).width() + 6 );
+		});
+		if( ulWidth > nTabWidth ){
+			$(".fa-caret-left,.fa-caret-right").show();	
+		}else{
+			$(".fa-caret-left,.fa-caret-right").hide();	
+		}
+		
+    	var wid = $('#myTab0 li:first').outerWidth(true), step = 1, timer;
+    	$('.fa-caret-right').bind('click',function(){ play(true) });
+    	$('.fa-caret-left').bind('click',function(){ play(false) });
+    	
+        $('.TabTitle').hover(function(){
+        	clearInterval( timer );
+        }) 
+	
+    	function play( flag ){
+    		if(!$('#myTab0').is(':animated')){
+        		var dir = flag?-1:1, objli;
+        		if( flag ){ 
+            		objli= $('#myTab0 li').slice(0,step);
+            		objli.clone().appendTo($('#myTab0'));
+        		}else{
+          			objli = $('#myTab0 li').slice(-step);
+          			objli.clone().prependTo($('#myTab0'));
+          			$('#myTab0').css({marginLeft:-wid});
+        		}
+        		$('#myTab0').animate({marginLeft:'+='+wid*dir},500,function(){
+          			if(flag){
+            			$('#myTab0').css({marginLeft:0});
+          			}
+          			objli.remove();
+        		})
+      		}
+    	}
+		
+	});
+	
+	 function onReturn(itemId, itemName, itemName2, itemName3){
+		window.opener.goodsDetailInfo(itemId, itemName, itemName2, itemName3);
+		window.close();
+		
+	}
+	
+</script>
+<form id="searchListForm"  method="post">
+	<input id="cid" name="cid" type="hidden" value= ""/>
+	<input id="itemName" name="itemName" type="hidden" value= ""/>
+</form>
+<!-- 中间内容 -->
+<div id="content" style="height:100%;width:100%;overflow-y:scroll;">
+    <div class="mid_search">
+        <div class="big_class" style="padding-top:10;">
+			<span  class="focus_class font_ff pointer">宝贝</span>
+        </div>
+        <!--(输入框和搜索按钮)-->
+        <div class="search po_re">
+            <input name="keyword" style="border:2px solid #e8e8e8;width:100%;height: 34px;" id="searchItemName" type="text" class="search_input" value="$!searchItemName" placeholder="请输入要搜索的信息"/>
+            <button type="button" class="button_search wid_80 po_ab pa_01 pointer js_search" style="outline: none;" onclick="searchItemInfo(this);">搜索
+            </button>
+        </div>
+        <!--search po_re end (输入框和搜索按钮)-->
+
+        <!--（中间搜索框下的标签）-->
+        <div class="Tag"></div>
+        <!--Tag（中间搜索框下的标签） end-->
+
+    </div>
+
+		<div class="nTab box-shadow1">
+			<!-- 标题开始 -->
+			<div class="TabTitle po_re">
+				<ul id="myTab0">
+					#foreach($category in $categoryes)
+						<li onclick="choseCategory('$category.categoryCid')" cid="$category.categoryCid">
+							$category.categoryCName
+						</li>
+					#end
+					<i class="fa-caret-left po_ab pa_00 font_18"></i>
+					<i class="fa-caret-right po_ab pa_01 font_18"></i> 
+		        </ul>
+	      	</div>
+	      	
+      		<div class="TabContent">
+      		#foreach($category in $categoryes)
+	      		<div class="myTab0_Content$!category.categoryCid" style="display: none; border-top: 1px solid #e8e8e8;">
+	            	#foreach($cate in $category.children)
+			            <div class="search_condition_box">
+			            	<div class="left_class bl cursor" onclick="choseCategory('$category.categoryCid:$cate.categoryCid')" cid="$cate.categoryCid">
+		            			$cate.categoryCName
+			            	</div>
+			              	<div class="right_list" style="min-height: 35px;">
+			                	<ul>
+			                		#foreach($c in $cate.children)
+			                  			<li onclick="choseCategory('$category.categoryCid:$cate.categoryCid:$c.categoryCid')" cid="$c.categoryCid">
+			                  				$c.categoryCName
+			                  			</li>
+			                		#end
+			                	</ul>
+			              	</div>
+			           	</div>
+	            	#end
+	            </div>
+      		#end
+			</div>
+			
+			<!--下面产品循环 start -->
+			<div class="Search_list">
+				#foreach( $item in $pager.records )
+					<!--每个产品的div开始-->
+			   		<div class="Product_box" style="height: 340px; margin-bottom: 20px;">
+						<div class="Product_box_1">
+							<div class="big_img">
+									<a href="javascript:void(0)" onclick="createShopListDiv($item.itemId,'$!item.itemName', this);">
+									<img src="$!imageServerAddr$!item.pictureUrl" style="width: 210px;height: 260px; margin-top: 4px;"/>
+								</a>
+							</div>
+							<div class="n_font">
+									<a href="javascript:void(0)" onclick="createShopListDiv('$item.itemId', this);">
+									$!item.itemName
+								</a>
+							</div>
+						</div>
+					</div>
+					<!--每个产品的div结束-->
+				#end
+			</div><!--Search_list end -->
+	  
+			
+			<form id="categoryItemsForm"  method="post">
+				<input id="itemId" name="itemId" type="hidden" value= "$!itemId"/>
+				<input id="itemNames" name="itemNames" type="hidden" value= "$!itemNames"/>
+				
+				<input name="page" type="hidden">
+			</form>
+			<!-- 分页 -->
+			#pageVelocity($pager)
+	    </div>
+</div><!-- 中间内容 end -->
+
+
+
+<div id="Idiv" class="po_fai" style="display: none;">
+    <div id="mou_head" class="po_main0" style="height: 450;width: auto;overflow:auto">
+		 <div class="tit pad_l10 hei_35 bg_05">
+            <span class="fl font_14b">选择供应商</span>
+            <i onclick="closeDiv();" class="fa fa-times-circle fr font_14 mar_r10 cursor"></i>
+        </div>
+		<div id="itemSearchResult" class="wid_500 hei_180">
+		</div>
+    </div>
+</div>

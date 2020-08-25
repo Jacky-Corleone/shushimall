@@ -1,0 +1,6 @@
+#set($layout = "/none_layout.vm")
+
+    <span style="color:white">$!result</span>
+	#foreach($err in $errmess)
+    <span style="color:white">$!err</span>
+	#end

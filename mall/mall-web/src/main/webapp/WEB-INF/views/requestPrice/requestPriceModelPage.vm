@@ -1,0 +1,75 @@
+#set($layout = "/none_layout.vm")		
+			<ul class="list_top bg_08 font_cen font_14b">
+				<li class="wid_50">全选</li>
+				<li class="wid_130">询价名称</li>
+				<li class="wid_90">状态</li>
+                <li class="wid_150">录入方</li>
+				<li class="wid_110">创建日期</li>
+				<li class="wid_150">截至报价日期</li>
+				<li class="wid_130">备注</li>
+            </ul>
+      <!-- 类型选择 -->
+	  <!--买家卖家分开-->
+	  #if($!sellerFlag == "1")
+          <ul class="right_select">
+            <li class="wid_50 font_cen"><input type="checkbox" class="mar_l10 hei_22" id="all_select" onclick="select_all(this);"/>  </li>
+            <li><button type="button" class="button_4 mar_l10 hei_24" id="button_update_response" onclick="responsePriceUpdate(this);">报价</button></li>
+            <li><button type="button" class="button_4 mar_l10 hei_24" onclick="lookInquiryInfo('response');">查看</button></li>
+			 <!--   <li><button type="button" class="button_4 mar_l10 hei_24" id="button_commit_response">确认价格</button></li> -->
+         <!--   <li><button type="button" class="button_4 mar_l10 hei_24">下单</button></li>-->
+          </ul>
+	  #else
+    		<!-- 类型选择 -->
+          <ul class="right_select">
+            <li class="wid_50 font_cen"><input type="checkbox" class="mar_l10 hei_22" id="all_select" onclick="select_all(this);"/></li>
+              <li><button type="button" class="button_4 mar_l10 hei_24" onclick="lookInquiryInfo('request');">查看</button></li>
+              <li><button type="button" class="button_4 mar_l10 hei_24" id="button_update" >修改</button></li>
+              <li><button type="button" class="button_4 mar_l10 hei_24" id="button_delete" onclick="button_delete(this)">删除</button></li>
+              <li><button type="button" class="button_4 mar_l10 hei_24" id="button_commit">发布询价</button></li>
+              <li><button type="button" class="button_4 mar_l10 hei_24" id="button_commit_re">重新询价</button></li>
+              <li><button type="button" class="button_4 mar_l10 hei_24" id="button_commit_accept">接受价格</button></li>
+              <li><button type="button" class="button_4 mar_l10 hei_24" id="button_create_order">下单</button></li>
+         <!--   <li><button type="button" class="button_4 mar_l10 hei_24">下单</button></li>-->
+            <span class="fr mar_tb10"><button type="button" class="button_2 hei_24 " onclick="toRequestPriceCreatePage()">+创建询价</button></span>
+          </ul>
+	  #end 
+	   #if($pager.totalCount == 0)
+			<p class="wid_500" style="font-size:26px;line-height: 40px;margin-left:330px;">亲,没有符合条件的数据哦!</p>
+	  #else
+      <!-- 内容开始 -->
+		 #foreach($page in $pager.records)
+             #if($!sellerFlag == "1")
+                <ul class="list_top hei_40 list_li" onclick ="onLookInfo(this,'$page.inquiryNo' ,'response');">
+            #else
+                <ul class="list_top hei_40 list_li" onclick ="onLookInfo(this,'$page.inquiryNo','request');">
+            #end
+              <li class="wid_50 font_cen">
+				<input type="hidden" name = "status" value="$page.status"/>
+                <input type="checkbox" class="mar_l10 hei_22" name = "inquiryNo" value="$page.inquiryNo"/>
+                  <input type="hidden"  name = "endDate" value="$!date.format('yyyy-MM-dd HH:mm:ss', $page.endDate)"/>
+              </li>
+              <li class="wid_130" style='white-space: nowrap;text-overflow:ellipsis; overflow:hidden;'>$!page.inquiryName</li>
+              #if($!page.status == "1")
+					<li class="wid_90 font_cen">待发布</li>
+			  #elseif($!page.status == "2")
+					<li class="wid_90 font_cen">报价中</li>
+			  #elseif($!page.status == "3")
+					<li class="wid_90 font_cen">已接收</li>
+			  #else
+				   <li class="wid_90 font_cen">&nbsp;</li>
+			  #end
+              <li class="wid_150 font_cen" style="white-space: nowrap;text-overflow:ellipsis; overflow:hidden;">$!page.alternate3</li>
+              <li class="wid_110 font_cen">$!date.format('yyyy-MM-dd',$!page.createDate)</li>
+              <li class="wid_150 font_cen">
+                 $!date.format('yyyy-MM-dd HH:mm:ss',$!page.endDate)
+              </li>
+              <li class="wid_130 font_cen" style="white-space: nowrap;text-overflow:ellipsis; overflow:hidden;">$!page.remarks</li>
+         </ul>  
+		 #end
+      <!-- 内容结束 -->
+	        <form id="categoryItemsForm"  method="post">
+				<input name="page" type="hidden">
+			</form>
+		    	<!-- 分页 -->
+            #pageVelocity($pager)
+       #end

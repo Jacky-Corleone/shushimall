@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.basecenter.dao.FriendlylinkPageDAO">
+	<resultMap id="BaseFriendlylinkPageMapper" type="com.camelot.basecenter.dto.FriendlylinkPageDTO">
+	        <result property="id" column="id" />
+			<result property="pageName" column="pageName" />
+			<result property="pageUrl" column="pageUrl" />
+			<result property="createTime" column="createTime"/>
+			<result property="updateTime" column="updateTime"/>
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		id, pageName, pageUrl,createTime,updateTime  
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseFriendlylinkPageMapper" parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List" />
+		from friendlylink_page
+		where id = #{id,jdbcType=BIGINT}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		delete from friendlylink_page
+		where id = #{id,jdbcType=BIGINT}
+	</delete>
+	
+	
+	<!-- thinking -->
+	<sql id="tabName">
+		friendlylink_page
+	</sql>
+	<sql id="where_fragement">
+		where 1 = 1
+	   <if test="entity.pageName!=null and entity.pageName!=''">
+	     and pageName = #{entity.pageName}
+	   </if>
+	   <if test="entity.pageUrl!=null and entity.pageUrl!=''">
+	     and pagekUrl = #{entity.pageUrl}
+	   </if>
+	</sql>
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<select id="queryCount" resultType="long">
+		SELECT
+		  count(1)
+		from friendlylink_page
+		<include refid="where_fragement" />
+	</select>
+	<insert id="addFriendlylinkPage" keyProperty="id" useGeneratedKeys="true">
+		insert into <include refid="tabName"/>(
+							id,
+							pageName,
+							pageUrl,
+							createTime,
+							updateTime
+						   )values(
+						    #{id},
+						    #{pageName},
+						    #{pageUrl},
+						    now(),
+						    now()
+						   )
+	
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.camelot.basecenter.dto.FriendlylinkPageDTO">
+		update friendlylink_page
+		<set>
+			<if test="pageName != null">
+				pageName = #{pageName,jdbcType=VARCHAR},
+			</if>
+			<if test="pageUrl != null">
+				pageUrl = #{pageUrl,jdbcType=VARCHAR},
+			</if>
+			updateTime = now()
+		</set>
+		where id = #{id,jdbcType=BIGINT}
+	</update>
+	<resultMap type="com.camelot.basecenter.dto.FriendlylinkPageDTO" id="friendlylinkPageMapper" extends="BaseFriendlylinkPageMapper">
+		<collection property="pageItems" javaType="list" ofType="com.camelot.basecenter.dto.FriendlylinkPageItemDTO">
+			<id property="id" column="pageitem_id" />
+			<result column="page_id" property="pageId" />
+			<result property="itemId" column="item_id" />
+
+			<association property="item" javaType="com.camelot.basecenter.dto.FriendlylinkItemDTO">
+				<id property="id" column="item_id" />
+				<result property="linkName" column="itemName" />
+				<result property="linkUrl" column="itemUrl" />
+			</association>
+		</collection>
+	</resultMap>
+	<select id="getAllDetails" resultMap="friendlylinkPageMapper">
+		SELECT
+		friendlylink_page.id,
+		friendlylink_page.pageName,
+		friendlylink_page.pageUrl,
+		friendlylink_page_item.id pageitem_id,
+		friendlylink_page_item.pageId page_id,
+		friendlylink_page_item.itemId item_id,
+		friendlylink_item.id item_id,
+		friendlylink_item.linkName itemName,
+		friendlylink_item.linkUrl itemUrl
+		FROM
+		friendlylink_page
+		Left JOIN friendlylink_page_item ON friendlylink_page.id = friendlylink_page_item.pageId
+		Left JOIN friendlylink_item ON friendlylink_page_item.itemId = friendlylink_item.id
+		<include refid="where_fragement" />
+		ORDER BY updateTime DESC
+		<if test=" page != null">
+			<include refid="pagination_tail" />
+		</if>
+		
+	</select>
+	
+	
+	
+	<select id="getFriendlylinkPages" resultMap="BaseFriendlylinkPageMapper">
+		select
+		<include refid="Base_Column_List" />
+		from friendlylink_page
+		<include refid="where_fragement" />
+		ORDER BY updateTime DESC
+		<if test=" page != null">
+			<include refid="pagination_tail" />
+		</if>
+		
+	</select>
+	
+	
+	
+	
+	
+</mapper>

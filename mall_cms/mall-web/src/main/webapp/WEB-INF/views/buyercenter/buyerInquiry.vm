@@ -1,0 +1,107 @@
+
+#set($layout = "/buyer_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<link href="$staticPath/css/manage_style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript">
+	$("document").ready(function(){
+		$("#leftBuyer").load("$request.contextPath/leftBuyer");
+	});
+	//到指定的分页页面
+	function topage(page){
+		var form = document.getElementById("inquiryForm");
+		form.page.value=page;
+		form.submit();
+	}
+	//查看商品详细属性
+	function viewDetail(itemId){
+		window.location.href="$request.contextPath/productController/details?id="+itemId;
+	}
+</script>
+
+
+
+<div id="main">
+	<!--left begin -->
+	<div id="leftBuyer" style="width: 198px; float: left;">&nbsp;</div>
+	<!--left end -->
+
+	<!--右边部分开始-->
+	<div id="right">
+		<div id="right_top" class="right_top border-4 bg_06">
+			<form id="inquiryForm" action="$request.contextPath/buyercenter/inquiry" method="post">
+				<input type="hidden" name="page" value="$!pager.page" />
+				<div class="tit bg_05 mar_lr10 " style="width: 98%;">我的询价</div>
+				<div class="right_top_l">
+					<ul class="list">
+						<li class="wid_300">
+							<span class="font_wid">商品：</span>
+							<input class="input_Style2 wid_150 hei_30" name="itemName" type="text" value="$!inquiry.itemName"/>
+						</li>
+						<li class="wid_500">
+							<span class="font_wid">询价时间：</span> 
+	                    	<input id="d4313" name="startTime" value="$!date.format('yyyy-MM-dd',$!inquiry.startTime)" readonly class="Wdate input_Style2 wid_160 mar_r10 hei_35" type="text" onFocus="WdatePicker({maxDate:'#F{$dp.$D(\'d4314\')}'})" style="line-height: 30px; height: 30px;"/>
+	                    	<i>-</i>
+							<input id="d4314" name="endTime" value="$!date.format('yyyy-MM-dd',$!inquiry.endTime)" readonly class="Wdate input_Style2 wid_160 mar_r10 hei_35" type="text" onFocus="WdatePicker({minDate:'#F{$dp.$D(\'d4313\')}'})" style="line-height: 30px; height: 30px;"/>
+						</li>
+	
+					</ul>
+				</div>
+				<div class="right_top_r ">
+					<button type="button" onclick="topage(1);" class="button_4 but_cx3">查 询</button>
+				</div>
+			</form>
+		</div>
+		
+		<!-- 标题 -->
+		<div id="right_bot" class="right_bot border-4 mar_t10 bg_06">
+			<div class="tit">询价管理</div>
+			<div class="right_xinxi mar_l14">
+				<ul class="list_top bg_08 font_cen">
+					<li class="wid_200 ">商品信息</li>
+					<li class="wid_80 ">卖家信息</li>
+					<li class="wid_80 ">购买数量</li>
+					<li class="wid_120 ">询价时间</li>
+					<li class="wid_100 ">询价价格</li>
+					<li class="wid_180 ">价格有效期</li>
+					<li class="wid_180 ">备注</li>
+				</ul>
+				
+				
+				#foreach( $inquiry in $pager.records )
+					<!-- 内容循环UL -->
+					<ul class="xunwen border-6">
+						<li class="wid_200">
+							<dl class="shop_selsct wid_220 mar_lr10">
+								<dt>
+									<img class="mar_t10 mar_l10 " src="$!imageServerAddr$inquiry.pictureUrl" width="50" height="50"
+									 	style="cursor: pointer;" onclick="viewDetail($!inquiry.itemId);">
+								</dt>
+								<dd class="wid_110 mar_t10 mar_l10" style="cursor: pointer;" onclick="viewDetail($!inquiry.itemId);">
+									$!inquiry.itemName
+								</dd>
+							</dl>
+						</li>
+						<li class="wid_80 font_cen hei_60 ">$!inquiry.sellerName</li>
+						<li class="wid_80 font_cen hei_60 ">$!inquiry.inquiryQty</li>
+						<li class="wid_120 font_cen hei_60">$!date.format('yyyy-MM-dd HH:mm:ss ',$!inquiry.created)</li>
+						<li class="wid_100 font_cen hei_60">$!inquiry.inquiryPrice</li>
+						<li class="wid_180 font_cen hei_60">
+							#if( $inquiry.startTime  && $inquiry.endTime )
+								<span>$!date.format('yyyy-MM-dd',$!inquiry.startTime)</span>至
+								<span>$!date.format('yyyy-MM-dd',$!inquiry.endTime)</span>
+							#end
+						</li>
+						<li class="wid_180 font_cen hei_60">$!inquiry.inquiryRemark</li>
+					</ul>
+				#end
+				#pageVelocity($pager)<!--page end -->
+			</div>
+			
+			
+		</div>
+		<!--id="right" end-->
+		<!--右边部分结束-->
+	</div>
+</div>
+	<!--#main end -->

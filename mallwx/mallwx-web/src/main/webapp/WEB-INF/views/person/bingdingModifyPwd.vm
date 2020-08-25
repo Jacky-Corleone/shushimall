@@ -1,0 +1,126 @@
+#set($layout = "common/blanklayout.vm")
+#set($staticPath="$request.contextPath/assets")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <base href="${request.getContextPath()}/"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>修改密码</title>
+    <link href="assets/css/detail.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="assets/plugin/common/captcha.js"></script>
+    <script type="text/javascript" src="assets\js\jquery-1.11.2.min.js"></script>
+    <script type="text/javascript">
+        var ctx = "$request.contextPath";
+        $(function() {
+
+            //同意协议并注册按钮开始-------------------------------------------------------------------------------------------------------
+            $("#personalBtn").click(function () {
+                $('#mag').html("");
+                if($("#password").val().trim()==""){
+                    $("#mag").html("密码不允许为空！");
+                    return false;
+                }
+                var chrnum = /^((?=.*?\d)(?=.*?[A-Za-z])|(?=.*?\d)(?=.*?[\W])|(?=.*?[A-Za-z])(?=.*?[\W]))[\dA-Za-z\W]+.{5,20}$/;
+                var loginpwd = $('#password').val().trim();
+                var r = loginpwd.match(chrnum);
+                if(r==null){
+                    $('#mag').html("密码为6-20位字符，由数字、字母、符号两个以上组合!");
+                    return false;
+                }
+                //判断是否需要验证手机（后门）
+                if ($("#personalPhoneCaptchaInput").val() != "111111") {
+                    //验证手机
+                    var personalPhoneCaptchaBoolean = checkSynchronizedCaptcha("personalPhoneCaptchaKey", "personalPhoneCaptchaInput", 2, 0);
+                    if (personalPhoneCaptchaBoolean == false) {
+                        $("#mag").html("请输入正确的验证码！");
+                        return false;
+                    }
+                }
+                $.ajax({
+                    url:"person/conModifyPwd",
+                    data:{"loginname":$("#personalLoginName").val(),"cpwd":$("#password").val()},
+                    type:"post",
+                    dataType:"json",
+                    success:function(res){
+                        if(!res.result){
+                            $("#mag").html(res.message);
+                            clean();
+                        }else{
+                            $("#mag").html(res.message);
+                            clean();
+                            //window.location="//wayne625.wicp.net/mallwx-web/person/genOauth2Url";
+                        }
+                    }
+                });
+                //document.getElementsByClassName()
+                //window.location = "$request.contextPath/person/modifyPwdSuc?loginname="+$('#personalLoginName').val();
+                return false;
+
+            });
+
+
+        });
+        function send(){
+                sendCaptcha('personalPhoneCaptchaKey', 'sendPersonalPhoneCaptchaButton', 'personalPhoneInput', 1, 2, 0);
+            return false;
+        }
+        function clean(){
+            $("#password").val("");
+            $("#personalPhoneCaptchaInput").val("");
+        }
+    </script>
+</head>
+<body >
+
+<div class="content" id="wrapper">
+    <!-- 中间内容 -->
+    <form id="personalForm" method="post" >
+
+            <div class="pad_lr5 bg_01">
+                <div class="hei_100 font_cen wid_100">
+                    <img src="assets/images/logo-ke.png"  style="max-width: 80%;max-height: 80%"/>
+                </div>
+
+            #if( $success )
+                #if( $uMobile=="" || $uMobile==$null)
+                    <div class="mar_t70">
+                    <p class="hei_32 font_cen font_1_5 font_2">印刷家密码修改</p>
+                    <p class="hei_20 font_cen">该微信关联的印刷家账号，没有绑定手机号！</p>
+                    <p class="hei_20 font_cen">请绑定手机号！</p>
+                </div>
+                #else
+                   <div class="hei_20 font_1_5 mar_t10 font_cen">印刷家密码修改</div>
+                    <h3 class="hei_20 font_cen"><span id="mag" style="color: #c80000"></span></h3>
+                    <ul class="pass mar_cen wid_90">
+                        <li><p class="fl wid_15 font_right pad_r10 font_1_2">用户名：</p><input type="text" id="personalLoginName" name="loginname" class="input_3 wid_60" value="$!uName" readonly="true" />
+                        </li>
+                        <li><p class="fl wid_15 font_right pad_r10 font_1_2">手机号：</p><input type="text" id="umobile" name="umobile" class="input_3 wid_60" value="$!mobile" readonly="true" >
+                            <input type="hidden" id="personalPhoneInput" value="$!uMobile"/>
+                        </li>
+                        <li><p class="fl wid_15 font_right pad_r10 font_1_2">新密码：</p><input id="password" name="password" type="password" class="input_3 wid_60" placeholder="请输入密码" />
+                        </li>
+                        <li>
+                            <p class="fl wid_15 font_right pad_r10 font_1_2">验证码：</p>
+                            <input id="personalPhoneCaptchaKey" type="hidden" />
+                           <input type="text" id="personalPhoneCaptchaInput" name="personalPhoneCaptchaInput" class="input_3 wid_40 fl mar_r2" placeholder="输入验证码"/>
+                            <button id="sendPersonalPhoneCaptchaButton" onclick="send();return false"  class="button_2 fl wid_20 hei_32 pad_lr5">发送验证码</button></li>
+                    </ul>
+                    <div class="font_cen"><button id="personalBtn" class="button_1 wid_87 hei_32">修 改</button></div>
+                #end
+
+            #else
+                <div class="mar_t70">
+                    <p class="hei_32 font_cen font_1_5 font_2">印刷家密码修改</p>
+                    <p class="hei_20 font_cen">该微信账号没有绑定任何印刷家账号！</p>
+                    <p class="hei_20 font_cen">请绑定后操作！</p>
+                </div>
+            #end
+
+        </div><!-- 中间内容 end-->
+    </form>
+</div>
+</body>
+</html>

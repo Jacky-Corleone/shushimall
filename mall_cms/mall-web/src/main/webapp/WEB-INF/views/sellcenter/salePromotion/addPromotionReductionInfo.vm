@@ -1,0 +1,492 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<style type="text/css">
+	.registere_class_hide{
+		display:none;
+	}
+	.org_class_hide{
+		display:none;
+	}
+	.tax_class_hide{
+		display:none;
+	}
+	.bank_class_hide{
+		display:none;
+	}
+	.information td {
+		padding: 0px;
+	}
+</style>
+<script language="javascript" type="text/javascript" src="$request.getContextPath()/assets/js/tab.js"></script>
+<script type="text/javascript" src="$staticPath/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$staticPath/js/common.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/common/loadMsg.js"></script>
+<script type="text/javascript">
+	var pageInitLoad = true;
+    $(function() {
+        //加载左侧菜单
+        $("#leftSeller").load("$request.contextPath/leftSeller");
+        //全部选中和不选功能
+        $("#all_select").click(function() {
+            $('input[name="selectedItem"]').attr("checked",this.checked);
+        });
+
+        $(".discount_percent").keyup(function(){
+            $(this).val($(this).val().replace(/[^0-9.]/g,''));
+        }).bind("paste",function(){  //CTR+V事件处理
+            $(this).val($(this).val().replace(/[^0-9.]/g,''));
+        }).css("ime-mode", "disabled"); //CSS设置输入法不可用
+        
+        var isAllItem="$!isAllItem";
+        if(isAllItem=='1'){
+        	$("#right_top").css("display","none");
+        	$("#tableId").css("display","none");
+        }
+		
+		markdownTypeChange();
+        
+        // 活动规则的两个radio（折扣、金额）改变时，需要对字样、input元素进行更改。
+        $("[name=markdownType]").bind('change', markdownTypeChange);
+		
+	 	function markdownTypeChange() {
+	 		/*
+	 		由于编辑直降活动时也使用该页面，而页面加载完后会触发此方法，
+	 		规定页面初始化后不清空，之后触发该方法才会清空
+	 		*/
+        	if (pageInitLoad === true) {
+        		pageInitLoad = false;
+        	}
+        	else {
+        		$("#discountPercent").val('');
+        	}
+        	
+        	$("#discountPercent").unbind('keyup');
+        	var textToChange = $("#discountPercent").next();
+        	var markdownType = $("[name=markdownType]:checked").val();
+        	if (markdownType == 1) {
+        		textToChange.html("折");
+        		$("#discountPercent").prop('maxLength',5);
+        		$("#discountPercent").bind('keyup',numInput4Discount);
+				$("#discountTip").text('提示：请输入0-10（包括10）之间的整数或两位小数。');
+        	} else {
+        		textToChange.html("元");
+        		$("#discountPercent").prop('maxLength',9);
+        		$("#discountPercent").bind('keyup', floatInput);
+				$("#discountTip").text('提示：请输入活动的直降金额，计算公式：售价=原售价-直降金额');
+        	}
+        	
+        	// 针对floatInput()：重置value2属性值
+        	$("#discountPercent").prop('value2','');
+        }
+	 	function floatInput(){
+			if(this.value==this.value2)
+	    		return;
+	    	else if(this.value.search(/^\d*(?:\.\d{0,2})?$/)==-1)
+	    		this.value=(this.value2)?this.value2:'';
+	    	else if (this.value.startsWith('0') &&
+	    				this.value.search(/^0\d+/)==0)
+	    		this.value=(this.value2)?this.value2:'';
+	    	else
+	    		this.value2=this.value;
+		}
+    });
+
+    //保存限时折扣和满减信息
+    function onSaveInfo(){
+    	$("#subId").loadingMsg();
+        var type="$!type";
+        var promotionId=$("#promotionId").val();
+        var meetPrice=$("#meetPrice").val();//满多少钱
+        var activityName=$("#activityName").val();//促销名称
+        var discountPrice=$("#discountPrice").val();//减多少钱
+        var beginDate=$("#beginDate").val();//促销开始时间
+        var endDate=$("#endDate").val();//促销结束时间
+        var words=$("#words").val();//广告语
+        var discountPercent=$("#discountPercent").val();//折扣百分比
+        var userType=$("#userType").val();//用户类型
+       /*  var membershipLevel='';
+		$("input[name='membershipLevel']:checked").each(function() {
+			membershipLevel+=$(this).val()+",";
+		});//会员类型 
+		membershipLevel=membershipLevel.replace(/,$/,'')*/
+        if(beginDate==""||endDate==""||meetPrice==""||discountPrice==""||activityName==""){
+            alert("带有*字符的必须要填写！");
+            $("#subId").hideMsg();
+            return false;
+        }
+        if(type == "2"){
+            if(isNaN(meetPrice)){
+                alert("满减金额只能输入数字！");
+                $("#subId").hideMsg();
+                return false;
+            }
+            if(isNaN(discountPrice)){
+                alert("优惠金额只能输入数字！");
+                $("#subId").hideMsg();
+                return false;
+            }
+        }else{
+			var markdownType =  $("[name=markdownType]:checked").val();
+			if (markdownType == 1) {
+                if(isNaN(discountPercent) || discountPercent > 10 || discountPercent <= 0){
+                    alert("折扣只能输入小数并且范围在0-10(包括10)之间！！");
+                    $("#subId").hideMsg();
+                    return false;
+                }
+			} else {
+				if (isNaN(discountPercent) || discountPercent == "") {
+					alert("请输入直降金额！！");
+					$("#subId").hideMsg();
+                    return false;
+				}
+			}
+        }
+        var isAllItem=$("#isAllItemId").val();
+        if(isAllItem==2){
+        	 var checkedItemIds=$("#checkedItemIds").val();//新的商品id数组
+             if(checkedItemIds.length<1) {
+                 alert("您没有选中项!");
+                 $("#subId").hideMsg();
+                 return false;
+             }
+        }
+       /* var start=TimeObjectUtil.compareRightStartTime(0,beginDate);
+        alert(start);
+        if(!start){
+            alert("促销开始时间不能小于当前时间!");
+            return false;
+        }*/
+		if (Number(meetPrice)<=Number(discountPrice)) {
+			alert("满减金额面值必须小于满减金额限额");
+			$("#discountPrice").val("");
+			$("#subId").hideMsg();
+			return;
+		}
+		if(confirm("您的活动信息将在指定时间自动发布，发布后将不可修改")){
+			$.ajax({
+                type:'post',
+                url:'$request.contextPath/sellcenter/salePromotion/saveReductionPromotion',
+                dataType:'json',
+                data:{
+                    itemIds:checkedItemIds,
+                    meetPrice:meetPrice,
+                    activityName:activityName,
+                    discountPrice:discountPrice,
+                    beginDate:beginDate,
+                    endDate:endDate,
+                    words:words,
+                    type:type,
+                    discountPercent:discountPercent,
+					markdownType:$("[name=markdownType]:checked").val(),
+                    promotionId:promotionId,
+                    isAllItem:isAllItem,
+                    userType:userType
+                },
+                success:function(data){
+                    if(data.result){
+                        alert("保存成功！");
+                        window.location.href="$request.contextPath/sellcenter/salePromotion/promotionIndex?type=$!type"
+                    }else if(data.message){
+                        alert(data.message);
+                        $("#subId").hideMsg();
+                    }else{
+                        alert("保存失败!");
+                        $("#subId").hideMsg();
+                    }
+                }
+            });
+		} else{
+			$("#subId").hideMsg();
+		}
+    }
+    //重置功能
+    function resetAll(formId){
+        $("#"+formId)[0].reset();
+    }
+
+    //到指定的分页页面
+    function topage(page){
+        $("input[name='page']").val(page);
+        if($("#promotionId").val()==""){
+        	$("#searchForm").submit();
+        }else{
+        	$("#searchForm").attr("action","$request.contextPath/sellcenter/salePromotion/toAddPromotion?promotionId=$!promotionInfo.id&type=$!type&isAllItem=$!isAllItem").submit();
+        }
+    }
+
+    //查询商品信息
+    function searchFormSubmit(){
+        if(isNaN($("#id").val())){
+            alert("商品编码只能输入数字！");
+            return false;
+        }
+        if($("#promotionId").val()==""){
+        	$("#searchForm").submit();
+        }else{
+        	$("#searchForm").attr("action","$request.contextPath/sellcenter/salePromotion/toAddPromotion?promotionId=$!promotionInfo.id&type=$!type&isAllItem=$!isAllItem").submit();
+        }
+        $("input[name='page']").val("1");
+    }
+
+    //取消返回index页面
+    function cancelProduct(){
+        window.location.href="$request.contextPath/sellcenter/salePromotion/promotionIndex?type=$!type"
+    }
+
+    //判断是否选中，同时向checkedItemIds隐藏域中存值
+    function selectItems(obj){
+       var checkedItemIds=$("#checkedItemIds").val();
+       if($("#"+obj).is(":checked")){
+           checkedItemIds+=($("#"+obj).val()+",");
+       }else{
+           var param=$("#"+obj).val()+",";
+           checkedItemIds=checkedItemIds.replace(param,"");
+       }
+        $("#checkedItemIds").val(checkedItemIds);
+    }
+
+	function numInput4Discount() {
+		var obj = this;
+		if (obj.value2===undefined) {
+			obj.value2='';
+		}
+		var value= obj.value;
+		if(!value)
+			return;
+		if(value.search(/^\d(\.\d{0,2})?$/)==-1 // 找不到x.xx
+				||value.search(/^0\.00$/)==0) { // 找到0.00
+			if (value.search(/^10(\.0{0,2})?$/)==-1) { // 找不到10.00
+				obj.value=obj.value2;
+			}
+			else {
+				obj.value2=value;
+			}
+		}
+		else {
+			obj.value2=value;
+		}
+	}
+	
+	
+	function numInputWithLength(length,obj){
+		if (typeof length !== "number") {
+			length = 6;
+		}
+		obj=obj||this;
+		if(obj.value==obj.value2)
+			return;
+		if (parseInt(obj.value)==0) {
+			obj.value=(obj.value2)?obj.value2:'';
+			return;
+		}
+		eval("var re = /^\\d{0,"+length+"}$/;");
+		if(obj.value.search(re)==-1)
+			obj.value=(obj.value2)?obj.value2:'';
+		else
+			obj.value2=obj.value;
+	}
+</script>
+
+
+<div id="main">
+<!--中间部分开始-->
+    <!--获取oss和ftp切换的状态值-->
+	#set($ossftpChange=$!ossftpChange)
+<!--left start -->
+<div id="leftSeller" class="border-4">
+                        
+</div>
+<!--left end -->
+
+<!--右边部分开始-->
+<div id="right">
+<div class="nTab">
+    <!-- 标题开始 -->
+      <div class="TabTitle">
+          <ul id="myTab0">
+        #if($!type=="2")
+            <li class="active">满减活动</li>
+        #else
+            <li class="active">直降活动</li>
+        #end
+          </ul>
+      </div>
+      <!-- 内容开始 -->
+      <div class="TabContent"> 
+        <!-- 商品介绍下的内容开始 -->
+        
+        #if($!activeType =='2')
+        <div id="myTab0_Content0" class="none" dispaly="none" >
+        #else
+        <div id="myTab0_Content0"> 
+        #end
+        <form method="post" id="searchForm" action="$request.contextPath/sellcenter/salePromotion/toAddPromotion?type=$!type&isAllItem=$!isAllItem">
+            <!--记录选中商品id-->
+            <input type="hidden" id="checkedItemIds" name="checkedItemIds" value="$!checkedItemIds"/>
+            <!--记录全部商品还是部分商品-->
+            <input type="hidden" id="isAllItemId" name="isAllItem" value="$!isAllItem"/>
+            <!--促销活动id-->
+            <input name="promotionId" id="promotionId" type="hidden" value="$!promotionInfo.id"/>
+            <!--区别是否是编辑和分页商品-->
+            <input name="itemType" id="itemType" type="hidden" value="itemType"/>
+			<!-- 用户类型为全部用户 -->
+            <input name="userType" id="userType" type="hidden" value="0"/>
+          <div id="right_top" class="right_top bg_06">
+            <div class="right_top_l">
+             <ul class="list">
+               <li class="wid_400">
+                 <span class="font_wid">商品编码：</span><input id="id" name="id" type="text" class="input_Style2 wid_120 hei_30" value="$!itemInDTO.id" onkeyup="numInput(this,0)"/>
+                </li>
+                <li class="wid_400">
+                 <span class="font_wid">商品名称：</span><input id="itemName"  name="itemName" class="input_Style2 wid_120 hei_30" type="text" value="$!itemInDTO.itemName"/>
+               </li>
+             </ul>
+            </div>
+            <div valign="center">
+
+                <input type="hidden" name="page" value="$!pager.page">
+              <button type="button" class="button_4 but_cx3" onclick="searchFormSubmit()">查 询
+              </button>  
+            </div>
+          </div>
+          <!-- 搜多条件结束 -->
+          <div id="right_bot" class="right_bot mar_t10 bg_06">
+           <!-- 商品列表开头 -->
+            <div class="right_xinxi mar_l14" id="tableId">
+             <ul class="list_top bg_08 font_cen font_14b" id="shop_show">         
+                  <li class="wid_50 font_cen">&nbsp;</li>
+                  <li class="wid_220 font_cen">商品编码</li>
+                  <li class="wid_300 font_cen">商品名称</li>
+                  <li class="wid_180 font_cen">商品售价</li>
+                  <li class="wid_150 font_cen">商品状态</li>
+              </ul>
+              <!-- 商品信息 -->
+              <table class="information">
+                #foreach($goods in $pager.records)
+                  #if($velocityCount % 2 == 0)
+                	#set($rowStyle="bg_05")
+                  #else
+                	#set($rowStyle="")
+                  #end
+                 <tr class="$rowStyle">
+                 <input type="hidden" name="spu_id" id="spu_id" value='$!goods.itemId'>
+                  <td class="wid_50 font_cen ">
+                      <input type="checkbox"
+                             #if("$!checkedItemIds" != "" && $!checkedItemIds.indexOf("$!goods.itemId") != "-1")
+                                 checked="checked"
+                             #end
+                             value="$!goods.itemId" class="mar_l10 hei_22" onchange="selectItems('selecdR_$!goods.itemId')" name='selectedItem' id='selecdR_$!goods.itemId'/></td>
+                  <td class="wid_220 font_cen ">$!goods.itemId</td>
+                  <td class="wid_300 font_cen " title="$!goods.itemName">
+                      #set($str=$!goods.itemName)
+                      #if($str.length()>20)
+                          #set($str=$str.substring(0,20))
+                          $str ...
+                      #else
+                          $!goods.itemName
+                      #end
+                      </td>
+                  <td class="wid_180 font_cen ">￥$!goods.guidePrice</td>
+                  <td class="wid_150 font_cen ">
+                     #if($!goods.itemStatus == 1)  未发布 #end
+				     #if($!goods.itemStatus == 2)  待审核 #end
+					 #if($!goods.itemStatus == 3)  待上架 #end
+					 #if($!goods.itemStatus == 4)  在售 #end
+					 #if($!goods.itemStatus == 5)  已下架 #end
+					 #if($!goods.itemStatus == 6)  锁定 #end
+					 #if($!goods.itemStatus == 7)  申请解锁 #end
+					 #if($!goods.itemStatus == 20)  审核驳回 #end
+                   </td>
+                </tr>
+                #end
+              </table> <!-- 商品信息 end-->
+                #pageVelocity($pager)
+              </div>
+              <!-- 优惠规则 -->
+              <div class="clear"></div>
+              <div class="mhei_30 border-1 pad_tb20">
+                <h3 class="tit">优惠规则</h3>
+				#if($!type=="1")
+				<p class="mar_20">
+					<input type="radio" name="markdownType" value="1" #if($markdownType!=2) checked #end>折扣
+					<input type="radio" name="markdownType" value="2" #if($markdownType==2) checked #end>金额
+				</p>
+				#end
+                  #if($!type=="2")
+                      <p class="hei_40 mar_20"><i class="font_65 font_fs">*</i>
+                      #if($!isAllItem=='1')
+                    	  全部商品在单笔订单满
+                      #elseif($!isAllItem=='2')
+                         当上述所选商品在单笔订单满
+                       #end 
+                       <input class="input_Style2 wid_100 hei_30" maxlength="9" name="meetPrice" id="meetPrice" value="$!meetPrice" type="text" onkeyup="numInputWithLength(9,this)" />
+                            元，订单总额减少 <input class="input_Style2 wid_70 hei_30" maxlength="6" name="discountPrice" id="discountPrice" type="text" value="$!discountPrice" onkeyup="numInputWithLength(6,this)" /> 元。</p>
+                  #else
+                      <p class="hei_40 mar_20"><i class="font_65 font_fs">*</i>
+                      #if($!isAllItem=='1')
+                    	  全部商品享有
+                      #elseif($!isAllItem=='2')
+                         所选商品享有
+                       #end  
+                      <input value="$!discountPercent" class="input_Style2 wid_70 hei_30" name="discountPercent" maxlength="5" id="discountPercent" type="text" />
+                  <span>折</span>促销。</p>
+                    <p style="margin: 5px 0px 0px 20px;font-size: 11px;color: #a00" id="discountTip">提示：请输入0-10（包括10）之间的整数或两位小数。</p>
+                  #end
+              </div> <!-- 优惠规则 end-->
+              <!-- 促销基本信息 -->
+              <div class="border-1 mar_tb10">
+                <h3 class="tit">促销基本信息</h3>
+                <ul class="list mar_l10">
+                  <li class="wid_230">
+                    <span class="font_wid"><i class="font_65 font_fs">*</i>促销名称：</span><input value="$!promotionInfo.activityName" class="input_Style2 wid_120 hei_30" name="activityName" id="activityName" maxlength="20" type="text" />
+                  </li>
+                  <li class="wid_600">
+                    <span class="font_wid"><i class="font_65 font_fs">*</i>促销时间：</span><input class="input_Style2 wid_160 hei_30" readonly="readonly" type="text" name="startTime" value="$!date.format('yyyy-MM-dd HH:mm:ss ',$!promotionInfo.startTime)"
+					id="beginDate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:true, maxDate:'#F{$dp.$D(\'endDate\')}',minDate: '%y-%M-%d' });"/>
+					 至 <input class="input_Style2 wid_160 hei_30" readonly="readonly" type="text" name="endTime" value="$!date.format('yyyy-MM-dd HH:mm:ss ',$!promotionInfo.endTime)"
+					id="endDate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:true,minDate:'#F{$dp.$D(\'beginDate\') ||\'%y-%M-%d\'}'} );"/>
+                  </li>
+                  <!-- <li class="wid_540">
+                  <span class="font_wid"><i class="font_65 font_fs">*</i>用户类型：</span>
+                    <select class="input_Style2 hei_30 wid_95" name="userType" id="userTypeId">
+	        		<option value="">请选择</option>
+	        		<option value="0" #if($!promotionInfo.userType=='0') selected="selected"  #end>全部</option>
+	        		<option value="1" #if($!promotionInfo.userType=='1') selected="selected"  #end>个人用户</option>
+	        		<option value="2" #if($!promotionInfo.userType=='2') selected="selected"  #end>企业用户</option>
+	       	        </select>
+                  </li> -->
+                
+                <!-- <li class="wid_600" style="margin-left:-310px">
+                    <span class="font_wid"><i class="font_65 font_fs">*</i>会员等级：</span>
+					 #foreach($vipLevel in $vipLevels)
+					<label style="cursor:pointer;">
+						<input type="checkbox" name="membershipLevel" value="$vipLevel.id" 
+							#if($promotionInfo.membershipLevel.contains($vipLevel.id.toString())) checked #end/>$vipLevel.name
+                    </label>
+					#end
+					
+                </li> -->
+                  <li class="wid_540">
+                   <span class="font_wid">促销广告语：</span><input value="$!promotionInfo.words" class="input_Style2 wid_400 hei_30" name="words" id="words" maxlength="50" type="text" />
+                  </li>
+                </ul>
+                 <div class="clear"></div>
+              </div> <!-- 促销基本信息 end-->
+
+              <div class="font_cen mar_cen">
+					<button type="button" onclick="onSaveInfo()" loadMsg="正在保存..." id="subId" class="button_2 hei_30">保存</button>
+					<button type="button" onclick="cancelProduct()" class="button_3 hei_30">取消</button>
+              </div>
+            </div>
+          </div> 
+        </div>
+        </div>
+      </div>
+  </div>
+    </form>
+</div>
+<!--右边部分结束-->
+</div><!--#main end -->
+
+  

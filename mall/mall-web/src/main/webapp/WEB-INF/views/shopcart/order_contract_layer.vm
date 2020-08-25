@@ -1,0 +1,260 @@
+#set($layout = "/none_layout.vm")
+<style>
+	.list_Tops{height:60px; line-height:60px; border-bottom:1px dashed #e8e8e8;margin:0 20px;max-width:940px; background:#f1f1f1; overflow:hidden;}
+	.list_Tops li{ padding-top:15px;}
+</style>
+	<div class="pad_l10 bg_05 hei_35 border-9 mar_t10">
+        订单信息
+      </div>
+      <div class="mar_lr20 min-hei border-6 mar_t10">
+        <h4 class="hei_35">收货人信息</h4>
+        <p class="hei_30">收&nbsp&nbsp货&nbsp&nbsp人：$!tradeOrder.name</p>
+        <p class="hei_30 over_ell" title="$!tradeOrder.fullAddress">地&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp址：$!tradeOrder.fullAddress</p>
+        <p class="hei_30">手机号码：$!tradeOrder.mobile</p>
+        <p class="hei_30 mar_b10">固定号码：$!tradeOrder.phone</p>
+      </div>
+      <div class="mar_lr20 min-hei border-6 mar_t10">
+        <h4 class="hei_30">支付及配送方式</h4>
+		<p class="hei_30">支付类型：#if($!tradeOrder.shipmentType == 1)立即支付#elseif($!tradeOrder.shipmentType == 2)延期付款($!tradeOrder.payPeriod天)#end </p>
+        <!-- <p class="hei_30">支付方式：#if($!tradeOrder.paymentMethod == 1)个人支付 #elseif($!tradeOrder.paymentMethod == 2)企业支付 #elseif($!tradeOrder.paymentMethod == 3)积分支付#else延期付款 #end </p> -->
+<!--         <p class="hei_30">付款方式：#if($!tradeOrder.paymentType == 0)支付宝#elseif($!tradeOrder.paymentType == 1)京东支付#elseif($!tradeOrder.paymentType == 2)小印支付/INPAY#elseif($!tradeOrder.paymentType == 3)线下付款#elseif($!tradeOrder.paymentType == 4)支付宝其他银行#elseif($!tradeOrder.paymentType == 5||$!tradeOrder.paymentType == 6)微信支付#elseif($!tradeOrder.paymentType == 7)积分支付#elseif($!tradeOrder.paymentType == 8)银联支付#elseif($!tradeOrder.paymentType == 100)支付宝手机端#elseif($!tradeOrder.paymentType == 101)京东支付手机端#end </p> -->
+<!--         <p class="hei_30">付款时间：$!date.format('yyyy-MM-dd HH:mm:ss ',$!tradeOrder.paymentTime ) #if($!tradeOrder.paymentTime && $!tradeOrder.paymentType == 2) <a href="javascript:showCiticTrade('$!date.format('yyyyMMdd',$!tradeOrder.paymentTime )','seller')" class="font_65">银行交易回单打印 </a>#end</p> -->
+        <p class="hei_30">运&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp费：￥$!myCart.totalFare</p>
+		<!-- <p class="hei_30">优&nbsp&nbsp惠&nbsp&nbsp码：$!tradeOrder.promoCode</p> -->
+		<p class="hei_30">备&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp注：$!tradeOrder.memo</p>
+		<p class="hei_30">图&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp纸：<a href='$!imageServerAddr$!enclosureUrl' target="_blank">$!enclosureName</a></p>
+      </div>
+	  
+	  #if($!tradeOrder.invoice == 2)
+      <div class="mar_lr20 min-hei border-6 mar_t10">
+        <h4 class="hei_30">普通发票信息</h4>
+		#if(!$invoiceDTO.invoiceTitle)
+			<p class="hei_30"><i id="invoice_tip">发票抬头：$!tradeOrder.invoiceTitle</i></p>
+		#else
+			<p class="hei_30"><i id="invoice_tip">发票抬头：$!invoiceDTO.invoiceTitle</i><!--&nbsp;&nbsp;&nbsp;<a href="javascript:showInvoice()" style="color:#ff0000;">点击查看</a>--></p>
+		#end
+      </div>
+	  #end
+	  #if($!tradeOrder.invoice == 3)
+      <div class="mar_lr20 min-hei border-6 mar_t10">
+        <h4 class="hei_30">增值税发票信息</h4>
+        <p class="hei_30"><i id="invoice_tip">单位名称：$!invoiceDTO.companyName</i></p>
+      </div>
+	  #end
+        <!--订单信息开始 -->
+      <div class="right_top mar_cen">
+      <h4 class="hei_35 wid_950 mar">商品清单</h4>
+          <ul class="list_top bg_08 font_14b wid_950 border-6 mar" style="background:#f1f1f1;">
+			  <li class="wid_150 font_cen hei_35">商品编号</li>
+              <li class="wid_150 font_cen hei_35">商品图片</li>
+              <li class="wid_200 font_cen hei_35">商品名称</li>
+              <li class="wid_200 font_cen hei_35">商品属性</li> 
+              <li class="wid_150 font_cen hei_35">售价</li>
+              <li class="wid_100 font_cen hei_35">商品数量</li>
+          </ul>
+		  
+         <!--每一笔订单可以循环一下内容 开始-->
+		 #foreach($shop in $!myCart.shops)
+         <div class="mar_cen">
+			<!-- 每一个商品信息 -->
+			#foreach( $item in $shop.products)
+			#if($item.checked)
+			<ul class="list_top hei_80 font_14b " style="background:#fff;">
+                <li class="font_cen" style="min-width:150px;">
+                  <span>$!item.itemId</span>
+                </li>
+                <li class="font_cen" style="min-width:150px;">
+					<a href="$request.getContextPath()/productController/details?id=$!item.itemId&skuId=$!item.skuId" target="_blank">
+						<img src="$!imageServerAddr$!item.src" width="65" height="40"/>
+					</a>
+                </li>
+                <li class="hei_min_80 pad_lr10" style="min-width:150px;">
+					<div style="width:180px; padding-bottom:10px;  text-align:center; ">
+						<a href="$request.getContextPath()/productController/details?id=$!item.itemId&skuId=$!item.skuId" target="_blank" title="$!array.itemName">
+  							$!item.title
+  							</a>
+                    </div>
+				</li>
+                <li class="hei_min_80 pad_lr10" style="min-width:150px;">
+					<div style="width:180px; padding-bottom:10px;  text-align:center;" title="#foreach( $array in $!jsonArray)#if($!array.skuId == $!item.skuId)$!array.itemAttrTitle#end#end">
+						#foreach( $attr in $!item.attrs)
+                        		<span>
+                				    $attr.name : $attr.value
+        						</span>
+							<br>
+    					#end
+                    </div>
+				</li>
+				<li class="wid_150 font_cen font_65" style="min-width:150px;">$!item.payPrice</li>
+                <li class="font_cen wid_100">$!item.quantity</li>
+			</ul>
+			
+				<!-- 套餐单品开始 -->
+			#foreach( $subItem in $!item.subProducts)
+    			<ul class="list_top hei_80 font_14b bg_09 list_Tops" >
+                    <li class="wid_150 font_cen">
+                      <span>$!subItem.itemId</span>
+                    </li>
+                    <li class="wid_150 font_cen">
+    					<a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank">
+    						<img src="$!imageServerAddr$!subItem.src" width="65" height="40"/>
+    					</a>
+                    </li>
+                    <li class="wid_180 hei_min_80 pad_lr10">
+    					<div style="width:180px; padding-bottom:10px;/*  padding-top:30px; */ text-align:center; ">
+    						<a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank" title="$!subItem.itemName">
+    							$!subItem.title
+    						</a>
+                        </div>
+    				</li>
+                    <li class="wid_180 hei_min_80 pad_lr10">
+    					<div style="width:180px; padding-bottom:10px;/*  padding-top:30px; */ text-align:center;" title="">
+    						#foreach( $attr in $!subItem.attrs )
+                                $attr.name：$attr.value &nbsp;
+                            #end                                
+                        </div>
+    				</li>
+    				<li class="wid_150 font_cen font_65">￥$!subItem.skuPrice</li>
+                    <li class="wid_50 font_cen">$!subItem.quantity</li>
+    			</ul>
+			#end
+			<!-- 套餐单品结束 -->
+			<!-- 基础服务开始 -->
+			#foreach( $subItem in $!item.showBasicProducts)
+    			<ul class="list_top hei_80 font_14b bg_09 list_Tops">
+                    <li class="wid_150 font_cen">
+                      <span>$!subItem.itemId</span>
+                    </li>
+                    <li class="wid_150 font_cen">
+    					<a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank">
+    						<img src="$!imageServerAddr$!subItem.src" width="65" height="40"/>
+    					</a>
+                    </li>
+                    <li class="wid_180 hei_min_80 pad_lr10">
+    					<div style="width:180px; padding-bottom:10px;/*  padding-top:30px */; text-align:center; ">
+    						<a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank" title="$!subItem.itemName">
+    							$!subItem.title
+    						</a>
+                        </div>
+    				</li>
+                    <li class="wid_180 hei_min_80 pad_lr10">
+    					<div style="width:180px; padding-bottom:10px;/*  padding-top:30px; */ text-align:center;" title="">
+    						#foreach( $attr in $!subItem.attrs )
+                                $attr.name：$attr.value &nbsp;
+                            #end
+                        </div>
+    				</li>
+    				<li class="wid_150 font_cen font_65">￥$!subItem.skuPrice</li>
+                    <li class="wid_50 font_cen">$!subItem.quantity</li>
+    			</ul>
+			#end
+			<!-- 基础服务结束 -->
+			<!-- 辅料类型开始 -->
+			#foreach( $subItem in $!item.showAuxiliaryProducts)
+    			<ul class="list_top hei_80 font_14b bg_09 list_Tops">
+                    <li class="wid_150 font_cen">
+                      <span>$!subItem.itemId</span>
+                    </li>
+                    <li class="wid_150 font_cen">
+    					<a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank">
+    						<img src="$!imageServerAddr$!subItem.src" width="65" height="40"/>
+    					</a>
+                    </li>
+                    <li class="wid_180 hei_min_80 pad_lr10">
+    					<div style="width:180px; padding-bottom:10px; /* padding-top:30px; */ text-align:center; ">
+    						<a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank" title="$!subItem.itemName">
+    							$!subItem.title
+    						</a>
+                        </div>
+    				</li>
+                    <li class="wid_180 hei_min_80 pad_lr10">
+    					<div style="width:180px; padding-bottom:10px;/*  padding-top:30px; */ text-align:center;" title="">
+    						#foreach( $attr in $!subItem.attrs )
+                                $attr.name：$attr.value &nbsp;
+                            #end
+                        </div>
+    				</li>
+    				<li class="wid_150 font_cen font_65">￥$!subItem.skuPrice</li>
+                    <li class="wid_50 font_cen">$!subItem.quantity</li>
+    			</ul>
+			#end
+			<!-- 辅料类型结束 -->
+			<!-- 增值服务开始 -->
+			#foreach( $subItem in $!item.valueAddedProducts)
+    			<ul class="list_top hei_80 font_14b bg_09 list_Tops">
+                    <li class="wid_150 font_cen">
+                      <span>$!subItem.itemId</span>
+                    </li>
+                    <li class="wid_150 font_cen">
+    					<a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank">
+    						<img src="$!imageServerAddr$!subItem.src" width="65" height="40"/>
+    					</a>
+                    </li>
+                    <li class="wid_180 hei_min_80 pad_lr10">
+    					<div style="width:180px; padding-bottom:10px;/*  padding-top:30px; */ text-align:center; ">
+    						<a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank" title="$!subItem.itemName">
+    							$!subItem.title
+    						</a>
+                        </div>
+    				</li>
+                    <li class="wid_180 hei_min_80 pad_lr10">
+    					<div style="width:180px; padding-bottom:10px;/*  padding-top:30px; */ text-align:center;" title="">
+    						#foreach( $attr in $!subItem.attrs )
+                                $attr.name：$attr.value &nbsp;
+                            #end
+                        </div>
+    				</li>
+    				<li class="wid_150 font_cen font_65">￥$!subItem.skuPrice</li>
+                    <li class="wid_50 font_cen">$!subItem.quantity</li>
+    			</ul>
+			#end
+			<!-- 增值服务结束 -->
+			#end
+			
+			
+			<!--每一笔订单可以循环一下内容 结束-->
+			<div class="freight" style="width:920px;">
+                <dl>
+    				<dd>
+        				<span class="wid_70">运送方式：</span>
+                        <span>#if($deliveryType==1)快递#elseif($deliveryType==2)EMS#elseif($deliveryType==3)平邮#else 快递#end</span>
+    				</dd>
+    			</dl>
+    		</div>
+        </div>
+        #end
+		#end
+	</div><!--right_bot end -->
+	
+      <div class="Order_Review_bottom">
+			<h2 >
+				<span>共计$myCart.quantity件商品</span>
+				<span class="mar_lr20">商品总金额：￥$myCart.total</span>
+			</h2>
+			#if($!tradeOrder.discountAmount)
+			<h2 class="font_fe">
+				该订单的折扣金额为$!tradeOrder.discountAmount元，将由舒适100统一与您进行月结。
+			</h2>
+			<h2 class="font_fe">
+				结算周期为买家确认收货并支付本订单货款后的次月。
+			</h2>
+			#end
+			 #set( $discount = $!{myCart.total} - $!{myCart.payTotal} - $!{myCart.integralDiscount} )
+			<dl><dt>优惠金额：</dt><dd>￥ $!discount</dd></dl>
+			<dl><dt>运费金额：</dt><dd>￥ $!{myCart.totalFare}</dd></dl>
+			<!--<dl><dt>积分抵扣：</dt><dd>#if($totalIntegralDiscount || $totalIntegralDiscount==0)￥$!totalIntegralDiscount #else ￥0.00 #end</dd></dl>-->
+			<div class="clear"></div>
+			<dl><dt><b>支付金额：</b></dt><dd><i class="font_fe font_14b">
+			#set( $total = $!{myCart.payTotal} + $!{myCart.totalFare} )
+			#if($!tradeOrder.paymentMethod == 3)
+				$!tradeOrder.integral积分
+			#else
+				￥$!total
+			#end
+			</i></dd></dl>
+      </div> 
+      <div class="mar_tb10 mar_l20"><a href="javascript:contractLayer();">订单合同</a></div> 
+      <div class="clear"></div> 
+    <!--下面订单信息 Order_Review end -->
+</div>
+</div>

@@ -1,0 +1,212 @@
+#set($assetsPath="$request.contextPath/assets")
+#set($layout = "/usedmarket_layout.vm")
+<link href="$assetsPath/css/basic.css" rel="stylesheet" type="text/css"/>
+<link href="$assetsPath/css/Details.css" rel="stylesheet" type="text/css"/>
+<script language="javascript" type="text/javascript" src="$assetsPath/js/tab.js"></script>
+<script type="text/javascript">
+
+</script>
+
+<!-- js 扩展的 map 对象 -->
+<script src="$assetsPath/js/goodscenter/map.js"></script>
+<script src="$assetsPath/js/goodscenter/details.js"></script>
+<script src="$assetsPath/js/goodscenter/productDetails.js"></script>
+<input type="hidden" id="contextPath" value="$request.getContextPath()"/>
+<input type="hidden" id="shopId" value="$!item.shopId"/>
+<input type="hidden" id="itemId" value="$!item.itemId"/>
+<input type="hidden" id="sellerId" value="$!item.sellerId"/>
+<input type="hidden" id="itemName" value="$!item.itemName"/>
+<input type="hidden" id="itemStatus" value="$!item.itemStatus"/>
+<input type="hidden" id="marketPrice" value="$!item.marketPrice"/>
+<input type="hidden" id="hasPrice" value="$!item.hasPrice"/>
+<input type="hidden" id="areaCode" value=""/>
+<input type="hidden" id="logging_status" value="$!logging_status"/>
+<input type="hidden" id="imageServerAddr" value="$!imageServerAddr"/>
+
+<div id="skuInfos" style="display:none;">
+	#foreach( $skuInfos in $!item.skuInfos)
+	<ul>
+		<li class="attributes">$skuInfos.attributes</li>
+		<li class="skuId">$skuInfos.skuId</li>
+		<li class="skuInventory">$skuInfos.skuInventory</li>
+		<li class="skuPicUrl">$skuInfos.skuPicUrl</li>
+		<li class="skuType">$skuInfos.skuType</li>
+	</ul>
+	#end
+</div>
+
+<!--内容开始-->
+<div id="content">
+	<div class="wid_auto mar_tb20 bg_05 pad_tb20 box-shadow1">
+		<div class="wid_1160 bg_06 border-4">
+			<!--面包屑开始-->
+			<div class="mic">
+				#foreach( $cadeOne in $catCascade)
+					<span><a href="$request.getContextPath()/usedMarket?levOneCid=$!cadeOne.cid">$!cadeOne.cname</a></span> >
+					#foreach( $cadeTwo in $cadeOne.childCats)
+						<a href="$request.getContextPath()/usedMarket?levOneCid=$!cadeOne.cid&levTwoCid=$!cadeTwo.cid">$!cadeTwo.cname ></a>
+						#foreach( $cadeThree in $cadeTwo.childCats)
+							<a href="$request.getContextPath()/usedMarket?levOneCid=$!cadeOne.cid&levTwoCid=$!cadeTwo.cid&levThreeCid=$!cadeThree.cid">$!cadeThree.cname</a>
+						#end
+					#end
+				#end
+			</div>
+			<!--面包屑结束-->
+			<!--左侧图片开始-->
+			<div class="left_pic">
+				<div id="vertical" class="bigImg">
+						<img src="$!imageServerAddr#foreach( $picUrl in $!itemPicture)#if($velocityCount == 1)$!picUrl.pictureUrl#end#end" width="398" height="398" id="midimg"/>
+					<div style="display:none;" id="winSelector"></div>
+				</div><!--bigImg end-->
+
+				<div class="smallImg">
+					<div class="scrollbutton smallImgUp disabled"><i class="fa-angle-left font_20"></i></div>
+					<div id="imageMenu">
+						<!-- $!item.picUrls -->
+						#if($!itemPicture)
+							<ul>
+							#foreach($picUrl in $!itemPicture)
+								#if($!picUrl.pictureUrl && $!picUrl.pictureUrl!="")
+									<li><img src="$!imageServerAddr$!picUrl.pictureUrl"/></li>
+								#end
+							#end
+							</ul>
+						#end
+					</div>
+					<div class="scrollbutton smallImgDown"><i class="fa-angle-right font_20"></i></div>
+				</div><!--smallImg end-->
+				<div id="bigView" style="display:none;"><img width="800" height="800" alt="" src="" /></div>
+				<!--下图片下面的分享信息 商品信息 开始 -->
+				<div class="mar_t10">
+					<span class="fl">商品编号：$!item.itemId</span>
+				</div>
+				<!--下图片下面的分享信息 商品信息 开始 -->
+			</div><!--left_pic end -->
+		<!--左侧图片结束-->
+		<!--中间文字购买信息开始-->
+		<div class="mid po_re">
+		<div class="mid_tit">
+		   #if($!item.status != 4)
+				<h1 class="fl over_ell cursor" title="$!item.itemName" style="font-size:18px;width:180px">$!item.itemName</h1>
+				<span class="font_fe" style="display: block;">商品不是在售状态，无法购买！</span>
+				#end
+				#if($!item.status == 4)
+				<h1 class="fl over_ell cursor" title="$!item.itemName" style="font-size:18px;width:650px">$!item.itemName</h1>
+		   #end
+		</div>
+			<div class="mid_font1">
+				<ul>
+					<li>
+						<div class="mid_f_left">原价：</div>
+						<div class="mid_f_right"><del>￥$!item.priceOld</del></div>
+					</li>
+					
+					<li>
+						<div class="mid_f_left">现价：</div>
+						<div class="mid_f_right" >
+							<strong class="font_fe font_16" >￥<span id="itemPrice_js">$!item.price</span></strong>
+						</div>
+					</li>
+
+					<li>
+						<div class="mid_f_left">运费：</div>
+						<div class="mid_f_right">
+						#if(!$!item.freight)
+							
+						#else
+							￥$!item.freight
+						#end
+							</div>
+					</li>
+					
+					<li>
+						<div class="mid_f_left">新旧程度：</div>
+						<div class="mid_f_right">
+							#if($!item.recency==10)
+								全新
+							#elseif($!item.recency==9)
+								9成新
+							#elseif($!item.recency==8)
+								8成新
+							#elseif($!item.recency==7)
+								7成新
+							#elseif($!item.recency==6)
+								6成新
+							#elseif($!item.recency==5)
+								5成新
+							#end
+						</div>
+					</li>
+					
+					<li>
+						<div class="mid_f_left">卖家联系电话：</div>
+						<div class="mid_f_right">$!item.sellerTel</div>
+					</li>
+					
+					<li>
+						<div class="mid_f_left">商品所在地：</div>
+						<div class="mid_f_right">$!item.provinceName $!item.cityName $!item.districtName</div>
+					</li>
+					<li>
+						<div class="mid_f_left">公司名称：</div>
+						<div class="mid_f_right">$!companyName</div>
+					</li>
+				</ul>
+
+			</div>
+			<!-- mid_font1 end-->
+			<div class="mid_font2 border-4 js_buyList" style="display:none;">
+			</div>
+			<!--mid_font2 end-->
+			<!--中间文字购买信息结束-->
+		   </div><!-- 右侧div结束-->
+		</div><!--1160 -->
+    </div><!--1200的外围盒子 -->
+<!--下面内容开始-->
+<div class=" clear"></div>
+ <!-- 右侧结束-->
+ 
+ <div id="right">
+ <!--tabs开始-->
+          <div class="nTab" style="width:1189px">
+            <!-- 标题开始 -->
+            <div class="TabTitle">
+              <ul id="myTab0">
+                <li class="active" onclick="nTabs(this,0);">商品详情</li>
+                <li class="normal" onclick="nTabs(this,1);">商品描述</li>
+              </ul>
+            </div>
+        
+	    <!--下面图片内容开始-->
+	    <div  class="TabContent">
+			
+			<!-- 商品详情开始 -->
+			<div id="myTab0_Content0" style="overflow:hidden;word-wrap:break-word; word-break:break-all; ">
+				#set($addr = 'src="/' + $!imageServerAddr )
+    			#set($describeDetail = $!item.describeDetail.replaceAll('src="/', $addr))
+				$!describeDetail
+              </div>
+              <!-- 商品描述下的内容开始 -->
+              <div id="myTab0_Content1" class="none" style="overflow:hidden;word-wrap:break-word; word-break:break-all; ">
+    			#set($addr = 'src="' + $!imageServerAddr +"/")
+    			#set($describeUrl = $!item.describeUr.replaceAll('src="/', $addr))
+				$describeUrl
+              </div>
+			
+			
+			
+			
+			<!--图片的宽度不能超过990px -->
+	       <!-- <img src="$assetsPath/pic/pic18.jpg"  class="img_l" />
+	       <img src="$assetsPath/pic/pic19.jpg"  class="img_r"/>
+	       <img src="$assetsPath/pic/pic20.jpg" class="img_l"/> -->
+	    </div>
+		<!--下面图片内容结束-->
+	</div>
+<!--tabs结束-->
+</div><!--id="right" -->
+
+</div>
+<!--下面内容结束-->
+</div>
+<!--#content end内容结束-->

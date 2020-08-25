@@ -1,0 +1,92 @@
+#set($layout="common/order.vm")
+<!DOCTYPE html>
+<html>
+<head>
+    <base href="${request.getContextPath()}/"/>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>用户信息</title>
+#parse("common/scriptAndCss.vm")
+<script type="text/javascript">
+	//查询地址
+	function queryAddress(){
+	   window.location.href="$request.contextPath/user/queryAddress?cus=$!{cus}";
+	}
+    //修改密码
+    function loginModifyPwd(){
+        window.location.href="$request.contextPath/person/loginModifyPwd?loginname=$!{user.uname}";
+    }
+    function toFav(){
+        window.location.href="$request.contextPath/user/toFav";
+    }
+
+	//注销
+	function unlogin(){
+		$.ajax({
+		   type: "POST",
+		   dataType: "json",
+		   url: "$request.contextPath/user/unlogin",
+		   success: function(data){
+			   if(data){
+				   window.location.href="$request.contextPath/";
+			   }
+		   },
+		   error:function(){
+			   alert("系统错误");
+		   }
+		});
+	}
+</script>
+</head>
+<body class="bg_03">
+<div id="main">
+    
+    <!-- 中间内容 -->
+    <div class="content" id="wrapper">
+        <div class="hei_100 font_cen wid_100">
+            <img src="assets/images/logo-ke.png"  style="max-width: 100%;max-height: 100%"/>
+        </div>
+        <div class="bg_01 hei_50 border_2 pad_mlr5 font_1_2" style="  margin-top: 20px;">
+            <p class="fl">账号:</p>
+            <p class="fr">$!{user.uname}</p>
+            <div class="clear"></div>
+        </div>
+        <div class="bg_01 hei_50 border_2 pad_mlr5 font_1_2">
+        	<a href="javascript:queryAddress();">
+	            <p class="fl">我的收货地址</p>
+	            <p class="fr"><i class="fa fa-angle-right fr"></i></p>
+            	<div class="clear"></div>
+            </a>
+        </div>
+        <div class="bg_01 hei_50 border_2 pad_mlr5 font_1_2">
+            <a href="javascript:window.location.href='$request.contextPath/user/toSetPwd';">
+                <p class="fl">设置支付密码</p>
+                <p class="fr"><i class="fa fa-angle-right fr"></i></p>
+                <div class="clear"></div>
+            </a>
+        </div>
+        <div class="bg_01 hei_50 border_2 pad_mlr5 font_1_2">
+            <a href="javascript:loginModifyPwd();">
+                <p class="fl">修改密码</p>
+                <p class="fr"><i class="fa fa-angle-right fr"></i></p>
+                <div class="clear"></div>
+            </a>
+        </div>
+        <div class="bg_01 hei_50 border_2 pad_mlr5 font_1_2">
+            <a href="javascript:toFav();">
+                <p class="fl">我的收藏</p>
+                <p class="fr"><i class="fa fa-angle-right fr"></i></p>
+                <div class="clear"></div>
+            </a>
+        </div>
+        <div class="font_cen">
+            <button class="button_1 wid_95 hei_34" onclick="unlogin()">注销账号</button>
+        </div>
+         
+    </div><!-- 中间内容 end-->
+</div>
+</body>
+
+</html>

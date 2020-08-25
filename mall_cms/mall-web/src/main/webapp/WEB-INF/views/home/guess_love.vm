@@ -1,0 +1,15 @@
+#set($layout = "/none_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+#if($guessLovePage.records && $guessLovePage.records.size() > 0 )
+	<div class="recommended_service">
+		<ul class="clearfix">
+		 	#foreach($ad in $guessLovePage.records )
+		 		#if($velocityCount<4)
+			    	<li class="fl">
+			    		<a href="javascript:adVisit('$!ad.id','$!ad.adURL',1)"><img width="392px" height="300px" src="$!imageServerAddr$!ad.adSrc"></a>
+			     	</li>
+		     	#end
+		 	 #end
+		</ul>
+	</div>
+#end

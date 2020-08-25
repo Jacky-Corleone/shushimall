@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+	<!-- 使用dubbo协议暴露服务 -->
+	<dubbo:service interface="com.camelot.usercenter.service.UserExportService"
+		owner="zhangfan" ref="userExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+	<dubbo:service interface="com.camelot.usercenter.service.UserExtendsService"
+		owner="zhangfan" ref="userExtendsService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+	<dubbo:service interface="com.camelot.usercenter.service.UserContractService"
+		owner="zhangfan" ref="userContractService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+	<dubbo:service interface="com.camelot.usercenter.service.UserCompanyService"
+		owner="zhangfan" ref="userCompanyService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+	<dubbo:service interface="com.camelot.usercenter.service.UserApplyAuditService"
+		owner="zhangfan" ref="userApplyAuditService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+	<dubbo:service interface="com.camelot.usercenter.service.UserPlatformServiceRuleService"
+		owner="zhangfan" ref="userPlatformServiceRuleService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+	<dubbo:service interface="com.camelot.usercenter.service.UserStorePermissionExportService"
+		owner="zhangfan" ref="userStorePermissionExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+	<dubbo:service interface="com.camelot.usercenter.service.UserCenterOperaService"
+		owner="zhangfan" ref="userCenterOperaService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+	<dubbo:service interface="com.camelot.usercenter.service.UserCreditExportService"
+		owner="zhangfan" ref="userCreditExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+	<dubbo:service interface="com.camelot.usercenter.service.UserCreditLogExportService"
+		owner="zhangfan" ref="userCreditLogExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+    <!--商家入驻报表 -->
+    <dubbo:service interface="com.camelot.usercenter.service.UserReportService"
+                   owner="zhangfan" ref="userReportService" version="1.0" protocol="dubbo"
+                   delay="-1" registry="qingdaoRegistry" />
+    <!-- 用户个人信息 -->
+    <dubbo:service interface="com.camelot.usercenter.service.UserPersonalInfoService"
+                   owner="zhangfan" ref="userPersonalInfoService" version="1.0" protocol="dubbo"
+                   delay="-1" registry="qingdaoRegistry" />	
+    <!-- 微信个人信息 -->
+	<dubbo:service interface="com.camelot.usercenter.service.UserWxExportService"
+				   owner="zhangfan" ref="userWxExportService" version="1.0" protocol="dubbo"
+				   delay="-1" registry="qingdaoRegistry" />    
+    <!-- 实地认证审核 -->
+    <dubbo:service interface="com.camelot.usercenter.service.FieldIdentificationAuditService"
+                   owner="zhangfan" ref="fieldIdentificationAuditService" version="1.0" protocol="dubbo"
+                   delay="-1" registry="qingdaoRegistry" />
+    <!-- 实地认证审核 -->
+    <dubbo:service interface="com.camelot.usercenter.service.FieldIdentificationAuditService"
+                   owner="zhangfan" ref="fieldIdentificationAuditService" version="1.0" protocol="dubbo"
+                   delay="-1" registry="qingdaoRegistry" />
+    <!-- 实地认证图片 -->
+    <dubbo:service interface="com.camelot.usercenter.service.FieldIdentificationPictureService"
+                   owner="zhangfan" ref="fieldIdentificationPictureService" version="1.0" protocol="dubbo"
+                   delay="-1" registry="qingdaoRegistry" />
+    <!--成长值记录-->
+    <dubbo:service interface="com.camelot.usercenter.service.UserGrowthService"
+                   owner="zhangfan" ref="userGrowthService" version="1.0" protocol="dubbo"
+                   delay="-1" registry="qingdaoRegistry" />
+    <!-- 用户积分信息 -->
+    <dubbo:service interface="com.camelot.usercenter.service.UserIntegralTrajectoryExportService"
+                   owner="zhangfan" ref="userIntegralTrajectoryService" version="1.0" protocol="dubbo"
+                   delay="-1" registry="qingdaoRegistry" />
+</beans>

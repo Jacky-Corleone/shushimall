@@ -1,0 +1,161 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+
+<style type="text/css">
+	.registere_class_hide{
+		display:none;
+	}
+	.org_class_hide{
+		display:none;
+	}
+	.tax_class_hide{
+		display:none;
+	}
+	.bank_class_hide{
+		display:none;
+	}
+</style>
+<script type="text/javascript" src="$staticPath/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/common/timer.js"></script>
+<script type="text/javascript">
+	$(function(){
+		//加载左侧菜单
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+		//全部选中和不选功能 
+		$("#all_select").click(function() {
+            $('input[name="itemId"]').attr("checked",this.checked); 
+        });
+        
+	});
+	function oncofirm(){
+		$("#searchForm").attr("action", "$request.contextPath/sellcenter/salePromotion/index");
+		$("#searchForm").submit();
+	}
+	//到指定的分页页面
+    function topage(page){
+       	window.location.href="$request.contextPath/sellcenter/salePromotion/promotionDetailInfo?id=$!promotionInfo.promotionId&proType=$!proType&isAllItem=1&page="+page;
+    }
+</script>
+
+
+<div id="main">
+<!--中间部分开始-->
+<!--left start -->
+<div id="leftSeller" class="border-4">
+</div>
+<!--left end -->
+<div id="right" class="hei_600 border-4 bg_06">
+	 <!--促销基本信息开始-->
+		<div class="breadcrumb" style="margin:0px; ">
+	          <h3 class="font_14 hei_60 mar_20">促销基本信息</h3>
+	    </div>
+	    <div class="wid_950 mar min-hei mar_t10">
+	       促销名称：$!promotionInfo.activityName<br/>
+	       促销广告语：$!promotionInfo.words<br/>
+	       促销状态：
+			#if("$!promotionInfo.onlineState" == "1")
+				#if("$!promotionInfo.dateDif" == "nostart")
+                    未开始
+				#elseif("$!promotionInfo.dateDif" == "starting")
+                    进行中
+				#elseif("$!promotionInfo.dateDif" == "end")
+                    已结束
+				#end
+			#else
+                已终止
+			#end
+			<br/>
+	       促销时间： $!date.format('yyyy-MM-dd HH:mm:ss ',$!promotionInfo.startTime)至 $!date.format('yyyy-MM-dd HH:mm:ss ',$!promotionInfo.endTime)<br/>
+	       剩余时间：
+	       #if($!promotionInfo.onlineState !='3')
+				<span class="wid_150 font_cen border-1"  countDown='true'
+				date="$!date.format('yyyy/MM/dd HH:mm:ss ',$!date)"
+				startTime = "$!date.format('yyyy/MM/dd HH:mm:ss',$!promotionInfo.startTime)"
+				noStartTip="未开始"
+				endTime="$!date.format('yyyy/MM/dd HH:mm:ss ',$!promotionInfo.endTime)"
+				endTip="已结束"
+				> 正在计算时间...
+			  </span>
+			  #elseif($!promotionInfo.onlineState =='3')
+                 <span class="wid_110 font_cen border-1">已终止</span>
+		  #end
+			</br>
+	      促销类型：
+	  #if($!promotionInfo.type =='1')
+	       直降
+	  #else
+	     满减
+	   #end<br/>
+	      用户类型：
+	      #if($!promotionInfo.userType=='0')
+	    	  全部用户
+	      #elseif($!promotionInfo.userType=='1')
+	         个人用户
+	      #elseif($!promotionInfo.userType=='2')
+	         企业用户
+	      #end   
+	      </br>
+<!-- 	      会员等级： $vipLevelStr -->
+	    </div>
+	      <!--促销基本信息开始 end-->
+	      <div class="mar_20 mar_t30 mar_r20 border-9">
+      		<h3 class="font_14 hei_60">促销商品</h3>
+	      </div>
+	          <div class="wid_820">
+		       			<table  border="0" cellpadding="2" cellspacing="0" class="font_cen border-4 mar_l10">
+				           <tr class="bg_08">
+				             	<td  class="wid_150 font_14b border-4">商品编码</td>
+				             	<td  class="wid_500 font_14b border-4">商品名称</td>
+				           </tr>
+				          #if($!promotionInfo.isAllItem=='2')
+				           #foreach($listFull in $listFull)
+					           <tr class="bg_08">
+					             	<td  class="wid_150 border-4">$!listFull.itemId</td>
+					             	<td  class="wid_500 border-4" title="$!listFull.itemName">
+										#set($str=$!listFull.itemName)
+										#if($str.length()>20)
+											#set($str=$str.substring(0,20))
+											$str ...
+										#else
+											$!listFull.itemName
+										#end
+										</td>
+					           </tr>
+				           #end
+				           #elseif($!promotionInfo.isAllItem=='1')
+					           #foreach($goods in $pager.records)
+								<tr>
+						          <td class="wid_80 border-1 font_cen">$!goods.itemId</td>
+						          <td  class="wid_500 border-4" title="$!goods.itemName">
+									#set($str=$!goods.itemName)
+									#if($str.length()>20)
+										#set($str=$str.substring(0,20))
+										$str ...
+									#else
+										$!goods.itemName
+									#end
+									</td>
+						        </tr>
+					           #end
+				           #end
+				        </table>
+			           #if($!promotionInfo.isAllItem=='1')
+			           #pageVelocity($pager)
+			           #end
+					</div>
+	      		<div class="mar_20 mar_t30 mar_r20 border-9" style="margin-top:50px">
+	      		   <h3 class="font_14 hei_60">促销方式</h3>
+		        </div>
+		        <span style="font-size:14px;margin-left:20px;">
+				#if($!proType == '2')
+	      			当上述所选商品在单笔订单满$!meetPrice元，订单总额减少$!discountPrice元。
+					#else
+                    上述所选商品统一享有$!discountPercent#if($markdownType!=2)折#else元#end优惠。
+				#end
+	      		</span>
+	      		<br/>
+	      </div>
+	 </div>
+<!--右边部分结束-->
+</div><!--#main end -->

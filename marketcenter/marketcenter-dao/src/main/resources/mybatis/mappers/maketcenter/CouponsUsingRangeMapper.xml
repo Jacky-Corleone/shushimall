@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.maketcenter.dao.CouponsUsingRangeDao">
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="couponUsingRangeMap" type="com.camelot.maketcenter.dto.CouponUsingRangeDTO">
+				<result property="id" column="ID"/>
+				<result property="couponId" column="COUPON_ID"/>
+				<result property="couponUsingId" column="COUPON_USING_ID"/>
+				<result property="remark" column="REMARK"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="com.camelot.maketcenter.dto.CouponUsingRangeDTO">
+		<![CDATA[
+		insert into coupon_using_range (
+		    	  COUPON_ID
+		    	 ,COUPON_USING_ID
+		    	 ,REMARK
+		   )values(
+		    	 #{couponId}
+		    	,#{couponUsingId}
+		    	,#{remark}
+		   )
+	    ]]>	
+	</insert>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+			  ID
+ 			 ,COUPON_ID
+	    	 ,COUPON_USING_ID
+	    	 ,REMARK
+		FROM 
+		coupon_using_range coupon_using_range_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.id != null">
+				<![CDATA[ and coupon_using_range_.ID  = #{entity.id} ]]>
+			</if>
+			<if test="entity.couponId != null">
+				<![CDATA[ and coupon_using_range_.COUPON_ID  = #{entity.couponId} ]]>
+			</if>
+			<if test="entity.couponUsingId != null">
+				<![CDATA[ and coupon_using_range_.COUPON_USING_ID  = #{entity.couponUsingId} ]]>
+			</if>
+			<if test="entity.remark != null">
+				<![CDATA[ and coupon_using_range_.REMARK  = #{entity.remark} ]]>
+			</if>
+			
+			<if test="entity.skuIdList != null and entity.skuIdList != '' ">
+                <![CDATA[ and coupon_using_range_.COUPON_USING_ID in]]>
+                <foreach collection="entity.skuIdList" item="skuid" index="index" open="(" separator="," close=")">
+                    #{skuid}
+                </foreach>
+            </if>
+            
+            <if test="entity.cIdList != null and entity.cIdList != '' ">
+                <![CDATA[ and coupon_using_range_.COUPON_USING_ID in]]>
+                <foreach collection="entity.cIdList" item="cId" index="index" open="(" separator="," close=")">
+                    #{cId}
+                </foreach>
+            </if>
+            
+		</if>
+		<![CDATA[ ORDER BY coupon_using_range_.ID desc ]]>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="couponUsingRangeMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		coupon_using_range coupon_using_range_
+		<include refid="where_fragement" />
+	</select>
+	
+	<delete id="delete" parameterType="string">
+		<![CDATA[
+		delete from coupon_using_range  where COUPON_ID = #{couponId}
+		]]>
+	</delete>
+</mapper>

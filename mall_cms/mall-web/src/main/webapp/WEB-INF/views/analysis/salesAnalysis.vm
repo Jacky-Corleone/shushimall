@@ -1,0 +1,454 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<!-- ECharts单文件引入 -->
+<script src="$staticPath/plugin/echarts/dist/echarts.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript">
+
+	var itemSize = $!{itemSize};
+	var lastItemIndex = 5;
+	var fristItemIndex = 1;
+	var curItemId = null;
+	$(function() {
+		//加载左侧菜单
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+		reload($!{dealDateList},$!{sellPriceTotalList},$!{sellTotalNumList});
+		
+	});
+	//路径配置
+	require.config({
+	    paths: {
+	        echarts: '$staticPath/plugin/echarts/dist'
+	    }
+	});
+	//加载折线图
+	function reload(dealDateList,sellPriceTotalList,sellTotalNumList){
+		// 使用
+        require(
+            [
+                'echarts',
+                'echarts/chart/line' //使用模块，按需加载
+            ],
+            function (ec) {
+                // 基于准备好的dom，初始化echarts图表
+                var myChart = ec.init(document.getElementById('myChart')); 
+                
+                var option = {
+               		title : {
+               	        text: '数据图'
+               	    },
+               		tooltip : {
+               	        trigger: 'axis'
+               	    },
+               	    legend: {
+               	    	selectedMode:'single',
+               	        data:['销售额','销售量'],
+    					selected: {
+    						'销售量' : false
+    					}
+               	    },
+               	    xAxis : [
+               	        {
+               	            type : 'category',
+               	            boundaryGap : false,
+               	            data : dealDateList
+               	        }
+               	    ],
+               	    yAxis : [
+               	        {
+               	            type : 'value'
+               	        }
+               	    ],
+               	    series : [
+               	        {
+               	            name:'销售额',
+               	            type:'line',
+               	            stack: '总量',
+               	            data:sellPriceTotalList
+               	        },
+               	        {
+               	            name:'销售量',
+               	            type:'line',
+               	            stack: '总量',
+               	            data:sellTotalNumList
+               	        }
+               	    ]
+                };
+        
+                // 为echarts对象加载数据 
+                myChart.setOption(option); 
+            }
+        );
+		
+	}
+	
+	//点击图片获取图片详细信息
+	function getItemInfo(itemId,itemName){
+	var startDate = $("#startDate").val();
+	var endDate = $("#endDate").val();
+	//修改商品名称
+	$("#itemNameDiv").html('当前商品 -->  商品名称：'+itemName);
+	$("#itemName").val(itemName)
+		curItemId = itemId;
+		$.ajax({
+    		url: "$request.getContextPath()/salesAnalysis/getItemSKUByItemId",
+    		type:"post",
+    		data:{
+    			itemId:itemId,
+				startDate:startDate,
+				endDate:endDate
+    		},
+    		dataType: "json",
+    		success:function(data){
+				$("#skuDiv").empty();
+				var tradeInventoryOutDTOList = data.tradeInventoryOutDTOList;
+				for(var i = 0; i< tradeInventoryOutDTOList.length ; i++){
+					var tradeInventoryOutDTO = tradeInventoryOutDTOList[i];
+					if(i==0){
+						$("#skuId").val(tradeInventoryOutDTO.skuId);
+						var newHtml = '<span class="press_classes po_re border-8 js_attr" id="'+tradeInventoryOutDTO.skuId+'" onclick="selectSKU('+tradeInventoryOutDTO.skuId+')">';
+						for(var j = 0 ; j < tradeInventoryOutDTO.itemAttr.length ; j++){
+    						var itemAttr = tradeInventoryOutDTO.itemAttr[j];
+							newHtml = newHtml + itemAttr.name + '：';
+    						for(var k = 0 ; k < itemAttr.values.length ; k++){
+    							var itemAttrValues = itemAttr.values[k];
+								newHtml = newHtml + itemAttrValues.name + '</br>';
+    						}
+    					}
+						newHtml = newHtml + '</span>';
+						$("#skuDiv").append(newHtml);
+					}else{
+						var newHtml = '<span class="press_classes po_re border-13 js_attr" id="'+tradeInventoryOutDTO.skuId+'" onclick="selectSKU('+tradeInventoryOutDTO.skuId+')">';
+						for(var j = 0 ; j < tradeInventoryOutDTO.itemAttr.length ; j++){
+    						var itemAttr = tradeInventoryOutDTO.itemAttr[j];
+							newHtml = newHtml + itemAttr.name + '：';
+    						for(var k = 0 ; k < itemAttr.values.length ; k++){
+    							var itemAttrValues = itemAttr.values[k];
+								newHtml = newHtml + itemAttrValues.name + '</br>';
+    						}
+    					}
+						newHtml = newHtml + '</span>';
+						$("#skuDiv").append(newHtml);
+					}
+					
+					
+				}
+				//修改折线图数据和列表数据，默认显示第一个sku的数据,data中存有第一个sku的销售额和销售量
+				reload(data.dealDateList,data.sellPriceTotalList,data.sellTotalNumList);
+				//修改列表数据
+				$("#information").empty();
+				var itemSkuSellReportList = data.itemSkuSellReportList;
+				for(var i = 0 ; i < itemSkuSellReportList.length ; i++){
+					var itemSkuSellReport =  itemSkuSellReportList[i];
+					var index = i+1;
+					var newHtml = '<tr><td class="wid_200 font_cen">'+index+'</td>';
+					newHtml = newHtml + '<td class="wid_220 font_cen">'+itemSkuSellReport.dealDate+'</td>';
+					newHtml = newHtml + '<td class="wid_230 font_cen">'+itemSkuSellReport.sellPriceTotalStr+'</td>';
+					newHtml = newHtml + '<td class="wid_230 font_cen">'+itemSkuSellReport.sellTotalNumStr+'</td></tr>';
+					$("#information").append(newHtml);					
+				}
+				//显示分页栏
+				
+				var itemSkuSellReportSize = itemSkuSellReportList.length;
+				$('#pageDiv').empty();
+				var pager = data.pager;
+				var newHtml = '<ul><input id="page" name="page" type="hidden" name="page" value="'+pager.page+'"><li class="lastPage"><a href="javascript:topage(1)">首页</a></li>';
+				newHtml = newHtml + '<li class="lastPage"><a href="javascript:topage('+pager.previewPage+')">上一页</a></li>';
+				
+				if(pager.endPageIndex!=0){
+    				for(var i = 1 ; i <= pager.endPageIndex ; i++){
+    					newHtml = newHtml +'<li>';
+    					if( i == pager.page){
+    						newHtml = newHtml +'<a class="curr" href="javascript:topage('+i+')">';
+    					}else{
+    						newHtml = newHtml +'<a href="javascript:topage('+i+')">';
+    					}
+    					if(pager.pageCode==i){
+    						newHtml = newHtml +'...';
+    					}else{
+    						newHtml = newHtml+i;
+    					}
+    					newHtml = newHtml + '</a></li>';
+    				}
+				}else{
+					newHtml = newHtml + '<li><a class="curr" href="javascript:topage('+pager.page+')">1</a></li>';
+				}
+				newHtml = newHtml + ' <li class="nextPage"><a href="javascript:topage('+pager.nextPage+')">下一页</a></li>';				
+				newHtml = newHtml + '<li class="nextPage"><a href="javascript:topage('+pager.totalPage+')">末页</a></li></ul>';
+				$('#pageDiv').append(newHtml);
+    		}
+    	});
+		
+	};
+	//查看前一个商品
+	function preItem(){
+		if(itemSize == null){
+			return ;
+		}
+		//如果存在隐藏的商品，点击上一个的时候，显示该商品
+		if(fristItemIndex > 1){
+			
+			//隐藏下一个
+			if(lastItemIndex > itemSize){
+				return ;
+			}
+			$("#"+lastItemIndex).attr('style',"display:none");
+			lastItemIndex = lastItemIndex - 1;
+			//显示前一个
+			fristItemIndex = fristItemIndex - 1; 
+			$("#"+fristItemIndex).removeAttr('style');
+			
+		}
+	};
+	//查看后一个商品
+	function nextItem(){
+	
+		if(itemSize == null){
+			return ;
+		}
+		//如果存在隐藏的商品，点击下一个的时候，显示该商品
+		if(lastItemIndex < itemSize){
+			lastItemIndex = lastItemIndex + 1;
+			//显示下一个
+			$("#"+lastItemIndex).removeAttr('style');
+			//隐藏第一个
+			if(fristItemIndex <=0){
+				return ;
+			}
+			$("#"+fristItemIndex).attr('style',"display:none");
+			fristItemIndex = fristItemIndex + 1; 
+		}
+	};
+	
+	function selectSKU(skuId){
+		$("#skuId").val(skuId);
+		$(".border-8").attr("class","press_classes po_re border-13 js_attr");
+		$("#"+skuId).attr("class","press_classes po_re border-8 js_attr");
+		var startDate = $("#startDate").val();
+		var endDate = $("#endDate").val();
+		//选择sku,重新加载折线图
+		$.ajax({
+    		url: "$request.getContextPath()/salesAnalysis/getSKUSellLineById",
+    		type:"post",
+    		data:{
+    			skuId:skuId,
+				startDate:startDate,
+				endDate:endDate
+    		},
+    		dataType: "json",
+    		success:function(data){
+				//重新加载折线图
+				reload(data.dealDateList,data.sellPriceTotalList,data.sellTotalNumList);
+				//重新加载列表数据
+				$("#information").empty();
+				$('#pageDiv').empty();
+				var itemSkuSellReportList = data.itemSkuSellReportList;
+				var pager = data.pager;
+				if(itemSkuSellReportList == null){
+					var newHtml = '<ul><input id="page" name="page" type="hidden" name="page" value="'+pager.page+'"><li class="lastPage"><a href="javascript:topage(1)">首页</a></li>';
+					newHtml = newHtml + '<li class="lastPage"><a href="javascript:topage('+pager.previewPage+')">上一页</a></li>';
+					newHtml = newHtml + '<li><a class="curr" href="javascript:topage('+pager.page+')">1</a></li>';
+					newHtml = newHtml + ' <li class="nextPage"><a href="javascript:topage('+pager.nextPage+')">下一页</a></li>';				
+    				newHtml = newHtml + '<li class="nextPage"><a href="javascript:topage('+pager.totalPage+')">末页</a></li></ul>';
+    				$('#pageDiv').append(newHtml);
+					return ;
+				}
+				for(var i = 0 ; i < itemSkuSellReportList.length ; i++){
+					var itemSkuSellReport =  itemSkuSellReportList[i];
+					var index = i+1;
+					var newHtml = '<tr><td class="wid_200 font_cen">'+index+'</td>';
+					newHtml = newHtml + '<td class="wid_220 font_cen">'+itemSkuSellReport.dealDate+'</td>';
+					newHtml = newHtml + '<td class="wid_230 font_cen">'+itemSkuSellReport.sellPriceTotalStr+'</td>';
+					newHtml = newHtml + '<td class="wid_230 font_cen">'+itemSkuSellReport.sellTotalNumStr+'</td></tr>';
+					$("#information").append(newHtml);					
+				}
+				
+				
+				//显示分页栏
+				
+				var itemSkuSellReportSize = itemSkuSellReportList.length;
+				
+				
+				var newHtml = '<ul><input id="page" name="page" type="hidden" name="page" value="'+pager.page+'"><li class="lastPage"><a href="javascript:topage(1)">首页</a></li>';
+				newHtml = newHtml + '<li class="lastPage"><a href="javascript:topage('+pager.previewPage+')">上一页</a></li>';
+				
+				
+				if(pager.endPageIndex!=0){
+    				for(var i = 1 ; i <= pager.endPageIndex ; i++){
+    					newHtml = newHtml +'<li>';
+    					if( i == pager.page){
+    						newHtml = newHtml +'<a class="curr" href="javascript:topage('+i+')">';
+    					}else{
+    						newHtml = newHtml +'<a href="javascript:topage('+i+')">';
+    					}
+    					if(pager.pageCode/2==i){
+    						newHtml = newHtml +'...';
+    					}else{
+    						newHtml = newHtml+i;
+    					}
+    					newHtml = newHtml + '</a></li>';
+    				}
+				}else{
+					newHtml = newHtml + '<li><a class="curr" href="javascript:topage('+pager.page+')">1</a></li>';
+				}
+				newHtml = newHtml + ' <li class="nextPage"><a href="javascript:topage('+pager.nextPage+')">下一页</a></li>';				
+				newHtml = newHtml + '<li class="nextPage"><a href="javascript:topage('+pager.totalPage+')">末页</a></li></ul>';
+				$('#pageDiv').append(newHtml);
+				
+			}
+		});
+		
+	}
+	//查看商品详情
+	function viewItem(itemId){
+		window.location.href="$request.contextPath/productController/details?id="+itemId;
+	}
+	//导出数据
+function exportExcel(){
+	$("#seachForm").attr('action','$request.contextPath/salesAnalysis/export');
+	$("#seachForm").submit();
+	$("#seachForm").attr('action','$request.contextPath/salesAnalysis/init');
+}
+
+//Form表单提交
+function topage(page){
+	$("#page").val(page);
+	$("#seachForm").submit();
+}
+</script>
+
+<div id="main">
+<!-- left start -->
+<div id="leftSeller" class="border-4"></div>
+<!--left end -->
+
+<!-- right start-->
+<div id="right" class="border-4 bg_06"> 
+<div id="right_bot" class="right_bot">
+		<div class="wid_950 mar hei_40 pad_l10 font_14b">
+			<form id="seachForm" action="$request.contextPath/salesAnalysis/init">
+                <input id="skuId" name="skuId" value="$!{skuId}" type="hidden" ></input>
+				<input type="hidden" name="page" id="page" value="1" />
+				<input id="itemId" name="itemId" value="$!{itemInfo.itemId}" type="hidden" ></input>
+				<input id="itemName" name="itemName" value="$!{itemInfo.itemName}" type="hidden" ></input>
+			商品销售情况
+			<span class="font_name">开始日期：</span><input id="startDate" name="startDate" type="text" value="$!{startDate}" class="wid_80 hei_30 input_Style2 border-4" onclick="WdatePicker({maxDate:'#F{$dp.$D(\'endDate\')||\'%y-%M-%d\'}',dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+			<span class="font_name">结束日期：</span><input id="endDate" name="endDate" type="text" value="$!{endDate}" class="wid_80 hei_30 input_Style2 border-4" onclick="WdatePicker({minDate:'#F{$dp.$D(\'startDate\')}',maxDate: '%y-%M-%d',dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+			<button class="button_1 hei_32">搜索</button>
+			</form>
+		</div>
+	<!-- 买家中心 商品收藏 开始-->
+	<div class="att_con1 att_webwrap bg_06 mar_tb10 border-6">
+		<div class="wid_950 mar hei_30 bg_05 pad_l10 font_14b">商品信息</div>
+		<!--这两个a 里放的是向前滚动，向后滚动的箭头  如果要用这两个箭头  上面div里加 att_webwrap这个样式-->
+		<a class="po_ab  prev" href="javascript:;">
+			<span class="po_ab icon-circle" onclick="preItem()">•<i class="arrow arrowL po_ab"></i></span>
+		</a>
+		<a class="po_ab next " href="javascript:;">
+			<span class="icon-circle" onclick="nextItem()">•<i class="arrow arrowR po_ab"></i></span>
+		</a>
+		
+		#foreach($item in ${itemList})
+				#if($velocityCount<=5)
+					<ul id="$velocityCount" >
+						<li class="att_pro">
+								<a href="javascript:void(0);" class="att_new "><img title="$!item.itemName" src="$!imageServerAddr$!item.pictureUrl" onclick="getItemInfo('$!item.itemId','$!item.itemName')" /></a>
+                            
+								<div class="button_2 hei_40 font_14b" style="margin:20px auto" onclick="viewItem('$!item.itemId')" >进入商品页</div>
+            			</li>
+					</ul>
+				#else
+					<ul id="$velocityCount" style="display:none" >
+    					<li class="att_pro">
+            				<a  href="javascript:void(0);" class="att_new"><img title="$!item.itemName" src="$!imageServerAddr$!item.pictureUrl" onclick="getItemInfo('$!item.itemId','$!item.itemName')" /></a>
+            				<div class="button_2 hei_40 font_14b" style="margin:20px auto" onclick="viewItem('$!item.itemId')" >进入商品页</div>
+            			</li>
+					</ul>
+				#end
+		#end
+		
+		<div class="clear"></div>
+	</div>
+	<div class="mar_l14">
+		<div id="itemNameDiv" class="wid_950 mar hei_30 bg_05 pad_l10 font_14b">当前商品 -->  商品名称：$!{itemName} </div>
+		<div id="skuDiv">
+			#foreach($tradeInventoryOutDTO in ${tradeInventoryOutDTOList} )
+				#if($!{tradeInventoryOutDTO.skuId} == $!{skuId})
+    				<span class="press_classes po_re border-8 js_attr" id="$!{tradeInventoryOutDTO.skuId}" onclick="selectSKU($!{tradeInventoryOutDTO.skuId})">
+    				#foreach($attrSale in ${tradeInventoryOutDTO.itemAttr})
+    					${attrSale.name}
+    					#foreach($attrSaleName in ${attrSale.values})
+    						：${attrSaleName.name}</br>
+    					#end
+    				#end
+    				</span>
+				#else
+					<span class="press_classes po_re border-13 js_attr" id="$!{tradeInventoryOutDTO.skuId}" onclick="selectSKU($!{tradeInventoryOutDTO.skuId})">
+    				#foreach($attrSale in ${tradeInventoryOutDTO.itemAttr})
+    					${attrSale.name}
+    					#foreach($attrSaleName in ${attrSale.values})
+    						：${attrSaleName.name}</br>
+    					#end
+    				#end
+    				</span>
+				#end
+			#end
+		</div>
+		<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+		<div id="myChart" style="height:400px"></div>
+		</br>
+		</br>
+		</br>
+		<!-- 商品列表开头 -->
+		<h3 class="mar_l14 mar_tb10">数据报表 <button type="button" class="button_5 hei_32" onclick="exportExcel()">导出数据</button></h3>
+		<ul class="list_top bg_08 font_cen font_14b">
+			<li class="wid_200">序号</li>
+			<li class="wid_230">日期</li>
+			<li class="wid_230">销售额</li>
+			<li class="wid_230">销售量</li>
+		</ul>
+		<table class="information mar_b10" id="information"><!--单双行变色加bg_05这个样式-->
+    		#foreach($itemSkuSellReport in ${itemSkuSellReportList})
+    			<tr>
+    				<td class="wid_200 font_cen">$velocityCount</td>
+    				<td class="wid_220 font_cen">$!{itemSkuSellReport.dealDate}</td>
+    				<td class="wid_230 font_cen">$!{itemSkuSellReport.sellPriceTotalStr}</td>
+    				<td class="wid_230 font_cen">$!{itemSkuSellReport.sellTotalNumStr}</td>
+    			</tr>
+    		#end
+		</table> 
+		<!--分页数据-->
+            		<div id="pageDiv" class="page">
+	        		    <ul>
+	        		    	<input id="page" name="page" type="hidden" name="page" value="$!pager.page">
+	        		    	<li class="lastPage"><a href="javascript:topage(1)">首页</a></li>
+	        			    <li class="lastPage"><a href="javascript:topage($pager.previewPage)">上一页</a></li>
+							#if($!pager.endPageIndex!=0)
+								#foreach($pageNo in [$!pager.startPageIndex .. $!pager.endPageIndex])
+									<li>
+										<a #if($pageNo==$pager.page) class="curr" #end href="javascript:topage($pageNo)">
+											#if($pager.pageCode==$pageNo)
+												...
+											#else
+												$pageNo
+											#end
+										</a>
+									</li>
+								#end
+							#else
+								<li>
+									<a class="curr" href="javascript:topage($pager.page)">
+										1
+									</a>
+								</li>
+							#end
+	        			    <li class="nextPage"><a href="javascript:topage($pager.nextPage)">下一页</a></li>
+	        			    <li class="nextPage"><a href="javascript:topage($pager.totalPage)">末页</a></li>
+	        		    </ul>
+	        		</div><!--分頁結束 -->
+		<!--<button class="button_2 hei_30 wid_80">返 回</button>-->
+	</div>
+</div>
+</div> 
+<!--id="right" end-->
+</div>

@@ -1,0 +1,127 @@
+#set($layout = "common/blanklayout.vm")
+#set($staticPath="$request.contextPath/assets")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <base href="${request.getContextPath()}/"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>修改密码</title>
+    <link href="assets/css/detail.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="assets/plugin/common/captcha.js"></script>
+    <script type="text/javascript" src="assets\js\jquery-1.11.2.min.js"></script>
+    <script type="text/javascript">
+        var ctx = "$request.contextPath";
+        $(function() {
+
+            //同意协议并注册按钮开始-------------------------------------------------------------------------------------------------------
+            $("#personalBtn").click(function () {
+                //判断是否需要验证手机（后门）
+                if ($("#personalPhoneCaptchaInput").val() != "111111") {
+                    //验证手机
+                    var personalPhoneCaptchaBoolean = checkSynchronizedCaptcha("personalPhoneCaptchaKey", "personalPhoneCaptchaInput", 2, 0);
+                    if (personalPhoneCaptchaBoolean == false) {
+                        return false;
+                    }
+                }
+
+                window.location = "$request.contextPath/person/modifyPwdSuc?loginname="+$('#personalLoginName').val();
+                return false;
+
+            });
+
+
+        });
+        /*验证用户名:唯一*/
+        function checkLogName( loginnameId ){
+            clean();
+            var loginname = $('#'+loginnameId).val();
+            if(loginname.length < 1){
+                $("#mag").html("用户名不能为空！");
+                return false;
+            }
+            var lognameFormat = /^[a-zA-Z0-9]{4,20}$/;
+            if(!lognameFormat.test(loginname)){
+                $("#mag").html("用户名格式不正确！");
+                return false;
+            }
+            var data = {loginname:loginname};
+            $.ajax({
+                url:"$request.contextPath/information/register/getUserInfoByLoginname",
+                type:"post",
+                data:data,
+                dataType: "json",
+                success:function(datas){
+                    clean();
+                    if(datas==null){
+                        $("#mag").html("用户名不存在！");
+                    }else{
+                        if(datas.umobile==null){
+                            $("#mag").html("该用户没有绑定手机号！");
+                        }else{
+                            $("#personalPhoneInput").val(datas.linkPhoneNum);
+                        }
+                    }
+                    return false;
+                }
+            });
+            return false;
+        }
+        function send(){
+            $.ajaxSetup({async : false});
+            var a=checkLogName('personalLoginName');
+            if(a!=null) {
+                sendCaptcha('personalPhoneCaptchaKey', 'sendPersonalPhoneCaptchaButton', 'personalPhoneInput', 2, 2, 0);
+            }
+            return false;
+        }
+        function clean(){
+            $("#mag").html("");
+            $("#personalPhoneInput").val("");
+        }
+        //验证输入的手机号 发送短信
+        function checkIphoneSend(){
+            $("#mag").html("");
+            if($("#personalPhoneInput").val()!=$("#umobile").val()){
+                $("#mag").html("手机号和绑定的号码不相同，请输入正确的手机号！");
+                return false;
+            }else{
+                send();
+                return false;
+            }
+        }
+    </script>
+</head>
+<body >
+#parse("common/common.vm")
+<div id="main" class="po_ab">
+    <!-- 中间内容 -->
+    <form id="personalForm" method="post" >
+        <div class="content" id="wrapper">
+            <div class="hei_100 font_cen wid_100">
+                <img src="assets/images/logo-ke.png"  style="max-width: 100%;max-height: 100%"/>
+            </div>
+            <div class="hei_20 font_1_5 mar_t10 font_cen">印刷家忘记密码</div>
+            <h3 class="hei_20 font_cen"><span id="mag" style="color: #c80000"></span></h3>
+            <ul class="pass mar_cen wid_90">
+                <li><p class="fl wid_15 font_right pad_r10 font_1_2">用户名：</p>
+                    <input type="text" id="personalLoginName" onblur="checkLogName('personalLoginName')" name="loginname" class="input_3 wid_60" placeholder="请输入用户名"/>
+                </li>
+                <li><p class="fl wid_15 font_right pad_r10 font_1_2">手机号：</p>
+                    <input type="text" id="umobile" name="umobile" class="input_3 wid_60" placeholder="请输入绑定的手机号">
+                    <input type="hidden" id="personalPhoneInput"/>
+                </li>
+                <li>
+                    <p class="fl wid_15 font_right pad_r10 font_1_2">验证码：</p>
+                    <input id="personalPhoneCaptchaKey" type="hidden" />
+                    <input type="text" id="personalPhoneCaptchaInput" name="personalPhoneCaptchaInput" class="input_3 wid_40 fl mar_r2" placeholder="输入验证码"/>
+                    <button id="sendPersonalPhoneCaptchaButton" onclick="checkIphoneSend();return false"  class="button_2 fl wid_20 hei_32 pad_lr5">发送验证码</button></li>
+            </ul>
+            <div class="font_cen"><button id="personalBtn" class="button_1 wid_87 hei_32">确  定</button></div>
+        </div><!-- 中间内容 end-->
+    </form>
+</div>
+</body>
+</html>

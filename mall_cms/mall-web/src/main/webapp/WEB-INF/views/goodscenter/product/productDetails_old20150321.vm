@@ -1,0 +1,826 @@
+
+#set($assetsPath="$request.contextPath/assets")
+<link href="$assetsPath/css/basic.css" rel="stylesheet" type="text/css"/>
+<link href="$assetsPath/css/Details.css" rel="stylesheet" type="text/css"/>
+<link href="$assetsPath/mycss/myDetails.css" rel="stylesheet" type="text/css"/>
+<script language="javascript" type="text/javascript" src="$assetsPath/js/tab.js"></script>
+
+<!-- js 扩展的 map 对象 -->
+<script src="$assetsPath/js/goodscenter/map.js"></script>
+<script src="$assetsPath/js/goodscenter/details.js"></script>
+<script src="$assetsPath/js/goodscenter/productDetails.js"></script>
+<input type="hidden" id="contextPath" value="$request.getContextPath()"/>
+<input type="hidden" id="shopId" value="$!item.shopId"/>
+<input type="hidden" id="itemId" value="$!item.itemId"/>
+<input type="hidden" id="sellerId" value="$!item.sellerId"/>
+<input type="hidden" id="itemName" value="$!item.itemName"/>
+<input type="hidden" id="marketPrice" value="$!item.marketPrice"/>
+
+
+<div id="skuInfos" style="display:none;">
+	#foreach( $skuInfos in $!item.skuInfos)
+	<ul>
+		<li class="attributes">$skuInfos.attributes</li>
+		<li class="skuId">$skuInfos.skuId</li>
+		<li class="skuInventory">$skuInfos.skuInventory</li>
+		<li class="skuPicUrl">$skuInfos.skuPicUrl</li>
+		<li class="skuType">$skuInfos.skuType</li>
+	</ul>
+	#end
+</div>
+
+<!--内容开始-->
+<div id="content">
+	<div class="wid_auto mar_tb20 bg_05 pad_tb20 box-shadow1">
+		<div class="wid_1160 bg_06 border-4">
+			<!--面包屑开始-->
+			<div class="mic">
+				#foreach( $cadeOne in $catCascade)
+					<a href="#"><span>$!cadeOne.cname</span></a> > 
+					#foreach( $cadeTwo in $cadeOne.childCats)
+						<a href="#">$!cadeTwo.cname</a> > 
+						#foreach( $cadeThree in $cadeTwo.childCats)
+							<a href="#">$!cadeThree.cname</a> >
+						#end
+					#end
+				#end
+				<a href="#">$!item.itemName</a>
+			</div>
+			<!--面包屑结束-->
+			<!--左侧图片开始-->
+			<div class="left_pic">
+				<div id="vertical" class="bigImg">
+					#foreach( $picUrl in $!item.picUrls) 
+						#if($velocityCount == 1)
+						<img src="$!imageServerAddr$picUrl" width="398" height="398" id="midimg"/>
+						#end
+					#end
+					<div style="display:none;" id="winSelector"></div>
+				</div><!--bigImg end-->
+				
+				<div class="smallImg">
+					<div class="scrollbutton smallImgUp disabled"><i class="fa-angle-left font_20"></i></div>
+					<div id="imageMenu">
+						<!-- $!item.picUrls -->
+						#if($!item.picUrls)
+							<ul>
+							#foreach( $picUrl in $!item.picUrls) 
+								<li><img src="$!imageServerAddr$picUrl"/></li>
+							#end
+							</ul>
+						#else
+						<ul>
+							<li id="onlickImg"><img src="$assetsPath/pic/05.jpg" alt="洋妞"/></li>
+							<li><img src="$assetsPath/pic/02.jpg"  alt="洋妞"/></li>
+							<li><img src="$assetsPath/pic/03.jpg" alt="洋妞"/></li>
+							<li><img src="$assetsPath/pic/04.jpg" alt="洋妞"/></li>
+							<li><img src="$assetsPath/pic/01.jpg"  alt="洋妞"/></li>
+							<li><img src="$assetsPath/pic/06.jpg" alt="洋妞"/></li>
+							<li><img src="$assetsPath/pic/04.jpg" alt="洋妞"/></li>
+						</ul>
+						#end
+					</div>
+					<div class="scrollbutton smallImgDown"><i class="fa-angle-right font_20"></i></div>
+				</div><!--smallImg end-->  
+				<div id="bigView" style="display:none;"><img width="800" height="800" alt="" src="" /></div>
+				<!--下图片下面的分享信息 商品信息 开始 -->
+				<div class="mar_t10">
+					<span class="fl">商品编号：$!item.productId</span>
+					<span class="mar_l10 fr js_favourite">
+						<i class="demo-icons fa-star font_ffd font_14"></i>
+						收藏商品
+					</span>
+				</div>
+				<!--下图片下面的分享信息 商品信息 开始 -->
+			</div><!--left_pic end -->
+		<!--左侧图片结束--> 
+		<!--中间文字购买信息开始-->
+		<div class="mid po_re"> 
+			<div class="mid_tit">$!item.itemName</div>
+			<div class="mid_font1">
+				<ul>
+					<li>
+						<div class="mid_f_left">市&nbsp;场&nbsp;价&nbsp;：</div>
+						<div class="mid_f_right"><del>￥$!item.marketPrice</del></div>
+					</li>
+					<li>
+						<div class="mid_f_left">售&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;价&nbsp;：</div>
+						<div class="mid_f_right">
+							#if($!item.marketPrice2)
+							<strong class="font_fe font_16" >￥$!item.marketPrice2</strong>
+							#else
+							<div id="doAskPrice"  style="margin-left: 5px; color:#005AA0; cursor: pointer;">我要询价</div>
+							#end
+						</div>
+					</li>
+					<li>
+						<div class="mid_f_left">促销信息：</div>
+						<div class="mid_f_right">
+							<div>
+								<em class="manjian">直降</em>
+								<span class="font_fe">已优惠￥27.00 满69.0元即赠热销商品，赠完即止</span>
+								<a href="#" target="_blank">&nbsp;&nbsp;详情 <s class="s-arrow">&gt;&gt;</s></a>
+							</div>
+						</div>
+					</li>
+					<li>
+						<div class="mid_f_left">商品评分：</div>
+						<div class="mid_f_right">
+							<span class="star sa4"></span>
+							<a href="#" style="float:left; color:#005AA0">(已有2202人评价)</a>
+						</div>
+					</li>
+					<li id="distrib" class="mar_tb20">
+						<div class="mid_f_left">配&nbsp;送&nbsp;至&nbsp;：</div>
+						<div class="mid_f_right">
+							<div class="text border-4 js_guanqu cursoe">
+								<span class="js_address">北京朝阳区管庄</span>
+								<b class="fa-angle-down"></b>
+							</div>
+							<div class="store-prompt">
+								<strong>有货</strong><span>，下单后立即发货</span>
+							</div>
+						</div>
+					</li>
+					<li>
+						<div class="mid_f_left">服　　务：</div>
+						<div class="mid_f_right">$!item.afterService </div>
+					</li>
+					#foreach( $attrSale in $!item.attrSale)
+					<li>
+						<div class="mid_f_left attrName_js" name="$attrSale.id:$attrSale.name" >$attrSale.name：</div>
+						<div class="mid_f_right">
+							<!--选中用border-8 的样式 然后加上<b class="po_ab pa_04"></b>标签-->
+							#foreach( $values in $!attrSale.values)
+							<span class="press_classes po_re border-4 js_attr" name="$values.id:$values.name">$values.name</span>
+							#end
+						</div>
+					</li>
+					#end
+					
+				</ul>
+				
+			</div>
+			<!-- mid_font1 end-->
+			<div class="mid_font2 border-4 js_buyList" style="display:none;">
+				<!--标题 开始 -->
+				<!-- <ul class="font_14b bg_05 border-3">
+					<li>品牌</li>
+					<li>单价</li>
+					<li>活动价</li>
+					<li>库存量</li>
+					<li>采购量</li>
+				</ul> -->
+				<!--标题结束 -->
+				<!--内容一行循环一个ul 开始 -->
+				<!-- <ul>
+					<li>北京印刷出版社</li>
+					<li>100.00￥</li>
+					<li>80.00￥</li>
+					<li>100件</li>
+					<li>
+					<div class="wrap-input">
+						<a class="btn-reduce border-4" href="#" onclick="minus(obj)">-</a>
+						<input value="1" class="text border-4" onkeyup="handEntry(obj)">
+						<a class="btn-add border-4" href="#" onclick="plus(obj)">+</a>
+					</div>
+					</li>
+				</ul> -->
+				<!--内容一行循环一个ul end -->
+				
+			</div>
+			<!--mid_font2 end-->
+			<div class="mid_font3 js_buyAll" style="display:none;">
+				<ul>
+					<li>共计<i class="mar_lr10 collectNum_js"></i>件商品</li>
+					<li>总金额：<i class="font_fe font_14b">￥<span class="collectMoney_js"></span></i></li>
+				</ul>
+			</div>
+			<!-- skuId 数量 店铺id 商品Id   shopCart/add?skuId= &quantity= &shopId= shopId-->
+			
+			<div class="mall_button js_addCart" style="display:none;">
+				<a href="javascript:addCart();">
+					<span class="icon"></span>加入进货车
+				</a>
+			</div>
+			<!--中间文字购买信息结束-->
+			
+			
+			
+			<!-- 最右侧的小盒子-->
+			<div class="right_box border-4 box-shadow2">
+				<h3 class="bg_05">商家信息</h3>
+				<ul>
+				<li class="left">服务评价：</li>
+				<li class="right1">
+					<div class="heart-red right_sev heart_icon4"></div><!--服务星级也是 图标heart_icon5，heart_icon4，heart_icon3到0为止 -->
+					<i class="evaluate-grade"><strong title="4.5714"><a href="http://item.jd.com/1029879454.html#none" target="_blank">4.5</a></strong>分</i><s></s>
+				</li>
+				<li class="right3">
+					<div class="list">
+						<ul>
+						<li>评分明细</li>
+						<li>与行业相比</li>
+						<li>描述相符：4.59分</li>
+						<li><div class="b_s"></div>5.67%</li>
+						<li>送货速度：4.59分</li>
+						<li><div class="b_s" ></div>5.67%</li>
+						<li>商品质量：4.59分</li>
+						<li><div class="b_s" ></div>5.67%</li>
+						<li>售后服务：4.59分</li>
+						<li><div class="b_x"></div>5.67%</li>
+						</ul>
+					</div>
+				</li>
+				<li class="left">公司名称：</li>
+				<li class="right1"><a href="$request.getContextPath()/shopItemListIndexController/toIndex?shopId=$!shopInfo.shopId">$!shopInfo.shopName</a></li>
+				<li class="left">所&nbsp;在&nbsp;地&nbsp;：</li>
+				<li class="right1"><a href="#">$!shopInfo.provinceName $!shopInfo.cityName $!shopInfo.districtName $!shopInfo.streetName</a></li>
+				<li class="right2"><a href="$request.getContextPath()/shopItemListIndexController/toIndex?shopId=$!shopInfo.shopId"  style="color:#09F">进入卖家店铺</a></li>
+				</ul>
+			</div>
+			<!-- 最右侧的小盒子-->
+				
+		   </div><!-- 右侧div结束-->
+		</div><!--1160 -->
+    </div><!--1200的外围盒子 -->
+<!--下面内容开始-->
+<div class=" clear"></div>
+<div class="wid">
+ <!--左侧开始-->
+ <div id="left">
+ <!-- 第0个图片开始-->
+ 	<div class="left_box border-4"><img src="$assetsPath/pic/pic22.jpg" width="200" height="400" /></div>
+ <!-- 第0个图片结束-->
+ <!-- 第一个相关分类开始-->
+ 	<div class="left_box border-4">
+        <div class="left_top">相关分类</div>
+        <div class="left_content1">
+            <ul>
+                <li>洗发护发</li><li>洗发护发</li><li>洗发护发</li>
+                <li>洗发护发洗发护</li><li>洗发护发</li><li>洗发护发</li><li>洗发护发</li><li>洗发护发</li><li>洗发护发</li><li>洗发护发</li><li>洗发护发</li><li>洗发护发</li><li>洗发护发</li>
+            </ul>
+         </div>
+    </div>
+ <!-- 第一个相关分结束-->
+ 
+ <!-- 第二个同类其他品牌开始-->
+ 	<div class="left_box border-4">
+        <div class="left_top">同类其他品牌</div>
+        <div class="left_content2">
+            <ul>
+                <li>洗发护发</li><li>洗发护发</li><li>洗发护发</li>
+                <li>洗发护</li><li>洗发护发</li><li>洗发护发</li><li>洗发护发</li><li>洗发护发</li><li>洗发护发</li><li>洗发护发</li><li>洗发护发</li><li>洗发护发</li><li>洗发护发</li>
+            </ul>
+         </div>
+    </div>
+ <!-- 第二个同类其他品牌结束-->
+
+ <!-- 第三个图片开始-->
+ 	<div class="left_box border-4"><img src="$assetsPath/pic/pic23.jpg" width="200" height="100" /></div>
+ <!-- 第三个图片结束-->
+ 
+  <!-- 第四个排行榜开始-->
+ 	<div class="left_box border-4">
+        <div class="left_top">
+        宝贝排行榜</div>
+        <div class="left_content3">
+            <ul>
+            <!--每一个宝贝排行循环li start-->
+               <li class="fore border-6">
+               <span class="icon_1">1</span>
+               <div class="i_img"><a href="#"><img src="$assetsPath/pic/pic24.jpg"/></a></div>
+               <div class="i_font"><a href="#" title="迎驾梅兰竹菊礼盒装500ml*4 ">迎驾梅兰竹菊礼盒装500ml*4 </a><br/><strong class="font_fe">￥32.00</strong></div>
+               </li>
+            <!--每一个宝贝排行循环li end-->
+               <li class="fore border-6">
+               <span class="icon_1">2</span>
+               <div class="i_img"><a href="#"><img src="$assetsPath/pic/pic24.jpg"/></a></div>
+               <div class="i_font"><a href="#" title="迎驾梅兰竹菊礼盒装500ml*4">迎驾梅兰竹菊礼盒装500ml*4 </a><br/><strong class="font_fe">￥32.00</strong></div>
+               </li>
+               <li class="fore border-6">
+               <span class="icon_1">3</span>
+               <div class="i_img"><a href="#"><img src="$assetsPath/pic/pic24.jpg"/></a></div>
+               <div class="i_font"><a href="#" title="52°无一物许燎源设计青瓷坛2013">52°无一物许燎源设计青瓷坛2013</a><br/><strong class="font_fe">￥32.00</strong></div>
+               </li>
+               <li class="fore border-6">
+               <span class="icon_2">4</span>
+               <div class="i_img"><a href="#"><img src="$assetsPath/pic/pic24.jpg"/></a></div>
+               <div class="i_font"><a href="#" title="60°大清猎酒烧酒2500ml">60°大清猎酒烧酒2500ml </a><br/><strong class="font_fe">￥32.00</strong></div>
+               </li>
+               <li class="fore border-6">
+               <span class="icon_2">5</span>
+               <div class="i_img"><a href="#"><img src="$assetsPath/pic/pic24.jpg"/></a></div>
+               <div class="i_font"><a href="#" title="52°五粮液美酒贵宾级（二）500ml">52°五粮液美酒贵宾级（二）500ml</a><br/><strong class="font_fe">￥32.00</strong></div>
+               </li>
+            </ul>
+         </div>
+    </div>
+ <!-- 第四个排行榜结束-->
+ 
+ <!-- 第五个图片开始-->
+ 	<div class="left_box border-4"><img src="$assetsPath/pic/pic21.jpg" width="200" height="360" /></div>
+ <!-- 第五个图片结束-->
+  <!-- 第6个还购买过开始-->
+ 	<div class="left_box border-4">
+        <div class="left_top">
+        看过本商品的用户还购买过</div>
+        <div class="left_content3">
+            <ul>
+            <!--每一个产品循环li开始-->
+               <li class="fore border-5">
+               <div class="b_img"><a href="#"><img src="$assetsPath/pic/pic25.jpg"/></a></div>
+               <div class="b_font"><a href="#">迎驾梅兰竹菊礼盒装500ml*4 </a><br/><strong class="font_fe">￥32.00</strong></div>
+               <div class="Add_cart"><a href="#">加入购物车</a></div>
+               </li>
+            <!--每一个产品循环li结束-->
+            <!--每一个产品循环li开始-->
+               <li class="fore border-5">
+               <div class="b_img"><a href="#"><img src="$assetsPath/pic/pic25.jpg"/></a></div>
+               <div class="b_font"><a href="#">迎驾梅兰竹菊礼盒装500ml*4 </a><br/><strong class="font_fe">￥32.00</strong></div>
+               <div class="Add_cart"><a href="#">加入购物车</a></div>
+               </li>
+            <!--每一个产品循环li结束-->
+            <!--每一个产品循环li开始-->
+               <li class="fore border-5">
+               <div class="b_img"><a href="#"><img src="$assetsPath/pic/pic25.jpg"/></a></div>
+               <div class="b_font"><a href="#">迎驾梅兰竹菊礼盒装500ml*4 </a><br/><strong class="font_fe">￥32.00</strong></div>
+               <div class="Add_cart"><a href="#">加入购物车</a></div>
+               </li>
+            <!--每一个产品循环li结束-->
+            </ul>
+         </div>
+    </div>
+ <!-- 第6个还购买过结束-->
+ </div>
+ <!--左侧结束-->
+
+ <!-- 右侧开始-->
+ <div id="right">
+ <!--tabs开始-->
+          <div class="nTab">
+            <!-- 标题开始 -->
+            <div class="TabTitle">
+              <ul id="myTab0">
+                <li class="active" onclick="nTabs(this,0);">商品介绍</li>
+                <li class="normal" onclick="nTabs(this,1);">规格说明</li>
+                <li class="normal" onclick="nTabs(this,2);">包装清单</li>
+                <li class="normal" onclick="nTabs(this,3);">商品评价</li>
+                <li class="normal" onclick="nTabs(this,4);">售后保障</li>
+              </ul>
+            </div>
+            <!-- 内容开始 -->
+            <div class="TabContent">
+                        <!-- 商品介绍下的内容开始 -->
+				<div id="myTab0_Content0">
+				<ul>
+					<li class="nTab_list wid_300">商品名称：$!item.itemName</li>
+					<li class="nTab_list wid_300">商品编号：$!item.productId</li>
+					<li class="nTab_list wid_300">店铺：$!item.shopId</li>
+					<li class="nTab_list wid_300">上架时间：$!item.listtingTime</li>
+					<li class="nTab_list wid_300">商品毛重：$!item.weight</li>
+					<li class="nTab_list wid_300">商品产地：$!item.origin</li>
+				</ul>
+              </div>
+                 <!-- 规格说明下的内容开始 -->
+              <div id="myTab0_Content1" class="none">
+                $!item.describeUrl
+                
+              </div>
+                 <!-- 包装清单下的内容开始 -->
+              <div id="myTab0_Content2" class="none">
+               $!item.packingList
+              </div>
+                 <!-- 商品评价下的内容开始 -->
+              <div id="myTab0_Content3" class="none">
+                  <div class="pingjia_box">
+                <div class="pingjia">
+                        	<div class="tx"><img src="$assetsPath/images/tx.jpg" width="54" height="54" /></div>
+                    </div>
+                        <div class="pingjia_con">
+                        	<div class="co_1"><span class="star sa4"></span><span class="time">2013-09-06 11:29</span></div>
+                            <div class="co_2">
+                            	<div class="left">心得：</div>
+                                <div class="right">东西还没用，不知道好不好，好评是给快递小哥的，快递小哥人很好，一直等到我回家，将商品送到我手中。还有不好的就是，我下单的时候让我选择时间，我选择的是当天19点至22点，但未及时送货，直到第二天才送到，造成我不小的麻烦（要送人的），我认为既然你们送不到就不要再出现这个时间段了，你们的系统需要好好地重现做一下，为顾客提供方便与实效，再这样下去，肯定会给京东造成不好的影响。最后再次感谢快递</div>
+                            </div>
+                            <div class="co_2">
+                            	<div class="left">购买日期：</div>
+                                <div class="right">2013-09-04</div>
+                            </div>
+                            <div class="co_3">
+                            	<div class="button">有用(0)</div>
+                                <div class="button">回复(0)</div>
+
+                            </div>
+                        </div>
+                   </div>
+              </div>
+                 <!-- 售后保障下的内容开始 -->
+              <div id="myTab0_Content4" class="none">
+				$!item.afterService
+              </div>
+            </div>
+          </div>
+    <!--tabs结束-->
+    <div class="clear"></div>
+    <!--下面图片内容开始-->
+    <div  class="right_pic">
+		$!item.describeUrl
+		<!--图片的宽度不能超过990px -->
+       <!-- <img src="$assetsPath/pic/pic18.jpg"  class="img_l" />
+       <img src="$assetsPath/pic/pic19.jpg"  class="img_r"/>
+       <img src="$assetsPath/pic/pic20.jpg" class="img_l"/> -->
+    </div>
+	<!--下面图片内容结束-->
+
+    <!--tabs开始-->
+    <div class="nTab">
+            <!-- 标题开始 -->
+            <div class="TabTitle">
+              <ul id="consult">
+                <li class="active" onclick="nTabs(this,0);">全部购买咨询</li>
+                <span class="button_small fr">发表咨询</span>
+              </ul>
+            </div><!--TabTitle end -->
+            <!-- 内容开始 -->
+            <div class="TabContent">
+                  <!-- 全部购买咨询 的内容开始 -->
+                  <div id="consult_Content0">
+                    <p><b>温馨提示</b>：因厂家更改产品包装、产地或者更换随机附件等没有任何提前通知，且每位咨询者购买情况、提问时间等不同，为此以下回复仅对提问者3天内有效，其他网友仅供参考！若由此给您带来不便请多多谅解，谢谢！</p>
+                      <!-- 每一行 循环dl 开始-->
+                      <ul>
+                      <!--每一组提问就一个LI 开始 -->
+                        <li class="border-5 mar_tb10">
+                          <dl >
+                               <dt >网　　友：</dt>
+                               <dd >请问这个台灯是几瓦的</dd>
+                          </dl>
+                      <!-- 每一行 循环dl end-->
+                      <!-- 每一行 循环dl 开始-->
+                          <dl>
+                               <dt >咨询内容：</dt>
+                               <dd >金秋风暴新飞卫浴全铜主体淋浴花洒柱套装...</dd>
+                          </dl>
+                      <!-- 每一行 循环dl end-->
+                      <!-- 每一行 循环dl 开始-->
+                          <dl class="font_65">
+                               <dt >科印回复：</dt>
+                               <dd >您好！vx2452能支持XP系统，显示器主要还是和显卡关系比较大，一般性的系统都支持。感谢您对京东的支持！祝您购物愉快！
+                                    <span class="fr font_c7">2015-01-14 10:53:13</span>
+                               </dd>
+                          </dl>
+                      </li>
+                      <!--每一组提问就一个LI end -->
+                      <!--每一组提问就一个LI 开始 -->
+                        <li class="border-5 mar_tb10">
+                          <dl >
+                               <dt >网　　友：</dt>
+                               <dd >请问这个台灯是几瓦的</dd>
+                          </dl>
+                      <!-- 每一行 循环dl end-->
+                      <!-- 每一行 循环dl 开始-->
+                          <dl>
+                               <dt >咨询内容：</dt>
+                               <dd >金秋风暴新飞卫浴全铜主体淋浴花洒柱套装...</dd>
+                          </dl>
+                      <!-- 每一行 循环dl end-->
+                      <!-- 每一行 循环dl 开始-->
+                          <dl class="font_65">
+                               <dt >科印回复：</dt>
+                               <dd >您好！vx2452能支持XP系统，显示器主要还是和显卡关系比较大，一般性的系统都支持。感谢您对京东的支持！祝您购物愉快！
+                                    <span class="fr font_c7">2015-01-14 10:53:13</span>
+                               </dd>
+                          </dl>
+                          <!-- 每一行 循环dl end-->
+                      </li>
+                      <!--每一组提问就一个LI end -->
+                      <div class="clear"></div>
+                      <p>
+                      购买之前，如有问题，请<a href="#" class="font_fe">[发表咨询]</a> 
+                      <i class="fr"><a href="#" >共6条   浏览所有咨询信息>></a></i>
+                      </p>
+                      </ul>
+                  </div><!-- consult0_Content0 end-->
+                  <!-- 商品咨询 的内容开始 -->
+                  <div id="consult_Content1" class="none">
+                    <p><b>温馨提示:</b>因厂家更改产品包装、产地或者更换随机附件等没有任何提前通知，且每位咨询者购买情况、提问时间等不同，为此以下回复仅对提问者3天内有效，其他网友仅供参考！若由此给您带来不便请多多谅解，谢谢！</p>
+                  <!-- 每一行 循环dl 开始-->
+                  <ul>
+                  <!--每一组提问就一个LI 开始 -->
+                    <li class="border-5 mar_tb10">
+                      <dl >
+                           <dt >网　　友：</dt>
+                           <dd >请问这个台灯是几瓦的</dd>
+                      </dl>
+                  <!-- 每一行 循环dl end-->
+                  <!-- 每一行 循环dl 开始-->
+                      <dl>
+                           <dt >咨询内容：</dt>
+                           <dd >金秋风暴新飞卫浴全铜主体淋浴花洒柱套装...</dd>
+                      </dl>
+                  <!-- 每一行 循环dl end-->
+                  <!-- 每一行 循环dl 开始-->
+                      <dl class="font_65">
+                           <dt >科印回复：</dt>
+                           <dd >您好！vx2452能支持XP系统，显示器主要还是和显卡关系比较大，一般性的系统都支持。感谢您对京东的支持！祝您购物愉快！
+                                <span class="fr font_c7">2015-01-14 10:53:13</span>
+                           </dd>
+                      </dl>
+                  </li>
+                  <!--每一组提问就一个LI end -->
+                  <!--每一组提问就一个LI 开始 -->
+                    <li class="border-5 mar_tb10">
+                      <dl >
+                           <dt >网　　友：</dt>
+                           <dd >请问这个台灯是几瓦的</dd>
+                      </dl>
+                  <!-- 每一行 循环dl end-->
+                  <!-- 每一行 循环dl 开始-->
+                      <dl>
+                           <dt >咨询内容：</dt>
+                           <dd >金秋风暴新飞卫浴全铜主体淋浴花洒柱套装...</dd>
+                      </dl>
+                  <!-- 每一行 循环dl end-->
+                  <!-- 每一行 循环dl 开始-->
+                      <dl class="font_65">
+                           <dt >科印回复：</dt>
+                           <dd >您好！vx2452能支持XP系统，显示器主要还是和显卡关系比较大，一般性的系统都支持。感谢您对京东的支持！祝您购物愉快！
+                                <span class="fr font_c7">2015-01-14 10:53:13</span>
+                           </dd>
+                      </dl>
+                      <!-- 每一行 循环dl end-->
+                  </li>
+                  <!--每一组提问就一个LI end -->
+                  <div class="clear"></div>
+                  <p>
+                  购买之前，如有问题，请<a href="#" class="font_fe">[发表咨询]</a> 
+                  <i class="fr"><a href="#" >共6条   浏览所有咨询信息>></a></i>
+                  </p>
+                  </ul>              
+                  </div><!-- consult0_Content1 end-->
+                  <!-- 库存配送 的内容开始 -->
+                  <div id="consult_Content2" class="none">
+                    <p><b>温馨提示:</b>因厂家更改产品包装、产地或者更换随机附件等没有任何提前通知，且每位咨询者购买情况、提问时间等不同，为此以下回复仅对提问者3天内有效，其他网友仅供参考！若由此给您带来不便请多多谅解，谢谢！</p>
+                  <!-- 每一行 循环dl 开始-->
+                  <ul>
+                  <!--每一组提问就一个LI 开始 -->
+                    <li class="border-5 mar_tb10">
+                      <dl >
+                           <dt >网　　友：</dt>
+                           <dd >请问这个台灯是几瓦的</dd>
+                      </dl>
+                  <!-- 每一行 循环dl end-->
+                  <!-- 每一行 循环dl 开始-->
+                      <dl>
+                           <dt >咨询内容：</dt>
+                           <dd >金秋风暴新飞卫浴全铜主体淋浴花洒柱套装...</dd>
+                      </dl>
+                  <!-- 每一行 循环dl end-->
+                  <!-- 每一行 循环dl 开始-->
+                      <dl class="font_65">
+                           <dt >科印回复：</dt>
+                           <dd >您好！vx2452能支持XP系统，显示器主要还是和显卡关系比较大，一般性的系统都支持。感谢您对京东的支持！祝您购物愉快！
+                                <span class="fr font_c7">2015-01-14 10:53:13</span>
+                           </dd>
+                      </dl>
+                  </li>
+                  <!--每一组提问就一个LI end -->
+                  <!--每一组提问就一个LI 开始 -->
+                    <li class="border-5 mar_tb10">
+                      <dl >
+                           <dt >网　　友：</dt>
+                           <dd >请问这个台灯是几瓦的</dd>
+                      </dl>
+                  <!-- 每一行 循环dl end-->
+                  <!-- 每一行 循环dl 开始-->
+                      <dl>
+                           <dt >咨询内容：</dt>
+                           <dd >金秋风暴新飞卫浴全铜主体淋浴花洒柱套装...</dd>
+                      </dl>
+                  <!-- 每一行 循环dl end-->
+                  <!-- 每一行 循环dl 开始-->
+                      <dl class="font_65">
+                           <dt >科印回复：</dt>
+                           <dd >您好！vx2452能支持XP系统，显示器主要还是和显卡关系比较大，一般性的系统都支持。感谢您对京东的支持！祝您购物愉快！
+                                <span class="fr font_c7">2015-01-14 10:53:13</span>
+                           </dd>
+                      </dl>
+                      <!-- 每一行 循环dl end-->
+                  </li>
+                  <!--每一组提问就一个LI end -->
+                  <div class="clear"></div>
+                  <p>
+                  购买之前，如有问题，请<a href="#" class="font_fe">[发表咨询]</a> 
+                  <i class="fr"><a href="#" >共6条   浏览所有咨询信息>></a></i>
+                  </p>
+                  </ul>              
+                  </div><!-- consult0_Content1 end-->
+                  <!-- 支付 的内容开始 -->
+                  <div id="consult_Content3" class="none">
+                    <p><b>温馨提示:</b>因厂家更改产品包装、产地或者更换随机附件等没有任何提前通知，且每位咨询者购买情况、提问时间等不同，为此以下回复仅对提问者3天内有效，其他网友仅供参考！若由此给您带来不便请多多谅解，谢谢！</p>
+                      <!-- 每一行 循环dl 开始-->
+                      <ul>
+                      <!--每一组提问就一个LI 开始 -->
+                        <li class="border-5 mar_tb10">
+                          <dl >
+                               <dt >网　　友：</dt>
+                               <dd >请问这个台灯是几瓦的</dd>
+                          </dl>
+                      <!-- 每一行 循环dl end-->
+                      <!-- 每一行 循环dl 开始-->
+                          <dl>
+                               <dt >咨询内容：</dt>
+                               <dd >金秋风暴新飞卫浴全铜主体淋浴花洒柱套装...</dd>
+                          </dl>
+                      <!-- 每一行 循环dl end-->
+                      <!-- 每一行 循环dl 开始-->
+                          <dl class="font_65">
+                               <dt >科印回复：</dt>
+                               <dd >您好！vx2452能支持XP系统，显示器主要还是和显卡关系比较大，一般性的系统都支持。感谢您对京东的支持！祝您购物愉快！
+                                    <span class="fr font_c7">2015-01-14 10:53:13</span>
+                               </dd>
+                          </dl>
+                      </li>
+                      <!--每一组提问就一个LI end -->
+                      <!--每一组提问就一个LI 开始 -->
+                        <li class="border-5 mar_tb10">
+                          <dl >
+                               <dt >网　　友：</dt>
+                               <dd >请问这个台灯是几瓦的</dd>
+                          </dl>
+                      <!-- 每一行 循环dl end-->
+                      <!-- 每一行 循环dl 开始-->
+                          <dl>
+                               <dt >咨询内容：</dt>
+                               <dd >金秋风暴新飞卫浴全铜主体淋浴花洒柱套装...</dd>
+                          </dl>
+                      <!-- 每一行 循环dl end-->
+                      <!-- 每一行 循环dl 开始-->
+                          <dl class="font_65">
+                               <dt >科印回复：</dt>
+                               <dd >您好！vx2452能支持XP系统，显示器主要还是和显卡关系比较大，一般性的系统都支持。感谢您对京东的支持！祝您购物愉快！
+                                    <span class="fr font_c7">2015-01-14 10:53:13</span>
+                               </dd>
+                          </dl>
+                          <!-- 每一行 循环dl end-->
+                      </li>
+                      <!--每一组提问就一个LI end -->
+                      <div class="clear"></div>
+                      <p>
+                      购买之前，如有问题，请<a href="#" class="font_fe">[发表咨询]</a> 
+                      <i class="fr"><a href="#" >共6条   浏览所有咨询信息>></a></i>
+                      </p>
+                      </ul>              
+                  </div><!-- consult0_Content1 end-->
+                  <!-- 发票保修 的内容开始 -->
+                  <div id="consult_Content4" class="none">
+                    <p><b>温馨提示:</b>因厂家更改产品包装、产地或者更换随机附件等没有任何提前通知，且每位咨询者购买情况、提问时间等不同，为此以下回复仅对提问者3天内有效，其他网友仅供参考！若由此给您带来不便请多多谅解，谢谢！</p>
+                  <!-- 每一行 循环dl 开始-->
+                  <ul>
+                  <!--每一组提问就一个LI 开始 -->
+                    <li class="border-5 mar_tb10">
+                      <dl >
+                           <dt >网　　友：</dt>
+                           <dd >请问这个台灯是几瓦的</dd>
+                      </dl>
+                  <!-- 每一行 循环dl end-->
+                  <!-- 每一行 循环dl 开始-->
+                      <dl>
+                           <dt >咨询内容：</dt>
+                           <dd >金秋风暴新飞卫浴全铜主体淋浴花洒柱套装...</dd>
+                      </dl>
+                  <!-- 每一行 循环dl end-->
+                  <!-- 每一行 循环dl 开始-->
+                      <dl class="font_65">
+                           <dt >科印回复：</dt>
+                           <dd >您好！vx2452能支持XP系统，显示器主要还是和显卡关系比较大，一般性的系统都支持。感谢您对京东的支持！祝您购物愉快！
+                                <span class="fr font_c7">2015-01-14 10:53:13</span>
+                           </dd>
+                      </dl>
+                  </li>
+                  <!--每一组提问就一个LI end -->
+                  <!--每一组提问就一个LI 开始 -->
+                    <li class="border-5 mar_tb10">
+                      <dl >
+                           <dt >网　　友：</dt>
+                           <dd >请问这个台灯是几瓦的</dd>
+                      </dl>
+                  <!-- 每一行 循环dl end-->
+                  <!-- 每一行 循环dl 开始-->
+                      <dl>
+                           <dt >咨询内容：</dt>
+                           <dd >金秋风暴新飞卫浴全铜主体淋浴花洒柱套装...</dd>
+                      </dl>
+                  <!-- 每一行 循环dl end-->
+                  <!-- 每一行 循环dl 开始-->
+                      <dl class="font_65">
+                           <dt >科印回复：</dt>
+                           <dd >您好！vx2452能支持XP系统，显示器主要还是和显卡关系比较大，一般性的系统都支持。感谢您对京东的支持！祝您购物愉快！
+                                <span class="fr font_c7">2015-01-14 10:53:13</span>
+                           </dd>
+                      </dl>
+                      <!-- 每一行 循环dl end-->
+                  </li>
+                  <!--每一组提问就一个LI end -->
+                  <div class="clear"></div>
+                  <p>
+                  购买之前，如有问题，请<a href="#" class="font_fe">[发表咨询]</a> 
+                  <i class="fr"><a href="#" >共6条   浏览所有咨询信息>></a></i>
+                  </p>
+                  </ul>              
+                  </div><!--consult0_Content4 end -->
+             </div><!--TabContent end-->
+      </div><!--nTab end--> 
+      <!--tabs结束-->
+    
+    </div><!--id="right" -->
+    </div>
+ <!-- 右侧结束-->
+</div>
+<!--下面内容结束-->
+</div>
+<!--#content end内容结束-->
+<!-- 咨询价格  start-->
+<div id="xunjia" class="po_fai price none " >
+    <div class="po_fai_bg"></div>
+    <div class="po_main pad_t10" >
+    <div class=" hei_32 bg_05 pad_l10 font_14b">
+		<i class="demo-icons fa-times-circle font_16 fr mar_r10 no" style="cursor:pointer;"></i>
+		咨询价格
+	</div>
+    <div class="clear"></div>   
+    <div class="register_content" style="width:500px; height:400px; margin:0;">
+         <p class="hei_30  font_cen">请填入询价信息，以便店家回复!</p>
+          <div class="register_box_mid" style="margin:0;">
+                <dl>
+                    <dt>我的邮箱：</dt>
+                    <dd style="border:none">
+						<input name="email" id="email_xunjia" type="text" value="" class="input_Style2 hei_30 wid_180" />
+                    </dd>
+                </dl>
+             
+                <!--如需增加可循环dl结束-->
+                <dl>
+                    <dt>手机：</dt>
+                    <dd style="border:none">
+						<input name="mobile" id="mobile_xunjia" maxlength="11" type="text" class="input_Style2 wid_180"  />
+                    </dd>
+                </dl>
+                 <dl>
+                    <dt>采购数量：</dt>
+                    <dd style="border:none">
+					<input name="inquiryQty" id="inquiryQty" onkeyup="this.value=this.value.replace(/\D/g,'')" type="text" class="input_Style2 wid_180"/>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>采购说明：</dt>
+                    <dd style="border:none">
+                        <textarea name="comment" id="comment" maxlength="300" class="input_Style2  wid_300 min-hei "></textarea><br>最多不能超过300字
+                    </dd>
+                </dl>
+				
+                <!--如需增加可循环dl结束-->
+                <div class="font_cen">
+                    <button style="margin:0 10px;" class="button_2 hei_40 font_16 js_xunjia">提交</button>
+                    <button style="margin:0 10px;" class="button_3 hei_40 font_16 cancel">取消</button>
+                </div>
+				<div class="font_cen" style="margin-top:10px;">
+					<span style="color:red;" class="errorMsg"></span>
+				</div>
+            </div><!--register_box-->
+    </div>
+    </div>
+</div>
+<!-- 咨询价格  end-->
+<!--选择收货地址开始 -->
+<!--tabs开始-->
+<div class="nTab_address box-shadow1 hide cursor">
+	<!-- 标题开始 -->
+	<div class="TabTitle_address">
+		<ul id="Tabaddress">
+			<li class="active">
+				<span class="js_tabAddress_one">请选择</span>
+				<i class="demo-icons fa-angle-down font_14b"></i>
+			</li>
+			<li class="normal none">
+				<span class="js_tabAddress_two">请选择</span>
+				<i class="demo-icons fa-angle-down"></i>
+			</li>
+		</ul>
+	</div>
+	<!-- 内容开始 -->
+	<div class="TabContent_address">
+		  <!-- 全部购买咨询 的内容开始 -->
+		  <div>
+			<ul id="Tabaddress_Content0">
+				
+			</ul>
+		  </div>
+		  <div class="none" >
+			<ul id="Tabaddress_Content1">
+				
+			</ul>
+		  </div>
+	</div>
+</div>
+<!--tabs end-->

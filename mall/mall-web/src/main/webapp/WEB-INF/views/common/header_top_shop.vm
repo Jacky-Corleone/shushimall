@@ -1,0 +1,185 @@
+#parse("/common/header_top.vm")
+<style type="text/css">
+	.all{left:450px; top:-2px; height:37px;}
+	.shop_man{ z-index: 5; top: 130px; left: 20px;}
+	.mhei_70{min-height: 70px;}
+</style>
+<script>
+	function show_man(){
+		var shop_man=document.getElementById("shop_man"),
+			down=document.getElementById("down");
+			shop_man.style.display="block";
+			var position = $(down).position();//获取相对父元素的偏移
+			$(shop_man).offset({ top: position.top + 20, left: position.left });
+			down.setAttribute("class","fa-angle-up");
+	}
+	function show_man2(){
+		var shop_man=document.getElementById("shop_man"),
+		down=document.getElementById("down");
+		shop_man.style.display="none";
+		down.setAttribute("class","fa-angle-down");
+	}
+	//绑定菜单高亮样式
+	$(function(){
+		//highLightMenu();
+		//搜索店铺商品
+		$("#shopSearch").bind("click",function(){
+			var flag = "$!curMenu";
+			if(flag=="index"){
+				$("#searchForm").attr("action", "$request.getContextPath()/shopItemListIndexController/toListIndex");
+			}else if(flag=="allproduct"){
+				$("#searchForm").attr("action", "$request.getContextPath()/shopItemListIndexController/toListIndex");
+			}
+			$("#searchForm").submit();
+			
+		});
+		
+		//搜索全站商品
+		$("#siteSearch").bind("click",function(){
+			$("#searchForm").attr("action", "$request.getContextPath()/searchController/searchItem");
+			$("#searchForm").submit();
+		});
+		
+		$("#keyword").keydown(function(e){
+			if(e.keyCode==13){
+				$("#shopSearch").trigger("click");
+			}
+		});
+	});
+	//高亮显示当前菜单
+	function highLightMenu(){
+		var highlight = "$!curMenu";
+		if(highlight!=null && highlight!=""){
+			$("#"+highlight).removeClass("font_ff").addClass("focus_li");
+		}
+	}
+	//收藏店铺
+	function addShopFavourite(sellerId,shopId){
+		$.ajax({
+			url: "$request.contextPath/favourite/addShop",
+			type:"post",
+			data:{"sellerId":sellerId,"shopId":shopId},
+			dataType: "json",
+			success: function(data){
+				if(data.success){
+					alert("收藏成功");
+					$("#buttonId").text("已收藏").attr('disabled',true); ;
+				}else{
+					alert("系统繁忙，请稍后再试！");
+				}
+			}
+		});
+	}
+	//绑定店铺信息点击事件
+	$(function(){
+		$("#shopInfoFloat").hide();//隐藏店铺信息小盒子
+		$("#aShopInfo").bind("click",function(){
+			$("#shopInfoFloat").toggle(function(){
+				$("#shopInfoFloat").show();
+			},function(){});
+		});
+	});
+	//进入卖家店铺
+	function toSellerIndex(){
+		window.location.href = "$request.contextPath/shopItemListIndexController/toIndex?shopId=$!shopInfo.shopId";
+	}
+</script>
+<link href="$request.contextPath/assets/css/shopping.css" rel="stylesheet" type="text/css" />
+<script language="javascript" type="text/javascript" src="$staticPath/js/all_classify.js"></script>
+<script language="javascript" type="text/javascript" src="$staticPath/js/adver_main.js"></script>
+<script language="javascript" type="text/javascript" src="$staticPath/js/title_change.js"></script>
+<script language="javascript" type="text/javascript" src="$staticPath/js/js.js"></script>
+<script language="javascript" type="text/javascript" src="$staticPath/js/tab.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<!-- 颜色编辑start -->
+#if($!flag && $!flag=='decorate')
+<div class="color">
+	<!-- 颜色编辑浮右 -->
+	<div class="fr">
+		<!-- 选择色块 -->
+		<div class="fl wid_270">
+			<p class="hei_60 font_ff fl ">选择模板颜色：</p>
+			<ul class="color_list fl">
+				<li class="color_1" color="#E50011"></li>
+				<li class="color_2" color="#6aa532"></li>
+				<li class="color_3" color="#075fcc"></li>
+				<li class="color_4" color="#d4ac4c"></li>
+				<li class="color_5" color="#ea4b87"></li>
+				<li class="color_6" color="#2d2d2d"></li>
+			</ul>
+		</div><!-- 选择色块 -->
+		<!-- 编辑色块 -->
+		<div class="fl wid_400">
+			<p class="hei_60 font_ff fl ">色值：#</p>
+			<div class="mar_t15 fl wid_350">
+				<input type="text" class="input_Style2 wid_60 mar_lr5 kf" id="colorText" />
+				<input type="hidden" id="colorValue" value="$!shopTemplates.color" value="$!shopTemplates.color" />
+				<button class="button_3 hei_30 kf" type="button" id="colorApplyBtn">应用</button>
+				<button class="button_2 hei_30 kf mar_l10" type="button" id="colorSaveBtn">保存</button>
+				<button class="button_5 hei_30 kf mar_l10" type="button" id="decorateExitBtn">退出</button>				
+			</div>
+		</div><!-- 编辑色块 end-->
+	</div><!-- 颜色编辑浮右 end-->
+</div>
+<script type="text/javascript">
+	$(function(){
+		$(".color_list li").bind("click",function(){
+			var color = $(this).attr("color");
+			$("#colorValue").val(color);
+			ShopDecorate.setStyle(color);
+			$("#more_font").attr("style","color:#ffffff;font-weight:100");
+		});
+		
+		$("#colorApplyBtn").bind("click",function(){
+			var color = "#"+$("#colorText").val();
+			if(!ShopDecorate.validColor(color)){
+				return;
+			}
+			$("#colorValue").val(color);
+			ShopDecorate.setStyle(color);
+			$("#more_font").attr("style","color:#ffffff;font-weight:100");
+		});
+		
+		$("#decorateExitBtn").bind("click",function(){
+			ShopDecorate.exit();
+		});
+		
+		$("#colorSaveBtn").bind("click",function(){
+			var templatesId = $("#templatesId").val();
+			var color = $("#colorValue").val();
+			$.post("$request.contextPath/shopItemListIndexController/saveShopDecorate",{templatesId:templatesId,color:color},function(response){
+				if(response.result=='success'){
+					alert("保存成功！");
+					var shopId = $("#shopId").val();
+					window.location.href = "$request.contextPath/shopItemListIndexController/toTempleList";
+				}else{
+					alert("保存失败！");
+				}
+			},"json");
+		});
+	});
+</script>
+#end
+<!-- 颜色编辑 end-->
+<!-- 头部内容start -->
+	<div class="clear"></div>
+    <div id="shop_header">
+    	<div class="left_img" style="margin-top:5px">
+    		<h3 class="font_24 mar_t10 over_ell"  title="$!shopInfo.shopName">
+    			$!shopInfo.shopName
+    		</h3>
+    	</div><!--left_img（放图标或者店铺名字的div） end-->
+        <div class="mid_search">
+            <!--(输入框和搜索按钮)-->
+        	<div class="search po_re mar_t30 fr" >
+        		<form id="searchForm">
+        			<input type="hidden" id="shopId" name="shopId" value="$!shopId" />
+					<input name="keyword" id="keyword" type="text" class="search_input" value="$!keyword" />
+	                <button class="shop_button pa_01 shop_color0 cursor" id="shopSearch" type="button">搜本店</button>
+	                <button class="shop_button search_all shop_color1 cursor" id="siteSearch" type="button">搜全站</button>
+                </form>
+            </div><!--search po_re end (输入框和搜索按钮)-->
+        </div><!--mid_search (包着中间搜索的框)end-->      
+    </div>
+<!-- 头部内容end -->
+   

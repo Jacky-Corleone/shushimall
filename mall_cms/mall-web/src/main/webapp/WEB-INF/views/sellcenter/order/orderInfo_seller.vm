@@ -1,0 +1,416 @@
+#set($assetsPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+#set($itemCount = 0)
+<link href="$assetsPath/css/register.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/jquery-migrate-1.1.0.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.shadow.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.ifixpng.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.fancyzoom.js"></script>
+<!-- 防止重复AJAX -->
+<script type="text/javascript" src="$assetsPath/plugin/common/loadMsg.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$(".js_invoice_cancle").click(function(){
+			$(".js_invoice").hide();
+		});
+		//图片查看
+		$('.po_re_img').fancyzoom({
+			Speed:400,
+			showoverlay:false,
+			imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+		});
+	});
+	// 查看发票
+	function showInvoice(){
+		$(".js_invoice").show();
+	}
+</script>
+<style tyle="text/css">
+	.freight{ width:96%; height:25px;line-height:25px; margin:10px auto; padding:5px 0px;background:#fffdf3;border: 2px solid #f1ddb5;}
+    .freight dl{ width:100%; height:25px; margin:0; border:none;}
+    .freight dd{ width:100%; height:25px;float:right;text-align:right; margin-right:10px;}
+    .freight dd span{ display:inline-block;}
+</style>
+<div id="main">
+<!--中间部分开始-->
+<!--内容流程start-->
+    <!--下面订单信息 start -->
+    <div class="Order_Review border-4">
+		#if($!tradeOrder.state == 6)
+			<h3 class="hei_35 font_20 font_fe"><i class="demo-icons fa-exclamation-triangle"></i>订单已取消</h3>
+		#else
+		<div class="stepflex_order">
+			<!--正在哪个流程就加入 doing 这个样式 -->
+			<dl class="first #if($!tradeOrder.state == 1)doing #elseif($!tradeOrder.state > 1) done #end">
+				<dt class="s-num">1</dt>
+				<dd class="s-text">
+					待付款<s></s><b></b><br/>
+				</dd>
+			</dl>
+			<dl class="normal #if($!tradeOrder.state == 2)doing #elseif($!tradeOrder.state > 2) done #end">
+				<dt class="s-num">2</dt>
+				<dd class="s-text">
+				  #if($!isServiceItem=='1')
+				  	待配送
+				  #else
+				  	待服务
+				  #end
+				<s></s><b></b><br/>
+				</dd>
+			</dl>
+			<dl class="normal #if($!tradeOrder.state == 3)doing #elseif($!tradeOrder.state > 3) done #end">
+				<dt class="s-num">3</dt>
+				<dd class="s-text">
+				  #if($!isServiceItem=='1')
+				  	待收货
+				  #else
+				        待验收
+				  #end
+				<s></s><b></b></dd>
+			</dl>
+			<dl class="normal #if($!tradeOrder.state == 4)doing #elseif($!tradeOrder.state > 4) done #end">
+				<dt class="s-num">4</dt>
+				<dd class="s-text">待评价<s></s><b></b></dd>
+			</dl>
+			<dl class="last #if($!tradeOrder.state == 5)doing#end">
+				<dt class="s-num"><i class="fa-check"></i></dt>
+				<dd class="s-text">完成<s></s><b></b></dd>
+			</dl>
+		</div><!--stepflex end -->
+		#end
+      <div class="pad_l10 bg_05 hei_35 border-9 mar_t10">
+        订单信息
+      </div>
+      <div class="mar_lr20 min-hei border-6 mar_t10">
+        <h4 class="hei_35">收货人信息</h4>
+        <p class="hei_30">收&nbsp&nbsp货&nbsp&nbsp人：$!tradeOrder.name</p>
+        <p class="hei_30 over_ell" title="$!tradeOrder.fullAddress">地&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp址：$!tradeOrder.fullAddress</p>
+        <p class="hei_30">手机号码：$!tradeOrder.mobile</p>
+        <p class="hei_30 mar_b10">固定号码：$!tradeOrder.phone</p>
+      </div>
+      <div class="mar_lr20 min-hei border-6 mar_t10">
+        <h4 class="hei_30">支付及配送方式</h4>
+		<p class="hei_30">支付类型：#if($!tradeOrder.shipmentType == 1)立即支付#elseif($!tradeOrder.shipmentType == 2)延期付款($!tradeOrder.payPeriod天)#end </p>
+        <p class="hei_30">支付方式：#if($!tradeOrder.paymentMethod == 1)个人支付 #elseif($!tradeOrder.paymentMethod == 2)企业支付 #elseif($!tradeOrder.paymentMethod == 3)积分支付#else延期付款 #end </p>
+        <p class="hei_30">付款方式：#if($!tradeOrder.paymentType == 0)支付宝#elseif($!tradeOrder.paymentType == 1)京东支付#elseif($!tradeOrder.paymentType == 2)小印支付/INPAY#elseif($!tradeOrder.paymentType == 3)线下付款#elseif($!tradeOrder.paymentType == 4)支付宝其他银行#elseif($!tradeOrder.paymentType == 5||$!tradeOrder.paymentType == 6)微信支付#elseif($!tradeOrder.paymentType == 7)积分支付#elseif($!tradeOrder.paymentType == 8)银联支付#elseif($!tradeOrder.paymentType == 100)支付宝手机端#elseif($!tradeOrder.paymentType == 101)京东支付手机端#end </p>
+        <p class="hei_30">付款时间：$!date.format('yyyy-MM-dd HH:mm:ss ',$!tradeOrder.paymentTime ) #if($!tradeOrder.paymentTime && $!tradeOrder.paymentType == 2) <a href="javascript:showCiticTrade('$!date.format('yyyyMMdd',$!tradeOrder.paymentTime )','seller')" class="font_65">银行交易回单打印 </a>#end</p>
+        <p class="hei_30">运&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp费：#if($tradeOrder.freight || $tradeOrder.freight==0)￥$!tradeOrder.freight#end</p>
+		<p class="hei_30">优&nbsp&nbsp惠&nbsp&nbsp码：$!tradeOrder.promoCode</p>
+		<p class="hei_30">备&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp注：$!tradeOrder.memo</p>
+		<p class="hei_30">图&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp纸：<a href='$!imageServerAddr$!enclosureUrl' target="_blank">$!enclosureName</a></p>
+      </div>
+	  
+	  #if($!tradeOrder.invoice == 2)
+      <div class="mar_lr20 min-hei border-6 mar_t10">
+        <h4 class="hei_30">普通发票信息</h4>
+		#if(!$invoiceDTO.invoiceTitle)
+			<p class="hei_30"><i id="invoice_tip">发票抬头：$!tradeOrder.invoiceTitle</i></p>
+		#else
+			<p class="hei_30"><i id="invoice_tip">发票抬头：$!invoiceDTO.invoiceTitle</i><!--&nbsp;&nbsp;&nbsp;<a href="javascript:showInvoice()" style="color:#ff0000;">点击查看</a>--></p>
+		#end
+      </div>
+	  #end
+	  #if($!tradeOrder.invoice == 3)
+      <div class="mar_lr20 min-hei border-6 mar_t10">
+        <h4 class="hei_30">增值税发票信息</h4>
+        <p class="hei_30"><i id="invoice_tip">单位名称：$!invoiceDTO.companyName</i>&nbsp;&nbsp;&nbsp;<a href="javascript:showInvoice()" style="color:#ff0000;">点击查看</a></p>
+      </div>
+	  #end
+        <!--订单信息开始 -->
+      <div class="right_top mar_cen">
+      <h4 class="hei_35 wid_950 mar">商品清单</h4>
+          <ul class="list_top bg_08 font_14b wid_950 border-6 mar">
+			  <li class="wid_150 font_cen hei_35">商品编号</li>
+              <li class="wid_150 font_cen hei_35">商品图片</li>
+              <li class="wid_200 font_cen hei_35">商品名称</li>
+              <li class="wid_200 font_cen hei_35">商品属性</li>
+              <li class="wid_150 font_cen hei_35">售价</li>
+              <li class="wid_100 font_cen hei_35">商品数量</li>
+          </ul>
+		  
+         <!--每一笔订单可以循环一下内容 开始-->
+		 #foreach($deliveryType in $!tradeOrder.groupItems.keySet())
+         <div class="wid_950 border-4 mar_cen">
+			<!-- 每一个商品信息 -->
+			#foreach( $item in $!tradeOrder.groupItems.get($deliveryType))
+			<ul class="list_top hei_80 font_14b wid_content">
+                <li class="wid_150 font_cen">
+                  <span>$!item.itemId</span>
+                </li>
+                <li class="wid_150 font_cen">
+					<a href="$request.getContextPath()/productController/details?id=$!item.itemId&skuId=$!item.skuId" target="_blank">
+						<img src="$!imageServerAddr#foreach( $array in $!jsonArray)#if($!array.skuId == $!item.skuId)$!array.skuPicUrl#end#end" width="65" height="40"/>
+					</a>
+                </li>
+                <li class="wid_180 hei_min_80 pad_lr10">
+					<div style="width:180px; padding-bottom:10px; padding-top:30px; text-align:center; ">
+						#foreach( $array in $!jsonArray)
+    						#if($!array.skuId == $!item.skuId)
+    							<a href="$request.getContextPath()/productController/details?id=$!item.itemId&skuId=$!item.skuId" target="_blank" title="$!array.itemName">
+    							$!array.itemName
+    							</a>
+    						#end
+						#end
+                    </div>
+				</li>
+                <li class="wid_180 hei_min_80 pad_lr10">
+					<div style="width:180px; padding-bottom:10px; padding-top:30px; text-align:center;" title="#foreach( $array in $!jsonArray)#if($!array.skuId == $!item.skuId)$!array.itemAttrTitle#end#end">
+						#foreach( $array in $!jsonArray)
+    						#if($!array.skuId == $!item.skuId)
+    							#foreach($itemAttrName in $!array.itemAttr)
+                            		<span>
+                    				    $itemAttrName.name :
+                        				#foreach($itemAttrValue in $itemAttrName.values)
+                        					$itemAttrValue.name 
+            							#end
+            						</span>
+									<br>
+                    			#end
+    						#end
+    					#end
+                    </div>
+				</li>
+				#if($!tradeOrder.paymentMethod == 3)
+					<li class="wid_150 font_cen font_65">$!number.integer($!item.payPrice)积分</li>
+				#else
+					<li class="wid_150 font_cen font_65">￥$!item.payPrice</li>
+				#end
+                <li class="wid_100 font_cen">#set($itemCount =$itemCount + $!item.num)$!item.num</li>
+			</ul>
+			<!-- 套餐单品开始 -->
+			#foreach( $subItem in $!subItemsMap.get($!item.skuId))
+    			<ul class="list_top hei_80 font_14b wid_content bg_09" style="border-bottom:1px dashed #e8e8e8;margin-bottom:0px;min-width:950px">
+                    <li class="wid_150 font_cen">
+                      <span>$!subItem.itemId</span>
+                    </li>
+                    <li class="wid_150 font_cen">
+    					<a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank">
+    						<img src="$!imageServerAddr$!subItem.skuPicUrl" width="65" height="40"/>
+    					</a>
+                    </li>
+                    <li class="wid_180 hei_min_80 pad_lr10">
+    					<div style="width:180px; padding-bottom:10px; padding-top:30px; text-align:center; ">
+    						<a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank" title="$!subItem.itemName">
+    							$!subItem.itemName
+    						</a>
+                        </div>
+    				</li>
+                    <li class="wid_180 hei_min_80 pad_lr10">
+    					<div style="width:180px; padding-bottom:10px; padding-top:30px; text-align:center;" title="">
+    						#foreach($itemAttrName in $!subItem.itemAttr)
+                        		<span>
+                				    $itemAttrName.name :
+                    				#foreach($itemAttrValue in $itemAttrName.values)
+                    					$itemAttrValue.name 
+        							#end
+        						</span>
+    							<br>
+                			#end
+                        </div>
+    				</li>
+    				<li class="wid_150 font_cen font_65">￥$!subItem.skuPrice</li>
+                    <li class="wid_100 font_cen">$!subItem.num</li>
+    			</ul>
+			#end
+			<!-- 套餐单品结束 -->
+			<!-- 增值服务开始 -->
+			#foreach( $subItem in $!valueAddedMap.get($!item.skuId))
+    			<ul class="list_top hei_80 font_14b wid_content bg_09" style="border-bottom:1px dashed #e8e8e8;margin-bottom:0px;min-width:950px">
+                    <li class="wid_150 font_cen">
+                      <span>$!subItem.itemId</span>
+                    </li>
+                    <li class="wid_150 font_cen">
+    					<a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank">
+    						<img src="$!imageServerAddr$!subItem.skuPicUrl" width="65" height="40"/>
+    					</a>
+                    </li>
+                    <li class="wid_180 hei_min_80 pad_lr10">
+    					<div style="width:180px; padding-bottom:10px; padding-top:30px; text-align:center; ">
+    						<a href="$request.getContextPath()/productController/details?id=$!subItem.itemId&skuId=$!subItem.skuId" target="_blank" title="$!subItem.itemName">
+    							$!subItem.itemName
+    						</a>
+                        </div>
+    				</li>
+                    <li class="wid_180 hei_min_80 pad_lr10">
+    					<div style="width:180px; padding-bottom:10px; padding-top:30px; text-align:center;" title="">
+    						#foreach($itemAttrName in $!subItem.itemAttr)
+                        		<span>
+                				    $itemAttrName.name :
+                    				#foreach($itemAttrValue in $itemAttrName.values)
+                    					$itemAttrValue.name 
+        							#end
+        						</span>
+    							<br>
+                			#end
+                        </div>
+    				</li>
+    				<li class="wid_150 font_cen font_65">￥$!subItem.skuPrice</li>
+                    <li class="wid_100 font_cen">$!subItem.num</li>
+    			</ul>
+			#end
+			<!-- 增值服务结束 -->
+			#end
+			<!--每一笔订单可以循环一下内容 结束-->
+			<div class="freight">
+                <dl>
+    				<dd>
+        				<span class="wid_70">运送方式：</span>
+                        <span>#if($deliveryType==1)快递#elseif($deliveryType==2)EMS#elseif($deliveryType==3)平邮#else 快递#end</span>
+    				</dd>
+    			</dl>
+    		</div>
+        </div>
+		#end
+	</div><!--right_bot end -->
+	
+      <div class="Order_Review_bottom">
+			<h2 >
+				<span>共计$itemCount件商品</span>
+				<span class="mar_lr20">商品总金额：#if($tradeOrder.totalPrice || $tradeOrder.totalPrice==0)￥$!tradeOrder.totalPrice#else￥0.00#end</span>
+			</h2>
+			#if($!tradeOrder.discountAmount)
+			<h2 class="font_fe">
+				该订单的折扣金额为$!tradeOrder.discountAmount元，将由舒适100统一与您进行月结。
+			</h2>
+			<h2 class="font_fe">
+				结算周期为买家确认收货并支付本订单货款后的次月。
+			</h2>
+			#end
+			<dl><dt>优惠金额：</dt><dd>#if($tradeOrder.totalDiscount || $tradeOrder.totalDiscount==0)￥$!tradeOrder.totalDiscount #else ￥0.00 #end</dd></dl>
+			<dl><dt>运费金额：</dt><dd>#if($tradeOrder.freight || $tradeOrder.freight==0)￥$!tradeOrder.freight #else ￥0.00 #end</dd></dl>
+			<!--<dl><dt>积分抵扣：</dt><dd>#if($totalIntegralDiscount || $totalIntegralDiscount==0)￥$!totalIntegralDiscount #else ￥0.00 #end</dd></dl>-->
+			<div class="clear"></div>
+			<dl><dt><b>支付金额：</b></dt><dd><i class="font_fe font_14b">
+			#if($!tradeOrder.paymentMethod == 3)
+				$!tradeOrder.integral积分
+			#else
+				￥$!tradeOrder.paymentPrice
+			#end
+			</i></dd></dl>
+      </div>  
+      <div class="clear"></div> 
+    <!--下面订单信息 Order_Review end -->
+</div>
+<!--#main end -->
+
+
+
+<!-- 发票信息 开始-->
+<div class="po_fai moban js_invoice" style="display:none;">
+    <div class="po_fai_bg"></div>
+    <div class="po_main" style="z-index:100">
+    	<div class="hei_32 bg_05 pad_l10 "><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor js_invoice_cancle"></i>发票信息</div>
+		<!--普通发票-->
+		#if($invoiceDTO.invoice==2)
+        <div id="invoice_title">
+			<dl class="wid_500 hei_40 mar_t20 po_re">
+    			<dt class="fl hei_30 wid_100 font_right"><i class="demo-icons font_fs">*</i>发票抬头：</dt>
+    			<dd class="fl hei_30 wid_380">
+    				$!invoiceDTO.invoiceTitle
+    			</dd>
+			</dl>
+			<div class="mar_tb10 mar_r20 font_cen">
+    			<button class="button_5 hei_30 mar_l10 demo-icons js_invoice_cancle">关闭</button>
+    		</div>
+		</div>
+		#end
+		<!--增值税发票-->
+		#if($invoiceDTO.invoice==3)
+		<div id="addedValueTaxInvoice" style="height:350px;overflow-y: auto;">
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right">发票内容：</dt>
+    			<dd class="fl hei_30">
+					<span>明细</span>
+    			</dd>
+			</dl>
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs">*</i>单位名称：</dt>
+    			<dd class="fl hei_30 wid_380">
+    				$!invoiceDTO.companyName
+    			</dd>
+			</dl>
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs">*</i>纳税人识别码：</dt>
+    			<dd class="fl hei_30 wid_380">
+    				$!invoiceDTO.taxpayerCode
+    			</dd>
+			</dl>
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs">*</i>注册地址：</dt>
+    			<dd class="fl hei_30 wid_380">
+    				$!invoiceDTO.registeredAddress
+    			</dd>
+			</dl>
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs">*</i>注册电话：</dt>
+    			<dd class="fl hei_30 wid_380">
+    				$!invoiceDTO.registeredPhone
+    			</dd>
+			</dl>
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs">*</i>开户银行：</dt>
+    			<dd class="fl hei_30 wid_380">
+    				$!invoiceDTO.bankName
+    			</dd>
+			</dl>
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs">*</i>银行账户：</dt>
+    			<dd class="fl hei_30 wid_380">
+    				$!invoiceDTO.bankAccount
+    			</dd>
+			</dl>
+			#foreach( $picUrl in $invoiceDTO.businessLicensePicUrl )
+				<dl class="wid_500 hei_40 mar_t20 po_re">
+        			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs"></i>营业执照：</dt>
+					<dd class="fl hei_30">
+    					<img id="businessLicenseImg$velocityCount" src="$!imageServerAddr$!picUrl"
+                         alt="" width="55" height="55" class="mar_lr10 fl po_re_img" title="点击查看大图">
+					</dd>
+    			</dl>
+			#end
+			#foreach( $picUrl in $invoiceDTO.taxRegistrationCertificatePicUrl )
+				<dl class="wid_500 hei_40 mar_t20 po_re">
+        			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs"></i>税务登记证：</dt>
+					<dd class="fl hei_30">
+    					<img id="taxRegistrationCertificateImg$velocityCount" src="$!imageServerAddr$!picUrl"
+                         alt="" width="55" height="55" class="mar_lr10 fl po_re_img" title="点击查看大图">
+					</dd>
+    			</dl>
+			#end
+			#foreach( $picUrl in $invoiceDTO.generalTaxpayerPicUrl )
+				<dl class="wid_500 hei_40 mar_t20 po_re">
+        			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs"></i>一般纳税人证明：</dt>
+					<dd class="fl hei_30">
+    					<img id="generalTaxpayerImg$velocityCount" src="$!imageServerAddr$!picUrl"
+                         alt="" width="55" height="55" class="mar_lr10 fl po_re_img" title="点击查看大图">
+					</dd>
+    			</dl>
+			#end
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs">*</i>收票人姓名：</dt>
+    			<dd class="fl hei_30 wid_380">
+    				$!invoiceDTO.consigneeName
+    			</dd>
+			</dl>
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs">*</i>收票人手机：</dt>
+    			<dd class="fl hei_30 wid_380">
+    				$!invoiceDTO.consigneeMobile
+    			</dd>
+			</dl>
+			<dl class="wid_500 hei_40 mar_t10 po_re">
+    			<dt class="fl hei_30 wid_110 font_right"><i class="demo-icons font_fs">*</i>收票人地址：</dt>
+                <dd class="fl hei_30 wid_380">
+    				$!invoiceDTO.fullAddress
+				</dd>
+			</dl>
+			<div class="mar_tb10 mar_r20 font_cen">
+    			<button class="button_5 hei_30 mar_l10 demo-icons js_invoice_cancle">关闭</button>
+    		</div>
+			#end
+        </div>
+    </div>
+</div>
+<!-- 发票信息 end -->
+<!-- 弹出层  交易信息列表DIV -->
+#parse("/bank/citic_trade_index.vm")

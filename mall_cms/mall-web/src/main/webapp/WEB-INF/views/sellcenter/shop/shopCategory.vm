@@ -1,0 +1,373 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<style type="text/css">
+.close-con {
+	display: none;
+}
+.demo-icons{
+	cursor:pointer
+}
+</style>
+<script type="text/javascript">
+	var indexHelp = new IndexUtil();
+	$(document).ready(function(){
+		//加载左侧菜单
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+		//给展开收缩按钮绑定事件
+		$("i[name*='iconexpand_']").bind("click",function(){
+			var className = $(this).attr("class");
+			var id = $(this).attr("name").substring($(this).attr("name").lastIndexOf("_")+1);
+			if(className=="fa-caret-right font_14"){
+				expandAll(this, "div[name='expandDiv_"+id+"']");
+			}else{
+				collapseAll(this, "div[name='expandDiv_"+id+"']");
+			}
+		});
+		//鼠标移动到删除图标上时，鼠标图标变为小手，鼠标移开时图标变为光标
+		$("i[class='fa-times demo-icons font_fe']").hover(
+		    function () {
+		        this.style.cursor='hand';
+		    },
+		    function () {
+		        this.style.cursor='pointer';
+		    }
+		);
+		//全部删除
+		$("div[class='Cate_right']").find("button:eq(0)").bind("click",function(){
+			var result = window.confirm("请谨慎操作，确认全部删除吗？");
+			if(result){
+				$.get("$request.contextPath/categoryController/deleteAll",{},function(response){
+                    if(response.result=='success'){
+                        alert("删除成功！");
+                    }else{
+                        alert(response.message);
+                    }
+                    toListPage();
+				},"json");			
+			}
+		});
+		//全部展开
+		$("div[class='Cate_right']").find("button:eq(1)").bind("click",function(){
+			expandAll("i[name*='iconexpand_']", "div[name*='expandDiv_']");
+		});
+		//全部收起
+		$("div[class='Cate_right']").find("button:eq(2)").bind("click",function(){
+			collapseAll("i[name*='iconexpand_']", "div[name*='expandDiv_']");
+		});
+		//是否在首页展示商品
+		$("input[name='homeshow']").bind("click",function(){
+			//需要在首页显示
+			if(this.checked){
+				$.get("$request.contextPath/categoryController/homeShow",{"id":$(this).val()},function(response){
+					if(response.result=='success'){
+						alert("更新成功");
+					}
+				},"json");
+			}else{
+			//不需要在首页显示
+				$.get("$request.contextPath/categoryController/homeNotShow",{"id":$(this).val()},function(response){
+					if(response.result=='success'){
+						alert("更新成功");
+					}
+				},"json");
+			}
+		});
+		
+		//是否展开子分类
+		$("input[name='expand']").bind("click",function(){
+			var expandStatus=2;
+			if(this.checked){
+				expandStatus=1;
+			}
+			
+			$.get("$request.contextPath/categoryController/expand",{"id":$(this).val(),"expand":expandStatus},function(response){
+				if(response.result=='success'){
+					alert("更新成功");
+				}
+			},"json");
+		});
+		
+		
+		//添加新分类
+		$("div[class='Cate_left']").find("button:eq(0)").bind("click",function(){
+			var parentCgIndex = indexHelp.getParentCgIndex();
+			var cghtml = "<ul class='bg_05'>"
+            +"<li class='wid_20'><i class='fa-caret-right font_14'></i></li>"
+            +"<li class='wid_260'>"
+            +" <input value='' name='parentName["+parentCgIndex+"]'  maxlength='200' type='text' class='input_1' /></li>"
+            +" <li class='wid_80'><i class='fa-times demo-icons font_fe' onclick='javascript:$(this).parent().parent().remove()'></i></li>"
+            +"</ul>";
+			$("#enddiv").append(cghtml);
+		});
+		
+		//保存类目
+		$("div[class='Cate_left']").find("button:eq(1)").bind("click",function(){
+			if(!validNull("input[name*='parentName']")){
+				alert("类目名称不能为空！");
+				return;
+			}
+			if(!validNull("input[name*='childCategoryName']")){
+				alert("类目名称不能为空！");
+				return;
+			}
+			$("#saveBtn").loadingMsg();
+			$.post("$request.contextPath/categoryController/saveShopCategory",$("#shopCategoryForm").serializeArray(),function(response){
+				if(response.result=='success'){
+					alert(response.msg);
+					toListPage();
+				}else{
+					alert(response.msg);
+				}
+				$("#saveBtn").hideMsg();
+			},"json");
+		});
+	});
+	
+	/**
+	 * 索引工具函数
+	 */
+	function IndexUtil(){
+		var parentCgIndex = 0;
+		var childCgIndex = 0;
+		return {
+			getParentCgIndex:function(){
+				return parentCgIndex++;
+			},
+			getChildCgIndex:function(){
+				return childCgIndex++;
+			}
+		}
+	}
+	
+	/**
+	 * 添加子分类
+	 */
+	function addChildCategory(ele, parentCid){
+		var childCgIndex = indexHelp.getChildCgIndex();
+		//子分类元素
+		var childEle = "<div class='open-con' name='expandDiv_"+parentCid+"'>"+
+		"<ul class='border-5'>"
+            +"<li class='wid_500'>"
+            +" <input value='' maxlength='200' name='childList["+childCgIndex+"].childCategoryName' type='text' class='input_1' />"
+            +" <input type='hidden' name='childList["+childCgIndex+"].parentCid' value='"+parentCid+"' /></li>"
+            +" <li class='wid_80'><i class='fa-times demo-icons font_fe' onclick='javascript:$(this).parent().parent().parent().remove()'></i></li>"
+        	+"</ul>"
+        +"<div><div class='clear'></div>";
+		
+		//获取父级ul标签
+		var ulEle = $(ele).parent().parent();
+		var lastChilds = ulEle.siblings("div[name='expandDiv_"+parentCid+"']:last");
+		if(lastChilds && lastChilds.length>0){
+			$(childEle).insertAfter(lastChilds.get(0));
+		}else{
+			$(childEle).insertAfter(ulEle);
+		}
+	}
+	
+	//根据提供的jquery表达式查找匹配的类目名称并将名称组装成一个以逗号分割的字符串,如:"类目1,类目2"
+	function buildCname(expr){
+		var cnames = $(expr);
+		var cnamestr = "";
+		for(var i=0; i<cnames.length; i++){
+			var val = cnames[i].value;
+			if($.trim(val)==undefined || val==""){
+				alert("类目名称不能为空！");
+				cnames[i].focus();
+				return;
+			}
+			if(i>0){
+				cnamestr += ",";
+			}
+			cnamestr += val;
+		}
+		return cnamestr;
+	}
+	
+	/**删除*/
+	function deleteShopCategory(cid){
+		var result = window.confirm("确认删除？");
+		if(!result){
+			return;
+		}
+		$.get("$request.contextPath/categoryController/deleteShopCategory",{"id":cid},function(response){
+            if(response.result=='success'){
+                alert("删除成功！");
+            }else{
+                alert(response.message);
+            }
+            toListPage();
+		},"json");
+			
+	}
+	
+	/**检查元素中是否有为空的数据*/
+	function validNull(expr){
+		var cnames = $(expr);
+		for(var i=0; i<cnames.length; i++){
+			var val = cnames[i].value;
+			if($.trim(val)==undefined || val==""){
+				cnames[i].focus();
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**收缩指定选择器的子分类*/
+	function collapseAll(selector1,selector2){
+		$(selector1).removeClass("fa-sort-desc font_14").addClass("fa-caret-right font_14");
+		$(selector2).removeClass("open-con").addClass("close-con");
+	}
+	
+	/**展开指定选择器的子分类*/
+	function expandAll(selector1,selector2){
+		$(selector1).removeClass("fa-caret-right font_14").addClass("fa-sort-desc font_14");
+		$(selector2).removeClass("close-con").addClass("open-con");
+	}
+	
+	/**跳转到列表页面*/
+	function toListPage(){
+		window.location.href = "$request.contextPath/categoryController/tolist";
+	}
+	
+	/**
+	 * 更新店铺类目名称
+	 * val 类目名称
+	 * cid 类目id
+	 */
+	function updateCName(val, cid,parentCid){
+		if(val==null || val==""){
+			alert("类目名称不能为空！");
+			return;
+		}
+		var oldVal = $("#hid_"+cid).val();//原来的类目名称
+		if(val!==oldVal){
+			$.get("$request.contextPath/categoryController/updateCName",{"id":cid,"cname":val,"parentCid":parentCid},function(response){
+				if(response.result=='success'){
+					alert("类目名称修改成功");
+					toListPage();
+				}
+			},"json");		
+		}
+	}
+</script>
+<form method="post" action="" id="shopCategoryForm">
+	<div id="main">
+		<!--中间部分开始-->
+
+		<!-- left start -->
+		<div id="leftSeller"></div>
+		<!--left end -->
+
+		<!--右边部分开始-->
+		<div id="right">
+			<!--头部按钮start -->
+			<div class="Cate_manage">
+				<div class="Cate_left">
+					<button class="button_normal fl" type="button">+添加新分类</button>
+					<button class="button_normal fl" type="button">保存</button>
+				</div>
+				<!--Cate_left-->
+
+				<div class="Cate_right">
+					<button class="button_normal fr" type="button">全部删除</button>
+					<button class="button_normal fr" type="button">全部展开</button>
+					<button class="button_normal fr" type="button">全部收起</button>
+				</div>
+				<!--Cate_right end -->
+			</div>
+			<!--Cate_manage end-->
+			<div class="clear"></div>
+			<!--头部按钮 end -->
+
+			<!--标题部分开始-->
+			<div class="Notice border-4 bg_06 box-shadow1">
+				<!--标题部分 开始-->
+				<ul class="bg_08 font_14b border-3">
+					<li class="wid_20"></li>
+					<li class="wid_260">分类</li>
+					<li class="wid_150">是否在首页展示商品</li>
+					<li class="wid_120">添加子分类</li>
+				<!-- 2015.6.10 去掉子分类
+				 	<li class="wid_120">展开子分类</li>
+				 -->
+					<li class="wid_80">删除</li>
+				</ul>
+				<!--标题 end -->
+				<!--内容1行 单双行变背景色 加class="bg_05"开始 -->
+				#foreach($entity in $categorylist) 
+					#if($entity.parentCid==0)
+						<ul #if($!velocityCount%2 == 1) class="bg_05" #end>
+							<li class="wid_20"><i class="fa-caret-right font_14"
+								name="iconexpand_$entity.cid"></i> <!--正常图标用class="fa-caret-right font_14" 展开图标用class="fa-sort-desc font_14"--></li>
+							<li class="wid_260">$!velocityCount. <input
+								value="$entity.cname"
+								onblur="updateCName(this.value, $entity.cid)" type="text"
+								class="input_1" title="鼠标移开后修改" alt="鼠标移开后修改" /> <!--存储原来的类目名称，用于判断是否修改过--> <input
+								type="text" value="$entity.cname" id="hid_$entity.cid"
+								maxlength="200" />
+							</li>
+							<li class="wid_150">
+								<input name="homeshow" type="checkbox" #if($entity.homeShow==1) checked="checked" #end value="$entity.cid" />
+							</li>
+							<li class="wid_120"><a href="javascript:void(0)"
+								onclick="addChildCategory(this, $entity.cid)">添加子分类</a></li>
+							<!-- 2015.6.10 去掉子分类
+								<li class="wid_120">
+									<input name="expand" type="checkbox" #if($entity.expand==1) checked="checked" #end value="$entity.expand"/>
+								</li>
+							 -->
+							<li class="wid_80"><i class="fa-times demo-icons font_fe"
+								onclick="deleteShopCategory($entity.cid)"></i></li>
+							<!--删除图标 end-->
+						</ul>
+						<!--展开部分-->
+						#if($!entity.childShopCategory.size()>0)
+						<div class="close-con" name="expandDiv_$entity.cid">
+							<!--循环ul是每一个产品 start -->
+							#foreach($entityChild in $!entity.childShopCategory)
+							<ul class="border-5">
+								<li class="wid_500">$velocityCount). <input
+									value="$entityChild.cname" maxlength="200"
+									onblur="updateCName(this.value, $entityChild.cid,$entityChild.parentCid)" type="text"
+									class="input_1" title="鼠标移开后修改" alt="鼠标移开后修改" />
+								</li>
+								<!--存储原来的类目名称，用于判断是否修改过-->
+								<input type="hidden" value="$entityChild.cname"
+									id="hid_$entityChild.cid" />
+								<li class="wid_260">
+									<!-- 2015.6.10 去掉子分类排列图标
+										<i class="icon_space icon_up"></i>
+										<i class="icon_space icon_top_up"></i>
+										<i class="icon_space icon_down"></i>
+										<i class="icon_space icon_bottom_down"></i>
+									 -->
+								</li>
+								<li class="wid_60"><i class="fa-times demo-icons font_fe"
+									onclick="deleteShopCategory($entityChild.cid)"></i></li>
+							</ul>
+							#end
+							<!--循环ul是每一个产品 end -->
+						</div>
+						<div class="clear"></div>
+						#end
+					<!--展开部分结束-->
+					#end 
+				#end
+				<div id="enddiv"></div>
+			</div>
+			<!-- Notice end-->
+			<div class="Cate_manage mar_t20">
+				<div class="Cate_left">
+					<button class="button_normal fl" type="button">+添加新分类</button>
+					<button class="button_normal fl" type="button" loadMsg="正在保存..." id="saveBtn">保存</button> 
+				</div>
+				<!--Cate_left-->
+			</div>
+			<!--id="right" end-->
+			<!--右边部分结束-->
+		</div>
+		<!--#main end -->
+	</div>
+</form>

@@ -1,0 +1,170 @@
+#set($layout = "common/order.vm")
+#foreach($contract in $conInfos)
+   #if($contract.createBy==$register.uid&&($contract.createBy==$contract.printerId||$contract.createBy==$contract.supplierId))
+       <!-- 发货商城 -->
+       <div class="bg_01 pad_mlr5 mar_b10">
+           <div class="hei_32 border_2">
+               <p class="fl over_ell"><span>协议名称：$!contract.contractName</span>
+               </p>
+
+               <p class="fr font_e5">$!statusMap.get($contract.status)</p>
+           </div>
+           <!-- 发货商城 -->
+           <!-- 发货信息 -->
+           <div class="border_2 shop_order pad_tb5">
+               #foreach($contractMat in $contract.contractMatDTOs)
+                   <div class="wid_50 fl shop_order_p">
+                       <p class="fl over_ell">商品编号：
+                           <a href="$request.contextPath/product/toDetail?id=$!{contractMat.get('itemId')}&skuId=$!{contractMat.get('skuId')}">
+                               $!contractMat.get("skuId")
+                           </a>
+                       </p>
+ 						<div class="clear"></div>
+                       <p class="fl over_ell">商品名称：
+                           <a href="$request.contextPath/product/toDetail?id=$!{contractMat.get('itemId')}&skuId=$!{contractMat.get('skuId')}">
+                               $!contractMat.get("itemName")
+                           </a>
+                       </p>
+ 						<div class="clear"></div>
+                       <p class="fl over_ell">商品属性：$!{contractMat.get("salerAttr")}</p>
+                          <div class="clear"></div>
+                              <p class="fl over_ell">协议类型：
+                               #if("1"==$!contract.protocolType)
+                               	单价
+                               #end
+                               #if("2"==$!contract.protocolType)
+                               	数量 ：$!contractMat.get("number")
+                               #end
+                               #if("3"==$!contract.protocolType)
+                               	总价格：￥$!contractMat.get("cost")
+                               #end
+                              </p>
+                       
+                   </div>
+                   <div class="fr lin_24">
+                       <p>￥$!contractMat.get("matPrice")</p>
+                   </div>
+               #end
+               <div class="clear"></div>
+           </div>
+           <!-- 发货信息 -->
+           <p class="hei_34">创建日期：$!date.format('yyyy-MM-dd',$contract.createDate)</p>
+           <!-- 按钮 -->
+           <div class="pad_tb5">
+               <input type="hidden" value="$contract.contractNo">
+               #if("未提交"==$statusMap.get($contract.status))
+                   <button class="button_3 pad_mlr5"
+                           onclick="deleteContract('$contract.id','$contract.contractNo','$contract.contractName')">
+                       删除协议
+                   </button>
+                   <button class="button_3 pad_mlr5"
+                           onclick="modifyContract('$contract.id')">
+                       修改协议
+                   </button>
+                   <button class="button_3 pad_mlr5"
+                           onclick="confirmContract('$contract.id','重新提交')">
+                       提交确认
+                   </button>
+               #end
+               #if("需要审批"==$statusMap.get($contract.status))
+                   <button class="button_3 pad_mlr5"
+                           onclick="deleteContract('$contract.id','$contract.contractNo','$contract.contractName')">
+                       删除协议
+                   </button>
+                   <button class="button_3 pad_mlr5"
+                           onclick="modifyContract('$contract.id')">
+                       修改协议
+                   </button>
+                   <button class="button_3 pad_mlr5"
+                           onclick="approveContract('$contract.id','重新提交')">
+                       提交审批
+                   </button>
+               #end
+               #if("审批驳回"==$statusMap.get($contract.status))
+                   <button class="button_3 pad_mlr5"
+                           onclick="approveContract('$contract.id','重新提交')">提交审批
+                   </button>
+                   <button class="button_3 pad_mlr5"
+                           onclick="modifyContract('$contract.id')">
+                       修改协议
+                   </button>
+               #end
+               #if("确认驳回"==$statusMap.get($contract.status))
+                   <button class="button_3 pad_mlr5"
+                           onclick="confirmContract('$contract.id','重新提交')">提交确认
+                   </button>
+                   <button class="button_3 pad_mlr5"
+                           onclick="modifyContract('$contract.id')">
+                       修改协议
+                   </button>
+               #end
+               #if("待发布"==$statusMap.get($contract.status))
+                   <button class="button_3 pad_mlr5"
+                           onclick="confirmContract('$contract.id','发布')">发布协议
+                   </button>
+               #end
+               #if("协议生效"==$statusMap.get($contract.status))
+                   <button class="button_3 pad_mlr5"
+                           onclick="orderContract('$contract.id')">
+                       协议下单
+                   </button>
+                   <button class="button_3 pad_mlr5"
+                           onclick="modifyContract('$contract.id')">
+                       修改协议
+                   </button>
+               #end
+               #if("协议生效(正在修改)"==$statusMap.get($contract.status))
+                   <button class="button_3 pad_mlr5"
+                           onclick="orderContract('$contract.id')">
+                       协议下单
+                   </button>
+               #end
+               <button class="button_3 pad_mlr5"
+                       onclick="showContractDetail('$contract.id')">
+                   查看详情
+               </button>
+               <div class="clear"></div>
+           </div>
+       </div>
+   #elseif("待确认"==$statusMap.get($contract.status)||"确认驳回"==$statusMap.get($contract.status)||
+       "待发布"==$statusMap.get($contract.status)||"协议生效"==$statusMap.get($contract.status))
+       <!-- 发货商城 -->
+       <div class="bg_01 pad_mlr5 mar_b10">
+           <div class="hei_32 border_2">
+               <p class="fl"><span>协议名称：$!contract.contractName</span>
+               </p>
+
+               <p class="fr font_e5">$!statusMap.get($contract.status)</p>
+           </div>
+           <!-- 发货商城 -->
+           <!-- 发货信息 -->
+           <div class="border_2 shop_order pad_tb5">
+               #foreach($contractMat in $contract.contractMatDTOs)
+                   <div class="wid_50 fl shop_order_p">
+                       <p>商品名称：
+                           <a href="$request.contextPath/product/toDetail?id=$!{contractMat.get('itemId')}&skuId=$!{contractMat.get('skuId')}">
+                               $!contractMat.get("itemName")
+                           </a>
+                       </p>
+
+                       <p>商品属性：$!{contractMat.get("salerAttr")}</p>
+                   </div>
+                   <div class="fr lin_24">
+                       <p>￥$!contractMat.get("matPrice")</p>
+                   </div>
+               #end
+               <div class="clear"></div>
+           </div>
+           <!-- 发货信息 -->
+           <p class="hei_34">创建日期：$!date.format('yyyy-MM-dd',$contract.createDate)</p>
+
+           <div class="pad_tb5">
+               <button class="button_3 pad_mlr5"
+                       onclick="showContractDetail('$contract.id')">
+                    查看详情
+                </button>
+                <div class="clear"></div>
+            </div>
+        </div>
+    #end
+#end

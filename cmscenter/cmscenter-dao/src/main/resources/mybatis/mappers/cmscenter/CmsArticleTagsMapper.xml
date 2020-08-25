@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.cmscenter.dao.CmsArticleTagsDAO">
+	<resultMap id="CmsArtTagMapper" type="com.camelot.cmscenter.dto.CmsArticleTagsDto">
+			<result property="tagid" column="tagid" />
+			<result property="parentid" column="parentid" />
+			<result property="tagname" column="tagname" />
+			<result property="art_seo" column="art_seo" />
+			<result property="pro_seo" column="pro_seo" />
+			<result property="img_seo" column="img_seo" />
+			<result property="type" column="type" />
+			<result property="art_tag" column="art_tag" />
+			<result property="img_tag" column="img_tag" />
+			<result property="pro_nav" column="pro_nav" />
+			<result property="img_nav" column="img_nav" />
+	</resultMap>
+
+	<select id="queryById" resultMap="CmsArtTagMapper" >
+		select * from cms_article_tags where tagid = #{id}
+	</select>
+	
+
+	<select id="queryCount" resultType="long">
+		SELECT
+		count(1)
+		from cms_article_tags
+		<include refid="where_fragement" />
+	</select>
+	<!-- 查询 -->
+	<select id="queryArtTagList" resultMap="CmsArtTagMapper">
+		select *
+		from cms_article_tags
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+
+	<sql id="where_fragement">
+		where 1 = 1
+		<if test="entity.parentid!=null and entity.parentid!=''">
+			and parentid = #{entity.parentid}
+		</if>
+		<if test="entity.tagname!=null and entity.tagname!=''">
+			and tagname = #{entity.tagname}
+		</if>
+		<if test="entity.type!=null and entity.type!=''">
+			and type = #{entity.type}
+		</if>
+		<if test="entity.tagname!=null and entity.tagname!=''">
+			and tagname = #{entity.tagname}
+		</if>
+		<if test="entity.art_tag!=null and entity.art_tag!=''">
+			and art_tag = #{entity.art_tag}
+		</if>
+		<if test="entity.img_tag!=null and entity.img_tag!=''">
+			and img_tag = #{entity.img_tag}
+		</if>
+		<if test="entity.tagidList != null and entity.tagidList.size() > 0 ">
+			AND tagid IN
+			<foreach collection="entity.tagidList" open="(" separator="," close=")" item="item">
+				#{item}
+			</foreach>
+		</if>
+	</sql>
+
+	<sql id="pagination_tail">
+		limit #{page.pageOffset} , #{page.rows}
+	</sql>
+</mapper>

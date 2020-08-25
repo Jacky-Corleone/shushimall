@@ -1,0 +1,72 @@
+#set($layout = "common/order.vm")
+<div class="fr mar_lr5" onclick="showSearchDiv('searchForm0')"><i class="fa-search font_1_2"></i>
+</div>
+<div class="clear"></div>
+<div id="searchForm0" class="none">
+    <form id="contractSearchForm">
+        <ul class="font_t pad_lr5">
+            #if($register.userType==3)
+                <li><a class="wid_25 fl hei_32">印刷厂</a><input name="printerName"
+                                                              class="form-control wid_60 hei_20"
+                                                              onclick="getCompany()"
+                                                              readonly="true"/>
+                </li>
+            #else
+                <li><a class="wid_25 fl hei_32">供应商</a><input name="supplierName"
+                                                              class="form-control wid_60 hei_20"
+                                                              onclick="getCompany()"
+                                                              readonly="true"/>
+                </li>
+            #end
+            <input type="hidden" name="printerId"/>
+            <input type="hidden" name="supplierId"/>
+            <li><a class="wid_25 fl hei_32">物品名称</a><input name="itemName"
+                                                           class="form-control wid_60 hei_20"/></li>
+            <li><a class="wid_25 fl hei_32">合同编号</a><input name="contractNo"
+                                                           class="form-control wid_60 hei_20"/></li>
+        </ul>
+    </form>
+    <div>
+        <button class="button_1 pad_lr5 hei_32 fr" onclick="searchContractInfoByCondition()">协议查询
+        </button>
+    </div>
+    <div class="clear"></div>
+</div>
+<!--协议遍历-->
+<div class="mar_lr5" id="contractList">
+    <!-- 表格 -->
+    #foreach($contract in $conInfos)
+        <!-- 发货商城 -->
+        <div class="hei_32 border_2">
+            <p class="fl"><span>$!contract.contractName</span>
+            </p>
+            <p class="fr font_e5">$!contract.status</p>
+        </div>
+        <!-- 发货商城 -->
+        <!-- 发货信息 -->
+        <div class="border_2 shop_order pad_tb5">
+            #foreach($contractMat in $contract.contractMatDTOs)
+                <p class="wid_69 fl shop_order_p">
+                    $!contractMat.get("itemName")
+                </p>
+
+                <div class="fr lin_24">
+                    <p>￥$!contractMat.get("matPrice")</p>
+                </div>
+            #end
+            <div class="clear"></div>
+        </div>
+        <!-- 发货信息 -->
+        <!-- 按钮 -->
+        <div class="pad_tb5">
+            <input type="hidden" value="$contract.contractNo">
+            <button class="button_3 pad_lr5" onclick="deleteContract('$contract.contractNo')">删除协议
+            </button>
+            <button class="button_3 pad_lr5" onclick="modifyContract('$contract.contractNo')">修改协议</button>
+            <button class="button_3 pad_lr5" onclick="showContractDetail('$contract.contractNo')">
+                查看详情
+            </button>
+            <div class="clear"></div>
+        </div>
+    #end
+</div>

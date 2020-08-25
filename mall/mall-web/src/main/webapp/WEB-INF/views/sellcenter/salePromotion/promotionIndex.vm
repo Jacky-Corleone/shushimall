@@ -1,0 +1,377 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<style type="text/css">
+	.registere_class_hide{
+		display:none;
+	}
+	.org_class_hide{
+		display:none;
+	}
+	.tax_class_hide{
+		display:none;
+	}
+	.bank_class_hide{
+		display:none;
+	}
+</style>
+<script type="text/javascript" src="$staticPath/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="$staticPath/js/common.js"></script>
+<script type="text/javascript">
+	$(function(){
+		//加载左侧菜单
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+		//全部选中和不选功能 
+		//$("#all_select").click(function() {
+        //    $('input[name="itemId"]').attr("checked",this.checked); 
+       // });
+		$("#all_select").click(function() {
+			var flag = $(this).is(":checked"); 
+			$("[name=itemId]:checkbox").each(function() { 
+				$(this).prop("checked", flag); 
+			}) 
+		});
+
+    });
+	function modifyOnlineStatus(promotionId,status){
+		var strIds=new Array();
+		strIds.push(promotionId);
+		var ids=strIds.join(","); 
+		var online_status='';
+		if(status=='1'){
+			online_status='2';
+		}else{
+			online_status='1';
+		}
+		$.ajax({
+			type:'post',
+			url:'$request.contextPath/sellcenter/salePromotion/shelveAll',
+			dataType:'json',
+			data:{
+				ids:ids,
+				status:online_status
+			},
+			success:function(result){
+				alert(result.message);
+				window.location.href="$request.contextPath/sellcenter/salePromotion/promotionIndex?type=$!type"
+			}
+		});
+	}
+	
+	//批量删除
+	function deleteAll(){
+        //声明一个存放id的数组
+        if(confirm("确定删除？")) {
+            var strIds = new Array();
+            var status = '1';
+            var message = "";
+            $("input[name='itemId']").each(function (i, d) {
+                if (d.checked) {
+                    if ($(d).attr("onLineState") == "1" && $(d).attr("status") == "starting") {
+                        message = "活动编码【" + $(d).attr("proCode") + "】和名称【" + $(d).attr("proname") + "】的状态为进行中,不允许删除！";
+                        return;
+                    }
+                    strIds.push(d.value);
+                }
+            })
+            if (message != "") {
+                alert(message);
+                return;
+            }
+            if (strIds.length < 1){
+            	alert("您没有选中项!");
+            	return;
+            }
+            if(strIds.length>=1){
+            	var ids = strIds.join(",");
+            }
+            $.ajax({
+                type: 'post',
+                url: '$request.contextPath/sellcenter/salePromotion/deleteAll',
+                dataType: 'json',
+                data: {
+                    ids: ids
+                },
+                success: function (result) {
+                    if (result) {
+                        alert("批量删除成功！");
+                        window.location.href = "$request.contextPath/sellcenter/salePromotion/promotionIndex?type=$!type"
+                    } else if (result.message) {
+                        alert(result.message);
+                    } else {
+                        alert("批量删除失败！");
+                    }
+                }
+            });
+        }
+	}
+    //查询
+	function topage(page){
+      /*if(isNaN($("#id").val())){
+            alert("促销编号只能输入数字！");
+            return false;
+        }
+     */   
+		$("#searchForm").attr("action", "$request.contextPath/sellcenter/salePromotion/promotionIndex?type=$!type");
+		$("input[name='page']").val(page);
+		$("#searchForm").submit();
+	}
+	//跳转至活动促销（满减或者限时折扣）
+	function addPromotionInfo(type){
+        window.location.href="$request.contextPath/sellcenter/salePromotion/promotionAddSelect?type="+type;
+	}
+
+	//查看促销活动
+	function checkDetail(promotionId,type,isAllItem){
+		window.location.href="$request.contextPath/sellcenter/salePromotion/promotionDetailInfo?id="+promotionId+"&proType="+type+"&isAllItem="+isAllItem;
+	}
+
+	//编辑促销活动
+    function updatePromotion(promotionId,type,isAllItem){
+        window.location.href="$request.contextPath/sellcenter/salePromotion/toAddPromotion?promotionId="+promotionId+"&type="+type+"&isAllItem="+isAllItem;
+	}
+
+	//删除活动
+	function deleteItem(promotionId){
+		//声明一个存放id的数组 
+		if(confirm("确定删除？")){
+			$.ajax({
+				type:'post',
+				url:'$request.contextPath/sellcenter/salePromotion/deletePromotion',
+				dataType:'json',
+				data:{
+					promotionId:promotionId
+				},
+				success:function(result){
+					alert(result.message);
+					window.location.href="$request.contextPath/sellcenter/salePromotion/promotionIndex?type=$!type"
+				}
+			});
+		}else
+			return;
+	}
+	/*function setGoodsOnLineState(id,online_status){
+		$.ajax({
+			type:'post',
+			url:'$request.contextPath/sellcenter/salePromotion/shelveAll',
+			dataType:'json',
+			data:{
+				ids:id,
+				status:online_status
+			},
+			success:function(result){
+				$("#"+id).html("已结束");
+			}
+		});
+	}*/
+
+	//终止活动不允许上架
+    function endPromotion(promotionId,type){
+        //声明一个存放id的数组
+        if(confirm("确定终止？")){
+            $.ajax({
+                type:'post',
+                url:'$request.contextPath/sellcenter/salePromotion/endPromotion',
+                dataType:'json',
+                data:{
+                    promotionId:promotionId
+                },
+                success:function(data){
+                    if(data.result){
+                        alert("终止成功！");
+                        window.location.href="$request.contextPath/sellcenter/salePromotion/promotionIndex?type=$!type"
+                    }else if(data.message){
+                        alert(data.message);
+                    }else{
+                        alert("终止失败!");
+                    }
+                }
+            });
+        }else
+            return;
+	}
+
+    //重置功能
+    function resetAll(formId){
+        $("#"+formId)[0].reset();
+        //优惠下拉框选中值
+//        $("#isEffective").val("");
+    }
+</script>
+<script type="text/javascript" src="$staticPath/plugin/common/newtimer.js"></script>
+<div id="main">
+<!--中间部分开始-->
+
+<!--left start -->
+<div id="leftSeller">
+</div>
+<!--left end -->
+
+<!--右边部分开始-->
+<div id="right">
+<div id="right_top" class="right_top">
+	<form method="post" id="searchForm" action="#">
+		<div class="right_top_l">
+			<ul class="list">
+              #*<li class="wid_220"> 
+                    <span class="font_wid">促销编码：</span><input type="text" name="id"
+					id="id" value="$!promotionInfo.id" class="input_Style2 wid_120 hei_30" onkeyup="numInput(this,0)" maxlength="5" />
+                </li>
+                *#
+				<li class="wid_440 ">
+					<span class="font_wid">促销名称：</span><input class="input_Style2 wid_120 hei_30" name="activityName"
+					id ="activityName" value="$!promotionInfo.activityName" type="text" />
+				</li>
+				<li class="wid_350">
+					<span class="font_wid">促销状态：</span>
+                    <select name="isEffective" id="isEffective" class="input_Style2 wid_114 mar_r10 hei_35">
+						<option value="">全部</option>
+						#foreach($timeStatus in $timeStatus)
+                            <option value="$!timeStatus.status" #if($!promotionInfo.isEffective==$!timeStatus.status) selected = "selected" #end>$!timeStatus.lable</option>
+						#end
+                    </select>
+				</li>
+				<li class="wid_440">
+					<span class="font_wid">创建时间：</span>
+					<input class="input_Style2 wid_120 hei_30" readonly="readonly" type="text" name="createTime"
+					id="createTime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});" value="$!date.format('yyyy-MM-dd ',$!promotionInfo.createTime)"/>
+					<i class="demo-icons">-</i><input class="input_Style2 wid_120 hei_30" name="createEndTime" 
+					id="createEndTime" readonly="readonly" type="text" 
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});" value="$!date.format('yyyy-MM-dd ',$!promotionInfo.createEndTime)"/>				
+				</li>
+				<li class="wid_220 ">
+				<span class="font_wid">活动范围：</span>
+				<select class="input_Style2 hei_30 wid_114" name="isAllItem" id="userTypeId">
+        		<option value="">请选择</option>
+        		<option value="1" #if($!promotionInfo.isAllItem=='1') selected="selected"  #end>全部商品</option>
+        		<option value="2" #if($!promotionInfo.isAllItem=='2') selected="selected"  #end>部分商品</option>
+       	        </select>
+			</li>
+			</ul>
+		</div>
+		<div class="right_top_r ">
+			#*<button type="button" onclick="resetAll('searchForm')" class="button_4 but_cx3">
+				<a class="font_1c hei_24">重 置</a>
+			</button>*#
+            <button type="button" onclick="topage(1)" class="button_4 but_cx3">
+				<a class="font_1c hei_24">查 询</a>
+			</button>		
+		</div>
+		<input type="hidden" name="page" value="$!pager.page" />
+		</form>
+		
+	</div>
+   <!-- right结束 -->
+
+	<div id="right_bot" class="right_bot">
+    <!-- 商品列表开头 -->
+		<div class="right_xinxi mar_l14">
+			
+			<ul class="list_top bg_08 font_14b">
+				<li class="wid_60 font_cen hei_35"><input type="checkbox" class="mar_l10 hei_22"  id="all_select"/>全选</li>
+				<li class="wid_150 font_cen hei_35">促销名称</li>
+				#*<li class="wid_100 font_cen hei_35">促销类型</li>*#
+				<li class="wid_200  hei_35 font_cen">有效期</li>
+				<li class="wid_140 font_cen hei_35">创建时间</li>
+				<li class="wid_150 font_cen hei_35">倒计时</li>
+				<li class="wid_90 font_cen hei_35">状态</li>
+				<li class="wid_80 font_cen hei_35">活动范围</li>
+				<li class="wid_80 font_cen hei_35">操作</li>
+			</ul>
+	      <ul class="right_select">
+	        <li><button type="button" onclick="deleteAll()" class="button_4 mar_l10 hei_24"><a class="font_1c">批量删除</a></button></li>
+	        #*<li><button type="button" onclick="undercarriageAll()" class="button_4 mar_l10 hei_24"><a class="font_1c">批量终止</a></button></li>*#
+	        <span class="fr mar_tb10">
+				#if($!type==2)
+                    <button type="button" onclick="addPromotionInfo('$!type')" class="button_4  hei_24 add_shop"><a class="font_1c">+添加满减促销活动</a></button>
+				#else
+                    <button type="button" onclick="addPromotionInfo('$!type')" class="button_4  hei_24 add_shop"><a class="font_1c">+添加直降活动</a></button>
+				#end
+			</span>
+	      </ul>
+		<table class="information" id="information">
+	      <!-- 类型选择 -->
+      <!-- 商品信息 -->
+      #foreach($goods in $pager.records)
+      <!-- 判断活动所在的状态 -->
+      	#set($isLine="")
+      	#if("$!goods.dateDif"!="end")
+   	  		#if($!goods.onlineState =='3')
+   	  			#set($isLine="$!goods.onlineState")
+   	  		#end
+   	   #end
+      	
+        <tr>
+          <td class="wid_60 border-1 hei_80">
+              <input type="checkbox" class="mar_l10 hei_22" name="itemId"
+          		status="$!goods.dateDif" onLineState="$!goods.onlineState" proCode="$!goods.id" proName="$!goods.activityName" value='$!goods.id' /></td>
+          <td class="wid_160 font_cen border-1" style="word-wrap:break-word;word-break:break-all;">$!goods.activityName</td>
+          #*<td class="wid_100 font_cen border-1">
+			  #if($!goods.type==1)
+			  直降活动
+				  #else
+                      满减
+             #end
+		  </td>*#
+          <td class="wid_200 font_cen border-1">$!date.format('yyyy-MM-dd HH:mm:ss',$!goods.startTime)<br/><i class="mar_lr10">至</i><br/>
+         	 $!date.format('yyyy-MM-dd HH:mm:ss ',$!goods.endTime)</td>
+          <td class="wid_140 font_cen border-1">$!date.format('yyyy-MM-dd HH:mm:ss',$!goods.createTime)</td>
+		  #if($!goods.onlineState !='3')
+				<td class="wid_150 font_cen border-1"  countDown='true'
+				serverTime="$!date.format('yyyy/MM/dd HH:mm:ss ',$!date)"
+				startTime = "$!date.format('yyyy/MM/dd HH:mm:ss',$!goods.startTime)"
+				noStartTip="未开始"
+				endTime="$!date.format('yyyy/MM/dd HH:mm:ss ',$!goods.endTime)"
+				endTip="已结束"
+				> 正在计算时间...
+			  </td>
+			  #elseif($!goods.onlineState =='3')
+                  <td class="wid_110 font_cen border-1">已终止</td>
+		  #end
+          <td class="wid_80 font_cen border-1">
+			<div id='$!goods.id'>
+				#if("$!goods.onlineState" == "1")
+						#if("$!goods.dateDif" == "nostart")
+							未开始
+						#elseif("$!goods.dateDif" == "starting")
+							进行中
+						#elseif("$!goods.dateDif" == "end")
+							已结束
+						#end
+					#else
+					已终止
+				#end
+            </div>
+          </td>	
+          <td class="wid_80 font_cen border-1">
+          #if("$!goods.isAllItem" == "1")
+        	  全部商品
+        	#elseif("$!goods.isAllItem" == "2")
+        	  部分商品
+        	#end
+          </td>
+          <td class="wid_80 font_cen border-1 font_1c">
+              <a onclick="checkDetail('$!goods.id','$!goods.type','$!goods.isAllItem')"  class="cursor">查看</a><br>
+		    #if("$!goods.onlineState" == "1")
+			  #if("$!goods.dateDif" == "nostart")
+				  <a onclick="updatePromotion('$!goods.id','$!goods.type','$!goods.isAllItem')" class="cursor">编辑</a><br>
+				  <a onclick="deleteItem('$!goods.id')" class="cursor">删除</a><br>
+			  #elseif("$!goods.dateDif" == "starting")
+                  <a onclick="endPromotion('$!goods.id','$!goods.type')"  class="cursor">终止</a><br>
+			  #else
+                  <a onclick="deleteItem('$!goods.id')" class="cursor">删除</a><br>
+			  #end
+				#else
+                    <a onclick="deleteItem('$!goods.id')" class="cursor">删除</a><br>
+			  #end
+          </td>
+        </tr>
+       #end 
+      </table>
+        #pageVelocity($pager)
+		</div>
+	</div>
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->
+

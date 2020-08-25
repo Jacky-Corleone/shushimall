@@ -1,0 +1,176 @@
+#set($layout="common/order.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>发票</title>
+
+	#parse("common/scriptAndCss.vm")
+
+<script type="text/javascript">
+    Zepto(function($){
+	    $('#list li a').click( function(){
+// 	        $(this).next('ul').toggle().parent().siblings().find('ul').hide();
+	    	$(this).next('ul').parent().find('ul').show();
+	    });
+	});
+</script>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		//不开发票
+		if('1'==${invoiceType}){
+			$("#"+${invoiceType}).prop("checked",true);
+			$("#company").prop("checked",false).prop("disabled",true);
+			$("#persion").prop("checked",false);
+		}else{//普通发票和增值税发票
+			$("#"+${invoiceType}).prop("checked",true);
+			if('$!{invoiceTitle}'){
+				$("#company").prop("checked",true);
+				$("#companyName").val('$!{invoiceTitle}').show();
+			}else{
+				$("#persion").prop("checked",true);
+			}
+		}
+		if('1'==${invoiceType}){
+			$("#pid").text("不开发票");
+		}else if('2'==${invoiceType}){
+			$("#pid").text("普通发票");
+		}else if('3'==${invoiceType}){
+			$("#pid").text("增值税发票");
+		}
+		
+		
+		$("input[name=title]").click(function(){
+			if('persion'==this.id){
+				$(".form-control").hide();
+			}else{
+				$(".form-control").show();
+			}
+		});
+	});
+	function changeInvoiceVal(id){
+		if("1"==id){//不開發票
+// 			$("#persion").attr("checked",false).attr("disabled",true);
+			$("#company").attr("checked",false).attr("disabled",true);
+// 			$("#persion")[0].checked=false;
+// 			$("#company")[0].checked=false;
+			$(".form-control").val("").hide();
+			$("#pid").text("不开发票");
+		}else if("2"==id){//普通發票
+// 			$("#persion").removeAttr("disabled").attr("checked",false);
+			$("#company").removeAttr("disabled").attr("checked",false);
+			$(".form-control").removeAttr("disabled");
+			$("#pid").text("普通发票");
+		}else{//增值稅發票
+// 			$("#persion").removeAttr("disabled").attr("checked",false);
+			$("#company").removeAttr("disabled").attr("checked",false);
+			$(".form-control").removeAttr("disabled");
+			$("#pid").text("增值税发票");
+		}
+	}
+	
+	function submitInvoice(){
+		if($("input[name='invoiceTypeRadio']:checked").length == 0){
+			alert("请选择发票类型");
+			$("#form").attr("onsubmit","return false;");
+			return false;
+		}else{
+			var id = $("input[name='invoiceTypeRadio']:checked").attr("id");
+			if(id==$("#2").attr("id")){
+// 				alert($("#company").is(":checked"));
+				if(!$("#company").is(":checked")){
+					alert("请选择发票抬头！！");
+					$("#form").attr("onsubmit","return false;");
+					return false;
+				}
+				if(!$(".form-control").val()){
+					alert("请输入发票抬头的内容！！");
+					$("#form").attr("onsubmit","return false;");
+					return false;
+				}
+			}else if(id==$("#3").attr("id")){
+				if(!$("#company").is(":checked")){
+					alert("请选择发票抬头！！！");
+					$("#form").attr("onsubmit","return false;");
+					return false;
+				}
+				if(!$(".form-control").val()){
+					alert("请输入发票抬头的内容！！！");
+					$("#form").attr("onsubmit","return false;");
+					return false;
+				}
+			}
+			$("#invoiceType").val(id);
+			$("#invoiceTitle").val($(".form-control").val())
+		}
+		$("#form").removeAttr("onsubmit");
+		var contractFlag = $("#contractFlag").val();
+		if(contractFlag && "1"==contractFlag){
+			$("#form").attr("action","$request.contextPath/orderWx/getShopCart").submit();
+		}else{
+			$("#form").attr("action","$request.contextPath/orderWx/toOrder").submit();
+		}
+// 		window.location.href="$request.contextPath/orderWx/submitInvoice?invoiceType="+invoiceType+"&invoiceTitle="+invoiceTitle+"&address="+address;
+	}
+</script>
+</head>
+<body  class="bg_02">
+##parse("common/headerWx.vm")
+<div id="main" class="po_re">
+	<form action="" id="form" method="post">
+	
+		<!-- 	页面必须的其他数据     start	 -->
+		<input id="address" name="address" value="$!{address}" type="hidden"/>
+		<input id="invoiceType" name="invoiceType" value="$!{invoiceType}" type="hidden"/>
+		<input id="invoiceTitle" name="invoiceTitle" value="$!{invoiceTitle}" type="hidden"/>
+		<input id="contractFlag" name="contractFlag" value="$!{contractFlag}" type="hidden"/>
+		<input id="contractNo" name="contractNo" value="$!{contractNo}" type="hidden"/>
+		<input type="hidden" name="couponId" value="$!{couponId}" id="couponId"/>
+			<!--协议或询价单 -->
+	    	<input type="hidden" name="orderType" value="$!{orderType}"/>
+		
+		<!-- 	页面必须的其他数据     end	 -->
+		
+	    <!-- 中间内容 -->
+	    <div class="content" id="wrapper">
+	        <div class="invoice_list">
+	            <ul id="list" >
+	                <li>
+						<p class="fl pad_r5"><span class="font_1_2">发票类型</span></p>
+						<p class="fl" id="pid">不开发票<i class="fa fa-angle-up"></i></p>
+					</li>
+					<li class="border_2">
+						<p class="fl mar_r2"><input type="radio" id="1" name="invoiceTypeRadio" onclick="changeInvoiceVal(this.id)"/></p>不开发票
+					</li>
+					<li class="border_2">
+						<p class="fl mar_r2"><input type="radio" id="2" name="invoiceTypeRadio" onclick="changeInvoiceVal(this.id)"/></p>普通发票
+					</li>
+					<li class="border_2">
+						<p class="fl mar_r2"><input type="radio" id="3" name="invoiceTypeRadio" onclick="changeInvoiceVal(this.id)"/></p>增值税发票
+					</li>
+	                <li>
+	                    <a href="#" class="hei_45">
+	                    	<p class="fl"><span>发票抬头</span></p>
+	                    	<p class="fr"><i class="fa fa-angle-up"></i></p>
+	                    	<div class="clear"></div>
+	                    </a>
+	                    <ul class="none" style="display: block">
+	                       <li class="border_2">
+	                       	<p class="fl  mar_r2"><input type="radio" id="company" name="title"/></p>公司
+	                       	<input type="text" class="form-control mar_lr4 hei_20 wid_60" style="display: none" id="companyName"/>
+	                       </li>
+	                   </ul>
+	                </li>
+	            </ul>
+	            <div class="font_cen">
+	                <button class="hei_34 wid_87 button_1" onclick="submitInvoice()">确认</button>
+	            </div>
+	        </div>          
+	    </div>
+    </form>
+</div>
+    
+    #parse("common/footer.vm")
+</body>
+</html>

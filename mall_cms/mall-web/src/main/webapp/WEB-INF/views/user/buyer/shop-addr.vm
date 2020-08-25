@@ -1,0 +1,295 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+<link href="$request.getContextPath()/assets/css/Details.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">
+	$(function(){
+		$("#leftBuyer").load("$request.contextPath/leftBuyer");
+	});
+</script>
+<div id="main">
+<!--left start-->
+<div id="leftBuyer"></div>
+<!--left end -->
+
+<!--右边部分开始-->
+<div id="right" class="bg_06 border-4" style="width:988px">
+	<div class="wid_950 bg_05 hei_35 mar_cen"><i class="mar_l10 font_14b">收货地址</i></div>
+    <div id="sortlist">
+<!--             <ul> -->
+<!--             #foreach($addr in $!addrList.rows) -->
+<!--                 <li><i class="demo-icons">#if($!addr.isdefault == 1) -->
+<!--                 <input type="radio" value="" checked="checked" />#else -->
+<!--                 <input type="radio" value="" />#end</i>$!addr.contactperson $!addr.contactphone  $!addr.fulladdress -->
+<!--                 	<button onclick="delAddr('$!addr.id')" type="button" style="margin-top: 0px;" class="button_3 hei_24 fr mar_l10"><i class=" demo-icons fa-trash font_16"></i>删 除</button> -->
+<!--                     <button onclick="modifyAddr('$!addr.id')" type="button" style="margin-top: 0px;" class="button_2 hei_24 fr mar_l10"><i class=" demo-icons fa-pencil font_16"></i>修 改</button> -->
+<!--                 </li> -->
+<!--             #end -->
+<!--             </ul> -->
+            <ul>
+			#foreach($addr in $!addrList.rows)
+				<li class="wid_950 bg_05 mar_cen" style="min-height:100px;" id="jcDayWrap">
+					<div id="$!addr.id" class="tit bor border-5">#if($!addr.isdefault == 1)<p class="fr" style="width: 205px">默认地址</p>#end
+					</div>
+					<div class="fl mar_l32">
+						<p class="hei_30">收货人姓名：$!addr.contactperson</p>
+						<p class="hei_30">收货人电话：$!addr.contactphone</p>
+						<p class="hei_30">收货人地址：$!addr.fulladdress</p>
+						<p class="hei_30">固定电话：$!addr.contacttel</p>
+						<dl class="cle_con1_but">
+                			<dt><input id="$!addr.id" name="defauleAddr" type="checkbox" value="$!addr.isdefault" #if($!addr.isdefault==1) checked="checked" #end style="border:0px;" onclick="modifyDefAddr('$!addr.id')" />设为常用地址</dt>
+                        </dl>
+					</div>
+					<div class="fr mar_r10">
+						<p><button onclick="delAddr('$!addr.id')" type="button" class="button_3 hei_32 fr mar_l10" style="margin-top: 10px;"><a class="font_82"><i class=" demo-icons fa-trash font_16"></i>删 除</a></button></p>
+						<p><button onclick="modifyAddr('$!addr.id')" type="button" class="button_2 hei_32 fr mar_l10" style="margin-top: 10px;"><i class=" demo-icons fa-pencil font_16"></i>修 改</button></p>
+					</div>
+					<div class="clear"></div>
+				</li>
+	        #end
+            </ul>
+        <div>
+    		<h4 class="hei_35">+新地址</h4>
+            <!--展开填写收货信息 start -->
+            <div class="clear"></div>
+            <form id="addrform_id" method="post">
+            <input type="hidden" name="id" id="addrId"/>
+    		<div class="cle_con1_add mar_l32">
+        		<dl>
+                    <dt><i class="demo-icons font_fe">*</i>收&nbsp;货&nbsp;人：</dt>
+                    <dd class="wid_180"><input id="contactperson_id" name="contactperson" type="text" maxlength="10" /></dd>
+                    <dd class="wid_80 font_right"><i class="demo-icons font_fe">*</i>手机号码</dd>
+                    <dd class="wid_180"><input id="contactphone_id" name="contactphone" type="text" maxlength="11" /></dd>
+       	 		</dl>
+        		<dl>
+                    <dt class="cle_con1_star"><i class="demo-icons font_fe">*</i>收货地址：</dt>
+                    <dd class="cle_con1_address">
+                    	<select name="provicecode" id="business_provinces" class="input_Style1 wid_80">
+							<option value="0" selected="selected"> 请选择 </option>
+							#foreach($address in $addressList)
+							    <option value="$!address.code"> $!address.name </option>
+							#end
+						</select>
+                    </dd>
+                    <dd class="cle_con1_address">
+                    	<select name="citycode" id="business_city" class="input_Style1 wid_80">
+							<option value="0" selected="selected"> 请选择 </option>
+						</select>
+                    </dd>
+                    <dd class="cle_con1_address" style="display:none">
+                    	<select name="countrycode" id="business_area" class="input_Style1 wid_80">
+							<option value="0" selected="selected"> 请选择 </option>
+						</select>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt class="cle_con1_star"><i class="demo-icons font_fe">*</i>详细地址：</dt>
+                    <dd class="cle_con1_det"><input id="fulladdress_id" name="fulladdress" type="text" maxlength="40" /></dd>
+                </dl>
+                <dl>
+                	<dt class="cle_con1_star">固定电话：</dt>
+                    <dd class="cle_con1_t2"><input id="contacttel_id" name="contacttel" type="text" maxlength="13" /></dd><span style="width: 150px; height: 20px; color: #747474;">格式：010-88888888</span>
+                </dl>
+                <dl class="cle_con1_but">
+                	<dt><input id="def_id_edit" name="defauleAddr" type="checkbox" value="1" style="border:0px;" /></dt>
+                    <dd>设为常用地址</dd>
+                    <dd><a href="#"><button id="submit_addr" class="button_1 mar_lr10 hei_35" type="button">保存收货地址</button></a></dd>
+                </dl>
+    		</div><!--cle_con1_add -->
+    		</form>
+        </div><!--包围上面模块 end -->
+    </div><!--id="sortlist" end -->
+	
+	<!-- 修改收货地址弹出层start -->
+            
+            <div class="page ml14px">
+        		   
+					
+        		</div>
+				<!--循环列表end-->
+
+	<div id="edit_div" style="display:none" >
+	</div>
+	<!-- 修改收货地址弹出层 end -->
+	
+    <script type="text/javascript">
+	
+    jQuery("#sortlist h4").bind("click",function() {
+        var element = $(this).parent();
+        if (element.hasClass("current")) {
+            element.removeClass("current");
+        } else {
+            element.addClass("current");
+        }
+    });
+    
+    $("#business_provinces").change(function(){
+		$("#business_area").empty();
+		$("#business_area").append($("<option>").text("请选择").val("0"));
+		optionItems("$request.contextPath/information/register/queryAddress",$("#business_provinces").val(),"business_city","");
+	});
+    
+    /* 不需要三级联动
+	$("#business_city").change(function(){
+		optionItems("$request.contextPath/information/register/queryAddress",$("#business_city").val(),"business_area","");
+	});
+    */
+    //工具方法：下拉框
+	function optionItems(url, parentCode, optionId,selectVal){
+		$.ajax({
+			url:url,
+			type:"post",
+			data:{
+				parentCode:parentCode
+			},
+			dataType: "json",
+			success:function(data){
+				var optionItem = $("#"+optionId);
+				optionItem.empty();
+				optionItem.append($("<option>").text("请选择").val(""));
+				$.each(data, function (n, address) {
+					var option = $("<option>").text(address.name).val(address.code);
+					if(address.code == selectVal){
+						option.attr("selected",true);
+					}
+					optionItem.append(option);
+				});
+			}
+		});
+	}
+    
+    $("#submit_addr").click(function(){
+    	var contactperson = $("#contactperson_id").val().replace(/[ ]/g,"");
+    	var contactphone = $("#contactphone_id").val().replace(/[ ]/g,"");
+    	var provinces = $("#business_provinces").val();
+    	var city = $("#business_city").val();
+    	//注释掉第三级
+    	//var area = $("#business_area").val();
+    	var fulladdress = $("#fulladdress_id").val().replace(/[ ]/g,"");
+    	var contacttel = $("#contacttel_id").val().replace(/[ ]/g,"");
+    	if(contactperson.length < 1 || contactphone.length < 1 || provinces.length < 1 || fulladdress.length < 1 || provinces == 0 || city == 0 /*|| area == 0*/){
+    		alert("请把必填信息填写完整");
+    	} else {
+    		var id = $("#addrId").val();
+    		if(id.length > 0){
+    			$("#addrform_id").attr("action","$request.getContextPath()/buyer/modifyAddr");
+    		} else {
+    			$("#addrform_id").attr("action","$request.getContextPath()/buyer/saveaddr");
+    		}
+    		contactperson = $("#contactperson_id").val();
+    		contactphone = $("#contactphone_id").val();
+    		contacttel = $("#contacttel_id").val();
+//     		var nameFormat = /^[\u4e00-\u9fa5]{1,6}$/;
+    		var mobileFormat = /^[1]{1}[0-9]{10}$/;
+    		var linePhoneFormat = /^[0-9]{3,4}[-]{1}[0-9]{7,8}$/;
+//     		if(!nameFormat.test(contactperson)){
+//     			alert("用户名格式不正确，只能是汉字！");
+//     			return;
+//     		} else 
+    		if(!mobileFormat.test(contactphone)){
+    			alert("手机号格式不正确！");
+    			return;
+    		}
+    		if(contacttel.length > 0) {
+    			if(!linePhoneFormat.test(contacttel)){
+	    			alert("固定电话格式不正确！");
+	    			return;
+	    		}
+    		}
+    		$("#addrform_id").submit();
+    	}
+    });
+    
+    function modifyAddr(id){
+		$("#edit_div").show();
+		$("#edit_div").load("$request.contextPath/buyer/getaddr?id="+id);
+    	/*$("#sortlist h4").parent().addClass("current");
+    	$.ajax({
+		     type: "post",
+		     dataType: "json",
+		     url:"$request.contextPath/buyer/getaddr",
+		     data:{
+		    	 "id":id,
+		     },
+		     success: function(result){
+	           //返回提示信息       
+	           $("#addrId").val(result.id);
+	           $("#contactperson_id").val(result.contactperson);
+	           $("#contactphone_id").val(result.contactphone);
+	           $("#fulladdress_id").val(result.fulladdress);
+	           $("#contacttel_id").val(result.contacttel);
+	           if(result.isdefault == 1){
+	        	   $("#def_id_edit").prop("checked", true);
+	           }else{
+			   	   $("#def_id_edit").prop("checked", false);
+			   }
+				optionItems("$request.contextPath/information/register/queryAddress",'0',"business_provinces",result.provicecode);
+				optionItems("$request.contextPath/information/register/queryAddress",result.provicecode,"business_city",result.citycode);
+				optionItems("$request.contextPath/information/register/queryAddress",result.citycode,"business_area",result.countrycode);
+		     }
+		 });*/
+    }
+    
+    function delAddr(id){
+    	if(confirm("确定要删除吗？")){
+	    	window.location.href="$request.getContextPath()/buyer/deladdr?addr="+id;
+    	}
+    }
+	function modifyDefAddr(id){
+		var tip = "是否将其修改为默认收货地址？";
+		var flag = 1;
+		var checkbox = $("input[type='checkbox']").filter("#"+id);
+		var checked = $(checkbox).prop("checked");
+		var isdefault = $(checkbox).val();
+		// 当前取消选中并且以前是默认地址
+		if(!checked && isdefault==1){
+			tip = "是否取消设置默认收货地址？";
+			flag = 2;
+		}
+		if(confirm(tip)){
+    		$.ajax({
+    		     type: "post",
+    		     dataType: "json",
+    		     url:"$request.getContextPath()/buyer/modifyDefAddr",
+    		     data:{
+    		    	 "id":id,
+    		    	 "flag":flag
+    		     },
+    		     success: function(result){
+    			 	if(result ==true){
+					
+						//点击设置为默认地址后，不刷新页面
+    					$("input[type='checkbox']").each(function(){
+    						if(this.id==id && checked && isdefault==2){
+								$(this).val(1);
+    							$(this).prop("checked",true);
+    							//$(this).prop("disabled",true);
+    							$("div#"+id).append('<p class="fr" style="width: 205px">默认地址</p>');
+    						}else{
+								$(this).val(2);
+    							$(this).prop("checked",false);
+    							//$(this).prop("disabled",false);
+								$("div#"+this.id).empty();
+    						}
+						})
+            		}else{
+        			 	alert("默认地址修改失败！")
+        			}
+    			}
+    		 });
+		}else if(!checked && isdefault==1){// 先前是默认地址，用户点击了取消，还恢复原来的选中状态
+			$(checkbox).prop("checked","checked");
+		}else{
+			if(checked){
+				$(checkbox).prop("checked",false);
+			}
+		}
+	}
+	
+    </script>
+	 <!--展开填写收货信息 start -->
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->
+    
+
+

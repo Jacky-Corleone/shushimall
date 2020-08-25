@@ -1,0 +1,87 @@
+#set($ctxPath="$request.contextPath")
+#set($layout = "common/blanklayout.vm")
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <base href="${request.getContextPath()}/"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>账号绑定</title>
+    <link href="$ctxPath/assets/css/detail.css" rel="stylesheet" type="text/css"/>
+    <style >
+        .mar_cen{
+            margin :10px auto;
+        }
+        .button_2{
+            margin-top : 30px;
+        }
+    </style>
+    <script type="text/javascript" src="$ctxPath/assets/js/iscroll.js"></script>
+    <script type="text/javascript" src="$ctxPath/assets/js/tab.js"></script>
+    <script type="text/javascript" src="$ctxPath/assets/js/style.js"></script>
+    <script type="text/javascript" src="assets\js\jquery-1.11.2.min.js"></script>
+    <script type="text/javascript">
+        //登陆绑定
+        function login(){
+            $.ajax({
+                url:"person/bingWxLogin",
+                data:{"userName":$("#username").val(),"password":$("#password").val()},
+                type:"post",
+                dataType:"json",
+                success:function(res){
+                    if(!res.success){
+                        $("#mag").html(res.errmsg);
+                    }else{
+                        window.location="person/genOauth2Url";
+                    }
+                }
+            });
+        }
+        //验证该账号是否有绑定其他微信
+        function checkUname(){
+            if($("#username").val().trim()==""){
+                $("#mag").html("账号不允许为空！");
+                return false;
+            }
+            if($("#password").val().trim()==""){
+                $("#mag").html("密码不允许为空！");
+                return false;
+            }
+            $.ajax({
+                url:"person/checkUname",
+                data:{"userName":$("#username").val()},
+                type:"post",
+                dataType:"json",
+                success:function(res){
+                    if(res.success){
+                        $("#mag").html(res.errmsg);
+                    }else{
+                        login();
+                    }
+                }
+            });
+        }
+    </script>
+</head>
+<body >
+<form action ="$ctxPath/person/personMain" method="post">
+    <div id="main" class="po_ab">
+        <!-- 中间内容 -->
+        <div class="content" id="wrapper">
+            <div class="hei_100 font_cen wid_100">
+                <img src="assets/images/logo-ke.png"  style="max-width: 100%;max-height: 100%"/>
+            </div>
+            <div class="hei_50 font_cen font_1_5">印刷家微信绑定</div>
+            <h3 class="hei_50 font_cen"><span id="mag" style="color: #c80000"></span></h3>
+            <ul class="pass mar_cen wid_87">
+                <li><input id="username" name="username" type="text" class="wid_95 input_3" placeholder="请输入印刷家平台账号" /></li>
+                <li><input id="password" name="password" type="password" class="wid_95 input_3" placeholder="请输入密码" /></li>
+            </ul>
+            <div class="font_cen"><button class="button_1 wid_87 hei_32" onclick="checkUname(); return false;" type="button">绑定</button></div>
+        </div><!-- 中间内容 end-->
+    </div>
+</form>
+
+</body>
+</html>

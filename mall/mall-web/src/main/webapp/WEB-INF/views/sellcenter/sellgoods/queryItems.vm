@@ -1,0 +1,165 @@
+#set($layout = "/none_layout.vm")
+<script type="text/javascript">
+//选择商品分页
+function page_num(){
+	var pageNumVal=$("#pageNum").val();
+	if(pageNumVal == ''){
+		topage(1);
+		$("#pageNum").val(1);
+	}else if(parseInt(pageNumVal)>=parseInt($pager.totalPage)){
+		topage($pager.totalPage);
+	}else{
+		topage(pageNumVal);
+	}
+}
+function enter_press_page(e){
+	if(e == 13|| e == 32){
+		page_num();
+	}
+}
+function topage(page){
+	$("input[name='page']").val(page);
+	var url = $("#queryForm").attr("action");
+	var searchFormObj = $('#queryForm').serialize();
+	$.ajax({
+		url : url,
+		type : "post",
+		data : searchFormObj,
+		dataType:"text",
+		cache : false,
+		success : function(html) {
+			$("#skuList .goodList").html(html);
+			checkedIds();
+		},
+		error:function(e){
+			
+		}
+	});
+}
+//判断是否选中，同时向checkedItemIds隐藏域中存值
+function selectItems(obj,type){
+   var checkedItemIds=$("#"+type+"_checkedItemIds").val();
+   var checkedItemNames=$("#"+type+"_checkedItemNames").val();
+   var attrSaleStrList=$("#"+type+"_attrSaleStrList").val();
+   var skuInfoList=$("#"+type+"_skuInfoList").val();
+   if($("#"+obj).is(":checked")){
+       checkedItemIds+=($("#"+obj).val()+",");
+       checkedItemNames+=($("#"+obj).attr("itemName")+",");
+       attrSaleStrList+=($("#"+obj).attr("attrSaleStr")+"&");
+       skuInfoList+=($("#"+obj).attr("skuinfo")+"&");
+   }else{
+       var param=$("#"+obj).val()+",";
+       var pName = $("#"+obj).attr("itemName")+",";
+       var attrSaleStr = $("#"+obj).attr("attrSaleStr")+"&";
+       var skuInfo = $("#"+obj).attr("skuinfo")+"&";
+       checkedItemIds=checkedItemIds.replace(param,"");
+       checkedItemNames=checkedItemNames.replace(pName,"");
+       attrSaleStrList=attrSaleStrList.replace(attrSaleStr,"");
+       skuInfoList=skuInfoList.replace(skuInfo,"");
+   }
+   
+    $("#"+type+"_checkedItemIds").val(checkedItemIds);
+    $("#"+type+"_checkedItemNames").val(checkedItemNames);
+    $("#"+type+"_attrSaleStrList").val(attrSaleStrList);
+    $("#"+type+"_skuInfoList").val(skuInfoList);
+}
+</script>
+  <div id="right_bot" class="right_bot border-4 mar_t10 bg_06" style=" margin-left: auto; margin-right: auto; ">
+  <!-- 商品列表开头 -->
+    <div class="right_xinxi mar_l14 ">
+      <ul class="list_top bg_08 font_14b">
+        
+        <li style="width:370px" class="font_cen hei_40">商品信息</li>
+        <li style="width:120px;" class="font_cen hei_40">商品编码</li>
+        <li style="width:130px;" class="font_cen hei_40">所属类目</li>
+        <li style="width:195px" class="font_cen hei_40">报价</li> 
+        <li style="width:126px" class="font_cen hei_40">商品状态</li>
+      
+      </ul>
+      <!-- 类型选择 -->
+     
+      <!-- 商品信息 -->
+      <table class="information border-1" style="width: 100%;" id="information ">
+        #foreach($item in $pager.records)
+        <tr>
+        <td class="wid_120 hei_60 border-1 border-12" >
+        <input type="checkbox" class="mar_lr5"  id="item_$!item.itemId"
+        		#if($!checkedItemType == "aux")
+			        #if( $!aux_checkedItemIds != "" && $!aux_checkedItemIds.indexOf("$!item.itemId") != "-1")
+			            checked="checked"
+	                #end 
+        		#elseif($!checkedItemType == "basis")
+        			#if( $!basis_checkedItemIds != "" && $!basis_checkedItemIds.indexOf("$!item.itemId") != "-1")
+			            checked="checked"
+	                #end 
+        		#elseif($!checkedItemType == "gene")
+        			#if( $!gene_checkedItemIds != "" && $!gene_checkedItemIds.indexOf("$!item.itemId") != "-1")
+			            checked="checked"
+	                #end 
+        		#else
+        			#if( $!added_checkedItemIds != "" && $!added_checkedItemIds.indexOf("$!item.itemId") != "-1")
+			            checked="checked"
+	                #end 
+        		#end
+              itemId="$!item.itemId" onchange="selectItems('item_$!item.itemId','$!checkedItemType')" value="$!item.itemId" attrSaleStr="$!item.attrSales" skuInfo="$!item.attrSaleStr" name="checkItem" itemName="$!item.itemName" itemStatus="$!item.itemStatus" />
+        
+        <img style="cursor: pointer;" onclick="viewDetail($!item.itemId);" src="$!imageServerAddr$!item.pictureUrl" width="75" height="50"/>       
+      </td>
+      <td class="wid_120 border-6 border-9"><a style="cursor: pointer;" onclick="viewDetail($!item.itemId);">$!item.itemName</a></td>
+      <td class="wid_80 border-1 font_cen">$!item.itemId</td>
+      <td class="wid_90 border-1 font_cen">$!item.cName</td>
+      <td class="wid_120 border-1 font_cen">
+      	$!item.guidePrice
+      </td>
+         ## <td class="wid_90 border-1 ">
+		##	<input type="text" maxlength='6' id="${item.skuId}" class="wid_40 mar_23 font_cen border-4" value="$!{item.totalInventory}" onkeyup="clearNoNum(this)"/>
+		  ##</td>
+          <td class="wid_90 border-1 font_cen">
+			#if($!{item.itemStatus} == 1)
+				未发布
+			#elseif($!{item.itemStatus} == 2)
+				待审核
+			#elseif($!{item.itemStatus} == 3)
+				待上架
+			#elseif($!{item.itemStatus} == 4)
+				在售
+			#elseif($!{item.itemStatus} == 5)
+				已下架
+			#elseif($!{item.itemStatus} == 6)
+				锁定
+			#elseif($!{item.itemStatus} == 7)
+				申请解锁
+			#elseif($!{item.itemStatus} == 20)
+				审核驳回
+			#end
+		  </td>
+        </tr>
+		#end
+      </table>
+     
+	 <div class="page ml14px">
+		 <ul>
+		 	<li class="lastPage" style="width: auto; line-height: inherit;">
+		 		<a href="javascript:topage(1)">首页</a>
+		 	</li>
+		 	<li class="lastPage" style="width: auto; line-height: inherit;">
+		 		<a href="javascript:topage($pager.previewPage)">上一页</a>
+		 	</li>
+		 	#foreach($pageNo in [$!pager.startPageIndex .. $!pager.endPageIndex])
+		 	<li style="width: auto; line-height: inherit;">
+		 		<a #if($pageNo==$pager.page) class="curr" #end href="javascript:topage($pageNo)">$pageNo</a>
+		 	</li>
+		 	#end
+		 	<li class="nextPage" style="width: auto; line-height: inherit;">
+		 		<a href="javascript:topage($pager.nextPage)">下一页</a>
+		 	</li>
+		 	<li class="nextPage" style="width: auto; line-height: inherit;">
+		 		<a href="javascript:topage($pager.totalPage)">末页</a>&nbsp;共$pager.totalPage页
+		 	</li>
+		 	<li class="nextPage" style="width: auto; line-height: inherit;">
+		 		，第<input class="input_Style2 wid_20 hei_26" value="$pager.page" onkeyup="value=this.value.replace(/\\D+/g,'')" onkeydown="enter_press_page(event.keyCode||event.which);" id="pageNum"/>页
+		 		 <span class="cursor font_fe" id="toPageNum" onclick="page_num()">[跳转]&nbsp;&nbsp;</span>
+		 	</li>
+		 </ul>
+	 </div>
+    </div>

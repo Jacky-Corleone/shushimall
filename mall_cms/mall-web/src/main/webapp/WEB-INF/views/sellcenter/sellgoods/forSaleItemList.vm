@@ -1,0 +1,617 @@
+#set($staticPath="$request.contextPath/assets")
+#set($rootPath="$request.scheme://"+"$request.serverName:"+"$request.serverPort")
+#set($layout = "/seller_layout.vm")
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript">
+	$(function(){
+		//加载左侧菜单
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+		$("#levelOne").change(function(){
+			$("#levelTwo").empty();
+			if(!$("#levelOne").val()){
+				$("#levelTwo").append($("<option>").text("二级分类").val(""));
+			}else{
+				optionItems($("#levelOne").val(),"levelTwo");
+			}
+		});
+		$("#changeShopLevelOne").change(function(){
+			$("#changeShopLevelTwo").empty();
+			if(!$("#changeShopLevelOne").val()){
+				$("#changeShopLevelTwo").append($("<option>").text("二级分类").val(""));
+			}else{
+				optionItems($("#changeShopLevelOne").val(),"changeShopLevelTwo");
+			}
+		});
+		//全部选中/取消
+		$("#all_select").click(function() {
+			var flag = $(this).is(":checked"); 
+			$('input:checkbox[name="itemId"]').each(function() { 
+				$(this).prop("checked", flag); 
+			}) 
+		});
+	})
+	
+	//联动
+	function optionItems(parentCode, optionId){
+		$.ajax({
+			url:"$request.contextPath/sellcenter/sellProduct/getShopCategory",
+			type:"post",
+			data:{
+				parentCid:parentCode
+			},
+			dataType: "json",
+			success:function(data){
+				//获取地域数据
+				var optionItem = $("#"+optionId);
+				optionItem.empty();
+				optionItem.append($("<option>").text("二级分类").val(""));
+				$.each(data.result, function (n, category) {
+					var option = $("<option>").text(category.cname).val(category.cid);
+					optionItem.append(option);
+				});
+			}
+		});
+	}
+	
+	//添加新商品
+	function addNewGoods(){
+		$.cookie('clicked_menu', "$rootPath$request.contextPath/sellcenter/sellProduct/itemAddSelect", {path:'/'});
+		window.location.href="$request.contextPath/sellcenter/sellProduct/itemAddSelect";
+	}
+	
+	//编辑商品信息
+	function edit(itemId,isPlant){
+		if(isPlant){
+			window.location.href="$request.contextPath/sellcenter/sellProduct/plantForm?itemId="+itemId+"&isPlantEdit=true";
+		}else{
+			window.location.href="$request.contextPath/sellcenter/sellProduct/form?itemId="+itemId;
+		}
+	}
+	
+	//批量上下架
+	function publishMore(status){
+		var checkboxs = $("input[name='itemId']:checked")
+		if(checkboxs.length == 0){
+			showDiv('showErrorMsg');
+		}else{
+		  var checks = "";
+		  var message = "";
+		  //获取选中的所有商品
+		  $("input:checkbox[name='itemId']").each(function(){
+	         if($(this).is(':checked')){
+	        	 //判断选中商品的状态
+	        	 var itemStatus = $(this).attr("itemStatus");
+	        	 var itemName = $(this).attr("itemName");
+	        	 //上架判断
+	        	 if(itemStatus != '3' && itemStatus != '5' && status == '4'){
+	        		 message += "【"+itemName+"】 ";
+	        	 }
+	        	 if(itemStatus != '4' && status == '5'){
+	        		 message += "【"+itemName+"】 ";
+	        	 }
+	        	//动态拼取选中的checkbox的值，用“,”符号分隔
+	        	 if(checks != ""){
+	        		 checks += ",";
+	        	 }
+	             checks += $(this).val();           
+	         }
+	      })
+	      if(message != ""){
+	    	  alert("商品"+message+"不允许执行此操作！");
+	    	  return false;
+	      }
+		  if(checks != ""){
+			  publish(checks,status);
+		  }
+	   }
+	}
+	
+	//上下架: '4':上架,'5':下架
+	function publish(itemIds,status){
+		$.ajax({
+			type:'post',
+			url:'$request.contextPath/sellcenter/sellProduct/goodsPublish',
+			dataType:'json',
+			data:{
+				itemIdStr:itemIds,
+				status:status
+			},
+			success:function(result){
+				alert(result.message);
+				window.location.href="$request.contextPath/sellcenter/sellProduct/goodsList";
+			}
+		});
+	}
+	
+	//查询选中的商品
+	function setAdWords(type){
+		var checkboxs = $("input[name='itemId']:checked")
+		if(checkboxs.length == '0'){
+			showDiv('showErrorMsg');
+		}else{
+			var checks = "";
+			//动态拼取选中的checkbox的值，用“,”符号分隔
+			checkboxs.each(function(){
+	        	 if(checks != ""){
+	        		 checks += ",";
+	        	 }
+	             checks += $(this).val();    
+		    });
+			$.ajax({
+				type:'post',
+				url:'$request.contextPath/sellcenter/sellProduct/getItems',
+				dataType:'json',
+				data:{
+					itemIds:checks
+				},
+				success:function(data){
+					//设置广告词
+					if(type == "ad"){
+						$("#information_advertisement").empty();
+						var trHtml = "";
+						$.each(data.result, function (n, itemDTO) {
+							trHtml += "<tr>";
+							trHtml += "<td class=\"wid_440 border-1\">";
+							trHtml += "<input type=\"checkbox\" name=\"advertisementCheck\" value=\""+itemDTO.itemId+"\" checked=\"checked\" />";
+							trHtml += "<img src=\"$!imageServerAddr"+itemDTO.pictureUrl+"\" width=\"75\" height=\"50\"/>";
+							trHtml += "<span>"+itemDTO.itemName+"</span>";
+							trHtml += "</td>";
+							trHtml += "<td class=\"wid_80 border-1 font_cen\">"+itemDTO.itemId+"</td>";
+							trHtml += "<td class=\"wid_440 border-1 font_cen \"><input type=\"text\" name=\"advertisement\" id=\"advertisement_"+itemDTO.itemId+"\" class=\"hei_30 wid_400 input_Style2\" /></td>";
+							trHtml += "</tr>";
+						});
+						$("#information_advertisement").append(trHtml);
+						$("#adDiv").show();
+					}else if(type == "cate"){
+						$("#information_shopCategory").empty();
+						var trHtml = "";
+						$.each(data.result, function (n, itemDTO) {
+							var cateName = "";
+							$.each(data.shopCategoryList, function (n, shopCategory) {
+								var itemId = shopCategory.split(":")[0];
+								var name = shopCategory.split(":")[1];
+								if(itemId == itemDTO.itemId){
+									cateName = name;
+									return;
+								}
+							})
+							trHtml += "<tr>";
+							trHtml += "<td class=\"wid_440 border-1\">";
+							trHtml += "<input type=\"checkbox\" name=\"shopCateItemCheck\" value=\""+itemDTO.itemId+"\" checked=\"checked\" />";
+							trHtml += "<img src=\"$!imageServerAddr"+itemDTO.pictureUrl+"\" width=\"75\" height=\"50\"/>";
+							trHtml += "<span>"+itemDTO.itemName+"</span>";
+							trHtml += "</td>";
+							trHtml += "<td class=\"wid_80 border-1 font_cen\">"+itemDTO.itemId+"</td>";
+							trHtml += "<td class=\"wid_440 border-1 font_cen \">"+cateName+"</td>";
+							trHtml += "</tr>";
+						});
+						$("#information_shopCategory").append(trHtml);
+						$("#shopCategoryItemDiv").show();
+					}
+				}
+			});
+		}
+	}
+	//设置广告词
+	function itemAdvertisementEdit(){
+		var checkboxs = $("input[name='advertisementCheck']:checked")
+		if(checkboxs.length == '0'){
+			showDiv('showErrorMsg');
+		}else{
+			var checks = "";
+			//动态拼取新设置的广告词
+			checkboxs.each(function(){
+	        	 if(checks != ""){
+	        		 checks += "&";
+	        	 }
+	        	 //获取广告词
+	             var advertisement = $("#advertisement_"+$(this).val()).val();
+	             checks += $(this).val()+","+advertisement;
+		    });
+			$.ajax({
+				type:'post',
+				url:'$request.contextPath/sellcenter/sellProduct/itemAdvertisementEdit',
+				dataType:'json',
+				data:{
+					itemAdvertisements:checks
+				},
+				success:function(data){
+					//$("#showSuccessMsg").show();
+					alert("广告词设置成功");
+					location.reload();
+				}
+			});
+		}
+	}
+	
+	//类目迁移
+	function itemShopCategoryEdit(){
+		var checkboxs = $("input[name='shopCateItemCheck']:checked")
+		if(checkboxs.length == '0'){
+			showDiv('showErrorMsg');
+		}else if($("#changeShopLevelTwo").val() == ""){
+			
+			showDiv('showCateErrorMsg');
+		}else{
+			var checks = "";
+			//动态拼取新设置的广告词
+			checkboxs.each(function(){
+	        	 if(checks != ""){
+	        		 checks += ",";
+	        	 }
+	        	 //获取广告词
+	             checks += $(this).val();
+		    });
+			$.ajax({
+				type:'post',
+				url:'$request.contextPath/sellcenter/sellProduct/itemShopCategoryEdit',
+				dataType:'json',
+				data:{
+					itemIdStr:checks,
+					shopCategoryId:$("#changeShopLevelTwo").val()
+				},
+				success:function(data){
+					alert("类目迁移成功");
+					location.reload();
+				}
+			});
+		}
+	}
+	
+	
+	
+	//到指定的分页页面
+	function topage(page){
+		$("#page").val(page);
+		$("#searchForm").submit();
+	}
+	
+	//查看商品信息
+	function view(itemId,isPlant){
+		if(isPlant){
+			window.location.href="$request.contextPath/sellcenter/sellProduct/plantForm?itemId="+itemId+"&isPlantEdit=true&doType=view";
+		}else{
+			window.location.href="$request.contextPath/sellcenter/sellProduct/form?itemId="+itemId+"&doType=view";
+		}
+	}
+	//查看商品详细属性
+	function viewDetail(itemId){
+		window.location.href="$request.contextPath/productController/details?id="+itemId;
+	}
+	function useAll(id){
+		$("input[name='advertisement']").val($("#"+id).val());
+	}
+	
+	function hideDiv(id){
+		$("#"+id).hide();
+	}
+	function showDiv(id){
+		$("#"+id).show();
+	}
+	function clearNoNum(obj)
+	{
+		//先把非数字的都替换掉，除了数字和.
+		obj.value = obj.value.replace(/[^\d.]/g,"");
+		//必须保证第一个为数字而不是.
+		obj.value = obj.value.replace(/^\./g,"");
+		//保证只有出现一个.而没有多个.
+		obj.value = obj.value.replace(/\.{2,}/g,".");
+		//保证.只出现一次，而不能出现两次以上
+		obj.value = obj.value.replace(".","$#$").replace(/\./g,"").replace("$#$",".");
+	}
+</script>
+<div id="main">
+<!--中间部分开始-->
+<div id="leftSeller" class="border-4">
+</div><!--left end -->
+<!--右边部分开始-->
+<div id="right">
+    <div id="right_top" class="right_top border-4 bg_06">
+	<form method="post" id="searchForm" action="$request.contextPath//sellcenter/sellProduct/goodsList">
+		<input type="hidden" name="page" id="page" />
+		<input type="hidden" name="queryType" id="queryType" value="forSale" />
+		<div class="right_top_l">
+			<ul class="list">
+				<li class="wid_220">
+					<span class="font_wid">商品名称：</span><input value="$!itemInDTO.itemName" class="input_Style2 wid_120 hei_30" type="text" name="itemName"/>
+				</li>
+				<li class="wid_220">
+					<span class="font_wid">商品编码：</span><input value="$!itemInDTO.id" type="text" onkeyup="value=value.replace(/[^\d]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))" maxlength="10" class="input_Style2 wid_120 hei_30" name="id"/>
+					</li>
+				<li>
+					<span class="font_wid">店铺分类：</span>
+					<select class="input_Style2 wid_90 mar_r10 hei_35" id="levelOne" name="shopLevelOneId">
+						<option value="">一级分类</option>
+						#foreach( $shopCategorySellerDTO in $shopCategorySellerDTOList)
+	                    	 <option #if($!shopLevelOneId == $shopCategorySellerDTO.cid) selected="selected" #end value="$!shopCategorySellerDTO.cid"> $!shopCategorySellerDTO.cname </option>
+						#end
+					</select>
+					<select class="input_Style2 wid_90 mar_r10 hei_35" id="levelTwo" name="shopCid">
+						<option value="">二级分类</option>
+						#foreach( $twoLevelCate in $levelTwoCategory)
+	                    	 <option #if($!itemInDTO.shopCid == $twoLevelCate.cid) selected="selected" #end value="$!twoLevelCate.cid"> $!twoLevelCate.cname </option>
+						#end
+					</select>
+				</li>
+
+				<li>
+					<span class="font_wid">售价区间：</span>
+						<input name="minPrice" onkeyup="clearNoNum(this)" value="$!itemInDTO.minPrice" class="input_Style2 wid_120 hei_30" type="text" />
+						<i class="demo-icons">-</i>
+						<input name="maxPrice" onkeyup="clearNoNum(this)" value="$!itemInDTO.maxPrice" class="input_Style2 wid_120 hei_30" type="text" />
+				</li>
+				<li><span class="font_wid" style="margin-left: 74px;">品牌名称：</span>
+				<select class="input_Style2 wid_90 mar_r10 hei_35" id="levelOne" name="brandIdList" >
+					<option value="">请选择</option>
+					#foreach( $dto in $itemBrandDTOs)
+					   #if($!itemInDTO.brandIdList.empty)
+                    	 <option #if($!itemInDTO.brandIdList == $!dto.brandId) selected="selected" #end value="$!dto.brandId"> $!dto.brandName </option>
+					   #else
+						<option  #if($!itemInDTO.brandIdList[0]== $!dto.brandId) selected="selected" #end value="$!dto.brandId"> $!dto.brandName </option>
+						#end
+                   #end
+				</select>
+				</li>
+				<li class="wid_250"><span class="font_wid">商品类型：</span>
+				<select class="input_Style2 wid_90 mar_r10 hei_35" name="addSource" >
+					<option value="">请选择</option>
+					<option #if($!itemInDTO.addSource == 1) selected="selected" #end value="1"> 普通商品 </option>
+					<option #if($!itemInDTO.addSource == 3) selected="selected" #end value="3"> 套装商品 </option>
+					<option #if($!itemInDTO.addSource == 4) selected="selected" #end value="4"> 基础服务商品</option>
+					<option #if($!itemInDTO.addSource == 5) selected="selected" #end value="5"> 增值服务商品 </option>
+					<option #if($!itemInDTO.addSource == 6) selected="selected" #end value="6"> 辅助材料商品 </option>
+				</select>
+				</li>
+			</ul>
+		</div>
+    </form>
+		<div class="right_top_r ">
+			<button type="button" class="button_4 but_cx1" onclick="topage(1)">
+				<a class="font_1c hei_24" >查 询</a>
+			</button>
+		</div>
+	</div>
+	<!-- right结束 -->
+
+	<div id="right_bot" class="right_bot border-4 mar_t10 bg_06">
+    <!-- 商品列表开头 -->
+		<div class="right_xinxi mar_l14">
+
+			<ul class="list_top bg_08 font_14b">
+				<li class="wid_350 font_cen hei_35">商品信息</li>
+				<li class="wid_80 font_cen hei_35">商品编码</li>
+				<li class="wid_120 font_cen hei_35">所属类目</li>
+				<li class="wid_120  hei_35 font_cen">报价</li>
+				<li class="wid_90 font_cen hei_35">商品类型</li>
+				<li class="wid_90 font_cen hei_35">商品状态</li>
+				<li class="wid_90 font_cen hei_35">操作</li>
+			</ul>
+      <!-- 类型选择 -->
+      <ul class="right_select">
+        <li><input type="checkbox" class="mar_l10 hei_22" id="all_select"/>全选</li>
+        <li><button type="button" class="button_4 mar_l10 hei_24" onclick="publishMore(4);"><a class="font_1c" >批量上架</a></button></li>
+        <li><button type="button" class="button_4 mar_l10 hei_24" onclick="publishMore(5);"><a class="font_1c" >批量下架</a></button></li>
+        <li><button type="button" class="button_4 mar_l10 hei_24" onclick="setAdWords('ad');"><a class="font_1c" >设置广告词</a></button></li>
+        <li><button type="button" class="button_4 mar_l10 hei_24" onclick="setAdWords('cate');"><a class="font_1c" >迁移类目</a></button></li>
+        <span class="fr mar_tb10"><button type="button" class="button_4  hei_24 " onclick="addNewGoods();"><a class="font_1c">+添加新商品</a></button></span>
+      </ul>
+      <!-- 商品信息 -->
+      <table class="information" id="information ">
+		#foreach($goods in $pager.records)
+		<tr>
+          <td class="wid_120 border-1 hei_60 border-12">
+            <input type="checkbox" value="$!goods.itemId" name="itemId" itemName="$!goods.itemName" itemStatus="$!goods.itemStatus" />
+            <img style="cursor: pointer;" onclick="viewDetail($!goods.itemId);" src="$!imageServerAddr$!goods.pictureUrl" width="75" height="50"/>
+          </td>
+          <td class="wid_230 border-6 border-9">
+            <a style="cursor: pointer;" onclick="viewDetail($!goods.itemId);">$!goods.itemName</a>
+          </td>
+          <td class="wid_80 border-1 font_cen">$!goods.itemId</td>
+          <td class="wid_120 border-1 font_cen">$!goods.cName</td>
+          <td class="wid_120 border-1 font_cen">
+             #if($!goods.hasPrice==1)
+	            $!goods.guidePrice
+	          #else
+	        	  暂无报价
+	          #end	
+          </td>
+          <td class="wid_90 border-1 font_cen">
+	            #if($!goods.addSource == 1)
+	        		普通商品
+	    		#elseif($!goods.addSource == 3)
+	    			套装商品
+	    		#elseif($!goods.addSource == 4) 
+	    		    基础服务商品
+	    		#elseif($!goods.addSource == 5)
+	    		    增值服务商品
+	    		#elseif($!goods.addSource == 6)
+	    		    辅助材料商品
+	    		#end
+          </td>
+          <td class="wid_90 border-1 font_cen">
+          	#if($!goods.itemStatus == 1)
+          		未发布
+			#elseif($!goods.itemStatus == 2)
+				待审核
+			#elseif($!goods.itemStatus == 3)
+				待上架
+			#elseif($!goods.itemStatus == 4)
+				在售
+			#elseif($!goods.itemStatus == 5)
+				已下架
+			#elseif($!goods.itemStatus == 6)
+				锁定
+			#elseif($!goods.itemStatus == 7)
+				申请解锁
+			#else
+				审核驳回
+			#end
+          </td>
+          <td class="wid_90 border-1 ">
+          	<p class="mar_l32 wid_30">
+         		#if($!goods.itemStatus == 4)
+				#elseif($!goods.itemStatus == 2)
+				#else
+					#if($!goods.addSource == 2)
+	          			<a class="font_1c" style="cursor: pointer;" onclick="edit($!goods.itemId,true);">编辑</a>
+	          			<br/>
+	          		#else
+	          			<a class="font_1c" style="cursor:pointer" onclick="edit($!goods.itemId,false);">编辑</a>
+	          			<br/>
+	          		#end
+				#end
+          		#if($!goods.itemStatus == 3)
+					<a class="font_1c" style="cursor:pointer" onclick="publish($!goods.itemId,4);">上架</a>
+					<br/>
+				#elseif($!goods.itemStatus == 5)
+					<a class="font_1c" style="cursor:pointer" onclick="publish($!goods.itemId,4);">上架</a>
+					<br/>
+				#elseif($!goods.itemStatus == 4)
+					<a class="font_1c" style="cursor:pointer" onclick="publish($!goods.itemId,5);">下架</a>
+					<br/>
+				#end
+				#if($!goods.addSource == 2)
+          			<a class="font_1c" style="cursor: pointer;" onclick="view($!goods.itemId,true);">查看</a>
+          			<br/>
+          		#else
+          			<a class="font_1c" style="cursor:pointer" onclick="view($!goods.itemId,false);">查看</a>
+          			<br/>
+          		#end
+          		#if($!goods.itemStatus == 1)
+	          		<a class="font_1c" style="cursor:pointer" onclick="publish($!goods.itemId,2);">发布</a>
+	          		<br/>
+				#end
+				<!-- 商品待审核或者在售状态时不能删除！ -->
+          		#if($!goods.itemStatus != 2 and $!goods.itemStatus != 4)
+	          		<a class="font_1c" style="cursor:pointer" onclick="pseudoDelete($!goods.itemId);">删除</a>
+	          		<br/>
+				#end
+          	</p>
+          </td>
+		</tr>
+		#end
+      </table>
+      #pageVelocity($pager)
+      <div class="clear"></div>
+	  </div>
+	</div>
+      
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->
+
+<!-- 弹出层 设置广告词 -->
+<div class="po_fai" id="adDiv" style="display:none">
+    <div class="po_fai_bg"></div>
+    <div class="po_main2 pad_t10" >
+      <div class=" hei_32 bg_05 pad_l10 font_14b"><i class="demo-icons fa-times-circle font_16 fr mar_r10" onclick="hideDiv('adDiv')"></i>设置广告词</div>
+        <div class="shop_xinxi mar_t10">
+          <ul class="add_xx mar_l10">
+            <li class="wid_300 mar_l8 mar_tb10">设置广告语 : <input type="text" id="adAll" class="border-4 wid_180 mar_l10 input_Style2 hei_30" /></li>
+            <li class="wid_260 mar_l8 mar_tb10">
+                <button type="button" class="button_2 hei_35" onclick="useAll('adAll')">
+                  <a  class="font_ff" >应用到所有</a>
+                </button>
+              </li>
+            </ul>
+        </div>  
+        <div class="clear"></div>
+      <div class="list mar_t10">
+        <!-- 商品列表开头 -->
+        <ul class="list_top bg_08 font_14b">
+          <li class="wid_440 font_cen hei_35">商品名称</li>
+          <li class="wid_80 font_cen hei_35">商品编码</li>
+          <li class="wid_440 font_cen hei_35">广告词</li>
+        </ul>
+        <div class="clear"></div>
+        <!-- 商品信息 -->
+        <table class="information" id="information_advertisement">
+        </table>
+        <div class="wid_260 mar_cen">
+          <button type="button" class="button_2 but_cx mar_r20 hei_30" onclick="itemAdvertisementEdit()"><a class="font_ff">确定</a></button> 
+          <button type="button" class="button_3 but_cx hei_30" onclick="hideDiv('adDiv')"><a class="font_82">取消</a>  </button> 
+        </div> 
+        <div class="clear"></div>
+      </div>
+    </div>    
+</div>
+<!-- 设置广告词 end -->
+
+<!-- 弹出层 迁移类目 -->
+<div class="po_fai" style="display:none;" id="shopCategoryItemDiv">
+    <div class="po_fai_bg"></div>
+    <div class="po_main0 pad_t10" >
+      <div class=" hei_32 bg_05 pad_l10 font_14b"><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor" onclick="hideDiv('shopCategoryItemDiv')"></i>迁移类目</div>
+        <div class="clear"></div>
+      <div class="list mar_t10">
+        <!-- 商品列表开头 -->
+        <ul class="list_top bg_08 font_14b fl">
+          <li class="wid_270 font_cen hei_35">商品名称</li>
+          <li class="wid_120 font_cen hei_35">商品编码</li>
+          <li class="wid_270 font_cen hei_35">当前店铺类目</li>
+        </ul>
+        <div class="clear"></div>
+        <!-- 商品信息 -->
+        <div class="add_qynm">
+        <table class="information" id="information_shopCategory">
+        </table>
+        </div>
+        <div class="mar_t20">
+        <h3 class="hei_35">
+        迁移至：<select class="input_Style2 wid_90 mar_r10 hei_35" id="changeShopLevelOne">
+			<option value="">一级分类</option>
+			#foreach( $shopCategorySellerDTO in $shopCategorySellerDTOList) 
+                  	 <option #if($!shopLevelOneId == $shopCategorySellerDTO.cid) selected="selected" #end value="$!shopCategorySellerDTO.cid"> $!shopCategorySellerDTO.cname </option>
+			#end 
+		</select>
+        <select class="input_Style2 wid_90 mar_r10 hei_35" id="changeShopLevelTwo">
+			<option value="">二级分类</option>
+		</select></h3>
+        </div>
+        <div class="wid_260 mar_cen">
+          <button type="button" class="button_2 but_cx mar_r20 hei_30 " onclick="itemShopCategoryEdit()"><a class="font_ff">确定</a></button> 
+          <button type="button" class="button_3 but_cx hei_30" onclick="hideDiv('shopCategoryItemDiv')"><a class="font_82">取消</a>  </button> 
+        </div> 
+        <div class="clear"></div>
+      </div>
+    </div>    
+</div>
+<!-- 迁移类目 end -->
+
+<!--以下为弹出层-->
+<div class="po_fai" id="showErrorMsg" style="display:none">
+    <div class="po_fai_bg"></div>
+    <div class="po_main1">
+      <div class="tit bg_05 hei_30 pad_l10">提示</div>
+    <ul>
+        <li>请选择需要设置的商品！</li>
+        <li><a href="#"><button type="button" class="button_1 hei_35" onclick="hideDiv('showErrorMsg')" id="showMsgBtn">确定</button></a></li>
+    </ul>
+  </div>
+</div>
+
+
+<div class="po_fai" id="showSuccessMsg" style="display:none">
+    <div class="po_fai_bg"></div>
+    <div class="po_main1">
+      <div class="tit bg_05 hei_30 pad_l10">提示</div>
+    <ul>
+        <li>广告词设置成功</li>
+        <li><a href="#"><button type="button" class="button_1 hei_35" onclick="hideDiv('showSuccessMsg')">确定</button></a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="po_fai" id="showCateErrorMsg" style="display:none">
+    <div class="po_fai_bg"></div>
+    <div class="po_main1">
+      <div class="tit bg_05 hei_30 pad_l10">提示</div>
+    <ul>
+        <li>请选择要设置的店铺分类！</li>
+        <li><a href="#"><button type="button" class="button_1 hei_35" onclick="hideDiv('showCateErrorMsg')" id="showMsgBtn">确定</button></a></li>
+    </ul>
+  </div>
+</div>
+    
+
+

@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.goodscenter.dao.EvalTagDao">
+	<resultMap type="com.camelot.goodscenter.dto.EvalTagsOfCatDTO" id="searchList">
+		<id column="cid_l2"/>
+		<association property="catL1" javaType="com.camelot.goodscenter.dto.ItemCategoryDTO">
+			<result column="cid_l1" property="categoryCid"/>
+			<result column="cname_l1" property="categoryCName"/>
+		</association>
+		<association property="catL2" javaType="com.camelot.goodscenter.dto.ItemCategoryDTO">
+			<result column="cid_l2" property="categoryCid"/>
+			<result column="cname_l2" property="categoryCName"/>
+		</association>
+		<collection property="evalTagGroups" ofType="com.camelot.goodscenter.dto.EvalTag">
+			<id column="tag_id" property="tagId"/>
+			<result column="tag_name" property="tagName"/>
+		</collection>
+	</resultMap>
+	
+	<resultMap type="com.camelot.goodscenter.dto.EvalTag" id="bareTag">
+		<id column="tag_id" property="tagId"/>
+		<result column="tag_name" property="tagName"/>
+	</resultMap>
+
+	<insert id="add">
+		INSERT INTO item_eval_tag (
+			tag_name,
+			cid_l1,
+			cid_l2,
+			created,
+			modified
+		)
+		VALUES
+			<foreach collection="param.evalTagNames" item="tagName"
+				separator=",">
+			(#{tagName},#{param.cidL1},#{param.cidL2},now(),now())
+			</foreach>
+	</insert>
+	
+	<select id="queryCatsOfPage" resultType="integer">
+		SELECT
+			distinct cid_l2
+		FROM
+			item_eval_tag tag
+		WHERE
+			tag.deleted = 0
+		<include refid="where_fragment"></include>
+		ORDER BY cid_l2
+		<if test="pager != null">
+		LIMIT #{pager.pageOffset}, #{pager.rows}
+		</if>
+	</select>
+
+	<select id="queryList" resultMap="searchList">
+		SELECT
+			tag_id,
+			tag_name,
+			cid_l1,
+			catl1.c_name cname_l1,
+			cid_l2,
+			catl2.c_name cname_l2
+		FROM
+			item_eval_tag tag
+		LEFT JOIN
+			item_category catl1 ON tag.cid_l1 = catl1.cid
+		LEFT JOIN
+			item_category catl2 ON tag.cid_l2 = catl2.cid
+		WHERE
+			tag.deleted = 0
+		<include refid="where_fragment"></include>
+		<if test="catsL2 != null">
+			AND tag.cid_l2 IN
+			<foreach collection="catsL2" item="catL2"
+				open="(" separator="," close=")">
+				#{catL2}
+			</foreach>
+		</if>
+		ORDER BY
+			cid_l2
+	</select>
+	
+	<select id="countUnderCondition" resultType="long">
+		SELECT
+			COUNT(DISTINCT cid_l2)
+		FROM
+			item_eval_tag tag
+		WHERE
+			tag.deleted = 0
+		<include refid="where_fragment"></include>
+	</select>
+	
+	<select id="queryByItemId" resultMap="bareTag">
+		SELECT
+			tag.tag_id,
+			tag.tag_name
+		FROM
+			item
+		LEFT JOIN item_category c3 ON item.cid = c3.cid
+		LEFT JOIN item_category c2 ON c3.parent_cid = c2.cid
+		LEFT JOIN item_eval_tag tag ON c2.cid = tag.cid_l2
+		WHERE
+			tag.deleted=0
+		AND	item_id = #{itemId}
+	</select>
+	
+	<update id="updateNameOfOneTag">
+		UPDATE item_eval_tag
+		SET
+			tag_name = #{tagName},
+			modified = NOW()
+		WHERE
+			tag_id = #{tagId}
+	</update>
+	
+	<update id="deleteTags">
+		UPDATE item_eval_tag
+		SET
+			deleted = 1,
+			modified = NOW()
+		WHERE
+			tag_id IN
+		<foreach collection="tagIds" item="tagId" 
+		 open="(" separator="," close=")">
+			#{tagId}
+		</foreach>
+	</update>
+	
+	<sql id="where_fragment">
+		<if test="param != null">
+			<if test="param.cidL1 != null">
+			AND tag.cid_l1 = #{param.cidL1}
+			</if>
+			<if test="param.cidL2 != null">
+			AND tag.cid_l2 = #{param.cidL2}
+			</if>
+		</if>
+	</sql>
+	
+</mapper>

@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+			<title>对账页</title>
+			<link href="css/detail.css" rel="stylesheet" type="text/css" />
+			<link rel="stylesheet" type="text/css" src="css/detail.js" />
+			<link rel="stylesheet" type="text/css" src="css/style.js" />
+			<script type="text/javascript" src="js/iscroll.js"></script>
+			<script type="text/javascript" src="js/tab.js"></script>
+</head>
+<body>
+	<div id="main" class="po_re">
+
+		<div class="TabTitle bg_01">
+			<ul id="_myTab0" class="myTab0">
+				<li class="active" onclick="queryRquestPriceInfo(this,0);">对账单详情</li>
+			</ul>
+		</div>
+		<!-- 中间内容 -->
+		if
+		<div class="content" id="wrapper">
+			<p class="pad_lr5 hei_34 mar_t10 border_2">
+				<span class="fl font_5 font_1_2">对账单号</span><span
+					class="fr font_5 font_1_2">2015-3-4</span>
+			</p>
+			<dl class="border_2 pad_tb5 lin_24 pad_lr5">
+				<dt class="fl wid_75">
+					<p class="font_1_2 one wid_75"></p>
+					<p class="font_5 mar_t10">07-21</p>
+				</dt>
+				<dd class="fr font_right wid_15">
+					<p class=" font_1_2">-72</p>
+					<p class="font_3 mar_t10">已完成</p>
+				</dd>
+				<div class="clear"></div>
+			</dl>
+			<dl class="border_2 pad_tb5 lin_24 pad_lr5">
+				<dt class="fl wid_75">
+					<p class="font_1_2 one wid_75">百度美团订单百度美团订单百度美团订单</p>
+					<p class="font_5 mar_t10">07-21</p>
+				</dt>
+				<dd class="fr font_right wid_15">
+					<p class=" font_1_2">-72</p>
+					<p class="font_3 mar_t10">已完成</p>
+				</dd>
+				<div class="clear"></div>
+			</dl>
+			<dl class="border_2 pad_tb5 lin_24 pad_lr5">
+				<dt class="fl wid_75">
+					<p class=" font_1_2 one wid_75">百度美团订单百度美团订单百度美团订单</p>
+					<p class="font_5 mar_t10">07-21</p>
+				</dt>
+				<dd class="fr font_right wid_15">
+					<p class=" font_1_2">-72</p>
+					<p class="font_3 mar_t10">已完成</p>
+				</dd>
+				<div class="clear"></div>
+			</dl>
+			<dl class="border_2 pad_tb5 lin_24 pad_lr5">
+				<dt class="fl wid_75">
+					<p class=" font_1_2 one wid_75">百度美团订单百度美团订单百度美团订单</p>
+					<p class="font_5 mar_t10">07-21</p>
+				</dt>
+				<dd class="fr font_right wid_15">
+					<p class=" font_1_2">-72</p>
+					<p class="font_4 mar_t10">等待确认</p>
+				</dd>
+				<div class="clear"></div>
+			</dl>
+			<div class="font_right lin_24 mar_t10 mar_r2">
+				<p class="font_1_2">总计：2078.00</p>
+				<p class="font_2">(未付：2078.00)</p>
+			</div>
+		</div>
+		<!-- 中间内容 end-->
+		<!-- 底部 -->
+		<div class="foot bg_02">
+			<footer>
+			<dl class="fl">
+				<dt>
+					<img src="images/house.png">
+				</dt>
+				<dd>搜索</dd>
+			</dl>
+			<dl class="fl">
+				<dt>
+					<img src="images/shopping.png">
+				</dt>
+				<dd>购物车</dd>
+			</dl>
+			<dl class="fl">
+				<dt>
+					<img src="images/mai.png">
+				</dt>
+				<dd>买家中心</dd>
+			</dl>
+			<dl class="fl">
+				<dt>
+					<img src="images/maijia.png">
+				</dt>
+				<dd>买家中心</dd>
+			</dl>
+			</footer>
+		</div>
+		<!-- 底部 -->
+	</div>
+</body>
+</html>

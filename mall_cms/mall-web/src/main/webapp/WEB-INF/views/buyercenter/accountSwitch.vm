@@ -1,0 +1,91 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+
+<script type="text/javascript">
+	function acctSwitch(){
+		var appReason = $("#appReason").val();
+		//console.log("retval:"+appReason);
+		if(!appReason || $.trim(appReason)==""){
+			alert("请输入申请理由");
+			return;
+		}
+		$.get("$request.contextPath/buyercenter/accountSwitch",{reason:appReason},function(response){
+			if(response.result=='success'){
+				$("#dialog").hide();
+				alert("申请成功，正在等待主账号用户确认申请！");
+			}else if(response.result=='noParentId'){
+				alert("非子账号，无法进行子主账号切换申请！");
+			}else if(response.result=='equalsAccount'){
+				alert("您不能向自己申请子主账号切换！");
+			}else if(response.result=='hasChanged'){
+				alert("您已经切换过子主账号，无法再次申请！");		
+			}else if(response.result=='hasApplyed'){
+				alert("您已经申请过，无需重复申请！");
+			}else{
+				alert("服务器繁忙，请稍后再试！");
+			}
+		},"json");
+	}
+	
+	$(function(){
+		//加载左侧菜单
+		$("#leftBuyer").load("$request.contextPath/leftBuyer");
+		$(".demo-icons").bind("click", function(){$("#dialog").hide();});
+	});
+</script>
+
+<div id="main">
+<!-- left start -->
+<div id="leftBuyer" style="width: 198px; float: left;">&nbsp;</div>
+<!-- left end -->
+
+<!-- right start-->
+<div id="right">
+	<div id="right_top" class="right_top border-4 bg_06 mar_b10">
+		<div class="wid_820 mar_20 ">
+			<button class="button_1 hei_32" type="button" onclick="$('#dialog').show();">申请子主账号切换</button><br>
+		</div>
+		<br><br>
+		<div class="wid_820 mar_20 ">
+			<font  style="color: #000000;font-family:Microsoft YaHei ;" >
+    			功能说明：此按钮可实现店铺子账号与主账号的身份切换功能。切换后，子账号与主账号权限互换。<br><br>
+    			操作步骤：<br><br>
+                步骤1：店铺子账号申请子主账号切换；<br><br>
+                步骤2：主账号同意申请；<br><br>
+                步骤3：重新登录系统，子账号与主账号身份切换成功。<br><br>
+			</font>
+	
+		</div>
+	</div>
+</div>
+<!-- right end-->
+</div>
+
+<div class="po_fai small_ban" style="display: none" id="dialog">
+	<div class="po_fai_bg"></div>
+	<div class="po_main pad_t10">
+		<div class=" hei_32 bg_05 pad_l10 ">
+			<i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor"></i>
+			<h3>请输入申请理由：</h3>
+		</div>
+		<div class="clear"></div>
+		<div class="register_content" style="width: 550px; margin-top: 10px">
+			<ul>
+				<li>
+					<div class="wid_110 fl"><p class="hei_30 font_right">申请理由：</p></div>
+					<div class="wid_410 fl mar_l10 po_re font_left">
+						<textarea rows="2" cols="45" class="input_Style2 kf" id="appReason"></textarea>
+					</div>
+				</li>
+			</ul>
+			<div class="wid_410 mar_t10">
+				<div class="font_cen">
+					<button class="button_1 hei_30 mar_t10" onclick="acctSwitch();">确认</button>
+					<button class="button_5 hei_30 mar_l10 demo-icons">
+						<a href="javascript:void(0)">取消</a>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

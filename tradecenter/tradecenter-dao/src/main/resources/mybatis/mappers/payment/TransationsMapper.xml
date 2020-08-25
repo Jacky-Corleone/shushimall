@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.camelot.payment.dao.TransationsDAO">
+	
+	<resultMap id="transationsResultMap" type="Transations">
+		<result column="ID" property="id"/>
+		<result column="OUT_TRADE_NO" property="outTradeNo"/>
+		<result column="ORDER_NO" property="orderNo"/>
+		<result column="SUBJECT" property="subject"/>
+		<result column="ORDER_PARENT_NO" property="orderParentNo"/>
+		<result column="PAY_ORDER_TYPE" property="payOrderType"/>
+		<result column="PAY_BANK" property="payBank"/>
+		<result column="PAY_TYPE" property="payType" />
+		<result column="ORDER_AMOUNT" property="orderAmount"/>
+		<result column="SELLER" property="seller"/>
+		<result column="TO_ACCOUNT" property="toAccount"/>
+		<result column="BUYER" property="buyer"/>
+		<result column="FROM_ACCOUNT" property="fromAccount"/>
+		<result column="TRANSACTION_NO" property="transactionNo"/>
+		<result column="REAL_AMOUNT" property="realAmount"/>
+		<result column="STATUS" property="status"/>
+		<result column="STATUS_TEXT" property="statusText"/>
+		<result column="ENABLE_FLAG" property="enableFlag"/>
+		<result column="COMPLETED_TIME" property="completedTime"/>
+		<result column="CREATED_TIME" property="createdTime"/>
+		<result column="UPDATED_TIME" property="updatedTime"/>
+		
+		<result column="BANK_DISCOUNT" property="bankDiscount"/>
+		<result column="DISCOUNT_AMOUNT" property="discountAmount"/>
+		<result column="LAUNCH_PAY_DATE" property="launchPayDate"/>
+		<result column="LAUNCH_PAY_TIMES" property="launchPayTimes"/>
+		<result column="CALL_BANK_RESULT_DATE" property="callBankResultDate"/>
+		<result column="CALL_BANK_RESULT_TIMES" property="callBankResultTimes"/>
+		
+		<result column="DELIVERY_TYPE" property="deliveryType"/>
+		<result column="ORDER_DETAILS" property="orderDetails"/>
+		<result column="DEAL_FLAG" property="dealFlag"/>
+		<result column="PAYMENT_INFO_TYPE" property="payMediumCode"/>
+	</resultMap>
+	<sql id="count_Tail">
+		select count(1) from transations transations_
+	</sql>
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			ID
+ 			,OUT_TRADE_NO
+ 			,ORDER_NO
+ 			,SUBJECT
+ 			,ORDER_PARENT_NO
+ 			,PAY_ORDER_TYPE
+ 			,PAY_BANK
+ 			,ORDER_AMOUNT
+ 			,SELLER
+ 			,TO_ACCOUNT
+ 			,BUYER
+ 			,FROM_ACCOUNT
+ 			,TRANSACTION_NO
+ 			,REAL_AMOUNT
+ 			,STATUS
+ 			,STATUS_TEXT
+ 			,ENABLE_FLAG
+ 			,ORDER_DETAILS
+ 			,DEAL_FLAG
+ 			,DELIVERY_TYPE
+ 			,COMPLETED_TIME
+ 			,CREATED_TIME
+ 			,UPDATED_TIME
+ 			,DISCOUNT_AMOUNT
+ 			,BANK_DISCOUNT
+ 			,LAUNCH_PAY_TIMES
+ 			,LAUNCH_PAY_DATE
+ 			,CALL_BANK_RESULT_TIMES
+ 			,CALL_BANK_RESULT_DATE
+ 			,PAY_TYPE
+ 			,PAYMENT_INFO_TYPE
+		FROM 
+		transations transations_
+		]]>
+	</sql>
+	<sql id="where_fragement">
+		where transations_.ENABLE_FLAG=1
+		<if test="entity!=null">
+			<if test="entity.status != null  and entity.status !=''">
+				<![CDATA[ and transations_.STATUS =#{entity.status} ]]>
+			</if>
+			<if test="entity.payType != null  and entity.payType !=''">
+				<![CDATA[ and transations_.PAY_TYPE =#{entity.payType} ]]>
+			</if>
+			<if test="entity.orderParentNo != null  and entity.orderParentNo !=''">
+				<![CDATA[ and transations_.ORDER_PARENT_NO =#{entity.orderParentNo} ]]>
+			</if>
+			<if test="entity.payOrderType != null  and entity.payOrderType !=''">
+				<![CDATA[ and transations_.PAY_ORDER_TYPE =#{entity.payOrderType} ]]>
+			</if>
+		</if>
+	</sql>
+	<insert id="add" parameterType="Transations"  useGeneratedKeys="true" keyProperty="id">
+		<selectKey keyProperty="outTradeNo" order="BEFORE" resultType="String">
+			SELECT get_out_trade_no()
+		</selectKey>
+		INSERT INTO transations
+		  (
+		   OUT_TRADE_NO,
+		   ORDER_NO,
+		   SUBJECT,
+		   ORDER_PARENT_NO,
+		   PAY_ORDER_TYPE,
+		   ORDER_AMOUNT,
+		   STATUS,
+		   ORDER_DETAILS,
+		   DELIVERY_TYPE,
+		   CREATED_TIME,
+		   DISCOUNT_AMOUNT,
+		   BANK_DISCOUNT,
+		   PAY_TYPE,
+		   PAYMENT_INFO_TYPE,
+		   SELLER,
+		   TO_ACCOUNT,
+		   PAY_BANK
+		 <if test="launchPayTimes !=null">
+		   ,LAUNCH_PAY_TIMES
+		   ,LAUNCH_PAY_DATE
+		 </if>
+		   )
+		VALUES  (
+		   #{outTradeNo},
+		   #{orderNo},
+		   #{subject},
+		   #{orderParentNo},
+		   #{payOrderType},
+		   #{orderAmount},
+		   #{status},
+		   #{orderDetails},
+		   #{deliveryType}, 
+		   now(),
+		   #{discountAmount}, 
+		   #{bankDiscount},
+		   #{payType},
+		   #{payMediumCode}	,
+		   #{seller},
+		   #{toAccount},
+		   #{payBank}
+		   <if test="launchPayTimes !=null">
+		   ,#{launchPayTimes}
+		   ,now()
+		  </if>
+		   )
+	</insert>
+	
+	<insert id="adds" >
+		INSERT INTO transations
+		  (
+		   OUT_TRADE_NO,
+		   ORDER_NO,
+		   SUBJECT,
+		   ORDER_PARENT_NO,
+		   PAY_ORDER_TYPE,
+		   ORDER_AMOUNT,
+		   STATUS,
+		   ORDER_DETAILS,
+		   DELIVERY_TYPE,
+		   CREATED_TIME,
+		   DISCOUNT_AMOUNT,
+		   BANK_DISCOUNT,
+		   PAY_TYPE,
+		   PAYMENT_INFO_TYPE,
+		   SELLER,
+		   TO_ACCOUNT,
+		   PAY_BANK
+		   ,LAUNCH_PAY_TIMES
+		   ,LAUNCH_PAY_DATE
+		   ) SELECT * FROM 
+		<foreach collection="listTransations" item="item" index="index" separator="union all"  open="(" close=")">  
+				SELECT 00000000000000000 OUT_TRADE_NO,
+			   #{item.orderNo} ORDER_NO,
+			   #{item.subject} SUBJECT,
+			    #{item.orderParentNo} ORDER_PARENT_NO,
+			   #{item.payOrderType} PAY_ORDER_TYPE,
+			   #{item.orderAmount} ORDER_AMOUNT,
+			   #{item.status} STATUS,
+			  #{item.orderDetails} ORDER_DETAILS,
+			  #{item.deliveryType} DELIVERY_TYPE, 
+			   now() CREATED_TIME,
+			  #{item.discountAmount} DISCOUNT_AMOUNT, 
+			  #{item.bankDiscount} BANK_DISCOUNT,
+			  #{item.payType} PAY_TYPE,
+			  #{item.payMediumCode} PAYMENT_INFO_TYPE,
+			  #{item.seller} SELLER,
+			  #{item.toAccount} TO_ACCOUNT,
+			  #{item.payBank} PAY_BANK,
+			<if test="item.launchPayTimes !=null">
+			   #{item.launchPayTimes} LAUNCH_PAY_TIMES,
+			   now() LAUNCH_PAY_DATE
+			</if>
+			<if test="item.launchPayTimes ==null">
+			   0 LAUNCH_PAY_TIMES,
+			   null LAUNCH_PAY_DATE
+			</if>
+		</foreach> 
+		A
+	</insert>
+	
+	<update id="update" parameterType="transations">
+		UPDATE transations t
+		   SET 
+		   		UPDATED_TIME = now()
+	   		<if test="outTradeNo !=null and outTradeNo !=''">
+	   			,out_trade_no = #{outTradeNo}
+		   	</if>
+		   	<if test="payBank !=null and payBank !=''">
+		   		,PAY_BANK = #{payBank}
+		   	</if>
+		   	<if test="seller !=null and seller !=''">
+		   		,SELLER = #{seller}
+		   	</if>
+		   	<if test="toAccount !=null and toAccount !=''">
+		   		,TO_ACCOUNT = #{toAccount}
+		   	</if>
+		   	<if test="buyer !=null and buyer !=''">
+		   		,BUYER = #{buyer}
+		   	</if>
+		   	<if test="fromAccount !=null and fromAccount !=''">
+				,FROM_ACCOUNT =#{fromAccount}
+		   	</if>
+		   	<if test="transactionNo !=null and transactionNo !=''">
+				,TRANSACTION_NO =  #{transactionNo}
+		   	</if>
+		   	<if test="realAmount !=null">
+				,REAL_AMOUNT = #{realAmount}
+		   	</if>
+		   	<if test="status !=null">
+				,STATUS = #{status}
+		   	</if>
+		   	<if test="statusText !=null and statusText !=''">
+				,STATUS_TEXT = #{statusText}
+		   	</if>
+		   	<if test="enableFlag !=null">
+				,ENABLE_FLAG = #{enableFlag}
+		   	</if>
+		   	<if test="dealFlag !=null">
+				,DEAL_FLAG = #{dealFlag}
+		   	</if>
+		   	<if test="completedTime !=null">
+				,COMPLETED_TIME = #{completedTime}
+		   	</if>
+		   	<if test="launchPayTimes !=null and launchPayTimes !=0">
+				,LAUNCH_PAY_TIMES = #{launchPayTimes}
+				,LAUNCH_PAY_DATE = now()
+		   	</if>
+		   	<if test="callBankResultTimes !=null and callBankResultTimes !=0">
+				,CALL_BANK_RESULT_TIMES = #{callBankResultTimes}
+				,CALL_BANK_RESULT_DATE = now()
+		   	</if>
+		 where t.out_trade_no = #{outTradeNo} and t.enable_flag = '1'
+		   	<if test="orderNo !=null and orderNo !=''">
+				and ORDER_NO = #{orderNo}
+		   	</if>
+	</update>
+	
+	<update id="updateAmount" parameterType="transations">
+		UPDATE transations t SET UPDATED_TIME = now(),ORDER_AMOUNT = #{orderAmount}
+		 where t.out_trade_no = #{outTradeNo} and t.order_no = #{orderNo} and t.enable_flag = '1'
+	</update>
+	
+	<update id="updatesByParentId" parameterType="transations">
+		UPDATE transations t
+		   SET 
+		   		UPDATED_TIME = now()
+		   	<if test="payBank !=null and payBank !=''">
+		   		,PAY_BANK = #{payBank}
+		   	</if>
+		   	<if test="status !=null">
+				,STATUS = #{status}
+		   	</if>
+		   	<if test="enableFlag !=null">
+				,ENABLE_FLAG = #{enableFlag}
+		   	</if>
+		   	<if test="statusText !=null and statusText !=''">
+				,STATUS_TEXT = #{statusText}
+		   	</if>
+		   	<if test="launchPayTimes !=null and launchPayTimes !=0">
+				,LAUNCH_PAY_TIMES = #{launchPayTimes}
+				,LAUNCH_PAY_DATE = now()
+		   	</if>
+		   	<if test="realAmount !=null">
+				,REAL_AMOUNT = #{realAmount}
+		   	</if>
+		 where (t.ORDER_NO = #{orderNo} or  t.ORDER_PARENT_NO =#{orderNo}) and t.enable_flag = '1'
+	</update>
+	
+	<update id="updateByOrderId" parameterType="transations">
+		UPDATE transations t
+		   SET 
+		   		UPDATED_TIME = now()
+		   	<if test="enableFlag !=null">
+				,ENABLE_FLAG = #{enableFlag}
+		   	</if>
+		 where t.ORDER_NO = #{orderNo} and t.enable_flag = '1'
+	</update>
+	<update id="updateOutTradeNoByOrderId">
+		UPDATE transations t
+			SET
+				out_trade_no = #{outTradeNo}
+			where t.ORDER_NO = #{orderId} and t.enable_flag = '1'
+	</update>
+	<select id="selectTransByOrderNo" resultMap="transationsResultMap">	
+		select * from transations t	
+		where t.order_no = #{orderNo}
+		and t.enable_flag = 1
+	</select>
+	
+	<select id="selectTransByOutTrade" resultMap="transationsResultMap">
+		select * from transations t 
+		where t.out_trade_no = #{outTradeNo}
+		and t.enable_flag = 1
+	</select>
+	
+	<select id="selectChildTransByParentNo" resultMap="transationsResultMap">
+		select * from transations t where t.ORDER_PARENT_NO =#{orderParentNo} and t.enable_flag = 1
+	</select>
+	
+	<select id="selectOutTranNo" resultType="String">
+		SELECT get_out_trade_no(#{payType})
+	</select>
+	
+	<select id="queryList" resultMap="transationsResultMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+	</select>
+	<select id="queryCount" resultType="long" >
+		<include refid="count_Tail"/>
+		<include refid="where_fragement"/>
+	</select>
+	
+</mapper>

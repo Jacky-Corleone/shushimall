@@ -1,0 +1,91 @@
+#set($ctxPath="$request.contextPath")
+#set($layout = "common/blanklayout.vm")
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <base href="${request.getContextPath()}/"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>快速注册</title>
+<link type="text/css" rel="stylesheet" href="assets/css/detail.css" />
+<script type="text/javascript" src="assets/js/iscroll.js"></script>
+    <script type="text/javascript" src="assets\js\jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="assets/js/tab.js"></script>
+
+<script >
+var canbedo=true;
+function checkPwd(){
+    $('#mag').html("");
+    var chrnum = /^((?=.*?\d)(?=.*?[A-Za-z])|(?=.*?\d)(?=.*?[\W])|(?=.*?[A-Za-z])(?=.*?[\W]))[\dA-Za-z\W]+.{5,20}$/;
+    var loginpwd = $('#loginpwd1').val().trim();
+    var r = loginpwd.match(chrnum);
+    if(r==null){
+        $('#mag').html("密码为6-20位字符，由数字、字母、符号两个以上组合!");
+        return false;
+    }
+    return true;
+}
+
+function register () {
+    if(!canbedo){
+        toast("请不要频繁操作");
+        return false;
+    }
+    
+    if(!checkPwd()){
+    	return false;
+    }
+    
+    if($('#loginpwd1').val()!=$('#loginpwd2').val()){
+        $('#mag').html("两次输入的密码不相同！");
+        canbedo=true;
+        return false;
+    }
+    canbedo=false;
+    $.ajax({
+        type: "post",
+        dataType: "json",
+        url: "$request.contextPath/information/register/submitPersonal",
+        data: $("#personalForm").serializeArray(),
+        success: function (data) {
+            $('#mag').html(data.message);
+            window.location = "$request.contextPath";
+        },
+        error: function (data) {
+            $('#loginpwd1').val("");
+            $('#loginpwd2').val("");
+            $('#mag').html("注册失败，请重新操作！");
+            canbedo=true;
+            return false;
+        }
+    });
+    return false;
+}
+</script>
+
+</head>
+<body>
+<form id="personalForm" method="post" >
+<input id="keyPersonalRegisterDuplicateRedis" name="keyPersonalRegisterDuplicateRedis" type="hidden" value="$!keyPersonalRegisterDuplicateRedis"/>
+	<input id="loginname" name="loginname" type="hidden" value="$!loginname"/>
+    <input id="userMobile" name="userMobile" type="hidden" value="$!loginPhone"/>
+<div id="main" class="po_ab">
+    <!-- 中间内容 -->
+    <div class="content" id="wrapper">
+        <div class="hei_100 font_cen wid_100">
+            <img src="assets/images/logo-ke.png"  style="max-width: 100%;max-height: 100%"/>
+        </div>
+        <div class="hei_50 font_cen font_1_5">用户名：$!loginname</div>
+        <h3 class="hei_50 font_cen"><span id="mag" style="color: #c80000"></span></h3>
+        <ul class="pass mar_cen wid_87">
+            <li><p class="font_1_2 fl">密码：</p><input type="password" id="loginpwd1" name="loginpwd" class="wid_60 input_3 fr" onblur="checkPwd()"  required="true" placeholder="请设置密码，6-20位字符" /></li>
+            <li><p class="font_1_2 fl">再次输入密码：</p><input type="password" id="loginpwd2" name="loginpwd2" class="wid_60 input_3 fr" required="true" placeholder="请确认密码" /></li>
+        </ul>
+        <div class="font_cen"><button id="personalBtn" onclick="return register();return false;" class="button_1 wid_87 hei_32">确认</button></div>
+    </div><!-- 中间内容 end-->
+</div>
+</form>
+    #parse("common/common.vm")
+</body>
+</html>

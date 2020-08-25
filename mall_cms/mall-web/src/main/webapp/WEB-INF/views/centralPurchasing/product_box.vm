@@ -1,0 +1,270 @@
+#set($layout = "/none_layout.vm")
+<div class="Product_box_1">
+	<div class="big_img">
+		<a href="$request.getContextPath()/productController/details?id=$!entity.itemId&skuId=$!entity.skuId&centralPurchasingId=$!entity.centralPurchasingId" target="_blank">
+			<img src="$!imageServerAddr$entity.activityImg" style="width: 260px;height: 230px; margin-top: 4px;"/>
+		</a>
+	</div>
+	<div class="n_font">
+		#set($fullAttVal="")
+		#foreach($atts in $!entity.attributes)
+			#foreach($attvalue in $!atts.values)
+				#set($fullAttVal = $fullAttVal + $!attvalue.name)
+			#end
+		#end
+		<a class="over_ell fl " style="width:220px;font-size:14px;" href="$request.getContextPath()/productController/details?id=$!entity.itemId&skuId=$!entity.skuId&centralPurchasingId=$!entity.centralPurchasingId" title="$!entity.activityName &nbsp; $!fullAttVal" alt="$!entity.activityName &nbsp; $!fullAttVal" target="_blank">
+		$!entity.activityName&nbsp;
+		$fullAttVal
+		</a>
+	</div>
+	#if($entity.detailedStatus && $!entity.detailedStatus==1)
+		<div class="pingfen">
+			<span class="sousuo wid_140 over_ell" title="¥$!{entity.originalPrice}">
+				售价：<del>¥$!{entity.originalPrice}</del>
+			</span>
+        </div>
+		<div class="pingfen status ">
+			<span class="sousuo over_ell" title="#if($entity.centralPurchasingPrice)¥$!{entity.centralPurchasingPrice}#end"
+				style="width:155px;">
+				集采价：#if($entity.centralPurchasingPrice)<em class="currency">¥</em><span class="price">$!{entity.centralPurchasingPrice}</span>#else 无 #end
+			</span>
+			<span class="fr" style="width:118px; text-align: center;">
+				#if($!logging_status == "true")
+					<input type="button" class="button_small hei_35 font_14b" onclick="window.open('$request.getContextPath()/productController/details?id=$!entity.itemId&skuId=$!entity.skuId&centralPurchasingId=$!entity.centralPurchasingId','_blank');" value="立即抢购"/>
+				#else
+					<input type="button" class="button_gary hei_35 font_14b" onclick="javascript:void(0);" value="登录后可抢购"/>
+				#end
+			</span>
+        </div>
+		<div class="pingfen ">
+			<span class="sousuo wid_135 over_ell font_12m beginTime">
+				开始日期：$!date.format('yyyy-MM-dd',$!entity.activityBeginTime)
+			</span>
+			<span class="fr"></span>
+        </div>
+		<div class="pingfen ">
+			<span class="sousuo wid_135 over_ell font_12m endTime">
+				结束日期：$!date.format('yyyy-MM-dd',$!entity.activityEndTime)
+			</span>
+			<span class="wid_110 font_12m countDown j_timeLeft" countDown='true'
+					serverTime = "$!serverTime"
+    				startTime = "$!date.format('yyyy/MM/dd HH:mm:ss',$!entity.activityBeginTime)"
+    				noStartTip=""
+    				endTime="$!date.format('yyyy/MM/dd HH:mm:ss ',$!entity.activityEndTime)"
+    				endTip=""
+					callBack="setCentralPurchasingState(this,$!entity.activitesDetailsId)">
+					正在计算时间...
+			</span>
+			<span class="fr"></span>
+        </div>
+		<div class="footer-section">
+			<p class="num-auction"><em>$!{entity.signUpNum}</em>人已报名</p>
+            <p class="num-apply"><em>$!{entity.purchaseNum}</em>人已付款</p>
+        </div>
+	#elseif($entity.detailedStatus && $!entity.detailedStatus==2)
+		<div class="pingfen">
+			<span class="sousuo wid_140 over_ell">
+			</span>
+        </div>
+		<div class="pingfen status ">
+			<span class="sousuo wid_110 over_ell">
+				活动未开始
+			</span>
+			<span class="fr">
+				#if($!logging_status == "true")
+					<input type="button" class="button_small hei_35 font_14b" onclick="javascript:editCentralPurchasing(this,'$!entity.activitesDetailsId');" value="立即报名"/>
+				#else
+					<input type="button" class="button_gary hei_35 font_14b" onclick="javascript:void(0);" value="登录后可报名"/>
+				#end
+			</span>
+		</div>
+		<div class="pingfen ">
+			<span class="sousuo wid_135 over_ell font_12m">
+				开始日期：$!date.format('yyyy-MM-dd',$!entity.activitySignUpTime)
+			</span>
+			<span class="fr"></span>
+        </div>
+		<div class="pingfen ">
+			<span class="sousuo wid_135 over_ell font_12m">
+				结束日期：$!date.format('yyyy-MM-dd',$!entity.activitySignUpEndTime)
+			</span>
+			<span class="wid_110 font_12m countDown j_timeLeft"  countDown='true'
+					serverTime = "$!serverTime"
+    				startTime = "$!date.format('yyyy/MM/dd HH:mm:ss',$!entity.activitySignUpTime)"
+    				noStartTip=""
+    				endTime="$!date.format('yyyy/MM/dd HH:mm:ss ',$!entity.activitySignUpEndTime)"
+    				endTip=""
+					callBack="setCentralPurchasingState(this,$!entity.activitesDetailsId)" >
+					正在计算时间...
+    			 </span>
+			<span class="fr"></span>
+        </div>
+		<div class="footer-section">
+			<p class="num-auction"><em>$!{entity.signUpNum}</em>人已报名</p>
+            <p class="num-apply"><em>$!{entity.purchaseNum}</em>人已付款</p>
+        </div>
+	#elseif($entity.detailedStatus && $!entity.detailedStatus==3)
+		<div class="pingfen">
+			<span class="sousuo wid_140 over_ell">
+			</span>
+        </div>
+		<div class="pingfen status ">
+			<span class="sousuo wid_110 over_ell">
+				活动未开始
+			</span>
+			<span class="fr">
+				<input type="button" class="button_gary hei_35 font_14b" onclick="javascript:void(0);" value="报名未开始"/>
+			</span>
+        </div>
+		<div class="pingfen ">
+			<span class="sousuo wid_135 over_ell font_12m">
+				开始日期：$!date.format('yyyy-MM-dd',$!entity.activitySignUpTime)
+			</span>
+			<span class="wid_110 font_12m countDown j_timeLeft"  countDown='true'
+					serverTime = "$!serverTime"
+    				startTime = "$!serverTime"
+    				noStartTip=""
+    				endTime="$!date.format('yyyy/MM/dd HH:mm:ss ',$!entity.activitySignUpTime)"
+    				endTip=""
+					callBack="setCentralPurchasingState(this,$!entity.activitesDetailsId)">
+					正在计算时间...
+    			 </span>
+			<span class="fr"></span>
+        </div>
+		<div class="pingfen ">
+			<span class="sousuo wid_135 over_ell font_12m">
+				结束日期：$!date.format('yyyy-MM-dd',$!entity.activitySignUpEndTime)
+			</span>
+			<span class="fr"></span>
+        </div>
+		<div class="footer-section">
+			<p class="num-auction"><em>$!{entity.signUpNum}</em>人已报名</p>
+            <p class="num-apply"><em>$!{entity.purchaseNum}</em>人已付款</p>
+        </div>
+	#elseif($entity.detailedStatus && $!entity.detailedStatus==4)
+		<div class="pingfen">
+			<span class="sousuo wid_140 over_ell">
+			</span>
+        </div>
+		<div class="pingfen status ">
+			<span class="sousuo wid_110 over_ell">
+				活动未开始
+			</span>
+			<span class="fr">
+				<input type="button" class="button_gary hei_35 font_14b" onclick="javascript:void(0);" value="活动未开始"/>
+			</span>
+        </div>
+		<div class="pingfen ">
+			<span class="sousuo wid_135 over_ell font_12m">
+				开始日期：$!date.format('yyyy-MM-dd',$!entity.activityBeginTime)
+			</span>
+			<span class="wid_110 font_12m countDown j_timeLeft"  countDown='true'
+					serverTime = "$!serverTime"
+    				startTime = "$!serverTime"
+    				noStartTip=""
+    				endTime="$!date.format('yyyy/MM/dd HH:mm:ss ',$!entity.activityBeginTime)"
+    				endTip=""
+					callBack="setCentralPurchasingState(this,$!entity.activitesDetailsId)">
+					正在计算时间...
+    			 </span>
+			<span class="fr"></span>
+        </div>
+		<div class="pingfen ">
+			<span class="sousuo wid_135 over_ell font_12m">
+				结束日期：$!date.format('yyyy-MM-dd',$!entity.activityEndTime)
+			</span>
+			<span class="fr"></span>
+        </div>
+		<div class="footer-section">
+			<p class="num-auction"><em>$!{entity.signUpNum}</em>人已报名</p>
+            <p class="num-apply"><em>$!{entity.purchaseNum}</em>人已付款</p>
+        </div>
+	#elseif($entity.detailedStatus && $!entity.detailedStatus==5)
+		<div class="pingfen">
+			<span class="sousuo wid_140 over_ell">
+			</span>
+        </div>
+		<div class="pingfen status ">
+			<span class="sousuo wid_110 over_ell">
+				已售罄
+			</span>
+			<span class="fr">
+				<input type="button" class="button_gary hei_35 font_14b" onclick="javascript:void(0);" value="已售罄"/>
+			</span>
+        </div>
+		<div class="pingfen ">
+			<span class="sousuo wid_135 over_ell font_12m">
+				开始日期：$!date.format('yyyy-MM-dd',$!entity.activityBeginTime)
+			</span>
+			<span class="fr"></span>
+        </div>
+		<div class="pingfen ">
+			<span class="sousuo wid_135 over_ell font_12m">
+				结束日期：$!date.format('yyyy-MM-dd',$!entity.activityEndTime)
+			</span>
+			<span class="fr"></span>
+        </div>
+		<div class="footer-section">
+			<p class="num-auction"><em>$!{entity.signUpNum}</em>人已报名</p>
+            <p class="num-apply"><em>$!{entity.purchaseNum}</em>人已付款</p>
+        </div>
+	#elseif($entity.detailedStatus && $!entity.detailedStatus==6)
+		<div class="pingfen">
+			<span class="sousuo wid_140 over_ell">
+			</span>
+        </div>
+		<div class="pingfen status ">
+			<span class="sousuo wid_110 over_ell">
+				活动已终止
+			</span>
+			<span class="fr">
+				<input type="button" class="button_gary hei_35 font_14b" onclick="javascript:void(0);" value="活动已终止"/>
+			</span>
+        </div>
+		<div class="pingfen ">
+			<span class="sousuo wid_135 over_ell font_12m">
+				开始日期：$!date.format('yyyy-MM-dd',$!entity.activityBeginTime)
+			</span>
+			<span class="fr"></span>
+        </div>
+		<div class="pingfen ">
+			<span class="sousuo wid_135 over_ell font_12m">
+				结束日期：$!date.format('yyyy-MM-dd',$!entity.activityEndTime)
+			</span>
+			<span class="fr"></span>
+        </div>
+		<div class="footer-section">
+			<p class="num-auction"><em>$!{entity.signUpNum}</em>人已报名</p>
+            <p class="num-apply"><em>$!{entity.purchaseNum}</em>人已付款</p>
+        </div>
+	#elseif($entity.detailedStatus && $!entity.detailedStatus==7)
+		<div class="pingfen">
+			<span class="sousuo wid_140 over_ell">
+			</span>
+        </div>
+		<div class="pingfen status ">
+			<span class="sousuo wid_110 over_ell">
+				活动已结束
+			</span>
+			<span class="fr">
+				<input type="button" class="button_gary hei_35 font_14b" onclick="javascript:void(0);" value="活动已结束"/>
+			</span>
+        </div>
+		<div class="pingfen ">
+			<span class="sousuo wid_135 over_ell font_12m">
+				开始日期：$!date.format('yyyy-MM-dd',$!entity.activityBeginTime)
+			</span>
+			<span class="fr"></span>
+        </div>
+		<div class="pingfen ">
+			<span class="sousuo wid_135 over_ell font_12m">
+				结束日期：$!date.format('yyyy-MM-dd',$!entity.activityEndTime)
+			</span>
+			<span class="fr"></span>
+        </div>
+		<div class="footer-section">
+			<p class="num-auction"><em>$!{entity.signUpNum}</em>人已报名</p>
+            <p class="num-apply"><em>$!{entity.purchaseNum}</em>人已付款</p>
+        </div>
+	#end
+ </div>

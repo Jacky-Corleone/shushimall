@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.basecenter.dao.BaseSendMessageDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="baseSendMessage" type="baseSendMessageDTO">
+		<result property="id" column="id"/>
+		<result property="title" column="title"/>
+		<result property="address" column="address"/>
+		<result property="title" column="title"/>
+		<result property="content" column="content"/>
+		<result property="type" column="type"/>
+		<result property="isSend" column="is_send"/>
+		<result property="isPildash" column="is_pildash"/>
+		<result property="sendNum" column="send_num"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<sql id="selectAllColumns">
+		SELECT
+		  id,
+		  title,
+		  address,
+		  content,
+		  type,
+		  is_send,
+		  is_pildash,
+		  send_num,
+		  create_time
+	</sql>
+	<sql id="where_fragement">
+		where 1 = 1
+	   <if test="entity.isSend!=null and entity.isSend!=''">
+	     and is_send = #{entity.isSend}
+	   </if>
+	   <if test="entity.type!=null and entity.type!=''">
+	     and type = #{entity.type}
+	   </if>
+	   <if test="entity.isPildash!=null and entity.isPildash!=''">
+	     and is_pildash = #{entity.isPildash}
+	   </if>
+	   <if test="entity.minSendNum!=null">
+	     and send_num >= #{entity.minSendNum}
+	   </if>
+	   <if test="entity.maxSendNum!=null">
+	     and send_num <![CDATA[<=]]>  #{entity.maxSendNum}
+	   </if>
+	   <if test="entity.beginTime!=null">
+			<![CDATA[ and create_time >= #{entity.beginTime} ]]>
+		</if>
+	   <if test="entity.endTime!=null">
+			<![CDATA[ and create_time <= #{entity.endTime} ]]>
+		</if>
+	</sql>
+	
+	<!-- mysql 分页尾 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法 -->
+    <!-- =========================================================== -->
+	<!-- 保存 -->
+	<insert id="add" keyProperty="id" useGeneratedKeys="true" keyColumn="id" >
+		<selectKey resultType="long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+		insert into base_send_message(
+				title,
+				address,
+				content,
+				type,
+				is_send,
+				is_pildash,
+				send_num,
+				create_time
+		)values(
+				#{title},
+				#{address},
+				#{content},
+				#{type},
+				#{isSend},
+				#{isPildash},
+				#{sendNum},
+				now()
+		)
+	</insert>
+	
+	<!-- 编辑 -->
+	<update id="update">
+		update base_send_message 
+		<set>
+			<if test="title != null">
+				title = #{title},
+			</if>
+			<if test="address != null">
+				address = #{address},
+			</if>
+			<if test="content != null">
+				content = #{content},
+			</if>
+			<if test="type != null">
+				type = #{type},
+			</if>
+			<if test="isSend != null">
+				is_send = #{isSend},
+			</if>
+			<if test="isPildash != null">
+				is_pildash = #{isPildash},
+			</if>
+			<if test="sendNum != null">
+				send_num = #{sendNum},
+			</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<!-- 批量更新 -->
+	<update id="updateAll">
+		INSERT INTO base_send_message (id,is_send,send_num) VALUES
+			<foreach item="message" index="key" collection="messages" separator="," >
+				<if test="message.id != null">
+					(#{message.id},#{message.isSend},#{message.sendNum})
+				</if>
+            </foreach>  
+			ON DUPLICATE KEY UPDATE send_num = VALUES(send_num),is_send = VALUES(is_send)
+	</update>
+	<!-- 查询 -->
+	<select id="questyBaseSendMessageList" resultMap="baseSendMessage">
+		<include refid="selectAllColumns" />
+		from base_send_message
+		<include refid="where_fragement" />
+		ORDER BY create_time ASC
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		SELECT
+		  count(1)
+		from base_send_message
+		<include refid="where_fragement" />
+	</select>
+	
+	<delete id="deleteSendMessage">
+	   <if test="entity != null">
+	      delete from base_send_message
+		  <include refid="where_fragement" />
+	   </if>
+	</delete>
+	
+	
+</mapper>

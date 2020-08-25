@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.settlecenter.dao.SettleItemExpenseDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="settlementItemExpenseMap" type="com.camelot.settlecenter.dto.SettleItemExpenseDTO">
+				<result property="id" column="id"/>
+				<result property="itemId" column="item_id"/>
+				<result property="shopId" column="shop_id"/>
+				<result property="sellerId" column="seller_id"/>
+				<result property="rebateRate" column="rebate_rate"/>
+				<result property="serviceFee" column="service_fee"/>
+				<result property="cashDeposit" column="cash_deposit"/>
+				<result property="created" column="created"/>
+				<result property="modified" column="modified"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,item_id
+ 			,shop_id
+ 			,seller_id
+ 			,rebate_rate
+ 			,service_fee
+ 			,cash_deposit
+ 			,created
+ 			,modified
+		FROM 
+		settlement_item_expense settlement_item_expense_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.id != null  and entity.id !=''">
+				<![CDATA[ and settlement_item_expense_.id  = #{entity.id} ]]>
+			</if>
+			<if test="entity.itemId != null  and entity.itemId !=''">
+				<![CDATA[ and settlement_item_expense_.item_id  = #{entity.itemId} ]]>
+			</if>
+			<if test="entity.shopId != null  and entity.shopId !=''">
+				<![CDATA[ and settlement_item_expense_.shop_id  = #{entity.shopId} ]]>
+			</if>
+			<if test="entity.sellerId != null  and entity.sellerId !=''">
+				<![CDATA[ and settlement_item_expense_.seller_id  = #{entity.sellerId} ]]>
+			</if>
+			<if test="entity.rebateRate != null  and entity.rebateRate !=''">
+				<![CDATA[ and settlement_item_expense_.rebate_rate  = #{entity.rebateRate} ]]>
+			</if>
+			<if test="entity.serviceFee != null  and entity.serviceFee !=''">
+				<![CDATA[ and settlement_item_expense_.service_fee  = #{entity.serviceFee} ]]>
+			</if>
+			<if test="entity.cashDeposit != null  and entity.cashDeposit !=''">
+				<![CDATA[ and settlement_item_expense_.cash_deposit  = #{entity.cashDeposit} ]]>
+			</if>
+			<if test="entity.created != null  and entity.created !=''">
+				<![CDATA[ and settlement_item_expense_.created  = #{entity.created} ]]>
+			</if>
+			<if test="entity.modified != null  and entity.modified !=''">
+				<![CDATA[ and settlement_item_expense_.modified  = #{entity.modified} ]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="settlementItemExpenseMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where settlement_item_expense_.id = #{id}
+		]]>
+	</select>
+	
+	<select id="queryByItemId" resultMap="settlementItemExpenseMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where settlement_item_expense_.item_id = #{itemId}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="settlementItemExpenseMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		settlement_item_expense settlement_item_expense_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="com.camelot.settlecenter.dto.SettleItemExpenseDTO">
+		
+		<![CDATA[
+		insert into settlement_item_expense (
+		    	 item_id
+		    	 ,shop_id
+		    	 ,seller_id
+		    	 ,rebate_rate
+		    	 ,service_fee
+		    	 ,cash_deposit
+		    	 ,created
+		    	 ,modified
+		   )values(
+		    	#{itemId}
+		    	,#{shopId}
+		    	,#{sellerId}
+		    	,#{rebateRate}
+		    	,#{serviceFee}
+		    	,#{cashDeposit}
+		    	,now()
+		    	,now()
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.settlecenter.dto.SettleItemExpenseDTO">
+		<![CDATA[
+		update settlement_item_expense set
+   			rebate_rate = #{rebateRate}
+   			,service_fee = #{serviceFee}
+   			,cash_deposit = #{cashDeposit}
+   			,modified = now()
+		 where id = #{id}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from settlement_item_expense where id = #{id}
+		]]>
+	</delete>
+</mapper>

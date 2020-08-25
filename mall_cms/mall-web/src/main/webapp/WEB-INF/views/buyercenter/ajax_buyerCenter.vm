@@ -1,0 +1,140 @@
+#set($layout = "/none_layout.vm")
+ <div class="att_top">
+    <ul>
+        <li class="hover" id="opt_1" onClick="change_tab(1,1)">收藏商品</li>
+        <li id="opt_2" class="" onClick="change_tab(2,1)">热销商品</li>
+        <li id="opt_3" class="" onClick="change_tab(3,1)">集采商品</li>
+    </ul>
+</div><!--标题att_top end -->
+
+<!--收藏商品 start -->
+<div class="att_con1 att_webwrap bg_06 mar_tb10 border-4" id="opt_1_content">
+	<!--这两个a 里放的是向前滚动，向后滚动的箭头  如果要用这两个箭头  上面div里加 att_webwrap这个样式-->
+	#if("$pagerJSON.page"=="1")
+		<a class="po_ab prev prevStop" href="javascript:;">
+			<span class="po_ab icon-circle">•<i class="arrow arrowL po_ab"></i></span>
+		</a>
+	#else
+		<a class="po_ab prev" href="javascript:change_tab(1,$pagerJSON.previewPage)">
+			<span class="po_ab icon-circle">•<i class="arrow arrowL po_ab"></i></span>
+		</a>
+	#end
+	#if("$pagerJSON.page"=="$pagerJSON.nextPage")
+		<a class="po_ab next prevStop" href="javascript:#">
+			<span class="icon-circle">•<i class="arrow arrowR po_ab"></i></span>
+		</a>
+	#else
+		<a class="po_ab next" href="javascript:change_tab(1,$pagerJSON.nextPage)">
+			<span class="icon-circle">•<i class="arrow arrowR po_ab"></i></span>
+		</a>
+	#end
+	#foreach( $product in $pagerJSON.records )
+	<ul>
+		<li class="att_pro">
+			<a href="$request.contextPath/productController/details?id=$product.itemId&skuId=$product.skuId" class="att_new" target="_Blank" >
+				#if($!product.picUrl)
+					<img src="$!imageServerAddr$!product.picUrl"/>
+				#else
+					<img src="#"/>
+				#end
+			</a>
+		</li>
+		<li class="att_name">
+			<a href="$request.contextPath/productController/details?id=$product.itemId&skuId=$product.skuId" target="_Blank" >$product.itemName</a>
+		</li>
+	</ul>
+	#end
+</div>
+<!--收藏商品end-->
+
+<!--热销商品 start -->
+<div class="att_con1 att_webwrap bg_06 mar_tb10 border-4" id="opt_2_content" style="display: none;">
+<!--这两个a 里放的是向前滚动，向后滚动的箭头  如果要用这两个箭头  上面div里加 att_webwrap这个样式-->
+    #if("$pagerJSON.page"=="1")
+		<a class="po_ab prev prevStop" href="javascript:;">
+			<span class="po_ab icon-circle">•<i class="arrow arrowL po_ab"></i></span>
+		</a>
+	#else
+		<a class="po_ab prev" href="javascript:change_tab(2,$pagerJSON.previewPage)">
+			<span class="po_ab icon-circle">•<i class="arrow arrowL po_ab"></i></span>
+		</a>
+	#end
+	#if("$pagerJSON.page"=="$pagerJSON.nextPage")
+		<a class="po_ab next prevStop" href="javascript:#">
+			<span class="icon-circle">•<i class="arrow arrowR po_ab"></i></span>
+		</a>
+	#else
+		<a class="po_ab next" href="javascript:change_tab(2,$pagerJSON.nextPage)">
+			<span class="icon-circle">•<i class="arrow arrowR po_ab"></i></span>
+		</a>
+	#end
+    #foreach($hotMallAdDTO in $pagerJSON.records)
+	<ul>
+		<li class="att_pro">
+			<a onclick="openUrl('$!hotMallAdDTO.adURL')" class="att_new cursor" target="_Blank">
+				#if($!hotMallAdDTO.adSrc)
+				<img src="$!imageServerAddr$!hotMallAdDTO.adSrc" width="100%" height="100%"/>
+				#else
+				<img src="#" width="100%" height="100%"/>
+				#end
+			</a>
+		</li>
+		<li class="att_name">
+			<a href="$hotMallAdDTO.adURL" target="_Blank" >
+				$hotMallAdDTO.title
+			</a>
+		</li>
+	</ul>
+	#end
+</div>
+<!--热销商品end-->
+
+<!--集采商品 start -->
+<div class="att_con1 att_webwrap bg_06 mar_tb10 border-4" id="opt_3_content" style="display: none;">
+<!--这两个a 里放的是向前滚动，向后滚动的箭头  如果要用这两个箭头  上面div里加 att_webwrap这个样式-->
+   	#if("$pagerJSON.page"=="1")
+		<a class="po_ab prev prevStop" href="javascript:;">
+			<span class="po_ab icon-circle">•<i class="arrow arrowL po_ab"></i></span>
+		</a>
+	#else
+		<a class="po_ab prev" href="javascript:change_tab(3,$pagerJSON.previewPage)">
+			<span class="po_ab icon-circle">•<i class="arrow arrowL po_ab"></i></span>
+		</a>
+	#end
+	#if("$pagerJSON.page"=="$pagerJSON.nextPage")
+		<a class="po_ab next prevStop" href="javascript:#">
+			<span class="icon-circle">•<i class="arrow arrowR po_ab"></i></span>
+		</a>
+	#else
+		<a class="po_ab next" href="javascript:change_tab(3,$pagerJSON.nextPage)">
+			<span class="icon-circle">•<i class="arrow arrowR po_ab"></i></span>
+		</a>
+	#end
+    #foreach($centralPurchase in $pagerJSON.records)
+	<ul>
+		#set($fullAttVal="")
+		#foreach($atts in $!centralPurchase.attributes)
+			#foreach($attvalue in $!atts.values)
+				#set($fullAttVal = $fullAttVal + $!attvalue.name)
+			#end
+		#end
+		<li class="att_pro">
+			<a class="over_ell fl att_new " style="width:220px" href="$request.getContextPath()/productController/details?id=$!centralPurchase.itemId&skuId=$!centralPurchase.skuId&centralPurchasingId=$!centralPurchase.centralPurchasingId" title="$!centralPurchase.activityName &nbsp; $!fullAttVal" alt="$!centralPurchase.activityName &nbsp; $!fullAttVal" target="_blank">
+				#if($!centralPurchase.activityImg)
+				<img src="$!imageServerAddr$!centralPurchase.activityImg" width="100%" height="100%"/>
+				#else
+				<img src="#" width="100%" height="100%"/>
+				#end
+			</a>
+		</li>
+		<li class="att_name">
+			
+			<a class="over_ell fl " style="width:220px" href="$request.getContextPath()/productController/details?id=$!centralPurchase.itemId&skuId=$!centralPurchase.skuId&centralPurchasingId=$!centralPurchase.centralPurchasingId" title="$!centralPurchase.activityName &nbsp; $!fullAttVal" alt="$!centralPurchase.activityName &nbsp; $!fullAttVal" target="_blank">
+				$!centralPurchase.activityName&nbsp;
+				$!fullAttVal
+			</a>
+		</li>
+	</ul>
+	#end
+</div>
+<!--集采商品 end-->

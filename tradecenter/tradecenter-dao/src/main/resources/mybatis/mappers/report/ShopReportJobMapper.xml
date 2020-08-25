@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.report.dao.ShopReportJobDao">
+
+	<!-- 把查出来的店铺的信息到report_sell_shop表 -->
+	<insert id="insertReportShopReportByShop" >
+		<![CDATA[
+		INSERT INTO report_sell_shop (
+			shop_id,
+			shop_name,
+			seller_id,
+			pass_time,
+			province_code,
+			province_name,
+			zcode,
+			street_name,
+			mobile,
+			orderNum,
+			saleNum,
+			customerNum
+		)
+		values (
+			#{shopReportDTO.shopId},
+			#{shopReportDTO.shopName},
+			#{shopReportDTO.sellerId},
+			#{shopReportDTO.passTime},
+			#{shopReportDTO.provinceCode},
+			#{shopReportDTO.provinceName},
+			#{shopReportDTO.zcode},
+			#{shopReportDTO.streetName},
+			#{shopReportDTO.mobile},
+			#{shopReportDTO.orderNum},
+			#{shopReportDTO.saleNum},
+			#{shopReportDTO.customerNum}
+		)	
+		]]>	
+	</insert>
+
+	<!-- 从tradecenter.trade_orders表里更新订单的信息到report_sell_shop表 -->
+	<update id="updateReportShopReportByOrder" parameterType="String">
+		UPDATE 
+		  report_sell_shop r 
+		  INNER JOIN 
+		    (SELECT 
+		      od.shop_id,
+		      COUNT(1) orderNum,
+		      SUM(i.num) saleNum,
+		      COUNT(DISTINCT od.buyer_id) customerNum 
+		    FROM
+		      (SELECT 
+		        t.order_id,
+		        t.buyer_id,
+		        t.shop_id 
+		      FROM
+		        trade_orders t 
+		      WHERE t.parent_order_id != '0' 
+		        AND t.paid = 2 
+		        AND EXISTS 
+		        (SELECT 
+		          1 
+		        FROM
+		          trade_orders p 
+		        WHERE t.shop_id = p.shop_id 
+		          AND p.parent_order_id != '0'  AND p.paid=2 
+		           <if test="dealDate != null  and dealDate !=''">
+					<![CDATA[  AND DATE_FORMAT(p.payment_time, '%Y%m%d') = #{dealDate}  ]]>
+				  </if>
+		        GROUP BY shop_id)) od 
+		      INNER JOIN 
+		        (SELECT 
+		          order_id,
+		          num 
+		        FROM
+		          trade_order_items) i 
+		        ON od.order_id = i.order_id 
+		    GROUP BY od.shop_id) s 
+		    ON r.shop_id = s.shop_id 
+		    SET r.orderNum = s.orderNum,
+				r.saleNum = s.saleNum,
+				r.customerNum = s.customerNum 
+	</update>
+</mapper>

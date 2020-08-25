@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.camelot.basecenter.dao.BaseConsultingSmsDAO">
+   <resultMap id="BaseConsultingSmsDTOmapper" type="com.camelot.basecenter.dto.BaseConsultingSmsDTO">
+      <result property="id" column="id"/>
+      <result property="itemId" column="item_id"/>
+      <result property="consulting" column="consulting"/>
+      <result property="reply" column="reply"/>
+      <result property="created" column="created"/>
+      <result property="modified" column="modified"/>
+      <result property="buyerId" column="buyers_id"/>
+      <result property="sellerId" column="seller_id"/>
+      <result property="status" column="status"/>
+   </resultMap>
+   
+   <sql id="selectAll">
+      select * from base_consulting_sms 
+   </sql>
+   <sql id="where_if">
+     where status=1  
+     <if test="entity != null">
+        <if test="entity.id != null and entity.id != 0">
+           and id=#{entity.id}
+        </if>
+        <if test="entity.itemId != null and entity.itemId != 0">
+           and item_id=#{entity.itemId}
+        </if>
+         <if test="entity.consulting != null and entity.consulting != ''">
+           and consulting=#{entity.consulting}
+        </if>
+        <if test="entity.reply != null and entity.reply != ''">
+           and reply=#{entity.reply}
+        </if>
+         <if test="entity.created != null and entity.created != 0">
+           and created=#{entity.created} 
+        </if>
+         <if test="entity.modified != null and entity.modified != 0">
+           and modified=#{entity.modified}
+        </if>
+        <if test="entity.buyerId != null and entity.buyerId != 0">
+           and buyers_id=#{entity.buyerId}
+        </if>
+        <if test="entity.buyerIdList != null and entity.buyerIdList.size()>0">
+			<![CDATA[ 
+				AND buyers_id in
+				]]>
+			<foreach collection="entity.buyerIdList" item="buyerId" open="(" separator="," close=")">
+				#{buyerId}
+			</foreach>
+		</if>
+        <if test="entity.sellerId != null and entity.sellerId != 0">
+           and seller_id=#{entity.sellerId}
+        </if>
+     </if>
+   </sql>
+   
+   <select id="queryList" resultMap="BaseConsultingSmsDTOmapper">
+     <include refid="selectAll"></include>
+     <include refid="where_if"></include>
+        ORDER BY created DESC,modified DESC 
+     <if test="page != null">
+       limit #{page.pageOffset},#{page.rows}
+     </if>
+   </select>
+   <select id="queryCount" resultType="long">
+     select count(*) from base_consulting_sms
+     <include refid="where_if"></include>
+   </select>
+   
+   <select id="queryById" resultMap="BaseConsultingSmsDTOmapper">
+    select * from base_consulting_sms  where id=#{id}
+   </select>
+   
+  <update id="updateBySelect" parameterType="com.camelot.basecenter.dto.BaseConsultingSmsDTO">
+    update base_consulting_sms
+    set reply=#{reply},
+        modified=now()
+    where id=#{id}
+  </update>
+  
+  <insert id="add" keyProperty="id" useGeneratedKeys="true" parameterType="com.camelot.basecenter.dto.BaseConsultingSmsDTO">
+     insert into base_consulting_sms(
+        item_id
+       ,consulting
+       ,reply
+       ,created
+       ,buyers_id
+       ,seller_id
+       ,status)
+    values(
+        #{itemId}
+       ,#{consulting}
+       ,#{reply}
+       ,now()
+       ,#{buyerId}
+       ,#{sellerId}
+       ,1)
+  </insert>
+  
+  <update id="delete" parameterType="long">
+     update base_consulting_sms
+     set status=2
+     where id=#{id}
+  </update>
+ </mapper>

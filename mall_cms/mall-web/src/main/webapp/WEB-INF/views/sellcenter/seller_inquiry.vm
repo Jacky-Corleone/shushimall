@@ -1,0 +1,273 @@
+
+
+#set($layout = "/seller_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<link href="$staticPath/css/manage_style.css" rel="stylesheet" type="text/css" />
+<link href="$staticPath/css/register.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript">
+    $("document").ready(function(){
+        $("#leftSeller").load("$request.contextPath/leftSeller");
+    });
+    //到指定的分页页面
+    function topage(page){
+        var form = document.getElementById("inquiryForm");
+        form.page.value=page;
+        form.submit();
+    }
+
+    function openWinInquiry(id){
+        $.ajax({
+            url: "$request.contextPath/sellercenter/inquiryInfo",
+            type: "post",
+            data: { "id":id },
+            dataType: "json",
+            success: function(er){
+                if( er.success ){
+                    $("#winInquiry").find("#email").html("").html(er.result.email);
+                    $("#winInquiry").find("#telephone").html("").html(er.result.cellphone);
+                    $("#winInquiry").find("#quantity").html("").html(er.result.inquiryQty);
+                    $("#winInquiry").find("#description").html("").html(er.result.comment);
+                    $("#winInquiry").find("[name='id']").val("").val(er.result.id);
+                    
+                    $("#winInquiry").find("#inquiryPrice").val("").val(er.result.inquiryPrice);
+                    $("#winInquiry").find("#inquiryRemark").val("").val(er.result.inquiryRemark);//卖家备注
+                    $("#winInquiry").find("#item").attr("src","").attr("src","$!imageServerAddr"+er.result.itemPic);
+                    $("#winInquiry").find("#itemTitle").attr("title",er.result.itemName).html(er.result.itemName);
+                    $("#winInquiry").find("#itemAttr").html("").html(er.result.itemAttr);
+                    $("#inquiryMsg").html("");
+
+					$("#winInquiry").find("#d4311").val("");
+					$("#winInquiry").find("#d4312").val("");
+                    if( er.result.startTime != null ){
+                        $("#winInquiry").find("#d4311").val(new Date(er.result.startTime).format("yyyy-MM-dd"));
+                    }
+                    if( er.result.endTime != null ){
+                        $("#winInquiry").find("#d4312").val(new Date(er.result.endTime).format("yyyy-MM-dd"));
+                    }
+                    $("#winInquiry").show();
+                }else{
+                    alert("获取询价信息异常，请稍候再试！");
+                }
+            }
+        });
+
+    }
+
+    function closeWinInquiry(obj){
+        $("#winInquiry").hide();
+    }
+
+    function saveInquiry(){
+
+        var inquiryPrice = $("#winInquiry").find("[name='inquiryPrice']").val();
+        var regPrice = /^(-)?(([1-9]{1}\d*)|([0]{1}))(\.(\d){1,2})?$/;
+        if( !regPrice.exec(inquiryPrice) ){
+            $("#inquiryMsg").html("输入金额有误！");
+            return;
+        }
+        var startTime = $("#winInquiry").find("[name='startTime']").val();
+        if( startTime == null || startTime == "" ){
+            $("#inquiryMsg").html("起始时间不能为空！");
+            return;
+        }
+        var endTime = $("#winInquiry").find("[name='endTime']").val();
+        if( endTime == null || endTime == "" ){
+            $("#inquiryMsg").html("结束时间不能为空！");
+            return;
+        }
+
+        $.ajax({
+            url: "$request.contextPath/sellercenter/modifyInquiry",
+            data: $("#winInquiry").find("form").serialize(),
+            type: 'post',
+            dataType: 'json',
+            success: function(data){
+                if( data.success ){
+                    location.href="$request.contextPath/sellercenter/inquiry"
+                }else{
+                    alert(data.result);
+                }
+            }
+        });
+    }
+</script>
+
+
+<div id="main">
+    <div id="leftSeller" style="width: 198px; float: left;" class="border-4">&nbsp;</div>
+
+    <!--右边部分开始-->
+    <div id="right">
+        <div id="right_top" class="right_top border-4 bg_06">
+            <form id="inquiryForm" action="$request.contextPath/sellercenter/inquiry" method="post">
+                <input type="hidden" name="page" value="$!pager.page" />
+                <div class="tit bg_05 mar_lr10 " style="width: 98%;">报价管理</div>
+                <div class="right_top_l">
+                    <ul class="list">
+                        <li class="wid_300">
+                            <span class="font_wid">商品：</span>
+                            <input class="input_Style2 wid_150 hei_30" name="itemName" type="text" value="$!inquiry.itemName"/>
+                        </li>
+                        <!-- 						<li class="wid_400"> -->
+                        <!-- 							<span class="font_wid">卖家信息：</span> -->
+                        <!-- 							<input class="input_Style2 wid_150 hei_30" type="text" /> -->
+                        <!-- 						</li> -->
+                        <li class="wid_500">
+                            <span class="font_wid">询价时间：</span>
+                            <input id="d4313" name="startTime" value="$!date.format('yyyy-MM-dd',$!inquiry.startTime)" readonly class="Wdate" type="text" onFocus="WdatePicker({maxDate:'#F{$dp.$D(\'d4314\')}'})" style="line-height: 30px; height: 30px;"/>
+                            <i>-</i>
+                            <input id="d4314" name="endTime" value="$!date.format('yyyy-MM-dd',$!inquiry.endTime)" readonly class="Wdate" type="text" onFocus="WdatePicker({minDate:'#F{$dp.$D(\'d4313\')}'})" style="line-height: 30px; height: 30px;"/>
+                        </li>
+                        <!-- 						<li class="wid_400"> -->
+                        <!-- 							<span class="font_wid">价格有效期：</span> -->
+                        <!-- 							<input class="jcDate wid_110 hei_24  border-4 wid_80 pad_l10" /> -->
+                        <!-- 							<i>-</i> -->
+                        <!-- 							<input class="jcDate wid_110 hei_24  border-4 wid_80 pad_l10" /> -->
+                        <!-- 						</li> -->
+
+                    </ul>
+                </div>
+                <div class="right_top_r ">
+                    <button type="button" onclick="topage(1);" class="button_4 but_cx3" style="width: 80px; height: 28px;">查 询</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 标题 -->
+        <div id="right_bot" class="right_bot border-4 mar_t10 bg_06">
+            <div class="tit">报价管理</div>
+            <div class="right_xinxi mar_l14">
+                <ul class="list_top bg_08 font_cen">
+                    <li class="wid_200">商品信息</li>
+                    <li class="wid_120">买家信息</li>
+                    <li class="wid_80">购买数量</li>
+                    <li class="wid_100">询价时间</li>
+                    <li class="wid_90">我的报价</li>
+                    <li class="wid_150">价格有效期</li>
+                    <li class="wid_150">备注</li>
+                    <li class="wid_50">操作</li>
+                </ul>
+
+                #foreach( $inquiry in $pager.records )
+                	<!-- 内容循环UL -->
+                    <ul class="xunwen border-6">
+                        <li class="wid_200">
+                            <dl class="shop_selsct wid_220 mar_lr10">
+                                <dt>
+                                    <a href="$request.contextPath/productController/details?id=$!inquiry.itemId&skuId=$!inquiry.skuId" target="_blank">
+                                        <img id="picUrl" class="mar_t10 mar_l10 " src="$!imageServerAddr$inquiry.pictureUrl" width="50" height="50">
+                                    </a>
+                                </dt>
+                                <dd id="itemName" class="wid_110 mar_t10 mar_l10">
+                                    <a href="$request.contextPath/productController/details?id=$!inquiry.itemId&skuId=$!inquiry.skuId" target="_blank">
+                                        $!inquiry.itemName
+                                    </a>
+                                </dd>
+                            </dl>
+                        </li>
+                        <li id="buyerName" class="wid_120 mar_t10">
+                            <p>姓名：$!inquiry.buyerName</p>
+                            <p>电话：$!inquiry.cellphone</p>
+                        </li>
+                        <li id="qty" class="wid_80 font_cen hei_60 ">$!inquiry.inquiryQty</li>
+                        <li class="wid_100 font_cen hei_60">$!date.format('yyyy-MM-dd HH:mm:ss ',$!inquiry.created)</li>
+                        <li class="wid_90 font_cen hei_60">$!inquiry.inquiryPrice</li>
+                        <li class="wid_150 font_cen hei_60">
+                            #if( $inquiry.startTime  && $inquiry.endTime )
+                                <span>$!date.format('yyyy-MM-dd',$!inquiry.startTime)</span>至
+                                <span>$!date.format('yyyy-MM-dd',$!inquiry.endTime)</span>
+                            #end
+                        </li>
+                        <li class="wid_150 font_cen hei_60">$!inquiry.inquiryRemark</li>
+                        <li class="wid_50 font_cen hei_60">
+                            <a class="border-6" href="javascript:void(0);" onclick="openWinInquiry($!inquiry.id)">修改</a>
+                        </li>
+                    </ul>
+                #end
+                #pageVelocity($pager)
+            </div>
+        </div>
+        <!--右边部分结束-->
+    </div>
+
+    <!-- 咨询价格  开始 -->
+    <div id="winInquiry" class="po_fai" style="display: none; width: 0px; height: 0px;">
+        <div class="po_fai_bg"></div>
+        <div class="po_main pad_t10" style="width: 700px;">
+            <div class=" hei_32 bg_05 pad_l10 font_14b">
+                <a href="javascript:void(0);" onclick="closeWinInquiry(this)"><i class="demo-icons fa-times-circle font_16 fr mar_r10"></i></a>
+               	 咨询价格
+            </div>
+            <div style="width: 700px; height: 280px;">
+                <div style="float: left; border-right: 1px solid #eee; width: 290px; height: 280px;">
+                    <div class="register_box_mid" style="margin-top: 5px; height: 50px; line-height: 50px;">
+                        <div style="height: 50px;line-height: 50px; padding-bottom:10px;">
+                            <div style="float: left;min-width: 80px; text-align: right;font-size: 16px;">
+                                <img id="item" style="width: 50px; height: 50px; margin-right: 5px;">
+                            </div>
+                            <div style="border:none; line-height: 24px; padding-left: 5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                <span id="itemTitle" ></span><br>
+                                <span id="itemAttr"></span>
+                            </div>
+                        </div>
+                        <div style="height: 30px;line-height: 30px; padding-bottom:10px;">
+                            <div style="float: left;min-width: 80px; text-align: right;font-size: 16px;">邮箱：</div>
+                            <div id="email" style="border:none"></div>
+                        </div>
+                        <div style="height: 30px;line-height: 30px; padding-bottom:10px;">
+                            <div style="float: left;min-width: 80px; text-align: right;font-size: 16px;">手机：</div>
+                            <div id="telephone" style="border:none"></div>
+                        </div>
+                        <div style="height: 30px;line-height: 30px; padding-bottom:10px;">
+                            <div style="float: left;min-width: 80px; text-align: right;font-size: 16px;">数量：</div>
+                            <div id="quantity" style="border:none"></div>
+                        </div>
+                        <div style="height: 30px;line-height: 30px; padding-bottom:10px;">
+                            <div style="float: left;min-width: 80px; text-align: right;font-size: 16px;">说明：</div>
+                            <div id="description" style="border:none"></div>
+                        </div>
+                    </div><!--register_box-->
+                </div>
+                <div style=" float: right; width:400px; height:280px;">
+                    <form>
+                        <div class="register_box_mid" style="margin:0; width: 400px;">
+                            <div style="height: 30px;line-height: 30px; padding-bottom:10px;">
+                                <div style="float: left;min-width: 60px; text-align: right;font-size: 16px;">单价：</div>
+                                <div id="email" style="border:none">
+                                    <input name="id" type="hidden">
+                                    <input id="inquiryPrice" name="inquiryPrice" class="input_Style2 wid_200 hei_24" type="text" maxlength="20"/>
+                                </div>
+                            </div>
+                            <div style="height: 30px;line-height: 30px; padding-bottom:10px;">
+                                <div style="float: left;min-width: 60px; text-align: right;font-size: 16px;">有效期：</div>
+                                <div id="email" style="border:none">
+                                    <input id="d4311" name="startTime" readonly class="Wdate" type="text" onFocus="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(\'d4312\')}'})" style="line-height: 24px; height: 24px; width: 120px"/>
+                                    <i class="demo-icons">-</i>
+                                    <input id="d4312" name="endTime" readonly class="Wdate" type="text" onFocus="WdatePicker({dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(\'d4311\')}'})" style="line-height: 24px; height: 24px; width: 120px"/>
+                                </div>
+                            </div>
+                            <div style="height: 60px;line-height: 30px; padding-bottom:10px;">
+                                <div style="float: left;min-width: 60px; text-align: right;font-size: 16px;">备注：</div>
+                                <div id="email" style="border:none">
+                                    <input name="id" type="hidden">
+                                    <textarea id="inquiryRemark" name="inquiryRemark" size="3" class="input_Style2 wid_260 hei_60" type="text" maxlength="200">
+                                    </textarea>
+                                </div>
+                            </div>
+                            <div>
+                                <button type="button" class="button_2 hei_40 font_16" onclick="saveInquiry()" style="margin: 0px;">确定</button>
+                                <button type="button" class="button_3  hei_40 font_16" onclick="closeWinInquiry(this)" style="margin: 0px;">取消</button>
+                            </div>
+                            <div id="inquiryMsg" style="height: 40px; line-height: 40px; text-indent: 100px;"></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- 咨询价格 end -->
+
+</div>
+<!--#main end -->

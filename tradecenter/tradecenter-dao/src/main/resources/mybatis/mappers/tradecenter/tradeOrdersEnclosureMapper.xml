@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.tradecenter.dao.TradeOrdersEnclosureDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="tradeOrdersEnclosureMap" type="com.camelot.tradecenter.dto.TradeOrdersEnclosureDTO">
+		<result property="id" column="ID"/>
+		<result property="orderId" column="ORDER_ID"/>
+		<result property="enclosureName" column="ENCLOSURE_NAME"/>
+		<result property="enclosureUrl" column="ENCLOSURE_URL"/>
+		<result property="type" column="TYPE"/>
+		<result property="remark" column="REMARK"/>
+		<result property="isDelete" column="IS_DELETE"/>
+	</resultMap>
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+		trade_orders_enclosure trade_orders_enclosure_
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			*
+		FROM 
+		trade_orders_enclosure trade_orders_enclosure_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1 
+		<if test="entity!=null">
+			<if test="entity.orderId != null and entity.orderId !=''">
+				<![CDATA[ and trade_orders_enclosure_.ORDER_ID = #{entity.orderId} ]]>
+			</if>
+			<if test="entity.enclosureUrl != null and entity.enclosureUrl !=''">
+				<![CDATA[ and trade_orders_enclosure_.ENCLOSURE_URL = #{entity.enclosureUrl} ]]>
+			</if>
+			<if test="entity.enclosureName != null and entity.enclosureName !=''">
+				<![CDATA[ and trade_orders_enclosure_.ENCLOSURE_NAME = #{entity.enclosureName} ]]>
+			</if>
+			<if test="entity.id != null and entity.id !=0">
+				<![CDATA[ and trade_orders_enclosure_.ID = #{entity.id} ]]>
+			</if>
+			<if test="entity.type != null and entity.type !=0">
+				<![CDATA[ and trade_orders_enclosure_.TYPE = #{entity.type} ]]>
+			</if>
+			<if test="entity.remark != null and entity.remark !=''">
+				<![CDATA[ and trade_orders_enclosure_.REMARK = #{entity.remark} ]]>
+			</if>
+			<if test="entity.isDelete != null">
+				<![CDATA[ and trade_orders_enclosure_.IS_DELETE = #{entity.isDelete} ]]>
+			</if>
+		</if>
+		order by trade_orders_enclosure_.ID desc
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="tradeOrdersEnclosureMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where trade_orders_enclosure_.ID = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="tradeOrdersEnclosureMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		<include refid="where_fragement" />
+	</select>
+	
+	<delete id="delete">
+	<![CDATA[
+		DELETE 
+		FROM 
+		  trade_orders_enclosure 
+		WHERE trade_orders_enclosure.ID =#{id}
+	]]>
+	
+	</delete>
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="com.camelot.tradecenter.dto.TradeOrdersEnclosureDTO" useGeneratedKeys="true" keyProperty="id">
+		<![CDATA[
+		insert into trade_orders_enclosure (
+		    	 ORDER_ID
+		    	 ,ENCLOSURE_NAME
+		    	 ,ENCLOSURE_URL
+		    	 ,TYPE
+		    	 ,REMARK
+		    	 ,IS_DELETE
+		   )values(
+		    	#{orderId}
+		    	,#{enclosureName}
+		    	,#{enclosureUrl}
+		    	,#{type}
+		    	,#{remark}
+		    	,#{isDelete}
+		   )
+	    ]]>
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.tradecenter.dto.TradeOrdersEnclosureDTO">
+		update trade_orders_enclosure set
+   			 ENCLOSURE_URL = #{enclosureUrl}
+   			 ,ENCLOSURE_NAME = #{enclosureName}
+   			 ,TYPE = #{type}
+   			 ,REMARK = #{remark}
+   			 ,IS_DELETE = #{isDelete}
+		     ,ORDER_ID = #{orderId}
+		     where ID = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,31 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/configuration_layout.vm")
+<!--内容start-->
+    <div class="stepflex">
+        <dl class="first done">
+            <dt class="s-num">1</dt><!--流程已走完就加入 done 这个样式 -->
+            <dd class="s-text">填写账户名<s></s><b></b></dd>
+        </dl>
+        <dl class="normal done">
+            <dt class="s-num">2</dt><!--流程已走完就加入 done 这个样式 -->
+            <dd class="s-text">验证身份<s></s><b></b></dd>
+        </dl>
+        <dl class="normal done">
+            <dt class="s-num">3</dt><!--流程已走完就加入 done 这个样式 -->
+            <dd class="s-text">设置新密码<s></s><b></b></dd>
+        </dl>
+        <dl class="last doing"><!--正在哪个流程就加入 doing 这个样式 -->
+            <dt class="s-num"><i class="fa-check"></i></dt>
+            <dd class="s-text">完成<s></s><b></b></dd>
+        </dl>
+    </div><!--stepflex end -->
+    <div class="clear"></div> 
+    <!--流程结束 -->  
+    <div class="register_content">
+        	<div class="register_box_mid" style="margin-top:40px">
+                <p class="font_24"><i class="fa-check-circle mar_r10 font_7a"></i><b>恭喜您，修改密码成功！</b></p>
+                <div class="register_state font_14b" style="margin:40px auto">您已完成了基础信息注册，可直接点击<a href="$!siteDomain" class="font_fe"> 首页 </a>浏览，如需实现交易，请您认证买家！
+            </div><!--register_box-->
+    </div><!--register_content-->
+<!--内容end-->
+</div>

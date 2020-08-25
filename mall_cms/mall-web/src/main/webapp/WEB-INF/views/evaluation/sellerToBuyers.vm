@@ -1,0 +1,174 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+
+<script type="text/javascript">
+$(function(){
+	/*加载左侧菜单*/
+	$("#leftSeller").load("$request.contextPath/leftSeller");
+	
+	/*评分功能*/
+	$(".starbigImg").click(function(){
+		var prevAll =  $(this).prevAll();
+		$(this).attr("src","$staticPath/images/star-on-big.png");
+		$.each(prevAll, function (n,prev) {
+			$(prev).attr("src","$staticPath/images/star-on-big.png");
+		});
+		var score = $(this).parent().next();
+		score.val(prevAll.length+1);
+	});
+	$(".starbigImg").mousemove(function(){
+		var prevAll = $(this).prevAll();
+		$(this).attr("src","$staticPath/images/star-on-big.png");
+		$.each(prevAll, function (n,prev) {
+			$(prev).attr("src","$staticPath/images/star-on-big.png");
+		});
+		var nextAll = $(this).nextAll();
+		$.each(nextAll, function (n,next) {
+			$(next).attr("src","$staticPath/images/star-off-big.png");
+		});
+	});
+	$(".starbigSpan").mouseout(function(){
+		var score = $(this).next().val();
+		var childrenAll =  $(this).children();
+		$.each(childrenAll, function (n,children) {
+			if(score <= n){
+				$(children).attr("src","$staticPath/images/star-off-big.png");
+			}
+			if(score > n){
+				$(children).attr("src","$staticPath/images/star-on-big.png");
+			}
+		});
+	});
+	
+	/*提交：商品评价/店铺评价*/
+	$("#submitBtn").click(function(){
+		//校验必填
+		var valid = initValid();
+		if(valid!="true"){
+			alert(valid);
+			return;
+		}
+		//防止重复提交
+		$("#submitBtn").loadingMsg();
+		//提交操作
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			url:"$request.contextPath/sellerEvaluation/submitSellerToBuyers",
+			data:$("#sellerToBuyersForm").serializeArray(),
+			success: function(data){
+				alert(data.messages);
+				$("#submitBtn").hideMsg();
+				window.location.href="$request.contextPath/order/querySeller";
+			},
+			error:function(result){
+				$("#submitBtn").hideMsg();
+			}
+		});
+	});
+	
+	/*取消*/
+	$("#cancelBtn").click(function(){
+		window.location.href="$request.contextPath/order/querySeller";
+		//history.back();
+	});
+});
+//校验必填
+function initValid(){
+	//对买家评分：必填
+	var skuScope = $("#skuScope").val();
+	if(skuScope==null || skuScope=="" || skuScope==undefined){
+		return "对买家评分不能为空值!";
+	}
+	return "true";
+}
+</script>
+
+<div id="main">
+<!-- left start -->
+<div id="leftSeller"></div>
+<!-- left end -->
+
+<!-- right start-->
+<div class="register_content box-shadow1 bg_06 border-4">
+	<div id="right_bot" class="right_bot">
+		<div class="wid_950 border-4 mar" >
+			<p class="hei_40 bg_08 wid_950 ">
+				<i class="fl mar_lr10 font_14b">| 交易评价</i>
+			</p>
+			<ul class="list_top bg_05 font_14b wid_950 mar_t10">
+				<li class="wid_220"><i class="mar_l10">订单号：$!tradeOrdersDTO.orderId</i></li>
+				<li class="wid_220">买家账号：$!userDTO.uname</li>
+				<li class="wid_220">收货人：$!tradeOrdersDTO.name</li>
+				<li class="wid_220">收货电话：$!tradeOrdersDTO.mobile</li>
+			</ul>
+			<form id="sellerToBuyersForm" method="post">
+			<div id="right_bot" class="mar_t10">
+				<!-- 评价隐藏字段：start -->
+				<!-- 说明：订单ID/评价人/被评价人/被评价店铺id/商品id/商品sku -->
+				<input name="orderId" type="hidden" value="$!tradeOrdersDTO.orderId"/>
+				<input name="userId" type="hidden" value="$!tradeOrdersDTO.sellerId"/>
+				<input name="byUserId" type="hidden" value="$!tradeOrdersDTO.buyerId"/>
+				<input name="byShopId" type="hidden" value="$!tradeOrdersDTO.shopId"/>
+				<!-- 评价隐藏字段：end -->
+				<ul class="list_top bg_05 font_14b wid_950 mar_t10">
+					<li class="wid_440 font_cen hei_35">商品信息</li>
+					<li class="wid_200 font_cen hei_35">商品属性</li>
+					<li class="wid_200 font_cen hei_35">购买时间</li>
+					<li class="wid_100 font_cen hei_35">购买数量</li>
+				</ul>
+				#foreach($tradeOrderItemsDTO in $tradeOrdersDTO.items)
+				<div class="wid_950 mar_cen border-6" >
+					<ul class="list_top hei_60 font_14b">
+						<li class="wid_440 font_cen over_ell">
+						#foreach($itemShopCartDTO in $itemShopCartDTOList)
+							#if($!itemShopCartDTO.skuId == $!tradeOrderItemsDTO.skuId)
+							<img src="$!imageServerAddr$!itemShopCartDTO.skuPicUrl" width="65" height="40"/>
+							#end
+						#end
+						#foreach($itemDTO in $itemDTOList)
+							#if($!itemDTO.itemId == $!tradeOrderItemsDTO.itemId)
+							<span  title="$!itemDTO.itemName">$!itemDTO.itemName</span>
+							#end
+						#end
+						</li>
+						<li class="wid_200 font_cen over_ell wid_120 fl cursor" title="$!tradeOrderItemsDTO.skuName">$!tradeOrderItemsDTO.skuName</li>
+						<li class="wid_200 font_cen">$!date.format('yyyy-MM-dd HH:mm:ss',$!tradeOrderItemsDTO.updateTime)</li>
+						<li class="wid_100 font_cen">$!tradeOrderItemsDTO.num</li>
+						<input name="itemId" type="hidden" value="$!tradeOrderItemsDTO.itemId"/>
+						<input name="skuId" type="hidden" value="$!tradeOrderItemsDTO.skuId"/>
+					</ul>
+				</div>
+				#end
+			</div>
+			<!-- 对买家评分 -->
+			<ul class="list_top hei_150 font_14b">
+				<p class="hei_35 mar_l10">
+					对买家评分：
+					<span class="starbigSpan">
+						<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+						<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+						<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+						<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+						<img class="starbigImg" src="$staticPath/images/star-off-big.png" />
+					</span>
+					<input id="skuScope" name="skuScope" type="hidden"/>
+				</p>
+				<p class="hei_35 mar_l10">
+					对买家评价：
+					<span id="star2">
+						<textarea name="content" cols="" rows="" class="input_Style2 wid_400 hei_100" maxlength="300" placeholder="请输入评论,最多输入300个字...."></textarea>
+					</span>
+				</p>
+			</ul>
+			<button class="button_2 hei_35 font_14b business_class_hide mar_l10" id="submitBtn" type="button" loadMsg="正在提交...">提 交</button>
+			<button class="button_3 hei_35 font_14b business_class_hide mar_r30" id="cancelBtn" type="button" >取 消</button>
+			</form>
+			<div class="hei_24"></div>
+		</div>
+	</div>
+</div>
+<!-- right end-->
+</div>

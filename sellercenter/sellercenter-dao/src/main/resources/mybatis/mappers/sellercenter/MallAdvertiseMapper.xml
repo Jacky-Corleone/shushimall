@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.sellercenter.dao.MallAdvertiseDAO">
+	<resultMap id="mallAdvertiseMapper" type="com.camelot.sellercenter.domain.MallAdvertise">
+			<result property="id" column="id" />
+			<result property="sortNum" column="sort_num" />
+			<result property="adType" column="ad_type" />
+			<result property="adTitle" column="ad_title" />
+			<result property="adUrl" column="ad_url" />
+			<result property="adSrc" column="ad_src" />
+			<result property="startTime" column="start_time" />
+			<result property="endTime" column="end_time" />
+			<result property="created" column="created" />
+			<result property="modified" column="modified" />
+			<result property="platformId" column="platform_id" />
+			<result property="status" column="status" />
+			<result property="cid" column="cid" />
+			<result property="close" column="close" />
+			<result property="advType" column="adv_type" />
+			<result property="themeId" column="theme_id" />
+			<result property="integral" column="integral" />
+			<result property="skuId" column="sku_id" />
+			<result property="titleDescription" column="title_description" />
+			<result property="applicableType" column="applicable_type" />
+			<result property="titleRemarks" column="title_remarks" />
+			<result property="isClick" column="isclick" />
+			<result property="priceColour" column="price_colour" />
+			<result property="adMiddleSrc" column="ad_middle_src" />
+			<result property="adBackSrc" column="ad_back_src" />
+			<result property="lrStyle" column="lr_style" />
+	</resultMap>
+	
+	<sql id="queryPage_where">
+		<where>
+			<![CDATA[is_delete <> 1 OR is_delete IS NULL]]>
+			<if test=" entity.cid != null and entity.cid != '' ">
+				and cid = #{entity.cid}
+			</if>
+			<if test=" entity.id != null and entity.id != '' ">
+				and id = #{entity.id}
+			</if>
+			<if test=" entity.adTitle != null and entity.adTitle != '' ">
+				and ad_title like concat('%',#{entity.adTitle},'%')
+			</if>
+			<if test=" entity.adType != null ">
+				and ad_type = #{entity.adType}
+			</if>
+			<if test=" entity.status != null and entity.status !=0">
+				and status = #{entity.status} 
+			</if>
+			<if test="  entity.status == 0 ">
+				and status = #{entity.status}  or status is null
+			</if>
+			<if test="  entity.themeId != null ">
+				<if test = "entity.themeId==-1">
+					and theme_id != 0
+				</if>
+				<if test = "entity.themeId!=-1">
+					and theme_id = #{entity.themeId}
+				</if>
+			</if>
+			<if test=" entity.timeFlag == 1 ">
+				<if test=" entity.startTime != null ">
+					and created >= date_format(#{entity.startTime},'%Y-%m-%d')
+				</if>
+				<if test=" entity.endTime != null ">
+					<![CDATA[
+					and created < DATE_ADD(date_format(#{entity.endTime},'%Y-%m-%d'), INTERVAL + 1 DAY)
+					]]>
+				</if>
+			</if>
+			<if test=" entity.timeFlag == 2 ">
+				<if test=" entity.startTime != null ">
+					and start_time >= date_format(#{entity.startTime},'%Y-%m-%d')
+				</if>
+				<if test=" entity.endTime != null ">
+					<![CDATA[
+					and start_time < DATE_ADD(date_format(#{entity.endTime},'%Y-%m-%d'), INTERVAL + 1 DAY)
+					]]>
+				</if>
+			</if>
+			<if test=" entity.timeFlag == 3 ">
+				<if test=" entity.startTime != null ">
+					and end_time >= date_format(#{entity.startTime},'%Y-%m-%d')
+				</if>
+				<if test=" entity.endTime != null ">
+					<![CDATA[
+					and end_time < DATE_ADD(date_format(#{entity.endTime},'%Y-%m-%d'), INTERVAL + 1 DAY)
+					]]>
+				</if>
+			</if>
+			<if test=" entity.skuId != null and entity.skuId != '' ">
+				and sku_id = #{entity.skuId}
+			</if>
+			<if test=" entity.advType != null and entity.advType != '' ">
+				and adv_type = #{entity.advType}
+			</if>
+			<if test=" entity.titleDescription != null and entity.titleDescription != '' ">
+				and title_description = #{entity.titleDescription}
+			</if>
+			<if test=" entity.applicableType != null and entity.applicableType != '' ">
+				and applicable_type = #{entity.applicableType}
+			</if>
+			<if test=" entity.titleRemarks != null and entity.titleRemarks != '' ">
+				and title_remarks = #{entity.titleRemarks}
+			</if>
+			<if test=" entity.isClick != null and entity.isClick != '' ">
+				and isclick = #{entity.isClick}
+			</if>
+			<if test=" entity.priceColour != null and entity.priceColour != '' ">
+				and price_colour = #{entity.priceColour}
+			</if>
+		</where>
+	</sql>
+	
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	
+	<select id="queryById" resultMap="mallAdvertiseMapper" >
+		select * from mall_advertise
+		where id = #{id}
+	</select>
+	
+	<insert id="add">
+		insert into mall_advertise(
+				sort_num,
+				ad_type,
+				ad_title,
+				ad_url,
+				ad_src,
+				start_time,
+				end_time,
+				created,
+				modified,
+				platform_id,
+				status,
+				close,
+				cid,
+				sku_id,
+				integral,
+				adv_type,
+				theme_id,
+				title_description,
+				applicable_type,
+				title_remarks,
+				isclick,
+				price_colour,
+				ad_middle_src,
+				ad_back_src,
+				lr_style
+		)values(
+				#{sortNum},
+				#{adType},
+				#{adTitle},
+				#{adUrl},
+				#{adSrc},
+				#{startTime},
+				#{endTime},
+				NOW(),
+				NOW(),
+				#{platformId},
+				#{status},
+				#{close},
+				#{cid},
+				#{skuId},
+				#{integral},
+				#{advType},
+				#{themeId},
+				#{titleDescription},
+				#{applicableType},
+				#{titleRemarks},
+				#{isClick},
+				#{priceColour},
+				#{adMiddleSrc},
+				#{adBackSrc},
+				#{lrStyle}
+		)
+		<selectKey resultType="long" order="AFTER" keyProperty="id">
+			select @@IDENTITY
+		</selectKey>
+	</insert>
+	
+	<update id="update">
+		update mall_advertise set
+				sort_num = #{sortNum},
+				ad_type = #{adType},
+				ad_title = #{adTitle},
+				ad_url = #{adUrl},
+				ad_src = #{adSrc},
+				start_time = #{startTime},
+				end_time = #{endTime},
+				modified = NOW(),
+				platform_id = #{platformId},
+				cid = #{cid},
+				close = #{close},
+				sku_id = #{skuId},
+				integral = #{integral},
+				status = #{status},
+				adv_type = #{advType},
+				theme_id = #{themeId},
+				title_description = #{titleDescription},
+				applicable_type = #{applicableType},
+				title_remarks = #{titleRemarks},
+				isclick = #{isClick},
+				price_colour = #{priceColour},
+				ad_middle_src = #{adMiddleSrc},
+				ad_back_src = #{adBackSrc},
+				lr_style = #{lrStyle}
+				
+		where id = #{id}
+		
+	</update>
+	<update id="autoBatchPublishAD">
+		<![CDATA[
+			UPDATE mall_advertise t SET t.status = 1 WHERE t.start_time <= NOW() AND t.status = 0
+		]]>
+	</update>
+	<update id="autoBatchCancelAD">
+		<![CDATA[
+			UPDATE mall_advertise t SET t.status = 0 ,t.start_time = NULL , t.end_time = NULL WHERE t.end_time <= NOW() AND t.status = 1
+		]]>
+	</update>
+	<update id="updateBySelect">
+		update mall_advertise(sort_num) 
+		select sort_num from mall_advertise 
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from mall_advertise
+		<if test=" codes != null and codes.size() > 0 ">
+			where id in
+			<foreach collection="codes" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test=" codes == null or codes.size() == 0 ">
+			where 1 = 3
+		</if>
+	</delete>
+	
+	<delete id="deleteById"> 
+		delete from mall_advertise where id = #{id}
+	</delete>
+	
+	<select id="queryList" resultMap="mallAdvertiseMapper">
+		select * from mall_advertise 
+	  	limit #{page.pageOffset} , #{page.rows}
+	</select>
+	
+	
+	
+	<select id="queryCount" resultType="long">
+		select count(0) from mall_advertise
+		<include refid="queryPage_where"/>
+	</select>
+	
+	<select id="queryPage" resultType="com.camelot.sellercenter.malladvertise.dto.MallAdDTO">
+		SELECT id,
+		       ad_src adSrc,
+		       ad_url adURL,
+		       ad_title title,
+		       sort_num sortNumber,
+		       created,
+		       modified,
+		       STATUS,
+		       start_time startTime,
+		       end_time endTime,
+		       ad_type adType,
+		       close,
+		       cid,
+		       adv_type advType,
+		        integral,
+		       sku_id skuId,
+		       theme_id themeId,
+		       title_description titleDescription,
+		       applicable_type applicableType,
+		       title_remarks titleRemarks,
+		       isclick isClick,
+		       price_colour priceColour ,	
+		       ad_middle_src adMiddleSrc,
+			   ad_back_src adBackSrc,
+			   lr_style lrStyle
+		FROM   mall_advertise
+		<include refid="queryPage_where"/>
+		order by sort_num ,modified desc
+	  	limit #{page.pageOffset} , #{page.rows}
+	</select>
+	
+	<update id="modifyMallAdStatus">
+		update mall_advertise set status = #{status}
+		<if test=" status == 0 ">
+			,  start_time = NULL  , end_time = NULL 
+		</if>
+		where id = #{id}
+	</update>
+	<update id="deleteMallAd">
+		update mall_advertise set is_delete = 1 where 1 = 3 
+		<if test=" null != id ">
+			or id = #{id } 
+		</if>
+	</update>
+</mapper>

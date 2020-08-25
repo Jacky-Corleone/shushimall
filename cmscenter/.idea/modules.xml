@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/basecenter.iml" filepath="$PROJECT_DIR$/basecenter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/basecenter-common/basecenter-common.iml" filepath="$PROJECT_DIR$/basecenter-common/basecenter-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/basecenter-dao/basecenter-dao.iml" filepath="$PROJECT_DIR$/basecenter-dao/basecenter-dao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/basecenter-domain/basecenter-domain.iml" filepath="$PROJECT_DIR$/basecenter-domain/basecenter-domain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/basecenter-export/basecenter-export.iml" filepath="$PROJECT_DIR$/basecenter-export/basecenter-export.iml" />
+      <module fileurl="file://$PROJECT_DIR$/basecenter-parent/basecenter-parent.iml" filepath="$PROJECT_DIR$/basecenter-parent/basecenter-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/basecenter-rpc/basecenter-rpc.iml" filepath="$PROJECT_DIR$/basecenter-rpc/basecenter-rpc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/basecenter-service/basecenter-service.iml" filepath="$PROJECT_DIR$/basecenter-service/basecenter-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/basecenter-web/basecenter-web.iml" filepath="$PROJECT_DIR$/basecenter-web/basecenter-web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cmscenter.iml" filepath="$PROJECT_DIR$/cmscenter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cmscenter-common/cmscenter-common.iml" filepath="$PROJECT_DIR$/cmscenter-common/cmscenter-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cmscenter-dao/cmscenter-dao.iml" filepath="$PROJECT_DIR$/cmscenter-dao/cmscenter-dao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cmscenter-domain/cmscenter-domain.iml" filepath="$PROJECT_DIR$/cmscenter-domain/cmscenter-domain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cmscenter-export/cmscenter-export.iml" filepath="$PROJECT_DIR$/cmscenter-export/cmscenter-export.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cmscenter-parent/cmscenter-parent.iml" filepath="$PROJECT_DIR$/cmscenter-parent/cmscenter-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cmscenter-rpc/cmscenter-rpc.iml" filepath="$PROJECT_DIR$/cmscenter-rpc/cmscenter-rpc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cmscenter-service/cmscenter-service.iml" filepath="$PROJECT_DIR$/cmscenter-service/cmscenter-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cmscenter-web/cmscenter-web.iml" filepath="$PROJECT_DIR$/cmscenter-web/cmscenter-web.iml" />
+    </modules>
+  </component>
+</project>

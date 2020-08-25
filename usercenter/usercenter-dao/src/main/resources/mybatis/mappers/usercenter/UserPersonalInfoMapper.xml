@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 
+<typeAlias alias="userPersonalInfo" type="com.camelot.usercenter.entity.dto.UserPersonalInfo" />
+ -->
+<mapper namespace="com.camelot.usercenter.dao.UserPersonalInfoMybatisDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="userPersonalInfoMap" type="userPersonalInfo">
+				<result property="id" column="id"/>
+				<result property="userId" column="user_id"/>
+				<result property="nikeName" column="nike_name"/>
+				<result property="sex" column="sex"/>
+				<result property="homePage" column="home_page"/>
+				<result property="birthday" column="birthday"/>
+				<result property="blood" column="blood"/>
+				<result property="origin" column="origin"/>
+				<result property="address" column="address"/>
+				<result property="income" column="income"/>
+				<result property="hobby" column="hobby"/>
+				<result property="evaluate" column="evaluate"/>
+				<result property="createDt" column="create_dt"/>
+				<result property="lastUpdDt" column="last_upd_dt"/>
+				<result property="deletedFlag" column="deleted_flag"/>
+				<result property="add2" column="add2"/>
+				<result property="add1" column="add1"/>
+				<result property="add3" column="add3"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{pager.pageOffset} , #{pager.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,user_id
+ 			,nike_name
+ 			,sex
+ 			,home_page
+ 			,birthday
+ 			,blood
+ 			,origin
+ 			,address
+ 			,income
+ 			,hobby
+ 			,evaluate
+ 			,create_dt
+ 			,last_upd_dt
+ 			,deleted_flag
+ 			,add2
+ 			,add1
+ 			,add3
+		FROM 
+		user_personal_info user_personal_info_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.id != null  and entity.id !=''">
+				<![CDATA[ and user_personal_info_.id  =#{entity.id}]]>
+			</if>
+			<if test="entity.userId != null  and entity.userId !=''">
+				<![CDATA[ and user_personal_info_.user_id  =#{entity.userId}]]>
+			</if>
+			<if test="entity.nikeName != null  and entity.nikeName !=''">
+				<![CDATA[ and user_personal_info_.nike_name  LIKE CONCAT('%',#{entity.nikeName},'%')]]>
+			</if>
+			<if test="entity.sex != null  and entity.sex !=''">
+				<![CDATA[ and user_personal_info_.sex  LIKE CONCAT('%',#{entity.sex},'%')]]>
+			</if>
+			<if test="entity.homePage != null  and entity.homePage !=''">
+				<![CDATA[ and user_personal_info_.home_page  LIKE CONCAT('%',#{entity.homePage},'%')]]>
+			</if>
+			<if test="entity.birthday != null  and entity.birthday !=''">
+				<![CDATA[ and user_personal_info_.birthday  LIKE CONCAT('%',#{entity.birthday},'%')]]>
+			</if>
+			<if test="entity.blood != null  and entity.blood !=''">
+				<![CDATA[ and user_personal_info_.blood  LIKE CONCAT('%',#{entity.blood},'%')]]>
+			</if>
+			<if test="entity.origin != null  and entity.origin !=''">
+				<![CDATA[ and user_personal_info_.origin  LIKE CONCAT('%',#{entity.origin},'%')]]>
+			</if>
+			<if test="entity.address != null  and entity.address !=''">
+				<![CDATA[ and user_personal_info_.address  LIKE CONCAT('%',#{entity.address},'%')]]>
+			</if>
+			<if test="entity.income != null  and entity.income !=''">
+				<![CDATA[ and user_personal_info_.income  LIKE CONCAT('%',#{entity.income},'%')]]>
+			</if>
+			<if test="entity.hobby != null  and entity.hobby !=''">
+				<![CDATA[ and user_personal_info_.hobby  LIKE CONCAT('%',#{entity.hobby},'%')]]>
+			</if>
+			<if test="entity.evaluate != null  and entity.evaluate !=''">
+				<![CDATA[ and user_personal_info_.evaluate  LIKE CONCAT('%',#{entity.evaluate},'%')]]>
+			</if>
+			<if test="entity.createDt != null  and entity.createDt !=''">
+				<![CDATA[ and user_personal_info_.create_dt  LIKE CONCAT('%',#{entity.createDt},'%')]]>
+			</if>
+			<if test="entity.lastUpdDt != null  and entity.lastUpdDt !=''">
+				<![CDATA[ and user_personal_info_.last_upd_dt  LIKE CONCAT('%',#{entity.lastUpdDt},'%')]]>
+			</if>
+			<if test="entity.deletedFlag != null  and entity.deletedFlag !=''">
+				<![CDATA[ and user_personal_info_.deleted_flag  LIKE CONCAT('%',#{entity.deletedFlag},'%')]]>
+			</if>
+			<if test="entity.add2 != null  and entity.add2 !=''">
+				<![CDATA[ and user_personal_info_.add2  LIKE CONCAT('%',#{entity.add2},'%')]]>
+			</if>
+			<if test="entity.add1 != null  and entity.add1 !=''">
+				<![CDATA[ and user_personal_info_.add1  LIKE CONCAT('%',#{entity.add1},'%')]]>
+			</if>
+			<if test="entity.add3 != null  and entity.add3 !=''">
+				<![CDATA[ and user_personal_info_.add3  LIKE CONCAT('%',#{entity.add3},'%')]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+     <select id="getAll" resultMap="userPersonalInfoMap">
+		<include refid="selectAllColumns"/>
+	</select>
+	<select id="get" resultMap="userPersonalInfoMap" parameterType="long">
+		<include refid="selectAllColumns"/>
+		<![CDATA[
+		where user_personal_info_.id = #{id}
+		]]>	
+	</select>
+   <!-- 根据id查询 -->
+	<select id="selectById" resultMap="userPersonalInfoMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where user_personal_info_.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="selectList" resultMap="userPersonalInfoMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="pager!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectCount" resultType="long">
+		<include refid="count_Tail" />
+		user_personal_info user_personal_info_
+		<include refid="where_fragement" />
+	</select>
+    <select id="searchByCondition" resultMap="userPersonalInfoMap" parameterType="userPersonalInfo">
+        <include refid="selectAllColumns"/>
+        <include refid="where_fragement" />
+    </select>
+	<insert id="insert" parameterType="userPersonalInfo" useGeneratedKeys="true" keyProperty="id">
+		
+		<![CDATA[
+		insert into user_personal_info
+		  (
+				user_id
+				,nike_name
+				,sex
+				,home_page
+				,birthday
+				,blood
+				,origin
+				,address
+				,income
+				,hobby
+				,evaluate
+				,create_dt
+				,last_upd_dt
+				,deleted_flag
+				,add2
+				,add1
+				,add3
+		   )
+		values
+		  (
+				#{userId}
+				,#{nikeName}
+				,#{sex}
+				,#{homePage}
+				,#{birthday}
+				,#{blood}
+				,#{origin}
+				,#{address}
+				,#{income}
+				,#{hobby}
+				,#{evaluate}
+				,#{createDt}
+				,#{lastUpdDt}
+				,#{deletedFlag}
+				,#{add2}
+				,#{add1}
+				,#{add3}
+		   )
+	    ]]>	
+	</insert>
+
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="userPersonalInfo">
+		<![CDATA[
+		update user_personal_info set
+   			id = #{id}
+   			,user_id = #{userId}
+   			,nike_name = #{nikeName}
+   			,sex = #{sex}
+   			,home_page = #{homePage}
+   			,birthday = #{birthday}
+   			,blood = #{blood}
+   			,origin = #{origin}
+   			,address = #{address}
+   			,income = #{income}
+   			,hobby = #{hobby}
+   			,evaluate = #{evaluate}
+   			,create_dt = #{createDt}
+   			,last_upd_dt = #{lastUpdDt}
+   			,deleted_flag = #{deletedFlag}
+   			,add2 = #{add2}
+   			,add1 = #{add1}
+   			,add3 = #{add3}
+		 where id = #{id}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from user_personal_info where id = #{id}
+		]]>
+	</delete>
+		<sql id="updateSelective_set">
+		 <set> 
+				<if test="userPersonalInfo.userId!= null"> 
+				 user_id = #{userPersonalInfo.userId}, 
+				</if> 
+				<if test="userPersonalInfo.nikeName!= null"> 
+				 nike_name = #{userPersonalInfo.nikeName}, 
+				</if> 
+				<if test="userPersonalInfo.sex!= null"> 
+				 sex = #{userPersonalInfo.sex}, 
+				</if> 
+				<if test="userPersonalInfo.homePage!= null"> 
+				 home_page = #{userPersonalInfo.homePage}, 
+				</if> 
+				<if test="userPersonalInfo.birthday!= null"> 
+				 birthday = #{userPersonalInfo.birthday}, 
+				</if> 
+				<if test="userPersonalInfo.blood!= null"> 
+				 blood = #{userPersonalInfo.blood}, 
+				</if> 
+				<if test="userPersonalInfo.origin!= null"> 
+				 origin = #{userPersonalInfo.origin}, 
+				</if> 
+				<if test="userPersonalInfo.address!= null"> 
+				 address = #{userPersonalInfo.address}, 
+				</if> 
+				<if test="userPersonalInfo.income!= null"> 
+				 income = #{userPersonalInfo.income}, 
+				</if> 
+				<if test="userPersonalInfo.hobby!= null"> 
+				 hobby = #{userPersonalInfo.hobby}, 
+				</if> 
+				<if test="userPersonalInfo.evaluate!= null"> 
+				 evaluate = #{userPersonalInfo.evaluate}, 
+				</if> 
+				<if test="userPersonalInfo.createDt!= null"> 
+				 create_dt = #{userPersonalInfo.createDt}, 
+				</if> 
+				<if test="userPersonalInfo.lastUpdDt!= null"> 
+				 last_upd_dt = #{userPersonalInfo.lastUpdDt}, 
+				</if> 
+				<if test="userPersonalInfo.deletedFlag!= null"> 
+				 deleted_flag = #{userPersonalInfo.deletedFlag}, 
+				</if> 
+				<if test="userPersonalInfo.add2!= null"> 
+				 add2 = #{userPersonalInfo.add2}, 
+				</if> 
+				<if test="userPersonalInfo.add1!= null"> 
+				 add1 = #{userPersonalInfo.add1}, 
+				</if> 
+				<if test="userPersonalInfo.add3!= null"> 
+				 add3 = #{userPersonalInfo.add3}, 
+				</if> 
+		</set> 
+	</sql>
+	<sql id="updateAll_set">
+		<set> 
+				user_id = #{userPersonalInfo.userId},
+				nike_name = #{userPersonalInfo.nikeName},
+				sex = #{userPersonalInfo.sex},
+				home_page = #{userPersonalInfo.homePage},
+				birthday = #{userPersonalInfo.birthday},
+				blood = #{userPersonalInfo.blood},
+				origin = #{userPersonalInfo.origin},
+				address = #{userPersonalInfo.address},
+				income = #{userPersonalInfo.income},
+				hobby = #{userPersonalInfo.hobby},
+				evaluate = #{userPersonalInfo.evaluate},
+				create_dt = #{userPersonalInfo.createDt},
+				last_upd_dt = #{userPersonalInfo.lastUpdDt},
+				deleted_flag = #{userPersonalInfo.deletedFlag},
+				add2 = #{userPersonalInfo.add2},
+				add1 = #{userPersonalInfo.add1},
+				add3 = #{userPersonalInfo.add3},
+		</set> 
+	</sql>
+	<update id="updateSelective" parameterType="userPersonalInfo"> 
+		update user_personal_info
+		<include refid="updateSelective_set"/>
+		where id = #{userPersonalInfo.id}
+	 </update> 
+	
+	<update id="updateAllWithDateTimeCheck">
+		update user_personal_info
+		  <include refid="updateAll_set"/>
+		where id = #{userPersonalInfo.id}
+		 and LAST_UPD_DT = #{prevUpdDt}
+	</update>
+
+	<update id="updateSelectiveWithDateTimeCheck">
+		update user_personal_info
+		<include refid="updateSelective_set"/>
+		<![CDATA[
+		 	where id = #{userPersonalInfo.id}
+		 	and LAST_UPD_DT = #{prevUpdDt}
+		]]> 
+	</update>
+	<sql id="searchByCondition_fragement">
+		<include refid="selectAllUserPersonalInfoColumns"/>
+		where 1=1
+		<if test="userPersonalInfo != null">
+				<if test="userPersonalInfo.userId != null">
+				and user_id = #{userPersonalInfo.userId}
+				</if>
+				<if test="userPersonalInfo.nikeName != null">
+				and nike_name = #{userPersonalInfo.nikeName}
+				</if>
+				<if test="userPersonalInfo.sex != null">
+				and sex = #{userPersonalInfo.sex}
+				</if>
+				<if test="userPersonalInfo.homePage != null">
+				and home_page = #{userPersonalInfo.homePage}
+				</if>
+				<if test="userPersonalInfo.birthday != null">
+				and birthday = #{userPersonalInfo.birthday}
+				</if>
+				<if test="userPersonalInfo.blood != null">
+				and blood = #{userPersonalInfo.blood}
+				</if>
+				<if test="userPersonalInfo.origin != null">
+				and origin = #{userPersonalInfo.origin}
+				</if>
+				<if test="userPersonalInfo.address != null">
+				and address = #{userPersonalInfo.address}
+				</if>
+				<if test="userPersonalInfo.income != null">
+				and income = #{userPersonalInfo.income}
+				</if>
+				<if test="userPersonalInfo.hobby != null">
+				and hobby = #{userPersonalInfo.hobby}
+				</if>
+				<if test="userPersonalInfo.evaluate != null">
+				and evaluate = #{userPersonalInfo.evaluate}
+				</if>
+				<if test="userPersonalInfo.createDt != null">
+				and create_dt = #{userPersonalInfo.createDt}
+				</if>
+				<if test="userPersonalInfo.lastUpdDt != null">
+				and last_upd_dt = #{userPersonalInfo.lastUpdDt}
+				</if>
+				<if test="userPersonalInfo.deletedFlag != null">
+				and deleted_flag = #{userPersonalInfo.deletedFlag}
+				</if>
+				<if test="userPersonalInfo.add2 != null">
+				and add2 = #{userPersonalInfo.add2}
+				</if>
+				<if test="userPersonalInfo.add1 != null">
+				and add1 = #{userPersonalInfo.add1}
+				</if>
+				<if test="userPersonalInfo.add3 != null">
+				and add3 = #{userPersonalInfo.add3}
+				</if>
+		</if>
+	</sql>
+
+
+	<update id="updateSelectiveByIdList">
+		update user_personal_info
+		<include refid="updateSelective_set"/>
+		where id in
+		<foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+	        #{item}
+	  	</foreach>
+	</update>
+	<update id="updateAllByIdList">
+		update user_personal_info
+		<include refid="updateAll_set"/>
+		where id in
+		<foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+	        #{item}
+	  	</foreach>
+	</update>
+	
+	
+	
+</mapper>

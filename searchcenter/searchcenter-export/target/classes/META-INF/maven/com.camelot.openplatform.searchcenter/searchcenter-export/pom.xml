@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>searchcenter-parent</artifactId>
+		<groupId>com.camelot.openplatform.searchcenter</groupId>
+		<version>shushi100-1.0.3.daily-SNAPSHOT</version>
+		<relativePath>../searchcenter-parent/pom.xml</relativePath>
+	</parent>
+	<artifactId>searchcenter-export</artifactId>
+	<name>searchcenter-export</name>
+	<url>http://maven.apache.org</url>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+    <dependencies>
+		<dependency>
+			<groupId>com.camelot.openplatform.usercenter</groupId>
+			<artifactId>usercenter-export</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.camelot.openplatform.goodscenter</groupId>
+			<artifactId>goodscenter-export</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.camelot.openplatform.storecenter</groupId>
+			<artifactId>storecenter-export</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.camelot.openplatform.searchcenter</groupId>
+			<artifactId>searchcenter-common</artifactId>
+		</dependency>
+    </dependencies>
+	
+	<!-- Maven私服配置 -->
+	<distributionManagement>
+		<repository>
+			<id>releases</id>
+    		<name>Releases</name>
+    		<url>http://121.42.168.19:8081/nexus/content/repositories/releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<name>Snapshots</name>
+    		<url>http://121.42.168.19:8081/nexus/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+</project>

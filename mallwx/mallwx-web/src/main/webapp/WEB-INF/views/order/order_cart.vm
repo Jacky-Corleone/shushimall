@@ -1,0 +1,564 @@
+#set($layout = "common/order.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>确认订单</title>
+#parse("common/scriptAndCss.vm")
+<script src="http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js" type="text/ecmascript"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		changeIconToRed(2);
+		
+		if($!userstatus <= 3){
+			$("#needApprove").hide();
+		}
+		/**
+		var backUrl = window.sessionStorage.getItem("backUrl");
+		if(backUrl){
+			window.sessionStorage.removeItem("backUrl");
+			window.location.href = backUrl;
+		}
+		*/
+	});
+	$(document).ready(function(){
+		if($("#shipmentType").val()=="2"){
+			$("#payPeriod").show();
+		}
+	});
+	$(document).ready(function(){
+		if($("#IPAddress").val()){
+			if("北京"==remote_ip_info["province"] || "上海"==remote_ip_info["province"] || "天津"==remote_ip_info["province"] || "重庆"==remote_ip_info["province"]){
+				$("#address").append("<p>点击此处添加收货地址</p>");
+			}else{
+				$("#address").append("<p>点击此处添加收货地址</p>");
+			}
+		}
+	});
+   function getIpPlace() {
+	   alert($("#IPAddress1").val());
+	   alert($("#IPAddress").val());
+      alert(remote_ip_info["country"] + "," + remote_ip_info["province"] + "省" + ',' + remote_ip_info["city"] + "市")
+   }
+   function queryAddress(obj){
+	   $("#form").removeAttr("onsubmit");
+	   $("#form").attr("action","$request.contextPath/orderWx/queryAddress?type="+obj+"").submit();
+   }
+   function queryInvoice(invoiceType,invoiceTitle){
+		var obj = $("#orderType").val();
+	   $("#form").removeAttr("onsubmit");
+	   var addressId = "";
+	   if(!invoiceType){
+		   invoiceType=1;//若invoiceType没有值则默认不开发票
+	   }
+	   if($("#addressId").val()){
+		   addressId = $("#addressId").val();
+	   }
+	   $("#form").attr("action","$request.contextPath/orderWx/queryInvoice?type="+obj+"").submit();
+   }
+   //订单提交
+   function orderSubmit(){
+// 	   var backUrl = window.location.href;
+// 	   if(backUrl){
+// 		   if(backUrl.indexOf("toOrder")>-1){
+// 			   console.debug(backUrl,"1");
+// 			   backUrl = backUrl
+// 		   }else{
+// 			   backUrl = backUrl+"?contractNo=$!{contractNo}";
+// 			   console.debug(backUrl,"2");
+// 		   }
+// 	   }
+// 	   console.debug(backUrl);
+	   window.sessionStorage.setItem("backUrl","$request.contextPath");
+	   if($("#IPAddress").val()){
+		   alert("请填写收货地址!!");
+		   $("#form").attr("onsubmit","return false;");
+		   return false;
+	   }
+	   if('$shop.quantity'==''||'$shop.quantity'<=0){
+		   alert("订单异常重新下单");
+		   $("#form").attr("onsubmit","return false;");
+		   return false;
+	   }
+	   if($("#divShopList").size()==0){
+		   alert("订单中没有要提交的商品");
+		   $("#form").attr("onsubmit","return false;");
+		   return false;
+	   }
+	   if($("#shipmentType").val()==2){
+		   if(!($("input[name='payPeriod']").val() || $("#payPeriodSelect").val())){
+			   alert("延期支付需要支付周期");
+			   $("#form").attr("onsubmit","return false;");
+			   return false;
+		   }
+	   }
+	   if($("#total").val()=="0.00"){
+		   alert("订单总金额为0，不能提交该订单！");
+		   $("#form").attr("onsubmit","return false;");
+		   return false;
+	   }
+	   
+	   
+// 	   $.ajax({
+//  			url: "$request.contextPath/orderWx/validate",
+//  			dataType: "html",
+//  			success: function(data){
+//  				if( data != null && data != "" ){
+//  					$("#xxx").append(data);
+//  				}else{
+//  					$("#form").submit();
+//  				}
+//  			}
+//  		});
+
+		console.debug($("input[name='needApprove']").is(":checked"));
+		console.debug($("#userId").val());
+		console.debug($("#approveUser").val());
+// 		$("#form").attr("onsubmit","return false;");
+	   
+	   if($("input[name='needApprove']").is(":checked") && $("#userId").val()==$("#approveUser").val()){
+		   console.debug("===================");
+		   $("#form").attr("onsubmit","return false;");
+		   if(window.confirm("您选择的审核人是本人，系统默认不走审核流程，执行正常订单流程，您确认提交该订单吗？")){
+			   $("#form").removeAttr("onsubmit");
+			   $("#form").submit();
+		   }
+	   }else if($("input[name='needApprove']").is(":checked") && $("#userId").val()!=$("#approveUser").val()){
+		   console.debug("-------------------------");
+		   $("#form").removeAttr("onsubmit");
+		   $("#form").attr("action","$request.contextPath/orderWx/orderApproveSubmit").submit();
+	   }else{
+		   $("#form").removeAttr("onsubmit");
+		   $("#form").submit();
+	   }
+   }
+   
+   //是否需要审批
+   function changeApprove(obj){
+	   if($(obj).is(":checked")){
+		   $("#approveUser").removeAttr("disabled");
+		   $("#approveUserLi").attr("style","display:block");
+	   }else{
+		   $("#approveUser").attr("disabled","disabled");
+		   $("#approveUserLi").attr("style","display:none");
+	   }
+   }
+   
+   //更改支付信息
+   function changePayType(obj){
+	   var payType = $(obj).val();
+		if( payType == 1 ){
+			$("#payPeriod").hide();
+			var flag = true; 
+			
+			if($!userstatus > 3){
+				$("#paymentMethod").html('<option value="1" selected="selected">个人支付</option><option value="2">企业支付</option>');
+			}else{
+				$("#paymentMethod").html('<option value="1" selected="selected">个人支付</option>');
+			}
+		}else{
+			$("#payPeriod").show();
+			$("#paymentMethod").html('<option value="2" selected="selected">企业支付</option>');
+		}
+   }
+	
+// 运送方式切换
+	function switchDeliveryType(){
+			var orderType = $("#orderType").val();
+			var contractNo = $("#contractNo").val();
+		 	addLoadMask();
+			if(!orderType){
+				$.ajax({
+		   			url: "$request.contextPath/orderWx/toOrderDetail",
+		   			data: $("#form").serialize(),
+		   			type: "post",
+		   			dataType: "html",
+		   			success: function(data){
+		   			   removeLoadMask();
+		   				$("#form").html(data);
+		   			}
+		   		});
+			}else if(orderType==0 || orderType==1){
+				$.ajax({
+		   			url: "$request.contextPath/orderWx/carriageGetShopCart",
+		   			data: $("#form").serialize(),
+		   			type: "post",
+		   			dataType: "html",
+		   			success: function(data){
+		   			   removeLoadMask();
+		   				$("#form").html(data);
+		   			}
+		   		});
+			}
+	}
+	// 切换支付方式
+	function selectPayType(){
+		var payType = $("#paymentMethod").val();
+		$.ajax({
+   			url: "$request.contextPath/orderWx/toOrderDetail",
+   			data: $("#form").serialize(),
+   			type: "post",
+   			dataType: "html",
+   			success: function(data){
+   			   removeLoadMask();
+   				$("#form").html(data);
+   				$("#paymentMethod").val(payType);
+   			}
+   		});
+	}
+	
+	function cuponsCont(){
+		//var paymentMethod=$("#paymentMethod").val();
+		//var paymentMethod=$("#paymentMethod").val();
+		var couponId = $("[name=couponId]").val();
+		$("#form").attr("action","$request.contextPath/coupons/indexCoupons?type=3&costAllocation=&shopId=").submit();
+		// location.href = "$request.contextPath/coupons/index?type=3&costAllocation=&shopId=&paymentMethod="+paymentMethod;
+
+	}
+	
+	
+	
+</script>
+
+</head>
+<body>
+	<div id="main" class="po_re">
+    ##parse("common/headerWx.vm")
+	    <form action="$request.contextPath/orderWx/orderSubmit" id="form" method="post">
+	    	<input type="hidden" name="contractFlag" value="$!{contractFlag}"/>
+	    	<input type="hidden" id="userId" value="$!userId"/>
+	    	<!--协议或询价单 -->
+	    	<input type="hidden" name="orderType" value="$!{orderType}" id="orderType" />
+			<!--协议或询价编号 -->
+	    	<input type="hidden" name="contractNo" value="$!{contractNo}"/>
+	    	
+	    	<input type="hidden" name="couponId" value="$!{couponId}"/>
+			<!-- <div> -->
+			<!--     <input id="Button1" type="button" value="根据IP地址获取所在城市" onclick="getIpPlace();" /> -->
+			<!-- </div> -->
+			    <!-- 中间内容 -->
+		    <div class="content" id="wrapper">
+		        <!-- 送货地址 -->
+		        <dl class="address bg_02 pad_7 border_bt000">
+		            <dt class="fl font_1_2">送&nbsp;至：</dt>
+		            	<a href="javascript:queryAddress($!{orderType});">
+				        	<dd class="fl" id="address">
+					            #if(${defAddress})
+					                <p>${defAddress.provicename} ${defAddress.cityname} ${defAddress.countryname} ${defAddress.fulladdress}</p>
+<!-- 					                <p>${defAddress.contactperson} &nbsp; &nbsp; ${defAddress.contactphone}</p> -->
+					                <input type="hidden" id="addressId" name="address" value="${defAddress.id}">
+					                
+					                
+						            <input type="hidden" name="proviceId" value="$!defAddress.provicecode">
+									<input type="hidden" name="cityId" value="$!defAddress.citycode">
+									<input type="hidden" name="countryId" value="$!defAddress.countrycode">
+									<input type="hidden" name="detailAddress" value="$!defAddress.fulladdress">
+									<input type="hidden" name="fullAddress" value="$!defAddress.provicename $!defAddress.cityname $!defAddress.countryname $!defAddress.fulladdress">
+									<input type="hidden" name="name" value="$!defAddress.contactperson">
+									<input type="hidden" name="mobile" value="$!defAddress.contactphone">
+									<input type="hidden" name="phone" value="$!defAddress.contacttel">
+					                
+					                
+						        #elseif(${firstAddress} && !${defAddress})
+						        	<p>${firstAddress.provicename} ${firstAddress.cityname} ${firstAddress.countryname} ${firstAddress.fulladdress}</p>
+<!-- 					                <p>${firstAddress.contactperson} &nbsp; &nbsp; ${firstAddress.contactphone}</p> -->
+					                <input type="hidden" id="addressId" name="address" value="${firstAddress.id}">
+					                
+									<input type="hidden" name="proviceId" value="$!firstAddress.provicecode">
+									<input type="hidden" name="cityId" value="$!firstAddress.citycode">
+									<input type="hidden" name="countryId" value="$!firstAddress.countrycode">
+									<input type="hidden" name="detailAddress" value="$!firstAddress.fulladdress">
+									<input type="hidden" name="fullAddress" value="$!firstAddress.provicename $!firstAddress.cityname $!firstAddress.countryname $!firstAddress.fulladdress">
+									<input type="hidden" name="name" value="$!firstAddress.contactperson">
+									<input type="hidden" name="mobile" value="$!firstAddress.contactphone">
+									<input type="hidden" name="phone" value="$!firstAddress.contacttel">						                
+					                
+						        #else
+						            <input type="hidden" id="IPAddress" value="true">
+					            #end
+				            </dd>
+			            </a>
+		            <div class="clear"></div>
+		            <dt class="fl font_1_2">联系人：</dt>
+		            <dd class="fl" id="address" style="width:180px">
+			            #if(${defAddress})
+			           		<p>${defAddress.contactperson}</p>
+			           	#elseif(${firstAddress} && !${defAddress})
+			           		<p>${firstAddress.contactperson}</p>
+			           	#end
+		            </dd><br/>
+		            <dt class="fl font_1_2">联系方式：</dt>
+		            <dd class="fl" id="address" style="width:180px">
+			            #if(${defAddress})
+			           		<p>$!{defAddress.contactphone}</p>
+			           	#elseif(${firstAddress} && !${defAddress})
+			           		<p>$!{firstAddress.contactphone}</p>
+			           	#end
+		            </dd>
+		        </dl><!-- 送货地址 -->
+		        <!-- 订单 -->
+		         <div class="pad_lr5 font_1_2 mar_t10">
+		            <p class="favour lin_24">订单信息</p>
+		<!--订单核对页商品拆分以及订单核对页运费使用	 -->
+		            <div class="clear"></div>
+	#foreach( $shop in $myCart.shops )
+		#if( $shop.quantity > 0 )
+		    <div class="content_list" id="divShopList">
+			     <h4 class="pad_l5 hei_32">店铺:<a href="$request.contextPath/shopBaseInfoController/toView?shopId=$shop.shopId">$shop.shopTitle</a></h4>
+				<h4 class="pad_l5 hei_32">店铺运费合计：￥$!number.format("#0.00", $!shop.fare)</h4>
+		    	<div class="clear"></div>
+				#foreach($shopFreightTemplateId in $shop.groupProducts.keySet())
+					<div class="border-4">
+					#foreach($product in $shop.groupProducts.get($shopFreightTemplateId))
+						#if( $product.checked == true )
+    						<dl class="shop_car pad_l5 border_2">
+    				           	     <!-- 商品图片 -->
+							                <dt class="fl" id="small_img">
+								                <a href="$request.contextPath/product/toDetail?id=$product.itemId&skuId=$product.skuId" target="_blank">
+								                    <img src="$!imageServerAddr$!product.src" height="75px" width="75px"/>
+								                </a>
+							                </dt> 
+							                <!-- 商品图片 -->
+							                <!-- 商品文字 -->
+							                <dd class="fl wid_65 mar_lr4">
+							                    <p class="lin_24">
+													<a href="$request.contextPath/product/toDetail?id=$product.itemId&skuId=$product.skuId" target="_blank">
+								                    	$!product.title<br/>
+								                    	#foreach( $attr in $product.attrs )
+		                                                    $attr.name:$attr.value &nbsp;
+		                                                #end
+													</a>
+							                    </p>
+							                    <p class="mar_t10"><span class="font_2 lin_24 fl mar_r2">￥$product.payPrice</span></p>
+							                    <div class="clear"></div>
+							                    <p class="lin_24"><span class="fl mar_r2">数量：</span>$product.quantity</p>
+							                </dd><!-- 商品文字 end-->
+    				    	</dl>
+    				    	<div class="clear"></div>
+						#end
+					#end
+					#if($shop.groupDeliveryTypes && $shop.groupDeliveryTypes.get($shopFreightTemplateId) && $shop.groupDeliveryTypes.get($shopFreightTemplateId).size()>0)
+						<div class="freight">
+                        <dl>
+                            <dd>
+							<span class="wid_70">运送方式：</span>
+                                <span>
+                                   <select name="freightDeliveryType" class="input_Style2 hei_30 wid_150" onchange="switchDeliveryType();" autocomplete="off">
+                                        #foreach($shopDeliveryType in $shop.groupDeliveryTypes.get($shopFreightTemplateId))
+											<option #if($freightDeliveryType.get($shopFreightTemplateId)==$shopDeliveryType.deliveryType)selected#end value="${shopDeliveryType.templateId}-${shopDeliveryType.deliveryType}">
+        										#if($shopDeliveryType.deliveryType==1)
+        											快递
+        										#elseif($shopDeliveryType.deliveryType==2)
+        											EMS
+        										#elseif($shopDeliveryType.deliveryType==3)
+        											平邮
+        										#end
+        										#if($shopDeliveryType.groupFreight == 0)
+        											包邮
+        										#else
+        											￥$!shopDeliveryType.groupFreight
+        										#end
+        									</option>
+                        				#end
+                                   </select>
+								</span>
+								<i class="fr font_fe">￥$!number.format("#0.00", $!shop.groupFreight.get($shopFreightTemplateId))</i>
+							</dd>
+						</dl>
+						</div>
+						#else
+						<div class="freight">
+                            <dl>
+                                <dd>
+								<span class="wid_70">运送方式：</span>
+                                    <span>
+                                       <select class="input_Style2 hei_30 wid_150">
+                                            <option>包邮</option>
+                                       </select>
+									</span>
+									<i class="fr font_fe">￥0.00</i>
+								</dd>
+							</dl>
+						</div>
+					#end
+					</div>
+				#end
+			</div>
+		#end
+	#end
+				</div>
+		        
+		        
+		        
+		        
+		        <ul class="individual bg_03 detail mar_t10">
+		<!--             <li class="border_3"><span class="fl">优惠</span><p class="fr"><span class="fl">未使用</span><i class="fa fa-angle-right fl"></i></p></li> -->
+		            <a href="javascript:queryInvoice('$!invoice','$!{invoiceTitle}')">
+			            <li class="border_3">
+			            	<span class="fl wid_25">发票信息:</span>
+			            	<p class="fl font_1_0 one wid_65">
+		            			#if($invoice==2)
+		            				普通发票-$!{invoiceTitle}
+		            				<input id="invoiceType" type="hidden" name="invoiceType" value="2"/>
+		            			#elseif($invoice==3)
+		            				增值税发票-$!{invoiceTitle}
+		            				<input id="invoiceType" type="hidden" name="invoiceType" value="3"/>
+		            			#else
+		            				不开发票
+		            				<input id="invoiceType" type="hidden" name="invoiceType" value="1"/>
+								#end
+		            				<input id="invoiceTitle" type="hidden" name="invoiceTitle" value="$!{invoiceTitle}" />
+			            	</p>
+							<i class="fa fa-angle-right" style="float:right;"></i>
+			            </li>
+		            </a>
+		            
+		             	#set($totalCouponCount = 0)
+					    #set($avaliableCouponCount = 0)
+					    #set($unavaliableCouponCount = 0)
+					    #if($avaliableCoupons && $unavaliableCoupons)
+					    	#set($totalCouponCount = $!avaliableCoupons.size()+$!unavaliableCoupons.size())
+					    	#set($avaliableCouponCount = $!avaliableCoupons.size())
+					    	#set($unavaliableCouponCount = $!unavaliableCoupons.size())
+					    #end
+					    #if($orderType!=1 && $orderType!=0 )
+					  	#if($avaliableCoupons && $!avaliableCoupons.size()>0) 
+						  	 <a href="#" onclick="cuponsCont();">
+					            <li class="border_3">
+					            	<span class="fl wid_20">
+					            	优惠券：</span>
+					     				 <p class="fl font_1_0 one wid_65">
+					     				 （$!{avaliableCouponCount}张可用）
+					     				 		#if (!$couponId)
+					     				 				未使用
+					     				 		 #else
+					     				 			           已使用
+					     				 	    #end
+		                            	
+		                                 </p> 
+										<i class="fa fa-angle-right" style="float:right;"></i> 
+					            </li>
+					            </a>
+			             #else
+			              <li class="border_3">
+					            	<span class="fl wid_80">
+					            使用优惠券：	暂无可用优惠券
+					            	
+					            	</span>
+					       </li>
+				       
+		             #end
+		             #end
+		              <li class="border_3">
+		            	<span class="fl">支付信息</span>
+		            	<p class="fr">
+		            	
+		            	<select name="shipmentType" onchange="changePayType(this)" id="shipmentType">
+							<option value="1" #if($shipmentType==1)selected#end>立即支付</option>
+							#if( $userstatus > 3 )
+								<option value="2" #if($shipmentType==2 || "1"==$!{orderType} || "0"==$!{orderType})selected#end>延期支付</option>
+							#end
+						</select>
+		            	</p>
+		            </li>
+		            <li class="border_3" style="display: none" id="payPeriod">
+		            	<span class="fl">支付账期</span>
+		            	<p class="fr">
+		            		#if("1"==$!{orderType})
+		            			<span>$!{payPeriods}</span>
+		            			<input name="payPeriod" type="hidden" value="$!{payPeriod}"/>
+		            		#else
+				            	<select name="payPeriod" id="payPeriodSelect">
+									<option value="" #if (!$payPeriod) selected #end>请 选 择</option>
+									<option value="7" #if ($!payPeriod==7) selected #end>7天</option>
+									<option value="15" #if ($!payPeriod==15) selected #end>15天</option>
+									<option value="30" #if ($!payPeriod==30) selected #end>30天</option>
+									<option value="45" #if ($!payPeriod==45) selected #end>45天</option>
+									<option value="60" #if ($!payPeriod==60) selected #end>60天</option>
+									<option value="75" #if ($!payPeriod==75) selected #end>75天</option>
+									<option value="90" #if ($!payPeriod==90) selected #end>90天</option>
+									<option value="120" #if ($!payPeriod==120) selected #end>120天</option>
+									<option value="180" #if ($!payPeriod==180) selected #end>180天</option>
+								</select>
+		            		#end
+		            	</p>
+		            </li>
+
+		            <li class="border_3">
+		            	<span class="fl">支付方式</span>
+		            	<p class="fr">
+		            	
+		            	<select name="paymentMethod" id="paymentMethod" >
+							<option value="1">个人支付</option>
+							#if($userstatus > 3)
+								<option value="2" selected="selected">企业支付</option>
+							#end
+						</select>
+		            	</p>
+		            </li>
+
+					<li class="border_3" id="needApprove">
+						<span class="fl">是否需要审核</span>
+						<p class="fr">
+							<input type="checkbox" name="needApprove" value="1" onclick="changeApprove(this)"/>
+						</p>
+					</li>
+					
+					<li class="border_3" style="display: none" id="approveUserLi">
+						<span class="fl">审核人</span>
+						<p class="fr">
+							<select name="auditorId" id="approveUser" disabled="disabled">
+								#foreach($!{userDTO} in $!{childUserListPosts})
+									<option value="$!{userDTO.userId}">$!{userDTO.username}</option>
+								#end
+							</select>
+						</p>
+					</li>
+
+                    <li class="border_3">
+                        <span class="fl">商品总金额：</span>
+                        <p class="fr">
+                            ￥&nbsp;$myCart.total&nbsp;元
+                        </p>
+                    </li>
+                    <li class="border_3">
+                        <span class="fl">运费：</span>
+                        <p class="fr">
+                            ￥&nbsp;$!myCart.totalFare&nbsp;元
+                        </p>
+                    </li>
+					#set( $discount = $!{myCart.total} - $!{myCart.payTotal} )
+                    <li class="border_3">
+                        <span class="fl">优惠金额：</span>
+                        <p class="fr">
+                            ￥&nbsp;$!discount&nbsp;元
+                        </p>
+                    </li>
+		        </ul><!-- 明细 end-->
+				#set( $total = $!{myCart.payTotal} + $!{myCart.totalFare} )
+                <p class="hei_45  pad_lr10 font_cen"><span class="font_e5 font_1_5">总计：￥$!{total}元</span></p>
+
+		        #*<div class="pad_l5 mar_t10">
+		        	<p class="hei_32 font_1_0">商品总金额：<span class="font_e5">￥&nbsp;$myCart.total&nbsp;元</span></p>
+		        	<p class="hei_32 font_1_0">运费：<span class="font_e5">￥&nbsp;$!myCart.totalFare&nbsp;元</span></p>
+		        	
+		        	#set( $discount = $!{myCart.total} - $!{myCart.payTotal} )
+		            <p class="hei_32 font_1_0">优惠金额：<span class="font_e5">￥&nbsp;$!discount&nbsp;元</span></p>
+		            
+		        	#set( $total = $!{myCart.payTotal} + $!{myCart.totalFare} )
+		            <p class="hei_32 font_1_0">总计：<span class="font_e5">￥&nbsp;$total&nbsp;元</span></p>
+		            	
+<!-- 			            <p class="lin_24"><span>账期：30天付款30% 60天付款60% 90天付款10%</span></p> -->
+		        </div>*#
+		        <input type="hidden" name="total" id="total" value="${total}"/>
+		        <div class="font_cen"><button class="button_1 hei_34 wid_87" onclick="orderSubmit()">提交</button></div>
+		    </div><!-- 订单 end-->
+		    <!-- 底部 -->
+		</form>
+
+
+	</div>
+	<div id="xxx"></div>
+		#parse("common/footer.vm")
+</body>
+</html>

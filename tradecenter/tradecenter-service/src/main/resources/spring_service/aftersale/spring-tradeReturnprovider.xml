@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+        <!-- 使用dubbo协议暴露类 关于 退货单创建 查询 等接口 -->
+        <dubbo:service interface="com.camelot.aftersale.service.TradeReturnExportService"
+		owner="storecenter" ref="tradeReturnExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+        <dubbo:service interface="com.camelot.aftersale.service.TradeReturnGoodsDetailService"
+		owner="storecenter" ref="tradeReturnGoodsDetailService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		<!-- 退款记录 --> 
+		<dubbo:service interface="com.camelot.aftersale.service.RefundTransationsService"
+		owner="zhangfan" ref="refundTransationsService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		
+		<!-- 退款退货--> 
+		<dubbo:service interface="com.camelot.aftersale.service.TradeReturnGoodsService"
+		owner="zhangfan" ref="tradeReturnGoodsService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+</beans>

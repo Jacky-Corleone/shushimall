@@ -1,0 +1,1779 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+
+<link href="$request.contextPath/assets/plugin/jquery-validation/1.11.1/jquery.validateA.css" type="text/css" rel="stylesheet" />
+
+<script type="text/javascript" src="$staticPath/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script src="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.js" type="text/javascript"></script>
+<script type="text/javascript" src="$staticPath/plugin/jquery-validation/1.11.1/messages_zh.js"></script>
+<script src="$staticPath/plugin/jquery-validation/1.11.1/messages_zh.js" type="text/javascript"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/jquery-migrate-1.1.0.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.shadow.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.ifixpng.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.fancyzoom.js"></script>
+
+<style type="text/css">
+	.basic_class_hide{
+		display:none;
+	}
+	.business_class_hide{
+		display:none;
+	}
+	.registere_class_hide{
+		display:none;
+	}
+	.org_class_hide{
+		display:none;
+	}
+	.tax_class_hide{
+		display:none;
+	}
+	.bank_class_hide{
+		display:none;
+	}
+	.manage_class_hide{
+		display:none;
+	}
+	
+	.checkbox{margin:0;}
+	.mover{ bottom:0px; left:0px;  }
+	.op_x{ background:#000; opacity:0.5;}
+	.mover p{ z-index:3; left:15px; top:0px; color:#fff;}
+	.boxxxx{float: right;width: 80px; padding:0px 10px;min-height: 37px;line-height: 23px;border: 1px solid #eee;text-align: center;padding-top: 15px;margin-right: 40px;color: #f00;}
+    .messageInput{background-color:transparent;width: 1px;}
+</style>
+
+<script type="text/javascript">
+$(function(){
+	var picPath="$!imageServerAddr$!userInfoDTO.userBusinessDTO.businessLicencePicSrc";
+	var isSanzhengflag="$!userInfoDTO.userBusinessDTO.isSanzheng";
+if("$!userInfoDTO.userBusinessDTO.financingNum"!=""){
+$("#edu").show();
+}else{
+$("#edu").hide();
+}
+	//图片查看
+	$("img[fancy_zoom='view_img']").fancyzoom({
+		Speed:400,
+		showoverlay:false,
+		imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+	});
+
+	//悬浮层
+	$(".po_re").mouseover(function(){
+		$(this).find(".mover").show();
+	})
+	$(".po_re").mouseout(function(){
+		$(this).find(".mover").hide();
+	})
+
+	//加载左侧菜单
+	$("#leftSeller").load("$request.contextPath/leftSeller");
+	//初始化基本信息校验
+	validateForm();
+    //初始化营业执照信息校验
+    businessFormValidate();
+    //组织机构代码信息
+    initValidPluginOrganization();
+    //初始化公司经营信息校验
+    validateCompanyBus();
+    
+    	//是否三证合一	      页面初始化的时候   
+	if("$!userInfoDTO.userBusinessDTO.isSanzheng"=="1" ){
+	    $('input:radio[name="isSanzhengRadio"]').each(function(){
+	         if($(this).val()==1){
+	           $("#eduXinyong").show();
+	           $("#isSanzhengHide").hide();//注册号(营业执照号) 隐藏
+	            $("#organizationdd").hide();//隐藏组织机构代码信息页面
+				$("#taxdd").hide();//隐藏税务登记证信息页面
+	         }
+	    })
+	}else if("$!userInfoDTO.userBusinessDTO.isSanzheng"=="0" ){
+		$('input:radio[name="isSanzhengRadio"]').each(function(){
+	         if($(this).val()==0){
+	            $("#eduXinyong").hide();
+	            $("#isSanzhengHide").show();//注册号(营业执照号) 显示
+	            $("#organizationdd").show();//隐藏组织机构代码信息页面
+				$("#taxdd").show();//隐藏税务登记证信息页面
+	         }
+	    })
+	}
+	//融资额度	      页面初始化的时候   
+	if("$!userInfoDTO.userBusinessDTO.isFinancing"=="1" ){
+	           $("#edu").show();
+	}else{
+	   $("#edu").hide();
+	}
+	//当点击是否三证合一  点击 单选的时候
+			$('input:radio[name="isSanzhengRadio"]').click(function(){
+		   $('input:radio[name="isSanzhengRadio"]').each(function(){
+			     if($(this).attr("checked")&&$(this).val()==1){
+			        $("#newBusinessLicencePicSrcImg").html("*请上传新的营业执照副本");
+			        $("#isSanzheng").val('1');
+					$("#eduXinyong").show();
+					$("#isSanzhengHide").hide();//注册号(营业执照号) 隐藏
+					$("#organizationdd").hide();//隐藏组织机构代码信息页面
+					$("#taxdd").hide();//隐藏税务登记证信息页面
+			    }else if($(this).attr("checked")&&$(this).val()==0){
+			    $("#newBusinessLicencePicSrcImg").empty();
+			        $("#isSanzheng").val('0');
+					$("#eduXinyong").hide();
+					$("#isSanzhengHide").show();//注册号(营业执照号) 显示
+					$("#organizationdd").show();//显示组织机构代码信息页面
+					$("#taxdd").show();//隐藏税务登记证信息页面
+			    }
+			    $("#unifiedCreditCode").focus();
+				$("#unifiedCreditCode").blur();
+	        })
+		})
+		
+	//公司电话
+	if("$!userInfoDTO.userBusinessDTO.companyPhone"!=null && "$!userInfoDTO.userBusinessDTO.companyPhone"!="" ){
+		var companyPhone = "$!userInfoDTO.userBusinessDTO.companyPhone";
+		var strs = companyPhone.split("-");
+		if(strs.length>0){
+			$("#area").val(strs[0]);
+		}
+		if(strs.length>1){
+			$("#phone").val(strs[1]);
+		}
+	}
+	//展示经营范围
+	$("input[name='businessScope']").val("$!userInfoDTO.userBusinessDTO.businessScope".split(","));
+	//保存基本信息
+	$("#btnInformationSave").click(function(){
+		//验证校验
+		var isValid = $("#user_form").valid();
+		if(!isValid){
+			return;
+		}
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			url:"$request.contextPath/information/informationSeller/modifySeller",
+			data:{
+				"userId":"$!userInfoDTO.userId",
+				"userDTO.uid":"$!userInfoDTO.userId",
+				"userDTO.nickname":$("#nickname").val(),
+                "userDTO.linkPhoneNum":$("#linkPhoneNum").val(),
+                "userDTO.linkMan":$("#linkManName").val(),
+                "userDTO.department":$("#departMentVal").val(),
+				 editType:1,
+			},
+			success: function(result){
+				//返回提示信息
+				alert(result.message);
+				location.reload();
+			}
+		});
+	});
+	//保存营业执照信息
+	$("#userBussinessSaveBtn").click(function(){
+		//电话号码
+		$("#companyPhone").val($("#area").val()+"-"+$("#phone").val());
+		//判断是否长期有效
+		var neverExpires = "1";
+		if($('#timeState').is(':checked')) {
+			neverExpires = "2";
+		}
+        //是否有融资需求
+        var isFinancing = "0";
+        if($("#isFinancingCheckbox").attr("checked")=="checked"){
+            isFinancing = "1";
+        }else{
+            isFinancing = "0";
+        }
+
+       //校验一下营业执照是否新的isSanzhengflag  由 否-->是 才判断图片   
+       if(isSanzhengflag=="0" && ($(':radio[name="isSanzhengRadio"]:checked').val()=="1")){
+          if($("#businessLicencePicSrcImg").attr("src")==picPath){
+               alert("请上传新的营业执照副本");
+               return false;
+         }
+       }
+      
+
+
+        var isValid = $("#business_form").valid();
+        if(!isValid){
+            return;
+        }
+
+		//经营范围
+		var str = "";
+		$("input[name='businessScope']:checked").each(function(){
+			str += $(this).val()+",";
+		});
+		$("#businessScope").val(str);
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			url:"$request.contextPath/information/informationSeller/modifySeller",
+			data:{
+				//营业执照信息
+				editType:2,
+				//数据库表user_extends主键
+				extendId:"$!userInfoDTO.extendId",
+				//用户Id
+				userId:"$!userInfoDTO.userId",
+				//1注册资本
+                "userBusinessDTO.idCardNum":$("#idCardNum").val(),
+				"userBusinessDTO.registeredCapital":$("#registeredCapital").val(),
+				//2法定代表人姓名
+				"userBusinessDTO.artificialPersonName":$("#artificialPersonName").val(),
+				//新增字段：证件类型
+				"userBusinessDTO.idCardType":$("#idCardType").val(),
+				//3证件号码（原：身份号码）
+				"userBusinessDTO.idCardNum":$("#idCardNum").val(),
+				//4注册号
+				"userBusinessDTO.businessLicenceId":$("#businessLicenceId").val(),
+				//5营业执照有效期
+				"userBusinessDTO.businessLicenceIndate":$("#businessLicenceIndate").val(),
+				//6营业执照是否长期有效
+				"userBusinessDTO.neverExpires":neverExpires,
+				//7经营范围
+				"userBusinessDTO.businessScope":$("#businessScope").val(),
+				//8营业执照所在地
+                "userBusinessDTO.businessLicenceAddress":$("#busLicProvince").val()+","+$("#busLicCity").val()/* +","+$("#busLicArea").val() */,
+                //9营业执照详细地址
+				"userBusinessDTO.businessLicencAddressDetail":$("#businessLicencAddressDetail").val(),
+				//10成立日期
+				"userBusinessDTO.businessLicenceDate":$("#businessLicenceDate").val(),
+				//11公司电话
+				"userBusinessDTO.companyPhone":$("#companyPhone").val(),
+				//12紧急联系人
+				"userBusinessDTO.linkman":$("#linkman").val(),
+				//13紧急联系人手机
+				"userBusinessDTO.linkmanPhone":$("#linkmanPhone").val(),
+				//14公司所在地
+				"userBusinessDTO.companyAddress":$("#company_province").val()+","+$("#company_city").val()/* +","+$("#company_area").val() */,
+				//15公司详细地址
+				"userBusinessDTO.companyDeclinedAddress":$("#companyDeclinedAddress").val(),
+				//16企业是否有融资需求isFinancing
+				"userBusinessDTO.isFinancing":isFinancing,
+				//17期望融资额度
+				"userBusinessDTO.financingNum":$("#financingNum").val(),
+				//18营业执照副本
+				"userBusinessDTO.businessLicencePicSrc":$("#businessLicencePicSrc").val(),
+				//19法人身份证（正面）
+				"userBusinessDTO.artificialPersonPicSrc":$("#artificialPersonPicSrc").val(),
+				//20法人身份证（反面）
+				"userBusinessDTO.artificialPersonPicBackSrc":$("#artificialPersonPicBackSrc").val(),
+			   //是否三证合一
+			   "userBusinessDTO.isSanzheng":$("#isSanzheng").val(),
+			   //统一社会信用代码
+			   "userBusinessDTO.unifiedCreditCode":$("#unifiedCreditCode").val()
+			},
+			success: function(result){
+				alert(result.message);
+				location.reload();
+			}
+		});
+	});
+	//保存组织机构代码信息
+	$("#userOrganizationBtnSave").click(function(){
+		//验证校验
+		var isValid = $("#organizationForm").valid();
+		if(!isValid){
+			return;
+		}
+
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			url:"$request.contextPath/information/informationSeller/modifySeller",
+			data:$("#organizationForm").serializeArray(),
+			success: function(result){
+				//返回提示信息
+				alert(result.message);
+				location.reload();
+			}
+		});
+	});
+
+	//税务登记证信息
+	$("#userTaxDTOSaveBtn").click(function(){
+	//验证校验
+		var isValid = $("#user_form").valid();
+		if(!isValid){
+			return;
+		}
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			url:"$request.contextPath/information/informationSeller/modifySeller",
+			data:{
+				extendId:"$!userInfoDTO.extendId",
+				userId:"$!userInfoDTO.userId",
+				"userTaxDTO.taxpayerCode":$("#taxpayerCode").val(),
+				"userTaxDTO.taxManId":$("#taxManId").val(),
+				"userTaxDTO.taxpayerType":$("#taxpayerType").val(),
+				"userTaxDTO.taxpayerCertificatePicSrc":$("#taxpayerCertificatePicSrc").val(),
+				"userTaxDTO.taxRegistrationCertificatePicSrc":$("#taxRegistrationCertificatePicSrc").val(),
+				editType:4,
+			},
+			success: function(result){
+				//返回提示信息
+				alert(result.message);
+				location.reload();
+			}
+		});
+	});
+
+	//税务登记
+	$("#bankAccountSaveBtn").click(function(){
+	//验证校验
+		var isValid = $("#user_form").valid();
+		if(!isValid){
+			return;
+		}
+		//验证码校验
+		if($('#bankCodePhone').val() == ''){
+			alert("请输入验证码");
+			return false;
+		}
+		if(!checkCode($('#bankCodePhone').val())){
+			alert("验证码输入有误");
+			return false;
+		}
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			url:"$request.contextPath/information/informationSeller/modifySeller",
+			data:{
+				extendId:"$!userInfoDTO.extendId",
+				userId:"$!userInfoDTO.userId",
+				"userAccountDTO.bankAccountName":$("#bankAccountName").val(),
+				"userAccountDTO.bankAccount":$("#bankAccount").val(),
+				"userAccountDTO.bankName":$("#bankName").val(),
+				"userAccountDTO.bankBranchJointLine":$("#bankBranchJointLine").val(),
+				"userAccountDTO.bankBranchIsLocated":$("#bank_province").val()+","+$("#bank_city").val()/* +","+$("#bank_area").val() */,
+				"userAccountDTO.isCiticBank":$("#isCiticBank").val(),
+				"userAccountDTO.bankAccountPermitsPicSrc":$("#bankAccountPermitsPicSrc").val(),
+				editType:6,
+			},
+			success: function(result){
+				//返回提示信息
+				alert(result.message);
+				location.reload();
+			}
+		});
+	});
+
+    $("#companyBusSaveBtn").bind("click", function(){
+        var isValid = $("#companybus_form").valid();
+        if(!isValid){
+            return;
+        }
+        $.ajax({
+            url:"$request.contextPath/information/informationSeller/modifySeller",
+            type:"post",
+            dataType:"json",
+            data:{
+                "extendId":"$!userInfoDTO.extendId",
+                "userId":"$!userInfoDTO.userId",
+                "userManageDTO.dealerType":$("#dealerType").val(),
+                "userManageDTO.isHaveEbusiness":$("input[name='userManageDTO.isHaveEbusiness']:checked").val(),
+                "userManageDTO.webOperaPeo":$("#webOperaPeo").val(),
+                "userManageDTO.homePage":$("#homePage").val(),
+                "userManageDTO.saleNum":$("#saleNum").val(),
+                "userManageDTO.erpType":$("#erpType").val(),
+                "editType":5
+            },
+            success: function(result){
+                //返回提示信息
+                alert(result.message);
+                location.reload();
+            }
+        });
+    });
+
+	$('#bankCodePhone').blur(function()
+	{
+		checkCode($(this).val());
+	});
+
+	function checkCode(codeVal)
+	{
+		$.ajax({
+			async:false,
+			type: "post",
+			dataType: "json",
+			url:"$request.contextPath/captcha/check",
+			data:{
+				codeKey:$('#code_key').val(),
+				code:codeVal
+			},
+			success: function(result){
+				//返回提示信息
+				if(result.message)
+				{
+					$('#checked').val('true');
+				}else
+				{
+					$('#checked').val('');
+				}
+			}
+		});
+
+		return !!$('#checked').val();
+	}
+
+	//地域联动
+	//开户行支行所在地
+	$("#bank_province").change(function(){
+		/* $("#bank_area").empty();
+		$("#bank_area").append($("<option>").text("请选择").val("")); */
+		optionItems($("#bank_province").val(),"bank_city","");
+	});
+	/* $("#bank_city").change(function(){
+		optionItems($("#bank_city").val(),"bank_area","");
+	}); */
+
+	//公司所在地
+	$("#company_province").change(function(){
+		/* $("#company_area").empty();
+		$("#company_area").append($("<option>").text("请选择").val("")); */
+		optionItems($("#company_province").val(),"company_city","");
+	});
+	/* $("#company_city").change(function(){
+		optionItems($("#company_city").val(),"company_area","");
+	}); */
+
+	//营业执照所在地
+    $("#busLicProvince").change(function(){
+        initBusLicCity();
+        //initBusLicArea();
+        optionItems($("#busLicProvince").val(),"busLicCity","");
+    });
+    /* $("#busLicCity").change(function(){
+        initBusLicArea();
+        optionItems($("#busLicCity").val(),"busLicArea","");
+    }); */
+    function initBusLicCity(){
+        $("#busLicCity").empty();
+        $("#busLicCity").append($("<option>").text("请选择").val(""));
+    };
+   /*  function initBusLicArea(){
+        $("#busLicArea").empty();
+        $("#busLicArea").append($("<option>").text("请选择").val(""));
+    }; */
+	//form校验
+	function validateForm(){
+		$("#user_form").validate({
+			rules:{
+				nickname:{
+					rangelength:[1,15]
+				},
+				businessLicenceId:{
+					required:true,
+					number:true
+				},
+				artificialPersonName:{
+					required:true
+				},
+				registeredCapital:{
+					required:true,
+					number:true
+				},
+				businessScope:{
+					required:true
+				},
+				companyPhone:{
+					required:true,
+					maxlength:16,
+					checkTel:true
+				},
+				organizationId:{
+					required:true
+				},
+				taxManId:{
+					required:true
+				},
+                bankAccountName:{
+					required:true
+				},
+				bankAccount:{
+					required:true,
+					number:true
+				},
+				bankName:{
+					required:true
+				},
+				bankBranchJointLine:{
+					required:true,
+					number:true
+				},
+				bankCodePhone:{
+					required:true
+				},
+				area:{
+					required: true,
+					number: true
+				},
+				phone:{
+					required: true,
+					number: true
+				}
+			}
+		});
+	}
+
+    //营业执照信息校验
+    function businessFormValidate(){
+        $("#business_form").validate({
+            rules:{
+                "userBusinessDTO.registeredCapital":{
+                    registeredCapital:true,
+                    required:true,
+                    maxlength:10
+                },
+                "userBusinessDTO.artificialPersonName":{
+                    artificialPersonName:true,
+                    required:true,
+                    maxlength:30
+                },
+                "userBusinessDTO.idCardType":{
+                    idCardNum:true,
+                    required:true,
+                    maxlength:50
+                },
+                "userBusinessDTO.idCardNum":{
+                    idCardNum:true,
+                    required:true,
+                    maxlength:50
+                },
+                "userBusinessDTO.businessLicenceId":{
+                    businessLicenceId:true,
+                    required:true,
+                    maxlength:100
+                },
+                "userBusinessDTO.businessLicenceIndate":{
+                    required:function(){return !$("#timeState").is(":checked");},
+                    maxlength:60
+                },
+                "userBusinessDTO.businessLicencAddressDetail":{
+                    required:true,
+                    maxlength:200
+                },
+                "userBusinessDTO.businessLicenceDate":{
+                    required:true,
+                    maxlength:60
+                },
+                "userBusinessDTO.companyPhone":{
+                    required:true
+                },
+                "userBusinessDTO.linkman":{
+                    required:true,
+                    maxlength:30
+                },
+                "userBusinessDTO.linkmanPhone":{
+                    linkmanPhone:true,
+                    required:true,
+                    maxlength:11
+                },
+                "userBusinessDTO.companyDeclinedAddress":{
+                    required:true,
+                    maxlength:200
+                },
+                "busLicProvince":{
+                    required:true
+                },
+                "busLicCity":{
+                    required:true
+                },
+                /* "busLicArea":{
+                    required:true
+                }, */
+                "company_province":{
+                    required:true
+                },
+                "company_city":{
+                    required:true
+                },
+                /* "company_area":{
+                    required:true
+                }, */
+				"area":{
+                    area:true,
+				    required:true,
+                    number:true
+				},
+				"phone":{
+                    phone:true,
+				    required:true,
+                    number:true
+				},
+				"userBusinessDTO.unifiedCreditCode":{
+                    unifiedCreditCode:true,
+                    required:true,
+                    maxlength:18
+                },
+                "userBusinessDTO.financingNum":{
+                    required: function(){return $("#isFinancingCheckbox").is(":checked");}
+                }
+            },excludeValidator:["userBusinessDTO.companyPhone"]
+        });
+        jQuery.validator.addMethod("registeredCapital", function(value, element) {
+            // var chrnum=/^(([\u4e00-\u9fa5]*[\+]?\d+(\.\d{0,9})?)|([\+]?\d+(\.\d{0,9})?[\u4e00-\u9fa5]*)|([\+]?\d+(\.\d{0,9})?)|([\u4e00-\u9fa5]*))$/;
+            var chrnum = /^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)|([^A-Za-z]))|([^A-Za-z])$/;
+            return this.optional(element) || (chrnum.test(value));
+        }, "企业注册资本由数字、小数点和中文组成");
+
+        jQuery.validator.addMethod("artificialPersonName", function(value, element) {
+            var chrnum = /^[\u4e00-\u9fa5a-zA-Z]{2,20}$/;
+            return this.optional(element) || (chrnum.test(value));
+        }, "输入2-20个字符，可由中文和英文组成");
+
+        jQuery.validator.addMethod("idCardNum", function(value, element) {
+            //  var chrnum = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/;
+            var chrnum= /^[A-Za-z0-9]{1,50}$/;
+            return this.optional(element) || (chrnum.test(value));
+        }, "由15-18位数字或者数字字母组成");
+
+        jQuery.validator.addMethod("businessLicenceId", function(value, element) {
+            var chrnum = /^[0-9-\u4e00-\u9fa5a-zA-Z]{2,20}$/;
+            return this.optional(element) || (chrnum.test(value));
+        }, "营业执照最多允许输入20个字符");
+        jQuery.validator.addMethod("area", function(value, element) {
+            var chrnum = /^\d{3,4}$/;
+            return this.optional(element) || (chrnum.test(value));
+        }, "请填写公司电话，以便于我们联系，如：0527-88001100！");
+
+        jQuery.validator.addMethod("phone", function(value, element) {
+            var chrnum = /^\d{7,8}$/;
+            return this.optional(element) || (chrnum.test(value));
+        }, "请填写公司电话，以便于我们联系，如：0527-88001100！");
+
+        jQuery.validator.addMethod("linkman", function(value, element) {
+            var chrnum = /^[\u4e00-\u9fa5a-zA-Z]{2,20}$/;
+            return this.optional(element) || (chrnum.test(value));
+        }, "输入2-20个字符，可由中文和英文组成");
+
+        jQuery.validator.addMethod("linkmanPhone", function(value, element) {
+            var chrnum = /^[1]([3|5|7|8][0-9]{1}|59|58|88|89)[0-9]{8}$/;
+            return this.optional(element) || (chrnum.test(value));
+        }, "请正确填写手机号，如：13010008976");
+         jQuery.validator.addMethod("unifiedCreditCode", function(value, element) {
+        var chrnum = /^[0-9a-zA-Z]{18}$/;
+        return this.optional(element) || (chrnum.test(value));
+        }, "统一社会信用代码仅允许输入18位数字和字母");
+        jQuery.validator.addMethod("financingNum", function(value, element) {
+            var chrnum = /^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)|([^A-Za-z]))|([^A-Za-z])$/;
+            return this.optional(element) || (chrnum.test(value));
+        }, "融资金额由数字、小数点和中文组成");
+    }
+
+
+
+    /*组织机构初始化校验控件*/
+    function initValidPluginOrganization(){
+        $("#organizationForm").validate({
+            rules: {
+                "userOrganizationDTO.organizationId":{
+                    organizationId:true,
+                    required: true
+                },
+                "userOrganizationDTO.userfulTime":{
+                    required: true
+                }
+            }
+        });
+
+        jQuery.validator.addMethod("organizationId", function(value, element) {
+            var chrnum = /^[a-zA-Z0-9_\-|\w]{4,40}$/;
+            return this.optional(element) || (chrnum.test(value));
+        }, "请按照公司组织机构代码证上的代码填写，不要省略“—”");
+    }
+
+
+
+    //公司经营信息校验
+    function validateCompanyBus(){
+        $("#companybus_form").validate({
+            rules:{
+                "dealerType":{
+                    required: true
+                },
+                "userManageDTO.isHaveEbusiness":{
+                    required: true
+                },
+                "userManageDTO.webOperaPeo":{
+                    required: true,
+                    number:true
+                }
+            }
+        });
+    }
+
+	//验证固定电话
+	jQuery.validator.addMethod("checkTel",function(value,element){
+		var pattern =/^(([0\+]\d{2,3}-)?(0\d{2,3})-)(\d{7,8})(-(\d{3,}))?$/;
+		if(value!=''){if(!pattern.exec(value)){return false;}};
+		return true;
+	},"格式错误");
+
+    //初始化公司所在地级联和营业执照所在地级联
+    companyAddressChange();
+});
+
+//图片上传
+/* var showImgEle = "";
+var urlSaveElel = "";
+function uploadImg(showImgId,urlInput){
+	$("#fileInput").click();
+	showImgEle = showImgId;
+	urlSaveElel = urlInput;
+} */
+function fileChange(fileInputId,showImgId,urlInput){
+	startUpload(fileInputId,showImgId,urlInput);
+}
+
+//更改编辑样式
+function changeShow(showClass,hideClass,flag){
+if(flag==1){
+  alert("温馨提示：如果您的组织机构代码证已到有效期而且需要重新上传新的证件，并且您更换了三证合一（营业执照、组织结构代码、税务证明）新营业执照，请您到“营业执照信息”中上传您的新营业执照电子版即可");
+}
+if(flag==2){
+  alert("温馨提示：如果您的税务登记证明已到有效期而且需要重新上传新的证件，并且您更换了三证合一（营业执照、组织结构代码、税务证明）新营业执照，请您到“营业执照信息”中上传您的新营业执照电子版即可");
+}
+    $(".formError").hide();//点击取消 提示框消失
+	$("."+showClass).show();
+	$("."+hideClass).hide();
+}
+
+//发送短信验证码
+function sendCode(){
+	var address = "$!userInfoDTO.userDTO.umobile";
+	var type = 2;
+	$.ajax({
+		type: "get",
+		dataType: "json",
+		url:"$request.contextPath/captcha/send",
+		data:{
+			address:address,
+			type:type,
+			smsType:'UPGOLDACCOUNT'
+		},
+		success: function(result){
+			if(result.isOK == "1"){
+				$("#code_key").val('');
+				if(result.message!=''){
+					alert(result.message);
+				}else{
+					alert("验证码发送失败");
+					}
+			}else{
+				$("#code_key").val(result.codeKey);
+				$("#sendPhoneLi button").remove();
+				$("#mobileSpan").before("验证码发送成功&nbsp;&nbsp;");
+			}
+		}
+	});
+}
+
+//地域
+function optionItems(parentCode, optionId,selectVal,linkageId){
+	$.ajax({
+		url:"$request.contextPath/shopBaseInfoController/queryAddress",
+		type:"post",
+		data:{
+			parentCode:parentCode
+		},
+		dataType: "json",
+		success:function(data){
+			//获取地域数据
+			var optionItem = $("#"+optionId);
+			optionItem.empty();
+			optionItem.append($("<option>").text("请选择").val(""));
+			$.each(data, function (n, address) {
+				var option = $("<option>").text(address.name).val(address.code);
+				if(address.code == selectVal){
+					option.attr("selected",true);
+				}
+				optionItem.append(option);
+			});
+			//触发的关联操作
+			//if(linkageId != ""){
+				//$("#"+linkageId).change();
+			//}
+		}
+	});
+}
+
+//银行所在地自动级联
+function bankAddressChange(){
+	optionItems($("#bank_province").val(),"bank_city","$!bankCity","");
+	optionItems("$!bankCity","bank_area","$!bankArea");
+}
+//公司所在地自动级联
+function companyAddressChange(){
+	optionItems($("#company_province").val(),"company_city","$!companyCity","");
+	optionItems("$!companyCity","company_area","$!companyArea");
+    busLicAddressChange();
+    bankAddressChange();
+}
+
+//营业执照所在地自动级联
+function busLicAddressChange(){
+    optionItems($("#busLicProvince").val(),"busLicCity","$!busLicCity","");
+    optionItems("$!busLicCity","busLicArea","$!busLicArea");
+}
+
+//图片上传实现类
+function startUpload(fileElementId, showImg,urlInput){
+	$.ajaxFileUpload({
+		url: '$request.getContextPath()/fileUpload/fixedUpload', //用于文件上传的服务器端请求地址
+		secureuri: false, //是否需要安全协议，一般设置为false
+		fileElementId: fileElementId, //文件上传域的ID
+		dataType: 'json', //返回值类型 一般设置为json
+		type:"post",
+		success: function (data, status){  //服务器成功响应处理函数
+			if(data.success){
+				$("#"+showImg).attr("src","$!imageServerAddr"+data.url);
+				$("#"+urlInput).val(data.url);
+				$("#"+fileElementId).val("");
+			}else{
+				alert(data.msg);
+			}
+		},
+		error: function (data, status, e){//服务器响应失败处理函数
+		}
+	});
+};
+//绑定type（phone代表绑定手机  mail代表邮箱 ） backUrl：修改完成后要跳转的地址
+function bundMailOrPhone(type){
+	window.location.href="$request.contextPath/information/informationSeller/newAuth?changeType="+type+"&uid=$!userInfoDTO.userId&backUrl=/information/informationSeller/initLoad";
+}
+//修改type（phone代表绑定手机  mail代表邮箱 ） backUrl：修改完成后要跳转的地址
+function editMailOrPhone(type){
+	window.location.href="$request.contextPath/information/informationSeller/authenticate?changeType="+type+"&uid=$!userInfoDTO.userId&backUrl=/information/informationSeller/initLoad";
+}
+//检测是否是长期有效
+function changeDisabled(id){
+	if($("#"+id).prop('checked')){
+		$("#businessLicenceIndate").attr('disabled','true');
+		$("#businessLicenceIndate").val("").attr("placeholder","长期有效");
+		$("#businessLicenceIndate").addClass('inputGray');
+	}else{
+		$("#businessLicenceIndate").removeAttr('disabled');
+		$("#businessLicenceIndate").attr("placeholder","");
+		$("#businessLicenceIndate").removeClass('inputGray');
+	}
+}
+function show(auditRemark){
+	$("#auditRemark").val(auditRemark);
+	$("#po_fai").show();
+}
+function closePo(){
+	$("#po_fai").hide();
+}
+function isFinancingChange(){
+if($("#isFinancingCheckbox").attr("checked")=="checked"){
+$("#edu").show();
+$("#financingNum").val("");
+}else{
+$("#edu").hide();
+$("#financingNum").val("");
+}
+}
+function cancel(showClass,hideClass){
+if("$!userInfoDTO.userBusinessDTO.financingNum"!=""){
+$("#isFinancingCheckbox").attr("checked","true");
+$("#edu").show();
+}else{
+$("#edu").hide();
+}
+$(".formError").hide();//点击取消 提示框消失
+//点击取消 回到三证合一 是 否 初始化的时候
+if("$!userInfoDTO.userBusinessDTO.isSanzheng"=="1" ){
+	    $('input:radio[name="isSanzhengRadio"]').each(function(){
+	         if($(this).val()==1){
+	           $("#eduXinyong").show();
+	           $("#isSanzhengHide").hide();//注册号(营业执照号) 隐藏
+	            $("#organizationdd").hide();//隐藏组织机构代码信息页面
+				$("#taxdd").hide();//隐藏税务登记证信息页面
+	         }
+	    })
+	}else if("$!userInfoDTO.userBusinessDTO.isSanzheng"=="0" ){
+		$('input:radio[name="isSanzhengRadio"]').each(function(){
+	         if($(this).val()==0){
+	            $("#eduXinyong").hide();
+	            $("#isSanzhengHide").show();//注册号(营业执照号) 显示
+	            $("#organizationdd").show();//隐藏组织机构代码信息页面
+				$("#taxdd").show();//隐藏税务登记证信息页面
+	         }
+	    })
+	}
+	
+changeShow(showClass,hideClass)
+}
+function update(showClass,hideClass){
+if("$!userInfoDTO.userBusinessDTO.financingNum"!=""){
+$("#financingNum").val($!userInfoDTO.userBusinessDTO.financingNum);
+}else{
+$("#isFinancingCheckbox").attr("checked",false);
+}
+
+
+	
+//点击修改的时候
+if("$!userInfoDTO.userBusinessDTO.isSanzheng"=="1" ){
+	    $('input:radio[name="isSanzhengRadio"]').each(function(){
+	         if($(this).val()==1){
+	            $(this).attr("checked",true);
+	            $("#isSanzheng").val('1');
+	            $("#eduXinyong").show();
+	            $("#organizationdd").hide();//隐藏组织机构代码信息页面
+				$("#taxdd").hide();//隐藏税务登记证信息页面
+	         }
+	    })
+	}else if("$!userInfoDTO.userBusinessDTO.isSanzheng"=="0" ){
+		$('input:radio[name="isSanzhengRadio"]').each(function(){
+	         if($(this).val()==0){
+	            $(this).attr("checked",true);
+	            $("#isSanzheng").val('0');
+	            $("#eduXinyong").hide();
+	            $("#organizationdd").show();//隐藏组织机构代码信息页面
+				$("#taxdd").show();//隐藏税务登记证信息页面
+	         }
+	    })
+	}
+	
+changeShow(showClass,hideClass)
+}
+</script>
+
+<div id="main">
+<!--left start-->
+<div id="leftSeller"></div>
+<!--left end-->
+
+<!--right start-->
+<div id="right" >
+	<h3>卖家基本信息管理 > 基本信息设置</h3>
+	<!-- 用户支付密码提示块 -->
+	<div class="right_top border-4 bg_06 mar_b10">
+		<div class="wid_820 fl mar_20">
+			<p class="hei_30">用户名：<span>$!userDTO.uname</span>
+				<!-- <a href="$request.getContextPath()/integralRecord/init">
+					<span class="font_7a fr">总 积 分: #if("$!userCreditDTO.credit"!="") $!userCreditDTO.credit #else 0 #end</span>
+				</a> -->
+			</p>
+			<p class="hei_30">
+				#if($!userDTO.securityLevel == 1)
+					支付密码 安全级别：低
+				<span class="plan po_re">
+					<span class="po_ab plan_scale" style="width: 33px;"></span>
+					<!--进度宽度 中间style控制宽度 end -->
+				</span>
+				<!--进度条最下面背景色 end -->
+				#elseif($!userDTO.securityLevel == 2)
+					支付密码 安全级别：中
+				<span class="plan po_re">
+					<span class="po_ab plan_scale" style="width: 67px;"></span>
+				<!--进度宽度 中间style控制宽度 end -->
+				</span>
+				<!--进度条最下面背景色 end -->
+				#elseif($!userDTO.securityLevel == 3)
+					支付密码 安全级别：高
+				<span class="plan po_re">
+					<span class="po_ab plan_scale" style="width: 100px;"></span>
+				<!--进度宽度 中间style控制宽度 end -->
+				</span>
+				<!--进度条最下面背景色 end -->
+				#elseif($!userDTO.isHavePayPassword == "0")
+					支付密码 安全级别：<span class="font_14b font_fe">您还未设置支付密码</span>
+				<span class="plan po_re">
+					<span class="po_ab plan_scale" style="width: 0px;"></span>
+					<!--进度宽度 中间style控制宽度 end -->
+				</span>
+				<!--进度条最下面背景色 end -->
+				#end 建议经常修改支付密码
+				<span class="font_7a fr">
+					#if("$!userDTO.isHavePayPassword" == "0")
+						<a href="$request.contextPath/security/setpaypwdpage?userType=seller">设置支付密码</a>
+					#else
+						<a href="$request.contextPath/security/modifypaypwdpage?userType=seller">修改支付密码</a>
+					#end
+				</span>
+			</p>
+			<div class="clear"></div>
+		</div>
+	</div>
+
+	
+	<div class="Basic_Info bg_06 border-4"><dl>
+		<form id="user_form" method="post">
+		<dd class="border-5 po_re">
+			<h3>联系人信息></h3>
+			##卖家认证待审核（黄色）
+			#if($!userInfoDTO.userDTO.auditStatus=="1")
+				<div class="border-1 Info_right_box bg_05 font_65">
+					<i class="fa-pencil-square  font_16 mar_r10"></i>
+					$!userInfoDTO.userDTO.userAuditStatusLabel
+				</div>
+			##卖家认证驳回（红色）
+			#elseif($!userInfoDTO.userDTO.auditStatus=="0")
+				<div class="border-1 Info_right_box bg_05 font_fe">
+					<i class="fa-info-circle font_16 mar_r10"></i>
+					$!userInfoDTO.userDTO.userAuditStatusLabel
+				</div>
+			##卖家认证审核通过（绿色）
+			#elseif($!userInfoDTO.userDTO.auditStatus=="2")
+				<div class="border-1 Info_right_box bg_05">
+					<i class="fa-check-circle font_7a font_16 mar_r10"></i>
+					$!userInfoDTO.userDTO.userAuditStatusLabel
+				</div>
+			#else
+				<div class="border-1 Info_right_box bg_05">
+					<i class="fa-minus-circle font_00 font_16 mar_r10"></i>
+					$!userInfoDTO.userDTO.userAuditStatusLabel
+				</div>
+			#end
+			<ul >
+				<li><span class="font_name">用户编号：</span>$!userInfoDTO.userId</li>
+				<li><span class="font_name">用 户 名：</span>$!userInfoDTO.userDTO.uname</li>
+				<li>
+					<span class="font_name">用户昵称：</span>
+					<span class="basic_class_show">$!userInfoDTO.userDTO.nickname</span>
+					<div class="basic_class_hide">
+						<input name="nickname" id="nickname" type="text" maxlength="20" value="$!userInfoDTO.userDTO.nickname" class="input_Style2 wid_160 hei_30" />
+					</div>
+				</li>
+				<li>
+					<span class="font_name"> 公司电话：</span>
+					<span class="basic_class_show" >$!userDTO.linkPhoneNum</span>
+					<div class="basic_class_hide">
+						<input id="linkPhoneNum" name="linkPhoneNum" class="hei_30 input_Style2 wid_160" type="text" value="$!userDTO.linkPhoneNum"/>
+					</div>
+				</li>
+				<li>
+					<span class="font_name"> 联系人姓名：</span>
+					<span class="basic_class_show" >$!userDTO.linkMan</span>
+					<div class="basic_class_hide">
+						<input id="linkManName" name="linkMan" maxlength="20" class="hei_30 input_Style2 wid_160" type="text" value="$!userDTO.linkMan"/>
+					</div>
+				</li>
+				<li>
+					<span class="font_name"> 所在部门：</span>
+					<span id="departMentVal_view" class="basic_class_show">$!userDTO.department.label</span>
+					<div class="basic_class_hide">
+						<select id="departMentVal" name="departMentVal" class="input_Style1 wid_160 hei_30">
+							<option value="" selected="selected">请选择</option>
+							#foreach($departMent in $departMents)
+								<option value="$!departMent" #if($!userDTO.department.code==$!departMent.code) selected="selected" #end> $!departMent.label </option>
+							#end
+						</select>
+					</div>
+				</li>
+				<li style="width:600px;">
+					<span class="font_name"> 绑定手机：</span>
+					<span class="wid_180"  style="display: inline-block">$!userInfoDTO.userDTO.umobile</span>
+					#if("$!userInfoDTO.userDTO.umobile" =='')
+						<i class="mar_l32 mar_r10 font_c7">未绑定</i>
+						<a href="#" class="font_fe" onclick="bundMailOrPhone('phone')">点此绑定</a>
+					#else
+						<i class="mar_l32 mar_r10 font_c7">已绑定</i>
+						<a href="#" class="font_fe" onclick="editMailOrPhone('phone')">点此修改</a>
+					#end
+				</li>
+				<li style="width:600px;">
+					<span class="font_name"> 绑定邮箱：</span>
+					<span class="wid_180" style="display: inline-block">$!userInfoDTO.userDTO.userEmail</span>
+					#if("$!userInfoDTO.userDTO.userEmail" =='')
+						<i class="mar_l32 mar_r10 font_c7">未绑定</i>
+						<a href="#" class="font_fe" onclick="bundMailOrPhone('mail')">点此绑定</a>
+					#else
+						<i class="mar_l32 mar_r10 font_c7">已绑定</i>
+						<a href="#" class="font_fe" onclick="editMailOrPhone('mail')">点此修改</a>
+					#end
+				</li>
+			</ul>
+			<div class="wid_460" style="margin:20px auto;">
+                ##一直显示修改按钮
+                <button class="button_2 hei_35 font_14b basic_class_show" type="button" onclick="changeShow('basic_class_hide','basic_class_show');" >修 改</button>
+				<button class="button_2 hei_35 font_14b basic_class_hide" type="button" id="btnInformationSave" style="display:none;">保 存</button>
+				<button class="button_3 hei_35 font_14b basic_class_hide" type="button" style="display:none;" onclick="changeShow('basic_class_show','basic_class_hide')">取 消</button>
+			</div>
+		</dd></form>
+
+		<a name="user_business" id="user_business"></a>
+        <form id="business_form" method="post">
+		<dd class="border-5 po_re" id="userBus">
+			<h3>营业执照信息></h3>
+			##只有卖家认证审核通过，才会显示营业执照信息
+			##营业执照信息待审核（黄色）
+			#if($!userInfoDTO.userBusinessDTO.businessStatus=="1")
+				<div class="border-1 Info_right_box bg_05 font_65">
+					<i class="fa-pencil-square  font_16 mar_r10"></i>$!userInfoDTO.userBusinessDTO.businessStatusLabel
+				</div>
+			##营业执照信息驳回（红色）
+			#elseif($!userInfoDTO.userBusinessDTO.businessStatus=="0")
+				<div class="border-1 Info_right_box bg_05 font_fe">
+					<i class="fa-info-circle font_16 mar_r10"></i>$!userInfoDTO.userBusinessDTO.businessStatusLabel<br/>
+                    #if($userInfoDTO.userBusinessDTO.auditRemark)
+						<a href="javascript:void(0)">
+							<span class="font_12" onclick="show('$!userInfoDTO.userBusinessDTO.auditRemark');">请查看驳回原因</span>
+						</a>
+					#end
+				</div>
+			##营业执照信息审核通过（绿色）
+			#elseif($!userInfoDTO.userBusinessDTO.businessStatus=="2")
+				<div class="border-1 Info_right_box bg_05">
+					<i class="fa-check-circle font_7a font_16 mar_r10"></i>$!userInfoDTO.userBusinessDTO.businessStatusLabel
+				</div>
+			#end
+			<ul>
+				<li class=" over_ell" title='$!userInfoDTO.userBusinessDTO.companyName.replace("舒适100","")'><span class="font_name"><i class="font_fs mar_r10">*</i>公司名称：</span>$!userInfoDTO.userBusinessDTO.companyName.replace("舒适100","")</li>
+				<li>
+					<span class="font_name"><i class="font_fs mar_r10">*</i>注册资本：</span>
+					<span class="registere_class_show">$!userInfoDTO.userBusinessDTO.registeredCapital</span>
+					<input name="userBusinessDTO.registeredCapital"  id="registeredCapital" type="text" class="input_Style2 wid_160 hei_30 registere_class_hide"
+						value="$!userInfoDTO.userBusinessDTO.registeredCapital" maxlength="13"/>
+					<i class="mar_lr10">万元</i>
+				</li>
+				<li>
+					<span class="font_name"><i class="font_fs mar_r10">*</i>法定代表人姓名：</span>
+					<span class="registere_class_show" >$!userInfoDTO.userBusinessDTO.artificialPersonName</span>
+					<input name="userBusinessDTO.artificialPersonName" id="artificialPersonName" maxlength="10" type="text" class="input_Style2 wid_160 hei_30 registere_class_hide" style="display:none;"
+						value="$!userInfoDTO.userBusinessDTO.artificialPersonName"/>
+				</li>
+				<li></li>
+				<li>
+					<span class="font_name"><i class="font_fs mar_r10">*</i>证件类型：</span>
+					<span class="registere_class_show">$!userInfoDTO.userBusinessDTO.idCardType</span>
+					<select id="idCardType" name="idCardType" class="registere_class_hide input_Style2 wid_160 hei_30">
+						<option value="" #if($!userInfoDTO.userBusinessDTO.idCardType =='') selected="selected" #end>请选择</option>
+						<option value="内地居民身份证" #if($!userInfoDTO.userBusinessDTO.idCardType =='内地居民身份证') selected="selected" #end>内地居民身份证</option>
+						<option value="香港身份证" #if($!userInfoDTO.userBusinessDTO.idCardType =='香港身份证') selected="selected" #end>香港身份证</option>
+						<option value="台湾身份证" #if($!userInfoDTO.userBusinessDTO.idCardType =='台湾身份证') selected="selected" #end>台湾身份证</option>
+						<option value="澳门身份证" #if($!userInfoDTO.userBusinessDTO.idCardType =='澳门身份证') selected="selected" #end>澳门身份证</option>
+						<option value="军人证件" #if($!userInfoDTO.userBusinessDTO.idCardType =='军人证件') selected="selected" #end>军人证件</option>
+						<option value="外籍身份证" #if($!userInfoDTO.userBusinessDTO.idCardType =='外籍身份证') selected="selected" #end>外籍身份证</option>
+						<option value="护照（中国）" #if($!userInfoDTO.userBusinessDTO.idCardType =='护照（中国）') selected="selected" #end>护照（中国）</option>
+						<option value="护照（外国）" #if($!userInfoDTO.userBusinessDTO.idCardType =='护照（外国）') selected="selected" #end>护照（外国）</option>
+					</select>
+				</li>
+				<li>
+					<span class="font_name"><i class="font_fs mar_r10">*</i>证件号码：</span>
+					<span class="registere_class_show">$!userInfoDTO.userBusinessDTO.idCardNum</span>
+					<input name="userBusinessDTO.idCardNum"  id="idCardNum" maxlength="50" value="$!userInfoDTO.userBusinessDTO.idCardNum" type="text" class="input_Style2 wid_160 hei_30 registere_class_hide"
+				</li>
+				
+					<li style="width:960px;height:56px; display:none;" >
+						<span class="font_name"><i class="font_fs mar_r10">*</i>经营范围：</span>
+						<span class="registere_class_show">$!userInfoDTO.userBusinessDTO.businessScope</span>
+						<span class="registere_class_hide">
+						<i><input name="businessScope" type="checkbox" value="书刊印刷" />书刊印刷</i>
+						<i><input name="businessScope" type="checkbox" value="包装印刷" />包装印刷</i>
+						<i><input name="businessScope" type="checkbox" value="数字印刷" />数字印刷</i>
+						<i><input name="businessScope" type="checkbox" value="商业印刷" />商业印刷</i>
+						<i><input name="businessScope" type="checkbox" value="报业印刷" />报业印刷</i>
+						<i><input name="businessScope" type="checkbox" value="标签印刷" />标签印刷</i>
+						<i><input name="businessScope" type="checkbox" value="票据印刷" />票据印刷</i>
+						<i><input name="businessScope" type="checkbox" value="特种印刷" />特种印刷</i>
+						<i><input name="businessScope" type="checkbox" value="广告设计" />广告设计</i>
+						<i><input name="businessScope" type="checkbox" value="专项印刷" />专项印刷</i>
+						<i><input name="businessScope" type="checkbox" value="其他" />其他</i>
+					</span>
+					</li>
+					
+					<input id="businessScope" name="userBusinessDTO.businessScope" type="hidden" />
+				<li>
+					<span class="font_name"><i class="font_fs mar_r10">*</i>营业执照所在地：</span>
+					<span class="registere_class_show">$!busLicAddr</span>
+					<select name="busLicProvince" id="busLicProvince" class="input_Style2 wid_80 hei_30 registere_class_hide" title="请选择省份" required>
+						<option value=""> 请选择 </option>
+						#foreach( $address in $addressList)
+							<option value="$!address.code" #if($!busLicProvince == $!address.code) selected="selected" #end > $!address.name </option>
+						#end
+					</select>
+					<select name="busLicCity" id="busLicCity" class="input_Style2 wid_80 hei_30 registere_class_hide" title="请选择城市" required>
+						<option value="" selected="selected"> 请选择 </option>
+					</select>
+					<!-- <select name="busLicArea" id="busLicArea" class="input_Style2 wid_80 hei_30 registere_class_hide" title="请选择区县" required>
+						<option value="" selected="selected"> 请选择 </option>
+					</select> -->
+                    <input type="hidden" name="userBusinessDTO.businessLicenceAddress" id="businessLicenceAddress" value="$!userInfoDTO.userBusinessDTO.businessLicenceAddress" />
+				</li>
+				<li>
+					<span class="font_name fl"><i class="font_fs mar_r10">*</i>营业执照详细地址：</span>
+					<span class="registere_class_show over_ell wid_250 fl" style="cursor:pointer" title="$!userInfoDTO.userBusinessDTO.businessLicencAddressDetail">$!userInfoDTO.userBusinessDTO.businessLicencAddressDetail</span>
+					<input name="userBusinessDTO.businessLicencAddressDetail"  id="businessLicencAddressDetail" type="text" maxlength="30" class="input_Style2 wid_160 hei_30 registere_class_hide"
+						value="$!userInfoDTO.userBusinessDTO.businessLicencAddressDetail" maxlength="50"/>
+				</li>
+				<li>
+					<span class="font_name"><i class="font_fs mar_r10">*</i>成立日期：</span>
+					<span class="registere_class_show">
+						<p style="width:200px;padding-left:150px">$!date.format('yyyy-MM-dd',$!userInfoDTO.userBusinessDTO.businessLicenceDate)</p>
+					</span>
+					<input name="userBusinessDTO.businessLicenceDate" id="businessLicenceDate" type="text" readonly="readonly"
+                           class="input_Style2 wid_160 hei_30 registere_class_hide" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"
+						value="$!date.format('yyyy-MM-dd',$!userInfoDTO.userBusinessDTO.businessLicenceDate)" maxlength="50"/>
+				</li>
+				<li>
+					<span class="font_name"><i class="font_fs mar_r10">*</i>公司电话：</span>
+					<span class="registere_class_show">$!userInfoDTO.userBusinessDTO.companyPhone</span>
+					<div class="registere_class_hide">
+						<input id="area" name="area" type="text" class="hei_30 border-4 wid_40 input_Style2" placeholder="输入区号..." maxlength="4"/>
+						<i> - </i>
+						<input id="phone" name="phone" type="text" class="hei_30 border-4 wid_95 input_Style2" placeholder="输入公司电话..." maxlength="8"/>
+						<input id="companyPhone" name="userBusinessDTO.companyPhone" type="text" class="messageInput" />
+					</div>
+				</li>
+				<li>
+					<span class="font_name"><i class="font_fs mar_r10">*</i>联系人：</span>
+					<span class="registere_class_show"><p class="over_ell">$!userInfoDTO.userBusinessDTO.linkman</p></span>
+					<input name="userBusinessDTO.linkman" id="linkman" type="text" class="input_Style2 wid_160 hei_30 registere_class_hide"
+						value="$!userInfoDTO.userBusinessDTO.linkman" maxlength="20"/>
+				</li>
+				<li>
+					<span class="font_name"><i class="font_fs mar_r10">*</i>联系人手机：</span>
+					<span class="registere_class_show"><p style="width:200px;padding-left:150px">$!userInfoDTO.userBusinessDTO.linkmanPhone</p></span>
+					<input name="userBusinessDTO.linkmanPhone" id="linkmanPhone" type="text" class="input_Style2 wid_160 hei_30 registere_class_hide"
+						value="$!userInfoDTO.userBusinessDTO.linkmanPhone" maxlength="50"/>
+				</li>
+				<li>
+					<span class="font_name"><i class="font_fs mar_r10">*</i>公司所在地：</span>
+					<span class="registere_class_show">$!companyAddress</span>
+					<select name="company_province" id="company_province" class="input_Style2 wid_80 hei_30 registere_class_hide" title="请选择省份" required>
+						<option value=""> 请选择 </option>
+						#foreach( $address in $addressList)
+							<option value="$!address.code" #if($!companyProvince == $!address.code) selected="selected" #end > $!address.name </option>
+						#end
+					</select>
+					<select name="company_city" id="company_city" class="input_Style2 wid_80 hei_30 registere_class_hide" title="请选择城市" required>
+						<option value="" selected="selected"> 请选择 </option>
+					</select>
+					<!-- <select name="company_area" id="company_area" class="input_Style2 wid_80 hei_30 registere_class_hide" title="请选择区县" required>
+						<option value="" selected="selected"> 请选择 </option>
+					</select> -->
+                    <input type="hidden" value="$!userInfoDTO.userBusinessDTO.companyAddress" name="userBusinessDTO.companyAddress" id="companyAddress" />
+				</li>
+				<li>
+					<span class="font_name fl"><i class="font_fs mar_r10">*</i>公司详细地址：</span>
+					<span class="registere_class_show over_ell wid_250 fl" style="cursor:pointer" title="$!userInfoDTO.userBusinessDTO.companyDeclinedAddress">$!userInfoDTO.userBusinessDTO.companyDeclinedAddress</span>
+					<input name="userBusinessDTO.companyDeclinedAddress"  id="companyDeclinedAddress" type="text" maxlength="30" class="input_Style2 wid_160 hei_30 registere_class_hide"
+						value="$!userInfoDTO.userBusinessDTO.companyDeclinedAddress" maxlength="50"/>
+				</li>
+				<li>
+					<span class="font_name">企业是否有融资需求：</span>
+					<span class="registere_class_show">
+						#if("$!userInfoDTO.userBusinessDTO.isFinancing"=="1") (有) #else (无) #end
+					</span>
+					<input id="isFinancingCheckbox" name="isFinancingCheckbox" type="checkbox" #if("$!userInfoDTO.userBusinessDTO.isFinancing"=="1") checked="checked" #end
+						class="wid_160 registere_class_hide" onchange="isFinancingChange();"/>
+					<input id="isFinancing" name="userBusinessDTO.isFinancing" type="hidden" value="$!userInfoDTO.userBusinessDTO.isFinancing" />
+				</li>
+                #if("$!userInfoDTO.userBusinessDTO.isFinancing"=="1")
+                <li style="display:block" id="edu">
+                    <span class="font_name"><i class="font_fs mar_r10">*</i>期望融资额度：</span>
+                    <span class="registere_class_show">
+                            $!userInfoDTO.userBusinessDTO.financingNum
+                    </span>
+                    <input name="userBusinessDTO.financingNum" id="financingNum" type="text" class="input_Style2 wid_160 hei_30 registere_class_hide"
+                        value="$!userInfoDTO.userBusinessDTO.financingNum" maxlength="50" placeholder="输入融资金额"/>万元
+                </li>
+                #end
+                <div class="clear"></div>
+                <li style="width:800px;">
+					<span class="font_name" style="width:350px;"><i class="font_fs mar_r10">*</i>是否三证合一（营业执照、组织机构代码、税务证明）：</span>
+					<span class="registere_class_show">
+						#if("$!userInfoDTO.userBusinessDTO.isSanzheng"=="1") (是) #else (否) #end
+					</span>
+						<input class="registere_class_hide" name="isSanzhengRadio" type="radio" value="1"/><i class="registere_class_hide">是</i>
+				        <input class="registere_class_hide" name="isSanzhengRadio" type="radio" value="0"/ ><i class="registere_class_hide">否</i>
+					<input id="isSanzheng" name="userInfoDTO.userBusinessDTO.isSanzheng" type="hidden" value="$!userInfoDTO.userBusinessDTO.isSanzheng" />
+				</li>
+				<div class="clear"></div>
+				
+				
+                <li style="display:block" id="eduXinyong">
+                    <span class="font_name"><i class="font_fs mar_r10">*</i>统一社会信用代码：</span>
+                    <span class="registere_class_show">
+                            $!userInfoDTO.userBusinessDTO.unifiedCreditCode
+                    </span>
+                    <input name="userBusinessDTO.unifiedCreditCode" id="unifiedCreditCode" type="text" class="input_Style2 wid_160 hei_30 registere_class_hide"
+                        value="$!userInfoDTO.userBusinessDTO.unifiedCreditCode" maxlength="50" />
+                </li>
+                
+                <li id="isSanzhengHide">
+					<span class="font_name"><i class="font_fs mar_r10">*</i>注册号(营业执照号)：</span>
+					<span class="registere_class_show">$!userInfoDTO.userBusinessDTO.businessLicenceId</span>
+					<input name="userBusinessDTO.businessLicenceId" id="businessLicenceId" maxlength="20" type="text" style="display:none;"
+						class="input_Style2 wid_160 hei_30 registere_class_hide" value="$!userInfoDTO.userBusinessDTO.businessLicenceId" />
+				</li>
+				<li>
+					<span class="font_name"><i class="font_fs mar_r10">*</i>营业执照有效期至：</span>
+					#if(!$userInfoDTO.userBusinessDTO.businessLicenceIndate || $userInfoDTO.userBusinessDTO.businessLicenceIndate=="")
+						<span class="registere_class_show">长期有效</span>
+					#else
+						<span class="registere_class_show">$!businessLicenceIndate</span>
+					#end
+					<input id="businessLicenceIndate" name="userBusinessDTO.businessLicenceIndate"
+                           #if(!$userInfoDTO.userBusinessDTO.businessLicenceIndate || $userInfoDTO.userBusinessDTO.businessLicenceIndate=="")
+                           disabled="disabled"
+                           #end
+                           value="$!businessLicenceIndate" type="text" readonly="readonly" maxlength="20"
+                           class="input_Style2 wid_160 hei_30 registere_class_hide"
+						onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});" placeholder="长期有效"/>
+					<i class="registere_class_hide ">
+						<input id="timeState" class="checkbox" placeholder="长期有效"  name="timeState" #if(!$userInfoDTO.userBusinessDTO.businessLicenceIndate || $userInfoDTO.userBusinessDTO.businessLicenceIndate=="") checked="checked" #end type="checkbox" value="1" onchange="changeDisabled(this.id);"/>
+                                                                  长期有效                                      
+					</i>
+				</li>
+				
+				<li style="width:970px;height:70px;">
+						<span class="font_name fl"><i class="font_fs mar_r10">*</i>营业执照副本：</span>
+						<img fancy_zoom="view_img" title="点击查看大图" id="businessLicencePicSrcImg" src="$!imageServerAddr$!userInfoDTO.userBusinessDTO.businessLicencePicSrc"
+							alt="" width="50" height="50" class="mar_lr10 fl" >
+						<p class="hei_40 fl registere_class_hide" style="width:300px">
+							<span class="z-upload mar_t20" style="width:300px">
+								<button type="button" class="button_4 font_12 border-1 button_small">重新上传</button><i  id="newBusinessLicencePicSrcImg" style="width:100px;color:#e50011"></i>
+								<input type="file" id="fileInputyy" class="file-img" name="file" onchange="fileChange('fileInputyy','businessLicencePicSrcImg','businessLicencePicSrc')">
+							</span>
+						</p>
+					</li>
+					<li style="width:970px;height:70px;">
+						<span class="font_name fl"><i class="font_fs mar_r10">*</i>法人身份证（正面）：</span>
+						<img fancy_zoom="view_img" title="点击查看大图" src="$!imageServerAddr$!userInfoDTO.userBusinessDTO.artificialPersonPicSrc" id="artificialPersonPicSrcImg" alt="" width="50" height="50" class="mar_lr10 fl" >
+						<p class="hei_40 fl registere_class_hide">
+							<span class="z-upload mar_t20">
+								<button type="button" class="button_4 font_12 border-1 button_small">重新上传</button>
+								<input type="file" id="fileInputz" class="file-img" name="file" onchange="fileChange('fileInputz','artificialPersonPicSrcImg','artificialPersonPicSrc')">
+							</span>
+						</p>
+					</li>
+					<li style="width:970px;height:70px;">
+						<span class="font_name fl"><i class="font_fs mar_r10">*</i>法人身份证（反面）：</span>
+						<img fancy_zoom="view_img" title="点击查看大图" src="$!imageServerAddr$!userInfoDTO.userBusinessDTO.artificialPersonPicBackSrc" id="artificialPersonPicBackSrcImg" alt="" width="50" height="50" class="mar_lr10 fl" >
+						<p class="  hei_40 fl registere_class_hide">
+							<span class="z-upload mar_t20">
+								<button type="button" class="button_4 font_12 border-1 button_small">重新上传</button>
+								<input type="file" id="fileInputf" class="file-img" name="file" onchange="fileChange('fileInputf','artificialPersonPicBackSrcImg','artificialPersonPicBackSrc')">
+							</span>
+						</p>
+					</li>
+					<input name="userBusinessDTO.businessLicencePicSrc" id="businessLicencePicSrc" type="hidden" value="$!userInfoDTO.userBusinessDTO.businessLicencePicSrc" />
+					<input name="userBusinessDTO.artificialPersonPicSrc" id="artificialPersonPicSrc" type="hidden" value="$!userInfoDTO.userBusinessDTO.artificialPersonPicSrc"/>
+					<input name="userBusinessDTO.artificialPersonPicBackSrc" id="artificialPersonPicBackSrc" type="hidden" value="$!userInfoDTO.userBusinessDTO.artificialPersonPicBackSrc"/>
+				</ul>
+				<div class="clear"></div>
+				<div class="wid_460" style="margin:20px auto">
+					##卖家认证审核通过并且营业执照信息模块审核通过可以显示修改按钮
+                    #if($!userInfoDTO.userDTO.auditStatus == 2 && $!userInfoDTO.userBusinessDTO.businessStatus != 1)
+                        <button type="button" class="button_2 hei_35 font_14b registere_class_show" onclick="update('registere_class_hide','registere_class_show')">修 改</button>
+                    #end
+					<button class="button_2 hei_35 font_14b registere_class_hide" type="button" id="userBussinessSaveBtn">保 存</button>
+					<button class="button_3 hei_35 font_14b mar_r30 registere_class_hide" type="button" onclick="cancel('registere_class_show','registere_class_hide')">取 消</button>
+				</div>
+			</dd>
+        </form>
+		<!--组织机构代码信息 start-->
+		<dd class="border-5 po_re" id="organizationdd"><form id="organizationForm" method="post">
+			<!-- 隐藏字段 start -->
+			<input name="userId" type="hidden" value="$!userInfoDTO.userId"/>
+			<input name="extendId" type="hidden" value="$!userInfoDTO.extendId"/>
+			<input name="editType" type="hidden" value="3"/>
+			<!-- 隐藏字段 end -->
+			<h3>组织机构代码信息> </h3>
+			##只有卖家认证审核通过，才会显示组织机构代码信息
+			##组织机构代码信息待审核（黄色）
+			#if($!userInfoDTO.userOrganizationDTO.organizationStatus=="1")
+                <div class="border-1 Info_right_box bg_05 font_65">
+					<i class="fa-pencil-square  font_16 mar_r10"></i>$!userInfoDTO.userOrganizationDTO.organizationStatusLabel
+				</div>
+			##组织机构代码信息驳回（红色）
+			#elseif($!userInfoDTO.userOrganizationDTO.organizationStatus=="0")
+                <div class="border-1 Info_right_box bg_05 font_fe">
+					<i class="fa-info-circle font_16 mar_r10"></i>$!userInfoDTO.userOrganizationDTO.organizationStatusLabel<br/>
+                    #if($userInfoDTO.userOrganizationDTO.auditRemark)
+						<a href="javascript:void(0)">
+							<span class="font_12" onclick="show('$!userInfoDTO.userOrganizationDTO.auditRemark');">请查看驳回原因</span>
+						</a>
+					#end
+				</div>
+			##组织机构代码信息审核通过（绿色）
+			#elseif($!userInfoDTO.userOrganizationDTO.organizationStatus=="2")
+				<div class="border-1 Info_right_box bg_05">
+					<i class="fa-check-circle font_7a font_16 mar_r10"></i>$!userInfoDTO.userOrganizationDTO.organizationStatusLabel
+				</div>
+			#end
+			<ul>
+				<li>
+					<span class="font_name"><i class="font_fs mar_r10">*</i>组织机构代码：</span>
+					<span class="org_class_show">$!userInfoDTO.userOrganizationDTO.organizationId</span>
+					<input name="userOrganizationDTO.organizationId" id="organizationId" maxlength="20" type="text"
+						class="input_Style2 wid_160 hei_30 org_class_hide" value="$!userInfoDTO.userOrganizationDTO.organizationId"/>
+				</li>
+				<li >
+					<span class="font_name"><i class="font_fs mar_r10">*</i>组织机构代码有效期：</span>
+					<span class="org_class_show">$!userInfoDTO.userOrganizationDTO.userfulTime</span>
+					<input name="userOrganizationDTO.userfulTime" id="userfulTime" type="text" maxlength="20"
+						class="input_Style2 wid_160 hei_30 org_class_hide" value="$!userInfoDTO.userOrganizationDTO.userfulTime"
+						onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});" />
+				</li>
+				<li style="width:970px;height:70px;">
+					<span class="font_name"><i class="font_fs mar_r10">*</i>组织机构代码证电子版：</span>
+					<img fancy_zoom="view_img" title="点击查看大图" src="$!imageServerAddr$!userInfoDTO.userOrganizationDTO.organizationPicSrc" id="organizationPicSrcImg" alt="" width="50" height="50" class="mar_lr10 fl" >
+					<p class="hei_40 fl org_class_hide">
+						<span class="z-upload mar_t20">
+							<button type="button" class="button_4 font_12 border-1 button_small">重新上传</button>
+							<input type="file" id="fileInputorg" class="file-img" name="file" onchange="fileChange('fileInputorg','organizationPicSrcImg','organizationPicSrc')">
+						</span>
+					</p>
+				</li>
+				<input name="userOrganizationDTO.organizationPicSrc" id="organizationPicSrc" type="hidden" value="$!userInfoDTO.userOrganizationDTO.organizationPicSrc" />
+			</ul>
+			<div class="wid_460" style="margin:20px auto">
+				#if($!userInfoDTO.userDTO.auditStatus == 2 && $!userInfoDTO.userOrganizationDTO.organizationStatus != 1)
+				 <button class="button_2 hei_35 font_14b org_class_show" type="button" onclick="changeShow('org_class_hide','org_class_show',1)" >修 改</button>
+				#end
+				<button class="button_2 hei_35 font_14b org_class_hide" type="button" id="userOrganizationBtnSave">保 存</button>
+				<button class="button_3 hei_35 font_14b mar_r30 org_class_hide" type="button" onclick="changeShow('org_class_show','org_class_hide')">取 消</button>
+			</div>
+		</form></dd>
+		<!--组织机构代码信息 end-->
+
+		<!--税务登记证信息 start-->
+		<dd class="border-5 po_re" id="taxdd">
+			<h3>税务登记证信息> </h3>
+			##只有卖家认证审核通过，才会显示税务登记证信息
+			##税务登记证信息待审核（黄色）
+			#if($!userInfoDTO.userTaxDTO.taxStatus=="1")
+				<div class="border-1 Info_right_box bg_05 font_65">
+					<i class="fa-pencil-square  font_16 mar_r10"></i>$!userInfoDTO.userTaxDTO.taxStatusLabel
+				</div>
+			##税务登记证信息驳回（红色）
+			#elseif($!userInfoDTO.userTaxDTO.taxStatus=="0")
+				<div class="border-1 Info_right_box bg_05 font_fe">
+					<i class="fa-info-circle font_16 mar_r10"></i>$!userInfoDTO.userTaxDTO.taxStatusLabel<br/>
+                    #if($userInfoDTO.userTaxDTO.auditRemark)
+						<a href="javascript:void(0)">
+							<span class="font_12" onclick="show('$!userInfoDTO.userTaxDTO.auditRemark');">请查看驳回原因</span>
+						</a>
+					#end
+				</div>
+			##税务登记证信息审核通过（绿色）
+			#elseif($!userInfoDTO.userTaxDTO.taxStatus=="2")
+				<div class="border-1 Info_right_box bg_05">
+					<i class="fa-check-circle font_7a font_16 mar_r10"></i>$!userInfoDTO.userTaxDTO.taxStatusLabel
+				</div>
+			#end
+			<ul>
+				<li>
+					<span class="font_name"><span style="color:red;font-size:17px" class="font_fs">*&nbsp;</span>税务人识别号：</span>
+					<span class="tax_class_show" >
+						<p class="over_ell" style="cursor:pointer" title="$!userInfoDTO.userTaxDTO.taxManId">$!userInfoDTO.userTaxDTO.taxManId</p>
+					</span>
+					<input name="taxManId"  id="taxManId" type="text" maxlength="50" class="input_Style2 wid_160 hei_30 tax_class_hide" value="$!userInfoDTO.userTaxDTO.taxManId"/>
+				</li>
+				<li>
+					<span class="font_name"><i class="font_fs mar_r10">*</i>纳税人类型：</span>
+					<span class="tax_class_show">$!userInfoDTO.userTaxDTO.taxpayerType</span>
+					<select name="taxpayerType" id="taxpayerType" class="tax_class_hide input_Style2 wid_160 hei_30">
+						<option value="一般纳税人" #if($!userInfoDTO.userTaxDTO.taxpayerType =='一般纳税人') selected="selected" #end>一般纳税人</option>
+						<option value="小规模纳税人" #if($!userInfoDTO.userTaxDTO.taxpayerType =='小规模纳税人') selected="selected" #end>小规模纳税人</option>
+						<option value="非增值税纳税人" #if($!userInfoDTO.userTaxDTO.taxpayerType =='非增值税纳税人') selected="selected" #end>非增值税纳税人</option>
+					</select>
+				</li>
+				<li>
+					<span class="font_name"><i class="font_fs mar_r10">*</i>税务人类型税码：</span>
+					<span class="tax_class_show">$!userInfoDTO.userTaxDTO.taxpayerCode</span>
+					<select name="taxpayerCode" id="taxpayerCode" class="tax_class_hide input_Style2 wid_160 hei_30">
+						<option value="0%" #if($!userInfoDTO.userTaxDTO.taxpayerCode =='0%') selected="selected" #end>0%</option>
+						<option value="3%" #if($!userInfoDTO.userTaxDTO.taxpayerCode =='3%') selected="selected" #end>3%</option>
+						<option value="6%" #if($!userInfoDTO.userTaxDTO.taxpayerCode =='6%') selected="selected" #end>6%</option>
+						<option value="7%" #if($!userInfoDTO.userTaxDTO.taxpayerCode =='7%') selected="selected" #end>7%</option>
+						<option value="11%" #if($!userInfoDTO.userTaxDTO.taxpayerCode =='11%') selected="selected" #end>11%</option>
+						<option value="13%" #if($!userInfoDTO.userTaxDTO.taxpayerCode =='13%') selected="selected" #end>13%</option>
+						<option value="17%" #if($!userInfoDTO.userTaxDTO.taxpayerCode =='17%') selected="selected" #end>17%</option>
+					</select>
+				</li>
+				<li style="width:970px;height:70px;">
+					<span class="font_name"><i class="font_fs mar_r10">*</i>纳税人资格证电子版：</span>
+					<img fancy_zoom="view_img" title="点击查看大图" src="$!imageServerAddr$!userInfoDTO.userTaxDTO.taxpayerCertificatePicSrc" id="taxpayerCertificatePicSrcImg" alt="" width="50" height="50" class="mar_lr10 fl" >
+					<p class="  hei_40 fl tax_class_hide">
+						<span class="z-upload mar_t20">
+						<button type="button" class="button_4 font_12 border-1 button_small">重新上传</button>
+						<input type="file" id="fileInputzg" class="file-img" name="file" onchange="fileChange('fileInputzg','taxpayerCertificatePicSrcImg','taxpayerCertificatePicSrc')">
+						</span>
+					</p>
+				</li>
+				<li style="width:970px;height:70px;">
+					<span class="font_name"><i class="font_fs mar_r10">*</i>纳税登记证电子版：</span>
+					<img fancy_zoom="view_img" title="点击查看大图" src="$!imageServerAddr$!userInfoDTO.userTaxDTO.taxRegistrationCertificatePicSrc" id="taxRegistrationCertificatePicSrcImg" alt="" width="50" height="50" class="mar_lr10 fl" >
+					<p class="hei_40 fl tax_class_hide">
+						<span class="z-upload mar_t20">
+							<button type="button" class="button_4 font_12 border-1 button_small">重新上传</button>
+							<input type="file" id="fileInputdj" class="file-img" name="file" onchange="fileChange('fileInputdj','taxRegistrationCertificatePicSrcImg','taxRegistrationCertificatePicSrc')">
+						</span>
+					</p>
+				</li>
+				<input name="taxpayerCertificatePicSrc" id="taxpayerCertificatePicSrc" type="hidden" value="$!userInfoDTO.userTaxDTO.taxpayerCertificatePicSrc" />
+				<input name="taxRegistrationCertificatePicSrc" id="taxRegistrationCertificatePicSrc" type="hidden" value="$!userInfoDTO.userTaxDTO.taxRegistrationCertificatePicSrc" />
+			</ul>
+			<div class="clear"></div>
+			<div class="wid_460" style="margin:20px auto">
+				#if($!userInfoDTO.userDTO.auditStatus == 2 && $!userInfoDTO.userTaxDTO.taxStatus != 1)
+				<button class="button_2 hei_35 font_14b tax_class_show" type="button" onclick="changeShow('tax_class_hide','tax_class_show',2)" >修 改</button>
+				#end
+				<button class="button_2 hei_35 font_14b tax_class_hide"  type="button" id="userTaxDTOSaveBtn">保 存</button>
+				<button class="button_3 hei_35 font_14b mar_r30 tax_class_hide"  type="button" onclick="changeShow('tax_class_show','tax_class_hide')">取 消</button>
+			</div>
+		</dd>
+		<!--税务登记证信息 end-->
+
+			<a name="user_account" id="user_account"></a>
+			
+			
+			<dd class="border-5 po_re"  style="display: none;">
+				<h3>出金账户信息></h3>
+				##只有卖家认证审核通过，才会显示出金账户信息
+				##出金账户信息待审核（黄色）
+				#if($!userInfoDTO.userAccountDTO.bankAccountStatus=="1")
+					<div class="border-1 Info_right_box bg_05 font_65">
+						<i class="fa-pencil-square  font_16 mar_r10"></i>$!userInfoDTO.userAccountDTO.bankAccountStatusLabel
+					</div>
+				##出金账户信息驳回（红色）
+				#elseif($!userInfoDTO.userAccountDTO.bankAccountStatus=="0")
+					<div class="border-1 Info_right_box bg_05 font_fe">
+						<i class="fa-info-circle font_16 mar_r10"></i>$!userInfoDTO.userAccountDTO.bankAccountStatusLabel<br/>
+                        #if($userInfoDTO.userAccountDTO.auditRemark)
+							<a href="javascript:void(0)">
+								<span class="font_12" onclick="show('$!userInfoDTO.userAccountDTO.auditRemark');">请查看驳回原因</span>
+							</a>
+						#end
+					</div>
+				##出金账户信息审核通过（绿色）
+				#elseif($!userInfoDTO.userAccountDTO.bankAccountStatus=="2")
+					<div class="border-1 Info_right_box bg_05">
+						<i class="fa-check-circle font_7a font_16 mar_r10"></i>$!userInfoDTO.userAccountDTO.bankAccountStatusLabel
+					</div>
+				#end
+				<ul>
+					<li><span class="font_name"><i class="font_fs mar_r10">*</i>银行开户名：</span>
+                    <span class="bank_class_show">$!userInfoDTO.userAccountDTO.bankAccountName</span>
+                    <input name="bankAccountName"  id="bankAccountName" type="text" maxlength="50" class="input_Style2 wid_160 hei_30 bank_class_hide"
+                           value="$!userInfoDTO.userAccountDTO.bankAccountName"/>
+                    </li>
+					<li>
+						<span class="font_name"><i class="font_fs mar_r10">*</i>公司银行帐号：</span>
+						<span class="bank_class_show">$!userInfoDTO.userAccountDTO.bankAccount</span>
+						<input name="bankAccount"  id="bankAccount" type="text" maxlength="25" class="input_Style2 wid_160 hei_30 bank_class_hide"
+							value="$!userInfoDTO.userAccountDTO.bankAccount"/>
+					</li>
+					<li style="min-height:30px;" ><span class="font_name"><i class="font_fs mar_r10">*</i>开户行支行名称：</span>
+						<span class="bank_class_show">
+							<p style="cursor:pointer" class="over_ell" title="$!userInfoDTO.userAccountDTO.bankName">$!userInfoDTO.userAccountDTO.bankName</p>
+						</span>
+						<input name="bankName"  id="bankName" type="text" maxlength="100" class="input_Style2 wid_160 hei_30 bank_class_hide"
+							value="$!userInfoDTO.userAccountDTO.bankName"/>
+					</li>
+					<li>
+						<span class="font_name"><i class="font_fs mar_r10">*</i>开户行支行联行号：</span>
+						<span class="bank_class_show">$!userInfoDTO.userAccountDTO.bankBranchJointLine</span>
+						<input name="bankBranchJointLine"  id="bankBranchJointLine" maxlength="20" type="text" class="input_Style2 wid_160 hei_30 bank_class_hide"
+							value="$!userInfoDTO.userAccountDTO.bankBranchJointLine"/>
+					</li>
+					<li>
+						<span class="font_name"><i class="font_fs mar_r10">*</i>开户行支行所在地：</span>
+						<span class="bank_class_show">$!bankBranchIsLocated</span>
+						<select name="bank_province" id="bank_province" class="input_Style2 wid_80 hei_30 bank_class_hide" title="请选择省份" required>
+							<option value=""> 请选择 </option>
+							#foreach( $address in $addressList)
+								<option value="$!address.code" #if($!bankProvince == $!address.code) selected="selected" #end > $!address.name </option>
+							#end
+						</select>
+						<select name="bank_city" id="bank_city" class="input_Style2 wid_80 hei_30 bank_class_hide" title="请选择城市" required>
+							<option value="" selected="selected"> 请选择 </option>
+						</select>
+						<!-- <select name="bank_area" id="bank_area" class="input_Style2 wid_80 hei_30 bank_class_hide" title="请选择区县" required>
+							<option value="" selected="selected"> 请选择 </option>
+						</select> -->
+					</li>
+					<li><span class="font_name"><i class="font_fs mar_r10">*</i>是否中信银行：</span>
+                        <span class="bank_class_show">
+                            #if($!userInfoDTO.userAccountDTO.isCiticBank == 1)
+                                是
+                            #elseif($!userInfoDTO.userAccountDTO.isCiticBank == 0)
+                                否
+                            #end
+                        </span>
+                        <select name="isCiticBank" id="isCiticBank" class="input_Style2 wid_80 hei_30 bank_class_hide">
+                            <option value="1" #if($!userInfoDTO.userAccountDTO.isCiticBank =='1') selected="selected" #end>是</option>
+                            <option value="0" #if($!userInfoDTO.userAccountDTO.isCiticBank =='0') selected="selected" #end>否</option>
+                        </select>
+				 	</li>
+					<li style="width:970px;height:70px;">
+						<span class="font_name"><i class="font_fs mar_r10">*</i>银行开户许可证电子版：</span>
+						<img fancy_zoom="view_img" title="点击查看大图" src="$!imageServerAddr$!userInfoDTO.userAccountDTO.bankAccountPermitsPicSrc" id="bankAccountPermitsPicSrcImg" alt="" width="50" height="50" class="mar_lr10 fl" >
+						<p class="hei_40 fl bank_class_hide">
+							<!-- <a class="font_fe" style="cursor:pointer;" onclick="uploadImg('bankAccountPermitsPicSrcImg','bankAccountPermitsPicSrc')"><span style="color:blue">重新上传</span></a> -->
+							<span class="z-upload mar_t20">
+								<button type="button" class="button_4 font_12 border-1 button_small">重新上传</button>
+								<input type="file" id="fileInputbank" class="file-img" name="file" onchange="fileChange('fileInputbank','bankAccountPermitsPicSrcImg','bankAccountPermitsPicSrc')">
+							</span>
+						</p>
+						</li>
+						<input name="bankAccountPermitsPicSrc" id="bankAccountPermitsPicSrc" type="hidden" value="$!userInfoDTO.userAccountDTO.bankAccountPermitsPicSrc" />
+					</ul>
+				<div class="mar_t10 bank_class_hide">
+					<ul>
+					<li style="width: 100%;" id="sendPhoneLi">
+						<p class="wid_230 hei_40 font_right fl"><i class="font_fs mar_r10">*</i>验证码：</p>
+							<input name="bankCodePhone" id="bankCodePhone" type="text" class="input_Style2 wid_160 hei_30" />
+							<input type="hidden" id="code_key" name="codeKey">
+							<input type="hidden" id='checked' name="checked">
+							<button type="button" class="mar_lr20 button_4 hei_24" onclick="sendCode()">获取验证码</button>
+								<span id="mobileSpan">手机号:$!userInfoDTO.userDTO.umobile</span> <span style="color:red;">修改账户信息必须短信验证 </span>
+					</li>
+					</ul>
+				</div>
+				<div class="clear"></div>
+				<div class="wid_460" style="margin:20px auto">
+					##非子账户、整体审核通过、该模块确认通过
+					#if($!userInfoDTO.userDTO.auditStatus == 2 && $!userInfoDTO.userAccountDTO.bankAccountStatus != 1)
+						<button class="button_2 hei_35 font_14b bank_class_show"  type="button" onclick="changeShow('bank_class_hide','bank_class_show');bankAddressChange();" >修 改 </button>
+					#end
+					<button class="button_2 hei_35 font_14b bank_class_hide" type="button" id="bankAccountSaveBtn">保 存</button>
+					<button class="button_3 hei_35 font_14b mar_r30 bank_class_hide"  type="button" onclick="changeShow('bank_class_show','bank_class_hide')">取 消</button>
+				</div>
+			</dd>
+			
+			
+			
+            <form id="companybus_form" method="post">
+			<dd class="">
+			 <h3>公司经营信息> </h3>
+				##只有卖家认证审核通过，才会显示公司经营信息
+				##公司经营信息待审核（黄色）
+				#if($!userInfoDTO.userManageDTO.userManageStatus=="1")
+					<div class="border-1 Info_right_box bg_05 font_65">
+						<i class="fa-pencil-square  font_16 mar_r10"></i>待审核
+					</div>
+				##公司经营信息驳回（红色）
+				#elseif($!userInfoDTO.userManageDTO.userManageStatus=="0")
+					<div class="border-1 Info_right_box bg_05 font_fe">
+						<i class="fa-info-circle font_16 mar_r10"></i>驳回<br/>
+                        #if($userInfoDTO.userManageDTO.auditRemark)
+							<a href="javascript:void(0)">
+								<span class="font_12" onclick="show('$!userInfoDTO.userManageDTO.auditRemark');">请查看驳回原因</span>
+							</a>
+						#end
+					</div>
+				##公司经营信息审核通过（绿色）
+				#elseif($!userInfoDTO.userManageDTO.userManageStatus=="2")
+					<div class="border-1 Info_right_box bg_05">
+						<i class="fa-check-circle font_7a font_16 mar_r10"></i>审核通过
+					</div>
+				#end
+				<ul>
+				<li>
+					<span class="font_name"><i class="demo-icons font_fs">*</i>公司类型：</span>
+					<span class="manage_class_show">$!userManageDTO.dealerType.label</span>
+					<select id="dealerType" name="dealerType" class="input_Style2 wid_160 manage_class_hide hei_30">
+						<option value="" selected="selected"> 请选择 </option>
+						#foreach($dealerType in $!dealerTypes)
+							<option value="$!dealerType" #if($!userManageDTO.dealerType.code == $!dealerType.code) selected="selected" #end> $!dealerType.label </option>
+						#end
+					</select>
+				</li>
+				<li>
+						<span class="font_name">公司官网地址：</span>
+						<span class="manage_class_show">$!userManageDTO.homePage</span>
+						<input id="homePage" name="userManageDTO.homePage" value="$!userManageDTO.homePage"
+							type="text" class="input_Style2 wid_160 hei_30 manage_class_hide" placeholder="输入公司官网地址..."/>
+				</li>
+				   <li >
+						<span class="font_name">最近一年销售额：</span>
+						<span class="manage_class_show">$!userManageDTO.saleNum 万元</span>
+						<input id="saleNum" name="userManageDTO.saleNum" value="$!userManageDTO.saleNum"
+							type="text" class="input_Style2 wid_160 hei_30 manage_class_hide" placeholder="输入最近一年销售额..."/>
+				   </li>
+				   <li>
+				   	<span class="font_name"><i class="demo-icons font_fs">*</i>同类电商网店经验：</span>
+					<span class="manage_class_show">#if($!userManageDTO.isHaveEbusiness==1) 有 #else 无 #end</span>
+					<i class="mar_r10 manage_class_hide">
+						<input name="userManageDTO.isHaveEbusiness" value="1" type="radio" #if($!userManageDTO.isHaveEbusiness==1) checked="checked" #end />有
+						<input name="userManageDTO.isHaveEbusiness" value="0" type="radio" #if($!userManageDTO.isHaveEbusiness==0) checked="checked" #end />无
+					</i>
+				   </li>
+				   <li>
+				  	<span class="font_name"><i class="demo-icons font_fs">*</i>网站运营人数：</span>
+					<span class="manage_class_show">$!userManageDTO.webOperaPeo 人</span>
+					<input id="webOperaPeo" name="userManageDTO.webOperaPeo" value="$!userManageDTO.webOperaPeo"
+						type="text" class="input_Style2 wid_160 hei_30 manage_class_hide" placeholder="输入网站运营人数..."/>
+				   </li>
+				   <li>
+				   		<span class="font_name">ERP类型：</span>
+						<span class="manage_class_show">$!userManageDTO.erpType.label</span>
+						<select id="erpType" name="erpType" class="input_Style2 wid_160 manage_class_hide hei_30">
+							<option value="" selected="selected"> 请选择 </option>
+							#foreach($ERPType in $!erpTypes)
+								<option value="$!ERPType" #if($!userManageDTO.erpType.code == $!ERPType.code) selected="selected" #end> $!ERPType.label </option>
+							#end
+						</select>
+				 	</li>
+				  </ul>
+
+				<div class="wid_460" style="margin:20px auto">
+					##非子账户、整体审核通过、该模块确认通过
+					#if($!userInfoDTO.userDTO.auditStatus == 2 && $!userInfoDTO.userManageDTO.userManageStatus != "1")
+					<button class="button_2 hei_35 font_14b manage_class_show"  type="button" onclick="changeShow('manage_class_hide','manage_class_show');bankAddressChange();" >修 改 </button>
+					#end
+					<button class="button_2 hei_35 font_14b manage_class_hide" type="button" id="companyBusSaveBtn">保 存</button>
+					<button class="button_3 hei_35 font_14b mar_r30 manage_class_hide"  type="button" onclick="changeShow('manage_class_show','manage_class_hide')">取 消</button>
+				</div>
+			</dd>
+            </form>
+            
+            
+			<dd style="display: none;">
+				<h3>中信账户信息> </h3>
+				<ul>
+					<li>
+						<span class="font_name">收款账户：</span>
+						<span>$!userInfoDTO.userCiticDTO.sellerWithdrawsCashAccount</span>
+						<span>($!userInfoDTO.userCiticDTO.accountStateLabel)</span>
+					</li>
+					<li>
+						<span class="font_name">冻结账户：</span>
+						<span>$!userInfoDTO.userCiticDTO.sellerFrozenAccount</span>
+						<span>($!userInfoDTO.userCiticDTO.accountStateLabel)</span>
+					</li>
+				</ul>
+			</dd>
+			
+			
+		</dl>
+	</div>
+</div>
+<!--right end -->
+
+<!-- 审批-驳回：弹出层 start -->
+<div class="po_fai" id="po_fai" style="display:none">
+	<div class="po_fai_bg"></div>
+	<div class="po_main" style="width:400px; margin-left:-200px;">
+		<div class="mar_l30 mar_r30 mar_t10">
+			<div class="clear"></div>
+			<p class="hei_30" style="font-size:15px;">驳回原因:</p>
+			<div class="clear"></div>
+			<div class="user">
+				<textarea style="width:330px; height:100px" id="auditRemark"></textarea>
+			</div>
+			<div class="clear"></div>
+			<div class="font_cen mar_t20 pad_t50 close" >
+			  <button type="button" class="button_2 hei_32 font_16" onclick="closePo();">关闭</button>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+<!-- 审批-驳回：弹出层 end -->
+
+
+
+

@@ -1,0 +1,43 @@
+#set($layout=("common/order.vm"))
+
+<h3 class="hei_32 pad_l5 mar_t10">明细信息</h3>
+<form action="$request.contextPath/orderWx/getShopCart" id="contractForm" method="post">
+	<input type="hidden" name="jsonProducts" id="jsonProducts"/>
+	
+	<input type="hidden" name="orderType" id="contract" value="1"/>
+	<input type="hidden" name="contractNo" id="contractNo"/>
+	<!-- 表格 -->
+	<div class="tab bg_01">
+	     <!-- 列表头部 -->
+		 <ul class="li_fl hei_34 font_cen">
+		     <li class="wid_25"><input type="checkbox" onclick="changeCheck(this)" id="checkAll"/>物料描述</li>
+		     <li class="wid_15">物料规格</li>
+		     <li class="wid_17">价格</li>
+		     <li class="wid_17">单位</li>
+		     <li class="wid_17">填写数量</li>
+		 </ul>
+		 <!-- 列表头部 end-->
+		 #if($contractMats)
+		 	#foreach($contractMat in ${contractMats})
+			 <!-- 信息 -->
+			 <ul class="li_fl hei_34 font_cen">
+			     <li class="wid_25"><input type="checkbox" name="matCd" value="$!contractMat.matCd" onchange="autoCheckAll(this)"/>$!contractMat.matDesc</li>
+			     <li class="wid_15">$!contractMat.matDesc</li>
+			     <li class="wid_17">$!contractMat.matPrice</li>
+			     <li class="wid_17">$!contractMat.matUnit</li>
+			     <li class="wid_17"><input name="quantity" value="1" onkeyup="changeQuantity(this)" maxlength="3" class="wid_55"/>
+			     	<input type="hidden" name="skuPrice" value="$!contractMat.matPrice"/>
+			     	<input type="hidden" name="skuId" value="$!contractMat.matCd"/>
+			     	<input type="hidden" name="itemId" value="$!contractMat.itemId"/>
+			     	<input type="hidden" name="shopId" value="$!contractMat.shopId"/>
+			     	<input type="hidden" name="sellerId" value="$!contractMat.sellerId"/>
+			     	<input type="hidden" name="regionId" value="$!contractMat.matCd"/>
+			     </li>
+			 </ul>
+			 <!-- 信息 end-->
+		 	#end
+		 #end		
+	</div>
+</form>
+	<!-- 表格 -->
+<div id="divButton"><button class="button_1 pad_lr10 hei_32 fr" onclick="toOrder()">订购</button></div>	

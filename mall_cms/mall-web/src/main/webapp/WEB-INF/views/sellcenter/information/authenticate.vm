@@ -1,0 +1,300 @@
+#set($layout = "/none_layout.vm")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("/common/tdk.vm")
+<link href="$request.contextPath/assets/css/basic.css" rel="stylesheet" type="text/css"/>
+<link href="$request.contextPath/assets/css/register.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+var timeType = "";
+var timeNum = 90;
+	$(function(){
+		var options = "";
+		if("$!userDTO.userEmail"){
+			options += "<option value='mail'>电子邮箱 </option>";
+			$("#phoneType").hide();
+			$("#mailType").show();
+		} else {
+			$("#phoneType").show();
+			$("#mailType").hide();
+		}
+		if ("$!userDTO.umobile"){
+			options += "<option value='phone' selected='selected'>手机号码 </option>";
+			$("#phoneType").show();
+			$("#mailType").hide();
+		}
+		$("#authType").html(options);
+		//切换验证方式
+		$("#authType").change(function(){
+			if($("#authType").val() == "phone"){
+				$("#phoneType").show();
+				$("#mailType").hide();
+			}else{
+				$("#phoneType").hide();
+				$("#mailType").show();
+			}
+		});
+		//下一步
+		$("#next").click(function(){
+			//验证码校验
+			var captcha = $("#code").val();
+			if(captcha == ""){
+				alert("请输入验证码");
+				return;
+			}
+			var data = {code:captcha,codeKey:$('#code_key').val()};
+			$.ajax({
+				url:"$request.contextPath/captcha/check",
+				type:"post",
+				data:data,
+				dataType: "json",
+				success:function(data){
+					if(!data.message){
+						alert("验证码不正确");
+					} else {
+						var type = "$!changeType";
+						if(type == ""){
+							type = $("#authType").val();
+						}
+                        if(type == "phone"){
+                            $("#editPhoneForm").submit();
+                        }else if(type == "mail"){
+                            $("#editMailForm").submit();
+                        }
+					}
+				}
+			});
+		});
+	});
+	var code = "";
+	function sendCode(){
+	
+		var pageType = '${changeType}';
+		
+		var authType = $("#authType").val();
+		//发送验证码过程中不允许切换校验身份的方式
+		$("#authType").attr("disabled","disabled");
+		var address = "";
+		var type = "";
+		var smsType = "";
+		if(authType == 'phone'&&pageType == 'phone')
+		{	
+			smsType = "UPBINDPHONE";
+		}else if(authType == 'phone'&&pageType == 'mail'){
+			smsType = "UPBINDEMAIL";
+		}
+		else if(authType == 'mail'&&pageType == 'phone'){
+			smsType = "EMAIL_UP_BIND_PHONE";
+		}
+		else if(authType == 'mail'&&pageType == 'mail')
+		{
+			smsType = "EMAIL_UP_BIND_EMAIL";
+		}
+
+		if(authType == "phone"){
+			address = "$!userDTO.umobile";
+			type = 2;
+			$("#sendMobileBtn").replaceWith("<div id='mobileMsg'>&nbsp;&nbsp;&nbsp;请稍候...</div>");
+		}else{
+			address = "$!userDTO.userEmail";
+			type = 1;
+			$("#sendMailBtn").replaceWith("<div id='mailMsg'>&nbsp;&nbsp;&nbsp;请稍候...</div>");
+		}
+
+		 if(authType == "phone"){
+			 $("#mobileMsg").html("&nbsp;&nbsp;&nbsp;重新发送<span id='span_mobile_time'>"+timeNum+"</span>");
+			 $("#msg_mobile_send").html("验证码已发送，请查看");
+				 $("#msg_mobile_send").parent().addClass("font_7a");
+			 timeType = "phone";
+		 }else{
+			 $("#mailMsg").html("&nbsp;&nbsp;&nbsp;重新发送<span id='span_mail_time'>"+timeNum+"</span>");
+			 $("#msg_mail_send").html("验证码已发送，请查看");
+			 $("#msg_mail_send").parent().addClass("font_7a");
+			 timeType = "mail";
+		 }
+		 sand_timer();
+
+		$.ajax({
+		     timeout:90000,
+		     type: "get",
+		     dataType: "json",
+		     url:"$request.contextPath/captcha/send",
+		     data:{
+		    	 address:address,
+		    	 type:type,
+		    	 smsType:smsType
+		     },
+		     success: function(result){
+		    	 if(result.isOK == "1"){
+		    		 if(result.message!=''){
+    					alert(result.message);
+    				}else{
+    					alert("验证码发送失败");
+    				}
+					$("#msg_mail_send").removeAttr("disabled");
+		    		 window.clearInterval(timer);//去掉定时器
+		    		 time = timeNum;
+		    		 if(authType == "phone"){
+		    			 $("#mobileMsg").replaceWith("<button id=\"sendMobileBtn\" class=\"mar_lr20 button_4 hei_24\" type=\"button\"  onclick=\"sendCode()\">获取短信验证码</button>");
+		    			 $("#msg_mobile_send").html("请发送验证码");
+		 				 $("#msg_mobile_send").parent().removeClass("font_7a");
+		    		 }else{
+		    			 $("#mailMsg").replaceWith("<button id=\"sendMailBtn\" class=\"mar_lr20 button_4 hei_24\" type=\"button\" onclick=\"sendCode()\">获取邮件验证码</button>");
+		    			 $("#msg_mail_send").html("请发送验证码");
+		 				 $("#msg_mail_send").parent().removeClass("font_7a");
+		    		 }
+		    	 }else{
+		    			 $("#code_key").val(result.codeKey);
+		    	 }
+		     }
+		 });
+	}
+
+	var time = timeNum;
+	var timer;
+	function sand_timer(){
+		timer = window.setInterval(showalert, 1000);
+	}
+
+	function showalert()
+	{
+		time--;
+		if(time > 0){
+			if(timeType == "phone"){
+				$("#span_mobile_time").html(time);
+			}else{
+				$("#span_mail_time").html(time);
+			}
+		} else {
+			if(timeType == "phone"){
+				$("#msg_mobile_send").html("请发送验证码");
+				$("#msg_mobile_send").parent().removeClass("font_7a");
+				$("#mobileMsg").replaceWith("<button id=\"sendMobileBtn\" class=\"mar_lr20 button_4 hei_24\" type=\"button\"  onclick=\"sendCode()\">获取短信验证码</button>");
+			}else{
+				$("#msg_mail_send").html("请发送验证码");
+				$("#msg_mail_send").parent().removeClass("font_7a");
+				$("#mailMsg").replaceWith("<button id=\"sendMailBtn\" class=\"mar_lr20 button_4 hei_24\" type=\"button\" onclick=\"sendCode()\">获取邮件验证码</button>");
+			}
+			//验证码发送成功后允许修改身份验证方式
+			$("#authType").removeAttr("disabled");
+			window.clearInterval(timer);//去掉定时器
+			time = timeNum;
+			timeType = "";
+		}
+	}
+
+
+</script>
+</head>
+
+<body>
+ <!--顶部开始-->
+#parse("/common/header_top.vm")
+    <!--顶部结束-->
+
+ <!--头部开始-->
+ <div id="header" >
+   <div class="left_img">
+   		<a href="$!siteDomain">
+   			<img src="$!imageServerAddr$!{logoDTO.picUrl}"/>
+   		</a>
+   	</div><!--left_img （放logo的div） end-->
+	<div class="right_img mar_lr20">
+        <!-- 每一个所占div-->
+        	<div class="per_one">
+                <span class="Service"></span>
+                诚信保障
+            </div>
+        <!-- 每一个所占div-->
+        	<div class="per_one">
+                <span class="approve"></span>
+                企业认证
+            </div>
+        <!-- 每一个所占div-->
+        	<div class="per_one">
+                <span class="safety"></span>
+                安全交易
+            </div><!--header end -->
+   </div><!--right_img end-->
+</div>
+ <!--头部结束-->
+<!--内容流程start-->
+    <div class="stepflex" >
+        <dl class="first doing" style="width:213px;"><!--正在哪个流程就加入 doing 这个样式 -->
+            <dt class="s-num">1</dt>
+            <dd class="s-text">验证身份<s></s><b></b></dd>
+        </dl>
+        <dl class="normal"  style="width:213px;">
+            <dt class="s-num">2</dt>
+            <dd class="s-text">设置绑定信息<s></s><b></b></dd>
+        </dl>
+        <dl class="last"  style="width:214px;">
+            <dt class="s-num"><i class="fa-check"></i></dt>
+            <dd class="s-text">完成<s></s><b></b></dd>
+        </dl>
+    </div><!--stepflex end -->
+    <div class="clear"></div>
+    <div class="register_content">
+        	<div class="register_box_mid"  style="margin-top:40px; min-height: 330px;">
+            	<dl>
+                    <dt>请选择验证身份方式：</dt>
+                    <dd style="border:none">
+                    <!--第一个下拉选 -->
+                        <select name="authType" id="authType" class="input_Style1 wid_200">
+<!-- 	                        <option value="phone" selected="selected"> 手机号码 </option> -->
+<!-- 	                        <option value="mail">电子邮箱 </option> -->
+                       </select>
+                    </dd>
+                </dl>
+                <!--如需增加可循环dl结束-->
+                <dl>
+                    <dt>昵称：</dt>
+                    <dd style="border:none">
+                    	$!userDTO.nickname
+                    </dd>
+                </dl>
+                <dl id="phoneType">
+                    <dt>已验证手机号码：</dt>
+                    <dd style="border:none" id="sendPhoneDD" ><i class="font_16" style="float: left;">$!userDTO.umobile</i>
+                    	<button id="sendMobileBtn" class="mar_lr20 button_4 hei_24" type="button"  onclick="sendCode()">获取短信验证码</button>
+                    	<p class="font_18" style="width: 330px;"><i class="fa-check-circle font_24 mar_r10"></i><b id="msg_mobile_send">请发送验证码</b></p>
+                    </dd>
+                </dl>
+
+                <dl style="display:none" id="mailType">
+                    <dt>已验证电子邮箱：</dt>
+                    <dd style="border:none" id="sendMailDD"><i class="font_16" style="float: left;">$!userDTO.userEmail</i>
+                    	<button id="sendMailBtn" class="mar_lr20 button_4 hei_24" type="button" onclick="sendCode()">获取邮件验证码</button>
+                   		<p class="font_18" style="width: 330px;"><i class="fa-check-circle font_24 mar_r10"></i><b id="msg_mail_send">请发送验证码</b></p>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>校验码：</dt>
+                    <dd style="border:none"><input name="code" id="code" type="text"  class="input_Style1 wid_180" />
+                    <input type="hidden" id="code_key" name="codeKey">
+                    </dd>
+                </dl>
+                <div class="button_1 hei_40 font_16" style="width: 280px;" id="next">下一步</div>
+             </div><!--register_box-->
+    </div><!--register_content-->
+<!--内容end-->
+
+ <!--手机空Form-->
+ <form method="post" action="$request.contextPath/sellcenter/information/newAuth" id="editPhoneForm">
+     <input type="hidden" name="changeType" value="phone">
+     <input type="hidden" name="uid" value="$!userDTO.uid">
+     <input type="hidden" name="backUrl" value="$!backUrl">
+ </form>
+
+ <!-- 邮箱空Form-->
+ <form method="post" action="$request.contextPath/sellcenter/information/newAuth" id="editMailForm">
+     <input type="hidden" name="changeType" value="mail">
+     <input type="hidden" name="uid" value="$!userDTO.uid">
+     <input type="hidden" name="backUrl" value="$!backUrl">
+ </form>
+
+</div>
+ </body>
+</html>

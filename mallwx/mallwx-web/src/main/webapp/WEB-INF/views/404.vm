@@ -1,0 +1,17 @@
+#set($staticPath="$request.contextPath/assets")
+<div id="main">
+    <!--中间内容开始 -->
+    <div class="content" id="wrapper">
+        <div class="font_cen mar_t120">
+          <p class="font_a1 font_5_0">404</p>
+          <p class="font_2_0 font_5 mar_t20">没有找到您要找的页面...</p>
+        </div>
+
+        <div class="the_img">
+          <img src="$staticPath/images/the_img.png">
+        </div>
+        
+        
+    </div> <!--中间内容 end -->
+   
+</div>

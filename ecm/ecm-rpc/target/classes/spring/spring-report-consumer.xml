@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+
+    <!--商家入驻报表 -->
+	   <dubbo:reference id="userReportService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.usercenter.service.UserReportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    <!--广告点击报表 -->
+    <!--店铺报表 -->
+    <dubbo:reference id="tradeReportService" registry="qingdaoRegistry"
+                     owner="zhangfan" interface="com.camelot.report.service.TradeReportService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+</beans>

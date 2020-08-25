@@ -1,0 +1,578 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/none_layout.vm")
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>店铺首页</title>
+	<link href="$staticPath/css/basic.css" rel="stylesheet" type="text/css" />
+	<link href="$staticPath/css/shopping.css" rel="stylesheet" type="text/css" />
+	<link href="$staticPath/css/color_1.css" rel="stylesheet" type="text/css" />
+	<script language="javascript" type="text/javascript" src="$staticPath/js/jquery-1.9.1.js"></script>
+	<script language="javascript" type="text/javascript" src="$staticPath/js/all_classify.js"></script>
+	<script language="javascript" type="text/javascript" src="$staticPath/js/adver_main.js"></script>
+	<script language="javascript" type="text/javascript" src="$staticPath/js/title_change.js"></script>
+	<!-- <script language="javascript" type="text/javascript" src="$staticPath/js/js.js"></script> -->
+	<script language="javascript" type="text/javascript" src="$staticPath/js/tab.js"></script>
+</head>
+<style type="text/css">
+	.pa_03{ top: 0px;}
+</style>
+<script>
+	function show_man(){
+		var shop_man=document.getElementById("shop_man"),
+			down=document.getElementById("down");
+			shop_man.style.display="block";
+			down.setAttribute("class"," fa-angle-up");
+	}
+	function show_man2(){
+		var shop_man=document.getElementById("shop_man"),
+		down=document.getElementById("down");
+		shop_man.style.display="none";
+		down.setAttribute("class","fa-angle-down");
+	}
+</script>
+<body>
+	<!-- 颜色编辑 -->
+	<div class="color">
+		<!-- 颜色编辑浮右 -->
+		<div class="fr">
+			<!-- 选择色块 -->
+			<div class="fl wid_270">
+				<p class="hei_60 font_ff fl ">选择模板颜色：</p>
+				<ul class="color_list fl">
+					<li class="color_1"></li>
+					<li class="color_2"></li>
+					<li class="color_3"></li>
+					<li class="color_4"></li>
+					<li class="color_5"></li>
+					<li class="color_6"></li>
+				</ul>
+			</div><!-- 选择色块 -->
+			<!-- 编辑色块 -->
+			<div class="fl wid_400">
+				<p class="hei_60 font_ff fl ">色值：#</p>
+				<div class="mar_t15 fl wid_350">
+					<input type="tetx" class="input_Style2 wid_60 mar_lr5 kf" />
+					<button class="button_3 hei_30 kf" type="button">应用</button>
+					<button class="button_2 hei_30 kf mar_20" type="button">保存</button>
+					<button class="button_5 hei_30 kf mar_20" type="button">退出</button>				
+				</div>
+				
+			</div><!-- 编辑色块 end-->
+		</div><!-- 颜色编辑浮右 end-->
+	</div><!-- 颜色编辑 end-->	<!--头部开始-->
+	<div class="header_top">
+		<div class="top_mid po_re">
+	       <div class="top_mid_l po_re">
+	        <i class="demo-icons fa-map-marker font_20 font_82"></i><b class="font_14 mar_r10">北京市</b><span class="city_select">查看省份<i class="demo-icons fa-sort-desc font_14"></i></span>
+	        <i class="demo-icons fa-weibo font_16 mar_lr10"></i>
+	        <i class="demo-icons  fa-wechat font_16"></i>
+	         <!-- 城市 -->
+	          <div class="city right_botton list wid_270 bg_06 border-4 box-shadow1 po_ab hide">
+	            <div class="tit mar_lr10 bg_05 pad_l10 mar_tb10">请选择您的收货地区:</div>
+	            <dl class="wid_110 fl mar_20 hei_30  ">
+	              <dt class="fl">A</dt>
+	              <dd class="fl mar_l10"><span>安徽</span><span class="mar_l10">澳门</span></dd>
+	            </dl>
+	            <dl class="wid_110 fl mar_20 hei_35">
+	              <dt class="fl">I</dt>
+	              <dd class="fl mar_l10"><span>内蒙古</span><span class="mar_l10">宁夏</span></dd>
+	            </dl>
+	             <dl class="wid_110 fl mar_20 hei_35">
+	              <dt class="fl">G</dt>
+	              <dd class="fl mar_l10"><span>安徽</span><span class="mar_l10">澳门</span></dd>
+	            </dl>
+	            <dl class="wid_110 fl mar_20 hei_35">
+	              <dt class="fl">K</dt>
+	              <dd class="fl mar_l10"><span>内蒙古</span><span class="mar_l10">宁夏</span></dd>
+	            </dl>
+	             <dl class="wid_110 fl mar_20 hei_35">
+	              <dt class="fl">C</dt>
+	              <dd class="fl mar_l10"><span>安徽</span><span class="mar_l10">澳门</span></dd>
+	            </dl>
+	            <dl class="wid_110 fl mar_20 hei_35">
+	              <dt class="fl">L</dt>
+	              <dd class="fl mar_l10"><span>内蒙古</span><span class="mar_l10">宁夏</span></dd>
+	            </dl>
+	             <dl class="wid_110 fl mar_20 hei_35">
+	              <dt class="fl">D</dt>
+	              <dd class="fl mar_l10"><span>安徽</span><span class="mar_l10">澳门</span></dd>
+	            </dl>
+	            <dl class="wid_110 fl mar_20 hei_35">
+	              <dt class="fl">M</dt>
+	              <dd class="fl mar_l10"><span>内蒙古</span><span class="mar_l10">宁夏</span></dd>
+	            </dl>
+	             <dl class="wid_110 fl mar_20 hei_35">
+	              <dt class="fl">E</dt>
+	              <dd class="fl mar_l10"><span>安徽</span><span class="mar_l10">澳门</span></dd>
+	            </dl>
+	            <dl class="wid_110 fl mar_20 hei_35">
+	              <dt class="fl">N</dt>
+	              <dd class="fl mar_l10"><span>内蒙古</span><span class="mar_l10">宁夏</span></dd>
+	            </dl>
+	             <dl class="wid_110 fl mar_20 hei_35">
+	              <dt class="fl">F</dt>
+	              <dd class="fl mar_l10"><span>安徽</span><span class="mar_l10">澳门</span></dd>
+	            </dl>
+	            <dl class="wid_110 fl mar_20 hei_35">
+	              <dt class="fl">O</dt>
+	              <dd class="fl mar_l10"><span>内蒙古</span><span class="mar_l10">宁夏</span></dd>
+	            </dl>
+	             <dl class="wid_110 fl mar_20 hei_35">
+	              <dt class="fl">G</dt>
+	              <dd class="fl mar_l10"><span>安徽</span><span class="mar_l10">澳门</span></dd>
+	            </dl>
+	            <dl class="wid_110 fl mar_20 hei_35">
+	              <dt class="fl">P</dt>
+	              <dd class="fl mar_l10"><span>内蒙古</span><span class="mar_l10">宁夏</span></dd>
+	            </dl>
+	            <dl class="wid_110 fl mar_20 hei_35">
+	              <dt class="fl">H</dt>
+	              <dd class="fl mar_l10"><span>内蒙古</span><span class="mar_l10">宁夏</span></dd>
+	            </dl>
+	          </div>
+	        </div><!--top_mid_l end-->
+	        <div class="top_mid_r po_re ">
+	          <a href="#">商城首页</a><i class="mar_lr10 font_ec">|</i>
+	          <i class="demo-icons fa-star font_82"></i><span id="top_collect"><a href="#">收藏夹</a><i class="demo-icons fa-sort-desc font_14 font_c7"></i></span>
+	          <i class="mar_lr10 font_ec">|</i>
+	          <i class="fa-cart"></i><span id="shop_car"><a href="#">购物车</a><i class="demo-icons fa-sort-desc font_14 font_c7"></i></span>
+
+	          <div class="collect wid_95 bg_06 font_cen border-4 hei_30 po_ab hide  box-shadow1">
+	              <ul>
+	                <li>收藏店铺</li>
+	                <li>收藏宝贝</li>
+	              </ul>
+	          </div>
+
+	        </div><!--top_mid_r end-->
+	         <!-- 购物车 -->
+	    <div class="shopping right_botton wid_400 po_ab bg_06  border-4 box-shadow1 hide">
+	      <div class="tit mar_lr10 bg_05 pad_l10 mar_tb10">最新加入的商品</div>
+	      <div class="car_shopping">
+	        <table class="information  mar_20 " style="height:75px;" id="information"><!--单双行变色加bg_05这个样式-->
+	          <tr>
+	            <td class="wid_90 "><img src="$staticPath/images/shop_img2.png" width="75" height="50"/></td>
+	            <td class="wid_180 font_cen">佳能2014新款喷墨打印</td>
+	            <td class="wid_90 ">￥5299x2<br><span class="font_1c">删除</span></td>
+	          </tr>
+	        </table>
+	        <table class="information mar_20 " style="height:75px;" id="information"><!--单双行变色加bg_05这个样式-->
+	          <tr>
+	            <td class="wid_90 "><img src="$staticPath/images/shop_img2.png" width="75" height="50"/></td>
+	            <td class="wid_180 font_cen">佳能2014新款喷墨打印 </td>
+	            <td class="wid_90 ">￥5299x2<br><span class="font_1c">删除</span></td>
+	          </tr>
+	        </table>
+	        <table class="information mar_20 " style="height:75px;" id="information"><!--单双行变色加bg_05这个样式-->
+	          <tr>
+	            <td class="wid_90 "><img src="$staticPath/images/shop_img2.png" width="75" height="50"/></td>
+	            <td class="wid_180 font_cen">佳能2014新款喷墨打印 </td>
+	            <td class="wid_90 ">￥5299x2<br><span class="font_1c">删除</span></td>
+	          </tr>
+	        </table>
+	        <table class="information mar_20 " style="height:75px;" id="information"><!--单双行变色加bg_05这个样式-->
+	          <tr>
+	            <td class="wid_90 "><img src="$staticPath/images/shop_img2.png" width="75" height="50"/></td>
+	            <td class="wid_180 font_cen">佳能2014新款喷墨打印 </td>
+	            <td class="wid_90 ">￥5299x2<br><span class="font_1c">删除</span></td>
+	          </tr>
+	        </table>
+	        <table class="information mar_20 " style="height:75px;" id="information"><!--单双行变色加bg_05这个样式-->
+	          <tr>
+	            <td class="wid_90 "><img src="$staticPath/images/shop_img2.png" width="75" height="50"/></td>
+	            <td class="wid_180 font_cen">佳能2014新款喷墨打印 </td>
+	            <td class="wid_90 ">￥5299x2<br><span class="font_1c">删除</span></td>
+	          </tr>
+	        </table>
+	        <table class="information mar_20 " style="height:75px;" id="information"><!--单双行变色加bg_05这个样式-->
+	          <tr>
+	            <td class="wid_90 "><img src="$staticPath/images/shop_img2.png" width="75" height="50"/></td>
+	            <td class="wid_180 font_cen">佳能2014新款喷墨打印 </td>
+	            <td class="wid_90 ">￥5299x2<br><span class="font_1c">删除</span></td>
+	          </tr>
+	        </table>
+	      </div>
+	      <div class="tit fr mar_r20">共<span class="font_fe">10</span>件商品，金额总计：<span class="font_fe">￥8500</span></div>
+	      <div class="clear "></div>
+	      <div class="fr mar_tb10 mar_r20"><button type="button" class="button_1 hei_40 ">去购物车结账</button></div>
+	    </div>
+	    </div><!--top_mid end-->
+	</div><!--header_top end-->
+    <div class="clear"></div>
+    <div id="shop_header">
+    	<div class="left_img">
+    		<h3 class="font_24 mar_t10">
+    			舒适100网
+    		</h3>
+    		<p onmouseover="show_man()" onmouseleave="show_man2()">认证服务:<img src="$staticPath/images/anquan.png"><b class=" font_14b fa-angle-down po_re" id="down"></b>
+    			<!-- 弹出框 -->
+    			<div class="shop_man" id="shop_man" style="display:none">
+    				<h2 class="border-6 hei_35 font_cen">
+    					店主:15900639512
+    				</h2>
+    				<div class="pad_tb20 pad_lr20">
+    					<img src=""  width="50" height="50" class="fl mar_r10">
+    					<p class="wid_120 fl" >已签署消费者保障协议并缴纳保证金。</p>
+    					<div class="clear"></div>
+    				</div>
+    			</div><!-- 弹出框 end-->
+    		</p>
+    	</div><!--left_img（放图标或者店铺名字的div） end-->
+        <div class="mid_search">
+            <!--(输入框和搜索按钮)-->
+        	<div class="search po_re mar_t30 fr" >
+				<input name="" type="text" class="search_input"/>
+                <button class="shop_button pa_01 shop_color0" >搜本店</button>
+                <button class="shop_button search_all shop_color1">搜全站</button>
+            </div><!--search po_re end (输入框和搜索按钮)-->
+        </div><!--mid_search (包着中间搜索的框)end-->      
+    </div>
+	<!--头部结束-->
+	<!-- 小广告条开始 -->
+	<div class="ban mar_t10 min-hei" >
+		<div class="ban_img mar wid_980 min-hei po_re">
+			<img src="$staticPath/pic/ban_img2.jpg" >	
+		</div>
+		 
+	</div><!-- 小广告条 end -->
+    <div class="nav_bg shop_color0">
+        <div class="nav po_re">
+            <ul class="font_cen font_14b">
+                <li class="focus_li font_ff">首 页</li>
+                <li class="font_ff">产品</li>
+                <li class="font_ff">纸 张</li>
+                <li class="font_ff">店铺店铺</li>
+                <li class="font_ff">店铺店铺</li>
+                <span class="fr font_ff wid_220 font_cen"><a href="#">店铺信息</a></span>
+            </ul>
+            <!-- 商家信息最右侧的小盒子-->
+            <div class="shop_right_box box-shadow1" style="display:none">
+                <h3 class="bg_05">商家信息</h3>
+                <ul>
+                <li class="left">服务评价：</li>
+                <li class="right1">
+                    <div class="heart-red right_sev heart_icon4"></div><!--服务星级也是 图标heart_icon5，heart_icon4，heart_icon3到0为止 -->
+                    <i class="evaluate-grade"><strong title="4.5714"><a href="http://item.jd.com/1029879454.html#none" target="_blank">4.5</a></strong>分</i><s></s>
+                </li>
+                <li class="right3">
+                    <div class="list">
+                        <ul>
+                            <li>评分明细</li>
+                            <li>与行业相比</li>
+                            <li>描述相符：4.59分</li>
+                            <li><div class="b_s"></div>5.67%</li>
+                            <li>送货速度：4.59分</li>
+                            <li><div class="b_s" ></div>5.67%</li>
+                            <li>商品质量：4.59分</li>
+                            <li><div class="b_s" ></div>5.67%</li>
+                            <li>售后服务：4.59分</li>
+                            <li><div class="b_x"></div>5.67%</li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="left">公司名称：</li>
+                <li class="right1 font_14b"><a href="#">北京金华服饰有限公司</a></li>
+                <li class="left">所&nbsp;在&nbsp;地&nbsp;：</li>
+                <li class="right1"><a href="#">北京市海淀区</a></li>
+                <li class="right2"><a href="#"   class="mar_r10 font_65"><i class="demo-icons fa-star font_65 font_14"></i>收藏店铺</a><a href="#"  class="font_65">进入卖家店铺</a></li>
+                </ul>
+            </div>
+            <!-- 商家信息最右侧的小盒子 end-->
+        </div>
+        </div>
+        <!-- 店铺导航 end -->
+	<!-- 店铺导航开始 -->
+<div class="main_flash banner mar_t10  po_re">
+  		<!-- 每一行轮播图片站位一个DIV-->
+       <div class="focusPic" style="display: block;">
+        <a href="#" target="_blank"><img src="$staticPath/pic/banner_10.jpg" border="0"/></a>
+   </div>
+  		<!-- 每一行轮播图片站位一个END -->
+       <div class="focusPic" style="display: none;">
+       <a href="#" target="_blank"><img src="$staticPath/pic/29b2d6bda8764080bb1c1a282ec6308a.jpg" border="0"/></a>
+       </div>
+       <div class="focusPic" style="display: none;">
+       <a href="#" target="_blank"><img src="$staticPath/pic/f5e2fdd2af544200ad323a4020a4d1fb.jpg" border="0"/></a>
+       </div>
+       <div class="focusPic" style="display: none;">
+        <a href="#" target="_blank"><img src="$staticPath/pic/29b2d6bda8764080bb1c1a282ec6308a.jpg" border="0"/></a>
+       </div>
+      <!--轮播图片的图标 开始 -->
+       <div class="num_bg1">
+        <ul>
+         <li class="focus_num"><a href="javascript:" onmouseover="SetActiveIndex($('.main_flash>.focusPic'), $('.main_flash>.num_bg1>ul>li'), 0);"></a></li>
+         <li class=""><a href="javascript:" onmouseover="SetActiveIndex($('.main_flash>.focusPic'), $('.main_flash>.num_bg1>ul>li'), 1);"></a></li>
+         <li class=""><a href="javascript:" onmouseover="SetActiveIndex($('.main_flash>.focusPic'), $('.main_flash>.num_bg1>ul>li'), 2);"></a></li>
+         <li class=""><a href="javascript:" onmouseover="SetActiveIndex($('.main_flash>.focusPic'), $('.main_flash>.num_bg1>ul>li'), 3);"></a></li>
+        </ul>
+       </div>
+        <!--轮播图片的图标 end -->
+  	</div>
+	<!-- 中间内容开始 -->
+	<!-- 店铺广告位 开始 -->
+  		<div class="shop_advert">
+  			 <ul>
+  			 	<li class="po_re" >
+  			 		<img src="$staticPath/pic/product-03.png" alt="" name="" width="233" height="125">
+  			 	</li>
+  			 	<li class="po_re" >
+  			 		<img src="$staticPath/pic/product-03.png" alt="" name="" width="233" height="125">
+  			 	</li>
+  			 	<li class="po_re" >
+  			 		<img src="$staticPath/pic/product-03.png" alt="" name="" width="233" height="125">
+  			 	</li>
+  			 	<li class="po_re" >
+  			 		<img src="$staticPath/pic/product-03.png" alt="" name="" width="233" height="125">
+  			 	</li>
+  			 </ul>
+  		</div><!-- advert end-->
+        
+	<!-- 店铺热卖商品 开始 -->
+    	<div class="wid_980 mar_cen font_cen font_24 hei_45">标题</div>
+  		<div class="shop_hot shop_color0">
+  			 <ul>
+  			 	<li  class="po_re" >
+  			 		<img src="$staticPath/pic/product_10.jpg" alt="" name=""  width="319" height="415">
+  			 	</li>
+  			 	<li class="po_re" >
+  			 		<img src="$staticPath/pic/product_10.jpg" alt="" name="">
+  			 	</li>
+  			 	<li class="po_re" >
+  			 		<img src="$staticPath/pic/product_10.jpg" alt="" name="">
+  			 	</li>
+  			 	<li class="po_re" >
+  			 		<img src="$staticPath/pic/product_10.jpg" alt="" name="">
+  			 	</li>
+  			 	<li class="po_re" >
+  			 		<img src="$staticPath/pic/product_10.jpg" alt="" name="">
+  			 	</li>
+  			 	<li class="po_re" >
+  			 		<img src="$staticPath/pic/product_10.jpg" alt="" name="">
+  			 	</li>
+  			 </ul>
+  		</div><!-- advert end-->
+		<!--下面 包含左侧和右侧的div 开始 -->
+		<div id="shop_content">
+			<!-- 商品列表-左 -->
+			<div id="shop_left">
+				<dl>
+				    <dt class="pad_l10">产品分类</dt>
+				    <dd>摄影摄像<i class="fa-angle-double-down fr mar_r10"></i><!--向上class="fa-angle-double-up" 向下class="fa-angle-double-down"的箭头--></dd>
+				        <ul>
+				          <li><i class="demo-icons fa-angle-right"></i>单反相机</li>
+				          <li><i class="demo-icons fa-angle-right"></i>数码相机</li>
+				          <li><i class="demo-icons fa-angle-right"></i>单电/微单相机</li>
+				        </ul>
+				    <dd>数码配件<i class="fa-angle-double-up fr mar_r10"></i><!--向上class="fa-angle-double-up" 向下class="fa-angle-double-down"的箭头--></dd>
+				    <dd>手机通讯<i class="fa-angle-double-down fr mar_r10"></i><!--向上class="fa-angle-double-up" 向下class="fa-angle-double-down"的箭头--></dd>
+				</dl>
+ 				<!-- 出货 收藏 开始-->
+			    <!--tabs开始-->
+		        <div class="nTab">
+		            <!-- 标题开始 -->
+                    <div class="left_top border-9 pad_l10 mar_tb10">
+                    	销量排行榜
+                    </div>
+		            <div class="TabTitle" id="shop-tab1">
+		              <ol id="myTab0">
+		                <li class="active" onclick="nTabs(this,0);">出货</li>
+		                <li class="normal" onclick="nTabs(this,1);">收藏</li>
+		              </ol>
+		            </div>
+		            <!-- 内容开始 -->
+		             <div class="TabContent">
+		             <!-- 商品介绍下的内容开始 -->
+		              <div id="myTab0_Content0">
+				        <div class="left_content3">
+				            <ol>
+				            <!--每一个宝贝排行循环li start-->
+				               <li class="fore border-6">
+				               <div class="i_img"><a href="#"><img src="$staticPath/pic/pic24.jpg"/></a></div>
+				               <div class="i_font_big"><a href="#" title="迎驾梅兰竹菊礼盒装500ml*4 ">迎驾梅兰竹菊礼盒装500ml*4 </a><br/><strong class="shop_font0">￥32.00</strong></div>
+				               </li>
+				            <!--每一个宝贝排行循环li end-->
+				               <li class="fore border-6">
+				               <div class="i_img"><a href="#"><img src="$staticPath/pic/pic24.jpg"/></a></div>
+				               <div class="i_font_big"><a href="#" title="迎驾梅兰竹菊礼盒装500ml*4">迎驾梅兰竹菊礼盒装500ml*4 </a><br/><strong class="shop_font0">￥32.00</strong></div>
+				               </li>
+				               <li class="fore border-6">
+				               <div class="i_img"><a href="#"><img src="$staticPath/pic/pic24.jpg"/></a></div>
+				               <div class="i_font_big"><a href="#" title="52°无一物许燎源设计青瓷坛2013">52°无一物许燎源设计青瓷坛2013</a><br/><strong class="shop_font0">￥32.00</strong></div>
+				               </li>
+				               <li class="fore border-6">
+				               <div class="i_img"><a href="#"><img src="$staticPath/pic/pic24.jpg"/></a></div>
+				               <div class="i_font_big"><a href="#" title="60°大清猎酒烧酒2500ml">60°大清猎酒烧酒2500ml </a><br/><strong class="shop_font0">￥32.00</strong></div>
+				               </li>
+				               <li class="fore border-6">
+				               <div class="i_img"><a href="#"><img src="$staticPath/pic/pic24.jpg"/></a></div>
+				               <div class="i_font_big"><a href="#" title="52°五粮液美酒贵宾级（二）500ml">52°五粮液美酒贵宾级（二）500ml</a><br/><strong class="shop_font0">￥32.00</strong></div>
+				               </li>
+				            </ol>
+				        </div><!-- left_content3 end-->
+		              </div><!-- myTab0_Content0 end-->
+		                 <!-- 规格说明下的内容开始 -->
+		              <div id="myTab0_Content1" class="hide">
+		                放收藏里的内容
+		              </div>
+		                 <!-- 包装清单下的内容开始 -->  
+		             </div>
+		          </div>
+    				<!--tabs结束-->
+			</div><!-- 商品列表-左 -->
+			
+			<!-- 商品列表-右 -->
+			<div class="fl" id="shop_right">
+                <div class="shopping_leixin">
+                    <!--每个产品的div开始-->
+                    <div class="shopping_box po_re" onmouseover="shop_edit_up()" onmouseleave="shop_edit_down(this)" >
+                        <div class="shopping_box_1">
+                        <div class="big_img"><img src="$staticPath/pic/product-02.jpg" width="238" height="250"/></div>
+                           <div class="n_font">爆款清仓 EyesonU 韩版优雅短袖蝙蝠针织衫休闲宽松条纹<span class="red">毛衣外套 M6014 无袖绿条</span></div>
+                        <div class="jq font_14b shop_font0">￥69.00</div>
+                        <div class="pf"><span class="star sa5"></span><!--评论里的星星级别可以从sa5到sa0-->
+                               <a href="#" style="float:left;color:#005AA0">已有2202人评价</a></div>
+                        </div>
+                    </div>
+                    <!--每个产品的div结束-->
+                    <!--每个产品的div开始-->
+                    <div class="shopping_box">
+                        <div class="shopping_box_1">
+                        <div class="big_img"><img src="$staticPath/pic/product-02.jpg" width="238" height="250"/></div>
+                           <div class="n_font">爆款清仓 EyesonU 韩版优雅短袖蝙蝠针织衫休闲宽松条纹<span class="red">毛衣外套 M6014 无袖绿条</span></div>
+                        <div class="jq font_14b shop_font0">￥69.00</div>
+                        <div class="pf"><span class="star sa5"></span><!--评论里的星星级别可以从sa5到sa0-->
+                               <a href="#" style="float:left;color:#005AA0">已有2202人评价</a></div>
+                        </div>
+                    </div>
+                    <!--每个产品的div结束-->
+                    <!--每个产品的div开始-->
+                    <div class="shopping_box">
+                        <div class="shopping_box_1">
+                        <div class="big_img"><img src="$staticPath/pic/product-02.jpg" width="238" height="250"/></div>
+                           <div class="n_font">爆款清仓 EyesonU 韩版优雅短袖蝙蝠针织衫休闲宽松条纹<span class="red">毛衣外套 M6014 无袖绿条</span></div>
+                        <div class="jq font_14b shop_font0">￥69.00</div>
+                        <div class="pf"><span class="star sa5"></span><!--评论里的星星级别可以从sa5到sa0-->
+                               <a href="#" style="float:left;color:#005AA0">已有2202人评价</a></div>
+                        </div>
+                    </div>
+                    <!--每个产品的div结束-->
+                    <!--每个产品的div开始-->
+                    <div class="shopping_box">
+                        <div class="shopping_box_1">
+                        <div class="big_img"><img src="$staticPath/pic/product-02.jpg" width="238" height="250"/></div>
+                           <div class="n_font">爆款清仓 EyesonU 韩版优雅短袖蝙蝠针织衫休闲宽松条纹<span class="red">毛衣外套 M6014 无袖绿条</span></div>
+                        <div class="jq font_14b shop_font0">￥69.00</div>
+                        <div class="pf"><span class="star sa5"></span><!--评论里的星星级别可以从sa5到sa0-->
+                               <a href="#" style="float:left;color:#005AA0">已有2202人评价</a></div>
+                        </div>
+                    </div>
+                    <!--每个产品的div结束-->
+                    <!--每个产品的div开始-->
+                    <div class="shopping_box">
+                        <div class="shopping_box_1">
+                        <div class="big_img"><img src="$staticPath/pic/product-02.jpg" width="238" height="250"/></div>
+                           <div class="n_font">爆款清仓 EyesonU 韩版优雅短袖蝙蝠针织衫休闲宽松条纹<span class="red">毛衣外套 M6014 无袖绿条</span></div>
+                        <div class="jq font_14b shop_font0">￥69.00</div>
+                        <div class="pf"><span class="star sa5"></span><!--评论里的星星级别可以从sa5到sa0-->
+                               <a href="#" style="float:left;color:#005AA0">已有2202人评价</a></div>
+                        </div>
+                    </div>
+                    <!--每个产品的div结束-->
+                    <!--每个产品的div开始-->
+                    <div class="shopping_box">
+                        <div class="shopping_box_1">
+                        <div class="big_img"><img src="$staticPath/pic/product-02.jpg" width="238" height="250"/></div>
+                           <div class="n_font">爆款清仓 EyesonU 韩版优雅短袖蝙蝠针织衫休闲宽松条纹<span class="red">毛衣外套 M6014 无袖绿条</span></div>
+                        <div class="jq font_14b shop_font0">￥69.00</div>
+                        <div class="pf"><span class="star sa5"></span><!--评论里的星星级别可以从sa5到sa0-->
+                               <a href="#" style="float:left;color:#005AA0">已有2202人评价</a></div>
+                        </div>
+                    </div>
+                    <!--每个产品的div结束-->
+                    <!--每个产品的div开始-->
+                    <div class="shopping_box">
+                        <div class="shopping_box_1">
+                        <div class="big_img"><img src="$staticPath/pic/product-02.jpg"  width="238" height="250"/></div>
+                           <div class="n_font">爆款清仓 EyesonU 韩版优雅短袖蝙蝠针织衫休闲宽松条纹<span class="red">毛衣外套 M6014 无袖绿条</span></div>
+                        <div class="jq font_14b shop_font0">￥69.00</div>
+                        <div class="pf"><span class="star sa5"></span><!--评论里的星星级别可以从sa5到sa0-->
+                               <a href="#" style="float:left;color:#005AA0">已有2202人评价</a></div>
+                        </div>
+                    </div>
+                    <!--每个产品的div结束-->
+                </div><!--shopping_leixin -->
+                <!-- 分页 -->
+                <div class="page">
+                  <ul>
+                  <li class="lastPage"><a href="">上一页</a></li>
+                  <li><a href="" class="curr" >1</a></li>
+                  <li><a href="">2</a></li>
+                  <li><a href="">3</a></li>
+                  <li><a href="">4</a></li>
+                  <li><a href="">5</a></li>
+                  <li><a href="">6</a></li>
+                  <li><a href="">7</a></li>
+                  <li><a href="">8</a></li>
+                  <li><a href="">9</a></li>
+                  <li><a href="">10</a></li>
+                  <li><a href="">...</a></li>
+                  <li><a href="">20</a></li>
+                  <li class="nextPage"><a href="">下一页</a></li>
+                  </ul>
+                </div>
+                <!-- 分页 end -->
+			</div><!-- 商品列表-右 -->
+		</div><!-- 商品分类 end-->
+  	</div><!-- shop_content end -->
+</body>
+</html>
+<!-- 大banner编辑 -->
+<div class="po_fai big_ban" style="display:none">
+    <div class="po_fai_bg"></div>
+    <div class="po_main pad_t10" >
+    <div class=" hei_32 bg_05 pad_l10 "><i class="demo-icons fa-times-circle font_16 fr mar_r10"></i>店铺页头编辑</div>
+    <div class="clear"></div>   
+    <div class="register_content" style="width:650px; margin: 0  ">
+        <ul>
+        	<li class="hei_40 mar_t10">
+        		<div class="wid_110 fl"><p class="hei_30 font_right">背景颜色</p></div>
+        		<div class="wid_500 fl mar_l10">
+	        		<input type="text" class="input_Style2 kf" />
+	        		<p class="fl hei_30 mar_l10 font_e3">( 填写色值)</p>
+
+	        	</div>
+        	</li>
+        	<li class="hei_40 mar_t10">
+        		<div class="wid_110 fl"><p class="hei_30 font_right">背景图片</p></div>
+        		<div class="wid_500 fl mar_l10">
+	        		<input type="text" class="input_Style2 kf" />
+	        		<button class="button_3 kf hei_30 mar_l10">选择文件</button>
+	        		<p class="fl hei_30 mar_l10 font_e3">( 建议尺寸：980*100px )</p>
+	        	</div>
+        	</li>
+        	<li class="hei_40 mar_t10">
+        		<div class="wid_110 fl"><p class="hei_30 font_right">图片跳转url</p></div>
+        		<div class="wid_500 fl mar_l10">
+	        		<input type="text" class="input_Style2 kf" />
+	        	</div>
+        	</li>
+        	<li class="hei_40">
+        		<div class="wid_110 fl"><p class="hei_30 font_right">上传图片</p></div>
+        		<div class="wid_500 fl mar_l10">
+	        		<input type="text" class="input_Style2 kf" />
+	        		<button class="button_3 kf hei_30 mar_l10">选择文件</button>
+	        		<p class="fl hei_30 mar_l10 font_e3">( 建议尺寸：980*100px )</p>
+	        	</div>
+        	</li>
+        </ul>
+        <div class="wid_410 mar">
+        	<div class="min-hei wid_300 border-4"></div>
+	    	<div class="wid_200 mar_t10 pad_t50">
+	    		<button class="button_1 hei_30">确定</button><button class="button_5 hei_30 mar_l10 demo-icons"><a href="#">取消</a></button>
+	    	</div>
+        </div>
+    </div>
+    </div>
+</div><!-- 大banner编辑 end -->

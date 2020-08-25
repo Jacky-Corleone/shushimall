@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.goodscenter.dao.TradeInventoryDAO">
+	
+	<resultMap id="tradeInventoryOutMapper" type="com.camelot.goodscenter.dto.TradeInventoryOutDTO">
+	        <result property="pictureUrl" column="picture_url" />
+	        <result property="itemName" column="item_name" />
+	        <result property="skuId" column="sku_id" />
+	        <result property="itemId" column="item_id" />
+	        <result property="sellPrice" column="sell_price" />
+	        <result property="totalInventory" column="total_inventory" />
+	        <result property="itemStatus" column="item_status" />
+	        <result property="attrSale" column="attr_sale" />
+	        <result property="marketPrice" column="market_price" />
+	        <result property="attributes" column="attributes" />
+	        <result property="skuStatus" column="sku_status" />
+	        <result property="shopId" column="shop_id" />
+	        <result property="platformId" column="platform_id" />
+	        <result property="guidePrice" column="guide_price" />
+	        
+	         
+	</resultMap>
+	<resultMap id="TradeInventoryDTOMapper" type="com.camelot.goodscenter.dto.TradeInventoryDTO" >
+	  <result property="shopId" column="shop_id" />
+	  <result property="skuId" column="sku_id" />
+	  <result property="sellerId" column="seller_id" />
+	  <result property="totalInventory" column="total_inventory" />
+	  <result property="occupieInventory" column="occupie_inventory" />
+	  <result property="created" column="created" />
+	   <result property="modified" column="modified" />
+	  <result property="state" column="state" />
+	  <result property="yn" column="yn" />
+	  <result property="createUser" column="create_user" />
+	  <result property="updateUser" column="update_user" />
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="where_fragement">
+	   trade_inventory t
+         INNER JOIN item_sku s ON s.sku_id=t.sku_id
+         INNER JOIN item i ON i.item_id=s.item_id
+	  where t.yn=2
+	  and s.sku_status=1 and i.item_status != 30 
+	  <if test="entity!=null">
+	     <if test="entity.sellerId != null and entity.sellerId != 0">
+	       and t.seller_id=#{entity.sellerId}
+	     </if>
+	      <if test="entity.shopId != null and entity.shopId != 0">
+	       and t.shop_id=#{entity.shopId}
+	     </if>
+	     <if test="entity.itemName != null and entity.itemName != ''">
+	       and i.item_name=#{entity.itemName}
+	     </if>
+	     <if test="entity.itemId != null and entity.itemId != 0">
+	        and s.item_id=#{entity.itemId}
+	     </if>
+	     <if test="entity.skuId != null and entity.skuId != 0">
+	        and t.sku_id=#{entity.skuId}
+	     </if>
+	     <if test="entity.minInvetory != null and entity.minInvetory != 0">
+	        and t.total_inventory >=#{entity.minInvetory}
+	     </if>
+	     <if test="entity.maxInvetory != null and entity.maxInvetory !=0">
+	        <![CDATA[  and t.total_inventory <=#{entity.maxInvetory}]]>
+	     </if>
+	     <if test="entity.productId != null and entity.productId != 0">
+	        and i.product_id >=#{entity.productId}
+	     </if>
+	     <if test="entity.itemStatus != null and entity.itemStatus != 0">
+	        and i.item_status =#{entity.itemStatus}
+	     </if>
+	     <if test="entity.cid != null and entity.cid != 0">
+	        and i.cid =#{entity.cid}
+	     </if>
+	     <if test="entity.shopCid != null and entity.shopCid != 0">
+	        and i.shop_cid =#{entity.shopCid}
+	     </if>
+	  </if>
+	</sql>
+	
+	<select id="queryBySkuId" parameterType="long" resultMap="TradeInventoryDTOMapper">
+	  select * from trade_inventory where sku_id=#{skuId} and yn=2
+	</select>
+	
+	<select id="queryTradeInventoryList" resultMap="tradeInventoryOutMapper">
+		select	t.sku_id
+ 			   ,t.total_inventory
+ 			   ,t.shop_id
+ 			   ,i.platform_id
+         FROM  
+        <include refid="where_fragement1" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryItemBySkuId" parameterType="long" resultMap="tradeInventoryOutMapper">
+	   select s.item_id
+	          ,s.attributes
+	          ,i.market_price
+	          ,i.item_name
+	          ,i.item_status
+	          ,i.cid
+	          ,i.attr_sale
+	          ,s.sku_status
+	          ,i.guide_price
+	   from  item_sku s
+       inner join item i
+        on i.item_id=s.item_id
+        where s.sku_id=#{skuId} 
+	</select>
+	<select id="queryCount" resultType="long">
+	 <include refid="count_Tail" />
+	 <include refid="where_fragement1" />
+	</select>
+	
+	<update id="modifyInventoryBySkuIds">
+		update trade_inventory 
+		set    modified = now(),
+			   total_inventory=#{inventory} 
+	    where  sku_id=#{skuid}
+	</update>
+	
+	<sql id="where_fragement1">
+	   trade_inventory t
+         INNER JOIN item_sku s ON s.sku_id=t.sku_id
+         INNER JOIN item i ON i.item_id=s.item_id
+	  where t.yn=2
+	  and s.sku_status=1 and i.item_status != 30 
+	  <if test="entity!=null">
+	     <if test="entity.sellerId != null and entity.sellerId != 0">
+	       and t.seller_id=#{entity.sellerId}
+	     </if>
+	      <if test="entity.shopId != null and entity.shopId != 0">
+	       and t.shop_id=#{entity.shopId}
+	     </if>
+	      <if test="entity.shopIds != null and entity.shopIds.size() > 0">
+	       and t.shop_id in
+	       	<foreach collection="entity.shopIds" open="(" separator="," close=")" item="shopId">
+				#{shopId}
+			</foreach>
+	     </if>
+	     <if test="entity.itemName != null and entity.itemName != ''">
+	       and i.item_name LIKE '%${entity.itemName}%'
+	     </if>
+	     <if test="entity.itemId != null and entity.itemId != 0">
+	        and s.item_id LIKE '%${entity.itemId}%'
+	     </if>
+	     <if test="entity.skuId != null and entity.skuId != 0">
+	        and t.sku_id  LIKE '%${entity.skuId}%'
+	     </if>
+	     <if test="entity.minInvetory != null and entity.minInvetory != 0">
+	        and t.total_inventory >=#{entity.minInvetory}
+	     </if>
+	     <if test="entity.maxInvetory != null and entity.maxInvetory !=0">
+	        <![CDATA[  and t.total_inventory <=#{entity.maxInvetory}]]>
+	     </if>
+	     <if test="entity.productId != null and entity.productId != 0">
+	        and i.product_id >=#{entity.productId}
+	     </if>
+	     <if test="entity.itemStatus != null and entity.itemStatus != 0">
+	        and i.item_status =#{entity.itemStatus}
+	     </if>
+	     <if test="entity.cid != null and entity.cid != 0">
+	        and FIND_IN_SET(i.cid,(SELECT queryChildCategory(#{entity.cid})))
+	     </if>
+	     <if test="entity.shopCid != null and entity.shopCid != 0">
+	        and i.shop_cid =#{entity.shopCid}
+	     </if>
+	      <if test="entity.hasPrice != null">
+	        and i.has_price = #{entity.hasPrice}
+	     </if>
+	     <if test="entity.platformId != null">
+	     	<choose>
+	     		<when test="entity.platformId == 0">
+		        	and i.platform_id is null
+	     		</when>
+	     		<otherwise>
+		        	and i.platform_id =#{entity.platformId}
+	     		</otherwise>
+	     	</choose>
+	     </if>
+	    </if> 
+	</sql>
+</mapper>

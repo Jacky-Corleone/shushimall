@@ -1,0 +1,189 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<script language="javascript" type="text/javascript" src="$request.getContextPath()/assets/js/tab.js"></script>
+<script type="text/javascript">
+    var path="$request.contextPath";
+    $(function() {
+                //加载左侧菜单
+                $("#leftSeller").load("$request.contextPath/leftSeller");
+                //延期付款 和  待付款 选项卡切换
+                $('#tabs li').click(function () {
+                    var $this =
+                    $(this);
+                    var $t = $this.index();
+                        $li.removeClass();
+                        $this.addClass('active');
+                });
+            });
+    <!--查询-->
+    function topage(page){
+        $("#searchForm").attr("action", path+"/storecenter/freightTemplate/queryFreight");
+        $("input[name='page']").val(page);
+        $("#searchForm").submit();
+    }
+
+    <!--跳转到添加模板页-->
+    function addPromotionInfo(){
+        window.location.href=path+"/storecenter/freightTemplate/addFreightTemplate";
+    }
+
+    //编辑
+    function update(id){
+        window.location.href=path+"/storecenter/freightTemplate/updateFreightTemplate?id="+id;
+    }
+    function viewTemplate(id){
+    	window.location.href=path+"/storecenter/freightTemplate/updateFreightTemplate?id="+id+"&doType=view";
+    }
+    //删除
+    function deleteTemplate(id){
+        if(confirm("是否确认删除？")) {
+            $.ajax({
+                url: path + "/storecenter/freightTemplate/delete",
+                type: "post",
+                data: {
+                    templateId: id
+                },
+                dataType: "json",
+                success: function (data) {
+                    if (data.result) {
+                        alert("删除成功!");
+                        window.location.href = path + "/storecenter/freightTemplate/queryFreight";
+                    } else if (data.message) {
+                        alert(data.message);
+                    } else {
+                        alert("操作失败!");
+                    }
+                },
+                error: function () {
+                    alert("请求超时!");
+                }
+            });
+        }
+    }
+	
+	//复制
+    function copy(id){
+        if(confirm("您确定要复制指定模版吗？")) {
+			window.location.href=path+"/storecenter/freightTemplate/updateFreightTemplate?id="+id+"&doType=copy";
+        }
+    }
+    //弹出层隐藏
+    function comboxDivHide(id){
+    	$("#"+id).hide();
+    }
+</script>
+<div id="main">
+    <!--left start -->
+    <div id="leftSeller" class="border-4">                    </div>
+    <!--left end -->
+<!--右边部分开始-->
+<div id="right">
+    <div id="right_top" class="right_top border-4 bg_06">
+        <form method="post" id="searchForm" action="#">
+        <div class="right_top_l">
+            <ul class="list">
+                <li class="wid_350">
+                    <span class="font_wid">模板名称：</span><input id="templateName" value="$!shopFreightTemplateDTO.templateName" name="templateName" class="input_Style2 wid_170 hei_30" type="text" />
+                </li>
+                <li class="wid_350">
+                    <span class="font_wid">计价方式：</span>
+                    <input type="hidden" name="page" value="$!pager.page">
+                    <select id="valuationWay" name="valuationWay" class="input_Style2 wid_180 mar_r10 hei_35">
+                        <option value="">请选择</option>
+                        <option value="1" #if($!shopFreightTemplateDTO.valuationWay == 1) selected="selected" #end>按件数</option>
+                        <option value="2" #if($!shopFreightTemplateDTO.valuationWay == 2) selected="selected" #end>按重量</option>
+                        <option value="3" #if($!shopFreightTemplateDTO.valuationWay == 3) selected="selected" #end>按体积</option>
+                    </select>
+                </li>
+                <li class="wid_350">
+                    <span class="font_wid">是否包邮：</span>
+                    <select id="postageFree" name="postageFree" class="input_Style2 wid_180 mar_r10 hei_35">
+                        <option value="">请选择</option>
+                        <option value="1" #if($!shopFreightTemplateDTO.postageFree == 1) selected="selected" #end>自定义运费</option>
+                        <option value="2" #if($!shopFreightTemplateDTO.postageFree == 2) selected="selected" #end>卖家承担运费</option>
+                    </select>
+                </li>
+            </ul>
+        </div>
+        <div class="right_top_r ">
+            <button type="button" onclick="topage(1)" class="button_4 but_cx3">
+                <a class="font_1c hei_24">查 询</a>
+            </button>
+        </div>
+        </form>
+    </div>
+    <!-- right结束 -->
+
+    <div id="right_bot" class="right_bot border-4 mar_t10 bg_06">
+        <!-- 商品列表开头 -->
+        <div class="right_xinxi mar_l14">
+            <ul class="list_top bg_08 font_cen font_14b">
+                <li class="wid_150">模板名称</li>
+                <li class="wid_100">是否包邮</li>
+                <li class="wid_100">计价方式</li>
+                <li class="wid_100">运送方式</li>
+                <li class="wid_160">发货时间</li>
+                <li class="wid_150">创建时间</li>
+                <li class="wid_170">操作</li>
+            </ul>
+            <!-- 类型选择 -->
+            <ul class="right_select">
+                <span class="fr mar_tb10"><button  onclick="addPromotionInfo()" type="button" class="button_4  hei_24 add_shop"><a class="font_1c">+添加运费模板</a></button></span>
+            </ul>
+            <!-- 商品信息 -->
+            <table class="information" id="information ">
+                #foreach($freight in $pager.records )
+                <tr class="bg_05">
+                    <td class="wid_150 font_cen">$!freight.templateName</td>
+                    <td class="wid_100 font_cen">
+                     #if($!freight.postageFree=='1')
+                         自定义运费
+                     #else
+                         包邮
+                    #end
+                    </td>
+                    <td class="wid_100 font_cen">
+                    #if($!freight.postageFree=='1')
+                    	$!freight.valuationWayName
+                    #else
+                    	无
+                    #end
+                    </td>
+                    <td class="wid_100 font_cen">
+                    #if($!freight.deliveryName)
+                    	#set($str=$!freight.deliveryName)
+                    	#set($end=$str.length() - 1)
+                    	#set($str=$str.substring(0,$end))
+                    	$str
+                    #else
+                    	无
+                    #end
+                    </td>
+                    <td class="wid_160 font_cen">$!freight.deliveryTime</td>
+                    <td class="wid_150 font_cen">$!date.format('yyyy-MM-dd HH:mm:ss',$!freight.createTime)</td>
+                    <td class="wid_170 font_cen">
+						<a class="font_1c" href="#" onclick="update($!freight.id);">编辑</a>
+                        &nbsp;&nbsp;<a class="font_1c" href="#" onclick="copy($!freight.id);">复制</a>
+                        &nbsp;&nbsp;<a class="font_1c" href="#" onclick="deleteTemplate($!freight.id);">删除</a>
+                        &nbsp;&nbsp;<a class="font_1c" href="#" onclick="viewTemplate($!freight.id);">查看</a>
+					</td>
+                </tr>
+                #end
+            </table>
+            #pageVelocity($pager)
+        </div>
+
+    </div>
+
+</div> <!--id="right" end-->
+</div>
+<!-- 运费模版复制弹出层 -->
+<div class="po_fai" id="shopFreightTemplateLoadMessage" style="display:none;z-index:10000">
+    <div class="po_fai_bg"></div>
+    <div class="po_main1">
+		<div class="tit bg_05 hei_30 pad_l10">提示</div>
+        <ul>
+            <li><img src="$request.contextPath/assets/images/loading.gif" alt="" />&nbsp;&nbsp;运费模版复制中,请稍后...   </li>
+        </ul>
+	</div>
+</div>

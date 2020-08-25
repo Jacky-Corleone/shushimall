@@ -1,0 +1,108 @@
+#set($layout = "/none_layout.vm")
+<div class="wid_110 fl mar_l10"><p class="hei_40 font_left">选择商品</p></div>
+<div class="clear"></div>
+<style type="text/css">
+/*分页*/
+.po_fai .po_main li {
+    text-align: center;
+    line-height: 30px;
+}
+.pagers{width:auto;float:right;height:30px;line-height:30px; margin:2px -180px 20px 400px;}
+.pagers ul li{display:inline-block;width:auto;height:30px; float:left; background:#fff;}
+.pagers ul li a{ padding:0px 3px; width:auto; float:left;background:#fefefe;}
+.pagers ul li a.curr{ padding:0px 3px 0px 3px;display:block;background:#E50011;line-height:30px;height:30px;text-align:center; color:#fff;}
+.pagers ul li a:hover.curr{ background:#c11208;}
+.skip{ float:right;height:30px; line-height:30px;}
+.skip input{ width:35px; float:left;height:28px; }
+a.go{display:block;background:#0483C7; padding:0px 5px; float:left; width:20px; color:#fff;}
+a:hover.go{background:#22b1e6;}
+/*分页end*/
+</style>
+<script type="text/javascript">
+	function page_num(){
+	 var pageNumVal=$("#pageNum").val();
+		if(pageNumVal == ''){
+			topage1(1);
+			$("#pageNum").val(1)
+		}
+	   else if(parseInt(pageNumVal)>=parseInt($!pager.totalPage))
+	   {
+		topage1($!pager.totalPage);
+	   }
+	  else{
+		topage1(pageNumVal);
+	  }
+	}
+  function enter_press_page(e){
+	if(e == 13|| e == 32){
+		page_num()
+		}
+	};
+</script>
+<!-- tab -->
+<table class="information mar_b10" id="information"><!--单双行变色加bg_05这个样式-->
+  <tr class="bg_05 hei_40">
+    <td class="wid_80 font_cen">选择</td>
+    <td class="wid_200 font_cen">商品编码</td>
+    <td class="wid_200 font_cen">商品名称</td>
+    <td class="wid_200 font_cen">商品价格</td>
+    <td class="wid_200 font_cen">总库存</td>
+  </tr>
+ </table>
+  <table class="information mar_b10" id="information1">
+   #if($pager.records && $pager.records.size()==0)
+  <tr class="hei_40">
+    <td class="font_cen" colspan="6">您的店铺还没有任何商品</td>
+  </tr>
+  #else
+  #foreach($entity in $pager.records)
+  <tr class="hei_40" >
+    <td class="wid_80 font_cen"><input type="radio" name="choiceImage" onclick="updateProImage('$!entity.productId','$!entity.pictureUrl','$!entity.itemId','$!entity.guidePrice','$!entity.itemName','$!entity.hasPrice')" /></td>
+    <td class="wid_200 font_cen">$!entity.itemId</td>
+    <td class="wid_200 font_cen">$!entity.itemName</td>
+    <td class="wid_200 font_cen">$!entity.guidePrice</td>
+    <td class="wid_200 font_cen">$!entity.inventory</td>
+  </tr>
+  #end
+  #end
+</table> 
+<!-- tab end-->
+ <div class="clear"></div>
+<!--分页开始 -->
+	<div class="pagers ml14px"  >
+    <ul style="width:650px;height:50px;" >
+        <li  style="width:50px;height:50px" class="lastPage">
+            <a href="javascript:topage1(1)">首页</a>
+        </li>
+        <li  style="width:50px;height:50px" class="lastPage">
+            <a href="javascript:topage1($pager.previewPage)">上一页</a>
+        </li>
+          #if ($!pager.totalCount==0) 
+				    #else
+        #foreach($pageNo in [$!pager.startPageIndex .. $!pager.endPageIndex])
+            <li style="width:50px;height:50px" id="backpage">
+                <a id="back_$pageNo" #if($pageNo==$pager.page) class="curr"  #end href="javascript:topage1($pageNo)">
+                  #if($page.pageCode/2==$pageNo)
+                        ...
+                        #else
+                        $pageNo
+                    #end
+                </a>
+            </li>
+        #end
+        #end
+        <li  style="width:50px;height:50px" class="nextPage">
+            <a href="javascript:topage1($pager.nextPage)">下一页</a>
+        </li>
+        <li  style="width:50px;height:50px" class="nextPage">
+            <a href="javascript:topage1($pager.totalPage)">末页</a>
+        </li>
+        <li  style="width:40px;height:50px" class="nextPage">
+                           共$pager.totalPage页 
+        </li>
+        </li>
+       <li style="width:120px;height:50px" class="nextPage">
+    第<input style="width:28px;height:28px;text-align: center;border:1px solid #dedede;"  value="$pager.page" onkeyup="value=this.value.replace(/\\D+/g,'')" onkeydown="enter_press_page(event.keyCode||event.which);" id="pageNum"/>页 <span style="width:40px;height:50px"  onclick="page_num()">[跳转]&nbsp;&nbsp;</span></li>
+        
+    </ul>
+</div>

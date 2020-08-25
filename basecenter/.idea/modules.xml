@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/basecenter.iml" filepath="$PROJECT_DIR$/basecenter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/basecenter-common/basecenter-common.iml" filepath="$PROJECT_DIR$/basecenter-common/basecenter-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/basecenter-dao/basecenter-dao.iml" filepath="$PROJECT_DIR$/basecenter-dao/basecenter-dao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/basecenter-domain/basecenter-domain.iml" filepath="$PROJECT_DIR$/basecenter-domain/basecenter-domain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/basecenter-export/basecenter-export.iml" filepath="$PROJECT_DIR$/basecenter-export/basecenter-export.iml" />
+      <module fileurl="file://$PROJECT_DIR$/basecenter-parent/basecenter-parent.iml" filepath="$PROJECT_DIR$/basecenter-parent/basecenter-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/basecenter-rpc/basecenter-rpc.iml" filepath="$PROJECT_DIR$/basecenter-rpc/basecenter-rpc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/basecenter-service/basecenter-service.iml" filepath="$PROJECT_DIR$/basecenter-service/basecenter-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/basecenter-web/basecenter-web.iml" filepath="$PROJECT_DIR$/basecenter-web/basecenter-web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../camelot-common/common.iml" filepath="$PROJECT_DIR$/../camelot-common/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../camelot-common/common-core/common-core.iml" filepath="$PROJECT_DIR$/../camelot-common/common-core/common-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../goodscenter/goodscenter.iml" filepath="$PROJECT_DIR$/../goodscenter/goodscenter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../goodscenter/goodscenter-common/goodscenter-common.iml" filepath="$PROJECT_DIR$/../goodscenter/goodscenter-common/goodscenter-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../goodscenter/goodscenter-dao/goodscenter-dao.iml" filepath="$PROJECT_DIR$/../goodscenter/goodscenter-dao/goodscenter-dao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../goodscenter/goodscenter-domain/goodscenter-domain.iml" filepath="$PROJECT_DIR$/../goodscenter/goodscenter-domain/goodscenter-domain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../goodscenter/goodscenter-export/goodscenter-export.iml" filepath="$PROJECT_DIR$/../goodscenter/goodscenter-export/goodscenter-export.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../goodscenter/goodscenter-parent/goodscenter-parent.iml" filepath="$PROJECT_DIR$/../goodscenter/goodscenter-parent/goodscenter-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../goodscenter/goodscenter-rpc/goodscenter-rpc.iml" filepath="$PROJECT_DIR$/../goodscenter/goodscenter-rpc/goodscenter-rpc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../goodscenter/goodscenter-service/goodscenter-service.iml" filepath="$PROJECT_DIR$/../goodscenter/goodscenter-service/goodscenter-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../goodscenter/goodscenter-web/goodscenter-web.iml" filepath="$PROJECT_DIR$/../goodscenter/goodscenter-web/goodscenter-web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../mallwx/mallwx.iml" filepath="$PROJECT_DIR$/../mallwx/mallwx.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../mallwx/mallwx-common/mallwx-common.iml" filepath="$PROJECT_DIR$/../mallwx/mallwx-common/mallwx-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../mallwx/mallwx-dao/mallwx-dao.iml" filepath="$PROJECT_DIR$/../mallwx/mallwx-dao/mallwx-dao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../mallwx/mallwx-domain/mallwx-domain.iml" filepath="$PROJECT_DIR$/../mallwx/mallwx-domain/mallwx-domain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../mallwx/mallwx-export/mallwx-export.iml" filepath="$PROJECT_DIR$/../mallwx/mallwx-export/mallwx-export.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../mallwx/mallwx-parent/mallwx-parent.iml" filepath="$PROJECT_DIR$/../mallwx/mallwx-parent/mallwx-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../mallwx/mallwx-rpc/mallwx-rpc.iml" filepath="$PROJECT_DIR$/../mallwx/mallwx-rpc/mallwx-rpc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../mallwx/mallwx-service/mallwx-service.iml" filepath="$PROJECT_DIR$/../mallwx/mallwx-service/mallwx-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../mallwx/mallwx-web/mallwx-web.iml" filepath="$PROJECT_DIR$/../mallwx/mallwx-web/mallwx-web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../tradecenter/tradecenter.iml" filepath="$PROJECT_DIR$/../tradecenter/tradecenter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../tradecenter/tradecenter-common/tradecenter-common.iml" filepath="$PROJECT_DIR$/../tradecenter/tradecenter-common/tradecenter-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../tradecenter/tradecenter-dao/tradecenter-dao.iml" filepath="$PROJECT_DIR$/../tradecenter/tradecenter-dao/tradecenter-dao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../tradecenter/tradecenter-domain/tradecenter-domain.iml" filepath="$PROJECT_DIR$/../tradecenter/tradecenter-domain/tradecenter-domain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../tradecenter/tradecenter-export/tradecenter-export.iml" filepath="$PROJECT_DIR$/../tradecenter/tradecenter-export/tradecenter-export.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../tradecenter/tradecenter-parent/tradecenter-parent.iml" filepath="$PROJECT_DIR$/../tradecenter/tradecenter-parent/tradecenter-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../tradecenter/tradecenter-rpc/tradecenter-rpc.iml" filepath="$PROJECT_DIR$/../tradecenter/tradecenter-rpc/tradecenter-rpc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../tradecenter/tradecenter-service/tradecenter-service.iml" filepath="$PROJECT_DIR$/../tradecenter/tradecenter-service/tradecenter-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../tradecenter/tradecenter-web/tradecenter-web.iml" filepath="$PROJECT_DIR$/../tradecenter/tradecenter-web/tradecenter-web.iml" />
+    </modules>
+  </component>
+</project>

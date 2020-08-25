@@ -1,0 +1,46 @@
+#set($layout = "common/blanklayout.vm")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <base href="${request.getContextPath()}/"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="-1" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <title>选择银行</title>
+    <link href="assets/css/detail.css" rel="stylesheet" type="text/css"/>
+</head>
+<body class="bg_02" >
+    <div id="main" class="po_re">
+
+        <!-- 中间内容 -->
+        <div class="content font_cen" id="wrapper">
+            <!--选择银行开始 -->
+            <h2 class="bank_title fl">选择银行</h2>
+            <ul class="bank_xuanze">
+                <li><a href="http://www.icbc.com.cn/icbc/" target="_blank"><img src="assets/images/bank/pay-bank2.png"><i></i></a></li>
+                <li><a href="http://www.cmbchina.com/" target="_blank"><img src="assets/images/bank/pay-bank3.png"><i></i></a></li>
+                <li><a href="http://www.cgbchina.com.cn/" target="_blank"><img src="assets/images/bank/pay-bank1.png"></a></li>
+                <li><a href="http://www.ccb.com/cn/home/index.html" target="_blank"><img src="assets/images/bank/pay-bank4.png"><i></i></a></li>
+                <li><a href="http://www.boc.cn/" target="_blank"><img src="assets/images/bank/pay-bank5.png"><i></i></a></li>
+                <li><a href="http://www.abchina.com/cn/" target="_blank"><img src="assets/images/bank/pay-bank6.png"><i></i></a></li>
+                <li><a href="http://www.bankcomm.com/BankCommSite/default.shtml" target="_blank"><img src="assets/images/bank/pay-bank7.png"><i></i></a></li>
+                <li><a href="http://bank.ecitic.com/" target="_blank"><img src="assets/images/bank/pay-bank8.png"><i></i></a></li>
+                <li><a href="http://www.cmbc.com.cn/" target="_blank"><img src="assets/images/bank/pay-bank9.png"><i></i></a></li>
+                <li><a href="http://www.bjrcb.com/" target="_blank"><img src="assets/images/bank/pay-bank10.png"><i></i></a></li>
+                <li><a href="http://www.cib.com.cn/cn/" target="_blank"><img src="assets/images/bank/pay-bank11.png"><i></i></a></li>
+                <li><a href="http://www.spdb.com.cn/chpage/c1/?COLLCC=2681107466&" target="_blank"><img src="assets/images/bank/pay-bank12.png"><i></i></a></li>
+                <li><a href="http://www.bankofshanghai.com/" target="_blank"><img src="assets/images/bank/pay-bank13.png"><i></i></a></li>
+                <li><a href="http://www.psbc.com/portal/zh_CN/index.html" target="_blank"><img src="assets/images/bank/pay-bank14.png"><i></i></a></li>
+                <li><a href="http://www.cebbank.com/" target="_blank"><img src="assets/images/bank/pay-bank15.png"><i></i></a></li>
+            </ul>
+            <!--选择银行 end -->
+        </div><!-- content end-->
+    </div>
+    #parse("common/footer.vm")
+</body>
+</html>

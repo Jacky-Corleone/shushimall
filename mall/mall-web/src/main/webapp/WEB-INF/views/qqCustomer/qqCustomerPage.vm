@@ -1,0 +1,27 @@
+#set($layout = "/none_layout.vm")
+#foreach($couponsInfo in $pager.records)
+                    <ul class="list_top hei_40">
+                        <li class="wid_30 over_ell font_cen">
+                        	<input type="checkbox" id="subCheck" onclick="setSelectAll()" name="contractId" value="$couponsInfo.id"/>
+                        </li>
+                        <li class="wid_160 over_ell font_cen" name="customerQqNumber" title="$!couponsInfo.customerQqNumber"><!-- 客服QQ帐号-->
+                        	$!couponsInfo.customerQqNumber
+                        </li>
+                        <!-- 是否为默认客服 -->
+                        <li class="wid_160 over_ell font_cen" name="isDefault" title="$!couponsInfo.isDefault">
+                        	#if($!couponsInfo.isDefault == '0')
+                              	  否
+                            #elseif($!couponsInfo.isDefault == '1')
+                           		  是
+                            #end
+                        </li>
+                        <li class="wid_250 over_ell font_cen" title="$!date.format('yyyy-MM-dd HH:mm:ss',$!couponsInfo.createDate)"><!-- 有效时间 -->
+                        	$!date.format('yyyy-MM-dd HH:mm:ss',$!couponsInfo.createDate)
+                        </li>
+                        <li class="wid_250 over_ell font_cen" title="$!date.format('yyyy-MM-dd HH:mm:ss',$!couponsInfo.lastUpdateDate)"><!-- 有效时间 -->
+                        	$!date.format('yyyy-MM-dd HH:mm:ss',$!couponsInfo.lastUpdateDate)
+                        </li>
+                    </ul>
+                       #end
+                        <!-- 分页 -->
+                    #pageVelocity($pager)

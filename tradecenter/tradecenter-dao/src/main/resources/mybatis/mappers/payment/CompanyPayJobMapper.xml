@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.payment.dao.CompanyPayJobDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="companyPayJobMap" type="companyPayJob">
+		<result property="id" column="id"/>
+		<result property="outTradeNo" column="OUT_TRADE_NO"/>
+		<result property="orderNo" column="ORDER_NO"/>
+		<result property="userId" column="user_id"/>
+		<result property="accType" column="acc_type"/>
+		<result property="dealFlag" column="deal_flag"/>
+		<result property="enableFlag" column="enable_flag"/>
+		<result property="batch" column="batch"/>
+		<result property="created" column="created"/>
+		<result property="midified" column="midified"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,OUT_TRADE_NO
+ 			,ORDER_NO
+ 			,user_id
+ 			,acc_type
+ 			,enable_flag
+ 			,deal_flag
+ 			,batch
+ 			,created
+ 			,midified
+		FROM 
+		company_pay_job company_pay_job_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.outTradeNo != null  and entity.outTradeNo !=''">
+				<![CDATA[ and company_pay_job_.OUT_TRADE_NO =#{entity.outTradeNo} ]]>
+			</if>
+			<if test="entity.orderNo != null  and entity.orderNo !=''">
+				<![CDATA[ and company_pay_job_.ORDER_NO =#{entity.orderNo} ]]>
+			</if>
+			<if test="entity.enableFlag != null  and entity.enableFlag !=''">
+				<![CDATA[ and company_pay_job_.enable_flag  =#{entity.enableFlag} ]]>
+			</if>
+			<if test="entity.dealFlag != null  and entity.dealFlag !=''">
+				<![CDATA[ and company_pay_job_.deal_flag  =#{entity.dealFlag} ]]>
+			</if>
+			<if test="entity.batch != null">
+				<![CDATA[ and company_pay_job_.batch  =#{entity.batch} ]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+    <!-- 查询立即支付的订单，去除掉延期支付的单子 -->
+	<select id="selectUnDeal"  resultMap="companyPayJobMap">
+		SELECT   *  FROM (
+			SELECT  c.*  FROM company_pay_job c 
+			JOIN trade_orders  t 
+			ON c.order_no = t.order_id AND t.orderType = 2 AND t.paid = 1 AND t.pay_period IS NULL
+    		WHERE c.deal_flag = 1 AND c.created > DATE_ADD(NOW(), INTERVAL - 3 DAY) 
+    		ORDER BY c.created ASC
+    	) company_pay_job_  
+  		GROUP BY company_pay_job_.user_id,company_pay_job_.acc_type 
+  		ORDER BY company_pay_job_.batch ASC  LIMIT 0, 40  
+	</select>
+	
+	<select id="queryByOutTrade" resultType="long">
+		SELECT count(1)  FROM company_pay_job c  
+		WHERE c.deal_flag = 1 AND c.created > DATE_ADD(NOW(), INTERVAL - 3 DAY) 
+		and c.OUT_TRADE_NO =#{outTradeNo}
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="companyPayJob" useGeneratedKeys="true" keyProperty="id">
+		<![CDATA[
+		insert into company_pay_job (
+		    	 OUT_TRADE_NO
+		    	 ,ORDER_NO
+		    	 ,user_id
+ 				,acc_type
+		    	 ,created
+		   )values(
+		    	#{outTradeNo}
+		    	,#{orderNo}
+		    	,#{userId}
+		    	,#{accType}
+		    	,now()
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="dealById" parameterType="long">
+		<![CDATA[
+		update company_pay_job set midified = now(),deal_flag = ''
+		 where id = #{id}
+		]]>
+	</update>
+	
+	<update id="enableByOutTradeNo" parameterType="String">
+		<![CDATA[
+		update company_pay_job set midified = now(), enable_flag=1
+		 where OUT_TRADE_NO = #{outTradeNo}
+		]]>
+	</update>
+	
+	<update id="update" parameterType="companyPayJob">
+		update company_pay_job set midified = now()
+		<if test="batch != null">
+			 ,batch  =#{batch}
+		</if>
+		 where  id = #{id}
+	</update>
+</mapper>

@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 
+<typeAlias alias="userAuditLog" type="com.camelot.usercenter.entity.dto.UserAuditLog" />
+ -->
+<mapper namespace="com.camelot.usercenter.dao.UserAuditLogMybatisDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="userAuditLogMap" type="userAuditLog">
+				<result property="id" column="id"/>
+				<result property="userId" column="user_id"/>
+				<result property="auditId" column="audit_id"/>
+				<result property="auditStatus" column="audit_status"/>
+				<result property="auditDate" column="audit_date"/>
+				<result property="remark" column="remark"/>
+				<result property="createDt" column="create_dt"/>
+				<result property="lastUpdDt" column="last_upd_dt"/>
+				<result property="deletedFlag" column="deleted_flag"/>
+				<result property="auditLogType" column="audit_log_type"/>
+                <result property="userType" column="user_type"/>
+               <result property="userName" column="username"/>
+
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{pager.pageOffset} , #{pager.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			user_audit_log_.id
+ 			,user_id
+ 			,audit_id
+ 			,audit_status
+ 			,audit_date
+ 			,remark
+ 			,create_dt
+ 			,last_upd_dt
+ 			,deleted_flag
+ 			,audit_log_type
+ 			,user_type
+ 			,u.username
+			,u.nickname
+		FROM 
+		user_audit_log user_audit_log_
+		left join user u on  user_audit_log_.user_id=u.id
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1 and deleted_flag="0"
+		<if test="entity!=null">
+			<if test="entity.id != null  and entity.id !=''">
+				<![CDATA[ and user_audit_log_.id  =#{entity.id}]]>
+			</if>
+			<if test="entity.userId != null  and entity.userId !=''">
+				<![CDATA[ and user_audit_log_.user_id = #{entity.userId}]]>
+			</if>
+			<if test="entity.auditId != null  and entity.auditId !=''">
+				<![CDATA[ and user_audit_log_.audit_id  =#{entity.auditId}]]>
+			</if>
+			<if test="entity.auditStatus != null  and entity.auditStatus !=''">
+				<![CDATA[ and user_audit_log_.audit_status =#{entity.auditStatus}]]>
+			</if>
+			
+			<if test="entity.remark != null  and entity.remark !=''">
+				<![CDATA[ and user_audit_log_.remark  LIKE CONCAT('%',{entity.remark},'%')]]>
+			</if>
+		
+			<if test="entity.deletedFlag != null  and entity.deletedFlag !=''">
+				<![CDATA[ and user_audit_log_.deleted_flag =#{entity.deletedFlag}]]>
+			</if>
+			<if test="entity.auditLogType != null  and entity.auditLogType !=''">
+				<![CDATA[ and user_audit_log_.audit_log_type =  #{entity.auditLogType}]]>
+			</if>
+            <if test="entity.userType != null  and entity.userType !=''">
+                <![CDATA[ and user_audit_log_.user_type =  #{entity.userType}]]>
+            </if>
+		</if>
+		order by user_audit_log_.create_dt desc
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+     <select id="getAll" resultMap="userAuditLogMap">
+		<include refid="selectAllColumns"/>
+	</select>
+	<select id="get" resultMap="userAuditLogMap" parameterType="long">
+		<include refid="selectAllColumns"/>
+		<![CDATA[
+		where user_audit_log_.id = #{id}
+		]]>	
+	</select>
+   <!-- 根据id查询 -->
+	<select id="selectById" resultMap="userAuditLogMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where user_audit_log_.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="selectList" resultMap="userAuditLogMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="pager!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+
+    <select id="searchByCondition" resultMap="userAuditLogMap" >
+        <include refid="selectAllColumns"/>
+        <include refid="where_fragement" />
+
+    </select>
+	<select id="selectCount" resultType="long">
+		<include refid="count_Tail" />
+		user_audit_log user_audit_log_
+		<include refid="where_fragement" />
+	</select>
+	
+	
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="userAuditLog"  useGeneratedKeys="true" keyProperty="id">
+		
+		<![CDATA[
+		insert into user_audit_log (
+		    	 
+		    	  user_id
+		    	 ,audit_id
+		    	 ,audit_status
+		    	 ,audit_date
+		    	 ,remark
+		    	 ,create_dt
+		    	 ,last_upd_dt
+		    	 ,deleted_flag
+		    	 ,audit_log_type
+		    	 ,user_type
+		   )values(
+		    
+		    	 #{userId}
+		    	,#{auditId}
+		    	,#{auditStatus}
+		    	,#{auditDate}
+		    	,#{remark}
+		    	,#{createDt}
+		    	,#{lastUpdDt}
+		    	,#{deletedFlag}
+		    	,#{auditLogType}
+		    	,#{userType}
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="userAuditLog">
+		<![CDATA[
+		update user_audit_log set
+   			id = #{id}
+   			,user_id = #{userId}
+   			,audit_id = #{auditId}
+   			,audit_status = #{auditStatus}
+   			,audit_date = #{auditDate}
+   			,remark = #{remark}
+   			,create_dt = #{createDt}
+   			,last_upd_dt = #{lastUpdDt}
+   			,deleted_flag = #{deletedFlag}
+   			,audit_log_type = #{auditLogType}
+   			,user_type=#{userType}
+		 where id = #{id}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from user_audit_log where id = #{id}
+		]]>
+	</delete>
+		<sql id="updateSelective_set">
+            <trim suffix="" suffixOverrides=",">
+		 <set> 
+				<if test="userAuditLog.userId!= null"> 
+				 user_id = #{userAuditLog.userId}, 
+				</if> 
+				<if test="userAuditLog.auditId!= null"> 
+				 audit_id = #{userAuditLog.auditId}, 
+				</if> 
+				<if test="userAuditLog.auditStatus!= null"> 
+				 audit_status = #{userAuditLog.auditStatus}, 
+				</if> 
+				<if test="userAuditLog.auditDate!= null"> 
+				 audit_date = #{userAuditLog.auditDate}, 
+				</if> 
+				<if test="userAuditLog.remark!= null"> 
+				 remark = #{userAuditLog.remark}, 
+				</if> 
+				<if test="userAuditLog.createDt!= null"> 
+				 create_dt = #{userAuditLog.createDt}, 
+				</if> 
+				<if test="userAuditLog.lastUpdDt!= null"> 
+				 last_upd_dt = #{userAuditLog.lastUpdDt}, 
+				</if> 
+				<if test="userAuditLog.deletedFlag!= null"> 
+				 deleted_flag = #{userAuditLog.deletedFlag}, 
+				</if> 
+				<if test="userAuditLog.auditLogType!= null"> 
+				 audit_log_type = #{userAuditLog.auditLogType}, 
+				</if>
+                 <if test="userAuditLog.userType!= null">
+                     user_type = #{userAuditLog.userType},
+                 </if>
+         </set>
+            </trim>
+	</sql>
+	<sql id="updateAll_set">
+		<set> 
+				user_id = #{userAuditLog.userId},
+				audit_id = #{userAuditLog.auditId},
+				audit_status = #{userAuditLog.auditStatus},
+				audit_date = #{userAuditLog.auditDate},
+				remark = #{userAuditLog.remark},
+				create_dt = #{userAuditLog.createDt},
+				last_upd_dt = #{userAuditLog.lastUpdDt},
+				deleted_flag = #{userAuditLog.deletedFlag},
+				audit_log_type = #{userAuditLog.auditLogType},
+                user_type=#{userAuditLog.userType}
+		</set> 
+	</sql>
+	<update id="updateSelective" parameterType="userAuditLog"> 
+		update user_audit_log
+		<include refid="updateSelective_set"/>
+		where id = #{userAuditLog.id}
+	 </update> 
+	
+	<update id="updateAllWithDateTimeCheck">
+		update user_audit_log
+		  <include refid="updateAll_set"/>
+		where id = #{userAuditLog.id}
+		 and LAST_UPD_DT = #{prevUpdDt}
+	</update>
+
+	<update id="updateSelectiveWithDateTimeCheck">
+		update user_audit_log
+		<include refid="updateSelective_set"/>
+		<![CDATA[
+		 	where id = #{userAuditLog.id}
+		 	and LAST_UPD_DT = #{prevUpdDt}
+		]]> 
+	</update>
+	<sql id="searchByCondition_fragement">
+		<include refid="selectAllColumns"/>
+		where 1=1
+		<if test="userAuditLog != null">
+				<if test="userAuditLog.userId != null">
+				and user_id = #{userAuditLog.userId}
+				</if>
+				<if test="userAuditLog.auditId != null">
+				and audit_id = #{userAuditLog.auditId}
+				</if>
+				<if test="userAuditLog.auditStatus != null">
+				and audit_status = #{userAuditLog.auditStatus}
+				</if>
+				<if test="userAuditLog.auditDate != null">
+				and audit_date = #{userAuditLog.auditDate}
+				</if>
+				<if test="userAuditLog.remark != null">
+				and remark = #{userAuditLog.remark}
+				</if>
+				<if test="userAuditLog.createDt != null">
+				and create_dt = #{userAuditLog.createDt}
+				</if>
+				<if test="userAuditLog.lastUpdDt != null">
+				and last_upd_dt = #{userAuditLog.lastUpdDt}
+				</if>
+				<if test="userAuditLog.deletedFlag != null">
+				and deleted_flag = #{userAuditLog.deletedFlag}
+				</if>
+				<if test="userAuditLog.auditLogType != null">
+				and audit_log_type = #{userAuditLog.auditLogType}
+				</if>
+		</if>
+	</sql>
+	
+	
+	<update id="updateSelectiveByIdList">
+		update user_audit_log
+		<include refid="updateSelective_set"/>
+		where id in
+		<foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+	        #{item}
+	  	</foreach>
+	</update>
+	<update id="updateAllByIdList">
+		update user_audit_log
+		<include refid="updateAll_set"/>
+		where id in
+		<foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+	        #{item}
+	  	</foreach>
+	</update>
+	
+	
+	
+</mapper>

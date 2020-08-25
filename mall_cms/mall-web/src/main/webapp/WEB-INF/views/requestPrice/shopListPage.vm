@@ -1,0 +1,31 @@
+#set($layout = "/none_layout.vm")
+<div id="detailTable" class="mar_t10">
+	<ul class="font_14b list_top bg_08">
+		<li class="wid_20 fl" style="padding-top: 15px;text-align: left;"><input type="checkBox" onclick="selectAll(this, $!itemId);"/></li>
+		<li class="wid_30 fl" style="padding-top: 8px; text-align: left;">全选</li>
+		<li class="wid_50 fl" style="padding-top: 8px; text-align: center;">编号</li>
+		<li class="wid_100 fl" style="padding-top: 8px; text-align: center;">商品编码</li>
+		<li class="wid_150 fl" style="padding-top: 8px; text-align: center;">商品名称</li>
+        <li class="wid_150 fl" style="padding-top: 8px; text-align: center;">供应商名称</li>
+    </ul>
+    #foreach($shop in $pager.records)
+        <ul ondblclick="changeConector(this)" class="list_top">
+            <li class="wid_50 fl" style="padding-top: 15px; text-align: left;">
+                <input type="checkBox" name="$!itemId" value="$!shop.linkMan2"/>
+                <input type="hidden" name="shopName" value="$!shop.shopName"/>
+                <input type="hidden" name="shopId" value="$!shop.shopId"/>
+			</li>
+            <li class="wid_50 fl" style="padding-top: 8px; text-align: center;">$!shop.cid</li>
+            <li class="wid_100 fl" style="padding-top: 8px; text-align: center;">$!shop.linkMan2</li>
+            <li class="wid_150 fl over_ell"  title="$!shop.linkMan1" style="padding-top: 8px; text-align: center;">$!shop.linkMan1</li>
+            <li class="wid_150 fl over_ell"  title="$!shop.shopName" style="padding-top: 8px; text-align: center;">$!shop.shopName</li>
+        </ul>
+	#end
+	<input type="hidden" name="itemName" value="$!itemName" />
+	<div class="clear"></div>
+	<div class="mar_cen font_cen">
+		<button type="button" value="确定" onclick="commitShopId($!itemId, '$!itemName', this);" class="button_1  hei_30 mar_r20">确 定</button>
+       <button type="button" onclick="closeDiv();" value="取消" class="button_5 hei_30">取消</button>
+    </div>
+</div>
+

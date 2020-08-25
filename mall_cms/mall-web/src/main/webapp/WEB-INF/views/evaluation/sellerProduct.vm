@@ -1,0 +1,330 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<script type="text/javascript" src="$staticPath/js/jquery.blockUI.js"></script>
+<script type="text/javascript" src="$staticPath/js/jquery-migrate-1.1.0.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/fancyzoom/jquery.shadow.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/fancyzoom/jquery.ifixpng.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/fancyzoom/jquery.fancyzoom.js"></script>
+
+<script type="text/javascript">
+$(function(){
+	//店铺分类
+	$("#levelOne").change(function(){
+		$("#levelTwo").empty();
+		if(!$("#levelOne").val()){
+			$("#levelTwo").append($("<option>").text("二级分类").val(""));
+		}else{
+			optionItems($("#levelOne").val(),"levelTwo");
+		}
+	});
+	$("#changeShopLevelOne").change(function(){
+		$("#changeShopLevelTwo").empty();
+		if(!$("#changeShopLevelOne").val()){
+			$("#changeShopLevelTwo").append($("<option>").text("二级分类").val(""));
+		}else{
+			optionItems($("#changeShopLevelOne").val(),"changeShopLevelTwo");
+		}
+	});
+	//联动
+	function optionItems(parentCode, optionId){
+		$.ajax({
+			url:"$request.contextPath/sellerEvaluation/getShopCategory",
+			type:"post",
+			data:{
+				parentCid:parentCode
+			},
+			dataType: "json",
+			success:function(data){
+				//获取地域数据
+				var optionItem = $("#"+optionId);
+				optionItem.empty();
+				optionItem.append($("<option>").text("二级分类").val(""));
+				$.each(data.result, function (n, category) {
+					var option = $("<option>").text(category.cname).val(category.cid);
+					optionItem.append(option);
+				});
+			}
+		});
+	};
+	//加载左侧菜单
+	$("#leftSeller").load("$request.contextPath/leftSeller");
+	//初始化加载页面
+	$("#scopeLevel").val("$!itemEvaluationQueryInDTO.scopeLevel");
+	//查询
+	$("#queryBtn").click(function(){
+		//初始化页码
+		$("#page").val("1");
+		$("#queryForm").submit();
+	});
+	//回复买家-保存
+	$("#saveBtn").click(function(){
+		//防止重复提交
+		$("#saveBtn").loadingMsg();
+		//提交操作
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			url:"$request.contextPath/sellerEvaluation/replyBuyers",
+			data:$("#replyForm").serializeArray(),
+			success: function(data){
+				alert(data.messages);
+				$("#saveBtn").hideMsg();
+				$("#replyDiv").hide();
+				window.location.href="$request.contextPath/sellerEvaluation/initProduct";
+			},
+			error:function(result){
+				$("#saveBtn").hideMsg();
+			}
+		});
+	});
+	//回复买家-取消
+	$("#cancelBtn").click(function(){
+		$("#content").val("");
+		replyHide();
+	});
+	$("#hidden_id").click(function(){
+		replyHide();
+	});
+	
+	$("img[fancy_zoom='view_img']").fancyzoom({
+		Speed:400,
+		showoverlay:false,
+		imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+	});
+});
+//Form表单提交
+function topage(page){
+	$("#page").val(page);
+	$("#queryForm").submit();
+}
+//回复-弹出层:显示
+function replyShow(evaluationId,buyerId,orderId,goodId){
+	$("#evaluationId").val(evaluationId);
+	$("#buyerId").val(buyerId);
+	$("#ordersId").val(orderId);
+	$("#goodId").val(goodId);
+	$("#replyDiv").show();
+}
+//回复-弹出层:隐藏
+function replyHide(){
+	$("#evaluationId").val("");
+	$("#buyerId").val("");
+	$("#ordersId").val("");
+	$("#goodId").val("");
+	$("#replyDiv").hide();
+}
+//商品编码输入框校验
+function itemIdChange(str){
+	$("#itemId").val(str.replace(/\D/gi, ""));
+}
+
+//订单编号输入框校验
+function orderIdChange(str){
+	$("#orderId").val(str.replace(/\D/gi, ""));
+}
+//转向商品详情页面
+function toView(id,skuId)
+{
+	window.location.href = '$request.contextPath/productController/details?id=' + id+'&skuId='+skuId;
+}
+</script>
+<style>
+.wid_102{width:102px;}
+
+.comm-tag{
+  display: inline-block;
+  height: 18px;
+  line-height: 18px;
+  padding: 2px 8px 3px;
+  margin: 0 10px 0 0;
+  vertical-align: middle;
+  font-size: 12px;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #999;
+  max-width: 90px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+</style>
+<div id="main">
+<!-- left start -->
+<div id="leftSeller"></div>
+<!-- left end -->
+
+<!-- right start-->
+<div id="right">
+<form id="queryForm" method="post" action="$request.contextPath/sellerEvaluation/initProduct">
+    <input id="page" name="page" type="hidden" />
+	<!-- 查询条件-->
+	<div class="right_top bg_06 border-4">
+		<div class="right_top_2 fl mar_t10">
+			<ul class="list">
+				<li class="wid_200">
+					<span class="font_wid">商品编码：</span>
+					<input id="itemId" name="itemId" class="input_Style2 wid_90 hei_30" type="text" value="$!itemEvaluationQueryInDTO.itemId" onkeyup="itemIdChange($('#itemId').val())" placeholder="请输入数字"/>
+				</li>
+				<li class="wid_200">
+					<span class="font_wid">商品名称：</span>
+					<input name="itemName" class="input_Style2 wid_90 hei_30" type="text" value="$!itemEvaluationQueryInDTO.itemName"/>
+				</li>
+				<li class="wid_220">
+					<span class="font_wid">订单编号：</span>
+					<input id="orderId" name="orderId" type="text" class="input_Style2 wid_120 hei_30" value="$!itemEvaluationQueryInDTO.orderId" onkeyup="orderIdChange('$('#orderId').val()')" placeholder="请输入数字"/>
+				</li>
+				<li class="wid_200">
+					<span class="font_wid">评分等级：</span>
+					<select id="scopeLevel" name="scopeLevel" class="wid_102 hei_30 input_Style2" >
+						<option value="" selected="selected">请选择</option>
+						<option value="1">好 评</option>
+						<option value="2">中 评</option>
+						<option value="3">差 评</option>
+					</select>
+				</li>
+				<li class="wid_350">
+					<span class="font_wid">评价时间：</span>
+					<input name="beginTime" class="input_Style2 wid_110 hei_30" type="text"
+						value="$!date.format('yyyy-MM-dd',$!itemEvaluationQueryInDTO.beginTime)"
+						onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/>
+					<i class="demo-icons">-</i>
+					<input name="endTime" class="input_Style2 wid_110 hei_30" type="text"
+						value="$!date.format('yyyy-MM-dd',$!itemEvaluationQueryInDTO.endTime)"
+						onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/>
+				</li>
+				<li class="wid_200">
+					<span class="font_wid">用 户 名：</span>
+					<input name="userName" type="text" class="input_Style2 wid_90 hei_30" value="$!userName"/>
+				</li>
+				<li>
+					<span class="font_wid">店铺分类：</span>
+					<select class="input_Style2 wid_90 mar_r10 hei_35" id="levelOne" name="shopLevelOneId">
+						<option value="">一级分类</option>
+						#foreach( $shopCategorySellerDTO in $shopCategorySellerDTOList)
+	                    	 <option #if($!shopLevelOneId == $shopCategorySellerDTO.cid) selected="selected" #end value="$!shopCategorySellerDTO.cid"> $!shopCategorySellerDTO.cname </option>
+						#end
+					</select>
+					<select class="input_Style2 wid_90 mar_r10 hei_35" id="levelTwo" name="shopCid">
+						<option value="">二级分类</option>
+						#foreach( $twoLevelCate in $levelTwoCategory)
+	                    	 <option #if($!itemEvaluationQueryInDTO.shopCid == $twoLevelCate.cid) selected="selected" #end value="$!twoLevelCate.cid"> $!twoLevelCate.cname </option>
+						#end
+					</select>
+				</li>
+			</ul>
+		</div>
+		<div class="right_top_3 fr mar_t10">
+			<button id="queryBtn" type="button" class="button_4 hei_24 but_cx2">
+				<a class="font_1c" href="#">查 询</a>
+			</button>
+		</div>
+	</div>
+
+	<!-- 评论内容 -->
+  <div class="appraise border-4 bg_06 mar_t10">
+   #foreach($evaluation in $pager.records)
+   <div class="qppraise_1 mar_tb20">
+	   <ul class="qppraise_xx mar_t10 border-4 hei_32 bg_05 mar_20">
+          <li class="wid_220 mar_l10">订单编号：<span>$!evaluation.orderId</span></li>
+          <li class="wid_220">评分：
+          	#if($evaluation.skuScope==5)
+				<span class="star sa5"></span>
+			#elseif($evaluation.skuScope==4)
+				<span class="star sa4"></span>
+			#elseif($evaluation.skuScope==3)
+				<span class="star sa3"></span>
+			#elseif($evaluation.skuScope==2)
+				<span class="star sa2"></span>
+			#elseif($evaluation.skuScope==1)
+				<span class="star sa1"></span>
+			#end
+		 </li>
+          <li class="wid_260">评论时间：$!date.format('yyyy-MM-dd HH:mm:ss',$!evaluation.createTime)</li>
+          <li class="wid_220">用 户 名：
+          	#foreach($userDTO in $userDTOMap.entrySet())
+          		#if($!userDTO.key==$evaluation.userId)
+          			$userDTO.value.uname
+          		#end
+          	#end
+          </li>
+        </ul>
+        <ul class="wid_920 hei_40 border-5 mar_l30">
+        	<li class="wid_220 fl">商品编号：$!evaluation.itemId </li>
+        	<li class="wid_220 fl over_ell">商品名称：<a href="javascript:void(0)" onclick="toView($!evaluation.itemId,$!evaluation.skuId)" title="$!evaluation.itemName">$!evaluation.itemName</a> </li>
+        	<li class="wid_220 fl over_ell cursor" title="$!evaluation.skuName">$!evaluation.skuName </li>
+        </ul>
+		#if($!evaluationMap2Tags.get($!evaluation.id))
+        <ul class="wid_920 hei_40 mar_l30">
+			<i class="font_14b">评价标签：</i>
+			#foreach($tag in $!evaluationMap2Tags.get($!evaluation.id))
+				<span class="comm-tag">$tag.tagName</span>
+			#end
+        </ul>
+		#end
+        <!-- <div class="wid_920 mar_l30 cursor" title="$!evaluation.content" style="overflow:hidden">买家/评价内容：$!evaluation.content</div> -->
+        <div class="wid_920 lin_22 mar_l30" >
+        	<i class="font_14b">买家/评价内容：</i>$!evaluation.content
+        	#if($picMap.get($!evaluation.id))
+				<div>
+		        	<i class="font_14b">买家晒单图片：</i>
+		          		#foreach($pic in $picMap.get($!evaluation.id))
+							<img src="$urlFtp$!pic.imgUrl" style="width: 120px; height: 90px; cursor: pointer; opacity: 1;" fancy_zoom="view_img" title="点击查看大图"/>
+						#end
+		        </div>	    	
+        	#end
+        </div>
+        <p class="wid_920 hei_30 mar_l30 border-5 " >
+        	<a class="fr font_1c cursor" onclick="replyShow($!evaluation.id,$!evaluation.userId,'$!evaluation.orderId',$!evaluation.itemId);">回 复</a>
+        </p>
+        
+        #foreach($itemEvaluationReply in $evaluation.itemEvaluationReplyList)
+        	<!-- <div class="wid_920 mar_l30 cursor" title="$!itemEvaluationReply.content" style="overflow:hidden">卖家/回复内容：$!itemEvaluationReply.content
+        	</div> -->
+       		
+        <div class="wid_920 lin_22 mar_l30" >
+        	<i class="font_14b">卖家/回复内容：</i>$!itemEvaluationReply.content
+        </div>
+        #end
+    </div>
+   #end
+  </div>
+
+	<!--分页数据-->
+	#pageVelocity($pager)
+</form>
+</div>
+<!--right end-->
+<!-- 回复：弹出层 -->
+<div id="replyDiv" class="po_fai" style="display:none">
+<form id="replyForm">
+	<input id="evaluationId" name="evaluationId" type="hidden">
+	<input id="buyerId" name="buyerId" type="hidden">
+	<input id="ordersId" name="ordersId" type="hidden">
+	<input id="goodId" name="goodId" type="hidden">
+	<div class="po_fai_bg"></div>
+	<div class="po_main" style="width:400px; margin-left:-200px;">
+		<div class="tit pad_l10 hei_30 bg_05" >
+			<div class="fl font_14">回复评价信息</div>
+			<i id="hidden_id" style="cursor: pointer;" class="fa close fa-times-circle fr font_14 mar_r10"></i>
+			<div class="clear"></div>
+		</div>
+		<div class="mar_l30 mar_r30 mar_t10">
+			<div class="clear"></div>
+			<p class="hei_30">回复内容</p>
+			<div class="user">
+				<textarea id="content" name="content" style="width:300px; height:100px;resize:none;" class="input_Style2 hei_30 wid_220" maxlength="300"></textarea>
+			</div>
+			提示：最多输入300个汉字
+			<div class="clear"></div>
+			<div class="font_cen mar_t20 pad_t50" >
+				<a id="saveBtn" href="#" class="button_2 hei_40 font_16">保存</a>
+				<a id="cancelBtn" href="#" class="button_2 hei_40 font_16">取消</a>
+			</div>
+		</div>
+	</div>
+</form>
+</div>
+</div>

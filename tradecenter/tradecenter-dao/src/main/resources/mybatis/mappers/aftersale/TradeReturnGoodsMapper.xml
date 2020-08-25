@@ -1,0 +1,818 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 
+<typeAlias alias="tradeReturnGoods" type="com.camelot.tradecenter.entity.dto.TradeReturnGoods" />
+ -->
+<mapper namespace="com.camelot.aftersale.dao.TradeReturnGoodsMybatisDAO">
+
+    <!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+    <resultMap id="tradeReturnGoodsMap" type="tradeReturnGoods">
+        <result property="id" column="id"/>
+        <result property="state" column="state"/>
+        <result property="codeNo" column="code_no"/>
+        <result property="orderId" column="order_id"/>
+        <result property="orderName" column="order_name"/>
+        <result property="buyId" column="buy_id"/>
+        <result property="returnResult" column="return_result"/>
+        <result property="remark" column="remark"/>
+        <result property="buyerName" column="buyer_name"/>
+        <result property="buyerAddress" column="buyer_address"/>
+        <result property="buyerPhone" column="buyer_phone"/>
+        <result property="buyerPostcode" column="buyer_postcode"/>
+        <result property="applyDt" column="apply_dt"/>
+        <result property="auditorId" column="auditor_id"/>
+        <result property="auditorName" column="auditor_name"/>
+        <result property="auditDt" column="audit_dt"/>
+        <result property="auditRemark" column="audit_remark"/>
+        <result property="expressNo" column="express_no"/>
+        <result property="expressName" column="express_name"/>
+        <result property="refundFreight" column="refund_freight"/>
+        <result property="refundGoods" column="refund_goods"/>
+        <result property="sellerId" column="seller_id"/>
+        <result property="returnAddress" column="return_address"/>
+        <result property="returnPhone" column="return_phone"/>
+        <result property="returnPostcode" column="return_postcode"/>
+        <result property="createdDt" column="created_dt"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="lastUpdDt" column="last_upd_dt"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="deletedFlag" column="deleted_flag"/>
+        <result property="add1" column="add1"/>
+        <result property="add2" column="add2"/>
+        <result property="add3" column="add3"/>
+        <result property="returnPic" column="return_pic"/>
+        <result property="orderPrice" column="order_price"/>
+        <result property="orderStatus" column="order_status"/>
+        <result property="isCustomerService" column="is_customer_service"/>
+        <result property="confirmStatus" column="confirm_status"/>
+        <result property="orderPayBank" column="payment_type"/>
+        <result property="afterService" column="after_service"/>
+        <result property="refundTime" column="refund_time"/>
+    </resultMap>
+
+    <!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+    <!-- mysql 分页 -->
+    <sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+    <!-- mysql 查询总数 -->
+    <sql id="count_Tail">
+		select count(distinct trade_return_goods_.id) from 
+	</sql>
+
+    <sql id="selectAllColumns">
+		<![CDATA[
+
+
+		select
+ 			 distinct trade_return_goods_.id
+ 			, trade_return_goods_.state
+ 			, trade_return_goods_.code_no
+ 			, trade_return_goods_.order_id
+ 			, trade_return_goods_.order_name
+ 			, trade_return_goods_.buy_id
+ 			, trade_return_goods_.return_result
+ 			, trade_return_goods_.remark
+ 			, trade_return_goods_.buyer_name
+ 			, trade_return_goods_.buyer_address
+ 			, trade_return_goods_.buyer_phone
+ 			, trade_return_goods_.buyer_postcode
+ 			, trade_return_goods_.apply_dt
+ 			, trade_return_goods_.auditor_id
+ 			, trade_return_goods_.auditor_name
+ 			, trade_return_goods_.audit_dt
+ 			, trade_return_goods_.audit_remark
+ 			, trade_return_goods_.express_no
+ 			, trade_return_goods_.express_name
+ 			, trade_return_goods_.refund_freight
+ 			, trade_return_goods_.refund_goods
+ 			, trade_return_goods_.seller_id
+ 			, trade_return_goods_.return_address
+ 			, trade_return_goods_.return_phone
+ 			, trade_return_goods_.return_postcode
+ 			, trade_return_goods_.created_dt
+ 			, trade_return_goods_.created_by
+ 			, trade_return_goods_.last_upd_dt
+ 			, trade_return_goods_.last_upd_by
+ 			, trade_return_goods_.deleted_flag
+ 			, trade_return_goods_.add1
+ 			, trade_return_goods_.add2
+ 			, trade_return_goods_.add3
+ 			, trade_return_goods_.return_pic
+ 			, trade_return_goods_.order_price
+ 			, trade_return_goods_.order_status
+ 			, trade_return_goods_.is_customer_service
+ 			, trade_return_goods_.confirm_status
+ 			, trade_return_goods_.after_service
+ 			, trade_return_goods_.refund_time
+ 			,factorage_journal_.factorage
+ 			,trade_orders.payment_type
+		FROM 
+		trade_return_goods trade_return_goods_ left join factorage_journal factorage_journal_ on trade_return_goods_.code_no=factorage_journal_.repro_no
+        left join trade_orders trade_orders on trade_return_goods_.order_id=trade_orders.order_id
+        ]]>
+	</sql>
+
+    <sql id="where_fragement">
+        where 1=1
+        <if test="entity!=null">
+            <if test="entity.id != null  and entity.id !=''">
+                <![CDATA[ and trade_return_goods_.id  LIKE CONCAT('%',#{entity.id},'%')]]>
+            </if>
+            <if test="entity.state != null  and entity.state !=''">
+                <![CDATA[ and trade_return_goods_.state  =#{entity.state}]]>
+            </if>
+            <if test="entity.codeNo != null  and entity.codeNo !=''">
+                <![CDATA[ and trade_return_goods_.code_no  =#{entity.codeNo}]]>
+            </if>
+            <if test="entity.orderId != null  and entity.orderId !=''">
+                <![CDATA[ and trade_return_goods_.order_id  =#{entity.orderId}]]>
+            </if>
+            <if test="entity.orderStatus != null  and entity.orderStatus !=''">
+                <![CDATA[ and trade_return_goods_.order_status  =#{entity.orderStatus}]]>
+            </if>
+
+            <!-- 定时任务时间节点 -->
+            <if test="entity.timeNode != null  and entity.timeNode !=''">
+                <![CDATA[ and trade_return_goods_.last_upd_dt  <= #{entity.timeNode}]]>
+            </if>
+            <if test="entity.orderName != null  and entity.orderName !=''">
+                <![CDATA[ and trade_return_goods_.order_name  LIKE CONCAT('%',#{entity.orderName},'%')]]>
+            </if>
+            <if test="entity.buyId != null  and entity.buyId !=''">
+                <![CDATA[ and trade_return_goods_.buy_id  =#{entity.buyId}]]>
+            </if>
+            <if test="entity.buyIdList != null and entity.buyIdList.size()>0">
+				<![CDATA[
+					AND trade_return_goods_.buy_id in
+					]]>
+				<foreach collection="entity.buyIdList" item="buyId" open="(" separator="," close=")">
+					#{buyId}
+				</foreach>
+			</if>
+            <if test="entity.returnResult != null  and entity.returnResult !=''">
+                <![CDATA[ and trade_return_goods_.return_result  LIKE CONCAT('%',#{entity.returnResult},'%')]]>
+            </if>
+            <if test="entity.remark != null  and entity.remark !=''">
+                <![CDATA[ and trade_return_goods_.remark  LIKE CONCAT('%',#{entity.remark},'%')]]>
+            </if>
+            <if test="entity.buyerName != null  and entity.buyerName !=''">
+                <![CDATA[ and trade_return_goods_.buyer_name  LIKE CONCAT('%',#{entity.buyerName},'%')]]>
+            </if>
+            <if test="entity.buyerAddress != null  and entity.buyerAddress !=''">
+                <![CDATA[ and trade_return_goods_.buyer_address  LIKE CONCAT('%',#{entity.buyerAddress},'%')]]>
+            </if>
+            <if test="entity.buyerPhone != null  and entity.buyerPhone !=''">
+                <![CDATA[ and trade_return_goods_.buyer_phone  LIKE CONCAT('%',#{entity.buyerPhone},'%')]]>
+            </if>
+            <if test="entity.buyerPostcode != null  and entity.buyerPostcode !=''">
+                <![CDATA[ and trade_return_goods_.buyer_postcode  LIKE CONCAT('%',#{entity.buyerPostcode},'%')]]>
+            </if>
+            <if test="entity.applyDt != null  and entity.applyDt !=''">
+                <![CDATA[ and trade_return_goods_.apply_dt  LIKE CONCAT('%',#{entity.applyDt},'%')]]>
+            </if>
+            <if test="entity.auditorId != null  and entity.auditorId !=''">
+                <![CDATA[ and trade_return_goods_.auditor_id  =#{entity.auditorId}]]>
+            </if>
+            <if test="entity.auditorName != null  and entity.auditorName !=''">
+                <![CDATA[ and trade_return_goods_.auditor_name  LIKE CONCAT('%',#{entity.auditorName},'%')]]>
+            </if>
+            <if test="entity.auditDt != null  and entity.auditDt !=''">
+                <![CDATA[ and trade_return_goods_.audit_dt  LIKE CONCAT('%',#{entity.auditDt},'%')]]>
+            </if>
+            <if test="entity.auditRemark != null  and entity.auditRemark !=''">
+                <![CDATA[ and trade_return_goods_.audit_remark  LIKE CONCAT('%',#{entity.auditRemark},'%')]]>
+            </if>
+            <if test="entity.expressNo != null  and entity.expressNo !=''">
+                <![CDATA[ and trade_return_goods_.express_no  LIKE CONCAT('%',#{entity.expressNo},'%')]]>
+            </if>
+            <if test="entity.expressName != null  and entity.expressName !=''">
+                <![CDATA[ and trade_return_goods_.express_name  LIKE CONCAT('%',#{entity.expressName},'%')]]>
+            </if>
+            <if test="entity.refundFreight != null  and entity.refundFreight !=''">
+                <![CDATA[ and trade_return_goods_.refund_freight  LIKE CONCAT('%',#{entity.refundFreight},'%')]]>
+            </if>
+            <if test="entity.refundGoods != null  and entity.refundGoods !=''">
+                <![CDATA[ and trade_return_goods_.refund_goods  LIKE CONCAT('%',#{entity.refundGoods},'%')]]>
+            </if>
+            <if test="entity.sellerId != null  and entity.sellerId !=''">
+                <![CDATA[ and trade_return_goods_.seller_id =#{entity.sellerId}]]>
+            </if>
+            <if test="entity.returnAddress != null  and entity.returnAddress !=''">
+                <![CDATA[ and trade_return_goods_.return_address  LIKE CONCAT('%',#{entity.returnAddress},'%')]]>
+            </if>
+            <if test="entity.returnPhone != null  and entity.returnPhone !=''">
+                <![CDATA[ and trade_return_goods_.return_phone  LIKE CONCAT('%',#{entity.returnPhone},'%')]]>
+            </if>
+            <if test="entity.returnPostcode != null  and entity.returnPostcode !=''">
+                <![CDATA[ and trade_return_goods_.return_postcode  LIKE CONCAT('%',#{entity.returnPostcode},'%')]]>
+            </if>
+            <if test="entity.createdDt != null  and entity.createdDt !=''">
+                <![CDATA[ and trade_return_goods_.created_dt  LIKE CONCAT('%',#{entity.createdDt},'%')]]>
+            </if>
+            <if test="entity.createdBy != null  and entity.createdBy !=''">
+                <![CDATA[ and trade_return_goods_.created_by  LIKE CONCAT('%',#{entity.createdBy},'%')]]>
+            </if>
+            <if test="entity.lastUpdDt != null  and entity.lastUpdDt !=''">
+                <![CDATA[ and trade_return_goods_.last_upd_dt  LIKE CONCAT('%',#{entity.lastUpdDt},'%')]]>
+            </if>
+            <if test="entity.lastUpdBy != null  and entity.lastUpdBy !=''">
+                <![CDATA[ and trade_return_goods_.last_upd_by  LIKE CONCAT('%',#{entity.lastUpdBy},'%')]]>
+            </if>
+
+            <if test="entity.add1 != null  and entity.add1 !=''">
+                <![CDATA[ and trade_return_goods_.add1  LIKE CONCAT('%',#{entity.add1},'%')]]>
+            </if>
+            <if test="entity.add2 != null  and entity.add2 !=''">
+                <![CDATA[ and trade_return_goods_.add2  LIKE CONCAT('%',#{entity.add2},'%')]]>
+            </if>
+            <if test="entity.add3 != null  and entity.add3 !=''">
+                <![CDATA[ and trade_return_goods_.add3  LIKE CONCAT('%',#{entity.add3},'%')]]>
+            </if>
+            <if test="entity.returnPic != null  and entity.returnPic !=''">
+                <![CDATA[ and trade_return_goods_.return_pic  LIKE CONCAT('%',#{entity.returnPic},'%')]]>
+            </if>
+            <if test="entity.orderPrice != null  and entity.orderPrice !=''">
+                <![CDATA[ and trade_return_goods_.order_price  LIKE CONCAT('%',#{entity.orderPrice},'%')]]>
+            </if>
+
+            <if test="entity.applyDtBegin != null  ">
+                <![CDATA[ and trade_return_goods_.apply_dt  >=#{entity.applyDtBegin}]]>
+            </if>
+            <if test="entity.applyDtEnd != null  ">
+                <![CDATA[ and trade_return_goods_.apply_dt   <#{entity.applyDtEnd}]]>
+            </if>
+            <if test="entity.isCustomerService != null  ">
+                <![CDATA[ and trade_return_goods_.is_customer_service =#{entity.isCustomerService}  ]]>
+            </if>
+            <if test="entity.deletedFlag != null  ">
+                <![CDATA[ and trade_return_goods_.deleted_flag =#{entity.deletedFlag}  ]]>
+            </if>
+            <if test="entity.confirmStatusList != null and entity.confirmStatusList.size()>0">
+				<![CDATA[
+					AND trade_return_goods_.confirm_status in
+					]]>
+				<foreach collection="entity.confirmStatusList" item="confirmStatus" open="(" separator="," close=")">
+					#{confirmStatus}
+				</foreach>
+			</if>
+			<if test="entity.confirmStatus != null  ">
+                <![CDATA[ and trade_return_goods_.confirm_status =#{entity.confirmStatus}  ]]>
+            </if>
+            <if test="entity.afterService != null  ">
+                <![CDATA[ and trade_return_goods_.after_service =#{entity.afterService}  ]]>
+            </if>
+            <if test="entity.refundTimeBegin != null  ">
+                <![CDATA[ and trade_return_goods_.refund_time >=#{entity.refundTimeBegin}  ]]>
+            </if>
+            <if test="entity.refundTimeEnd != null  ">
+                <![CDATA[ and trade_return_goods_.refund_time <=#{entity.refundTimeEnd}  ]]>
+            </if>
+            <if test="entity.orderPayBank != null  ">
+                <![CDATA[ and trade_orders.payment_type =#{entity.orderPayBank}  ]]>
+            </if>
+            <if test="entity.orderPayBankList != null and entity.orderPayBankList.size()>0">
+				<![CDATA[
+					AND trade_orders.payment_type in
+					]]>
+				<foreach collection="entity.orderPayBankList" item="orderPayBank" open="(" separator="," close=")">
+					#{orderPayBank}
+				</foreach>
+			</if>
+            order by created_dt desc
+        </if>
+    </sql>
+
+    <!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+    <select id="getAll" resultMap="tradeReturnGoodsMap">
+        <include refid="selectAllColumns"/>
+    </select>
+    <select id="get" resultMap="tradeReturnGoodsMap" parameterType="long">
+        <include refid="selectAllColumns"/>
+        <![CDATA[
+		where trade_return_goods_.id = #{id}
+		]]>
+    </select>
+    <!-- 根据id查询 -->
+    <select id="queryById" resultMap="tradeReturnGoodsMap" parameterType="long">
+        <include refid="selectAllColumns"/>
+        <![CDATA[
+		where trade_return_goods_.id = #{id}
+		]]>
+    </select>
+
+    <!-- 分页查询 -->
+    <select id="queryList" resultMap="tradeReturnGoodsMap">
+        <include refid="selectAllColumns"/>
+        <include refid="where_fragement"/>
+        <if test="page!=null">
+            <include refid="pagination_tail"/>
+        </if>
+    </select>
+
+    <select id="queryCount" resultType="long">
+        <include refid="count_Tail"/>
+       trade_return_goods trade_return_goods_ left join factorage_journal factorage_journal_ on trade_return_goods_.code_no=factorage_journal_.repro_no
+       left join trade_orders trade_orders on trade_return_goods_.order_id=trade_orders.order_id
+        <include refid="where_fragement"/>
+    </select>
+
+    <select id="searchByCondition" resultMap="tradeReturnGoodsMap">
+        <include refid="selectAllColumns"/>
+        <include refid="where_fragement"/>
+
+    </select>
+
+    <select id="searchByOrderIdAndState" resultMap="tradeReturnGoodsMap">
+        <include refid="selectAllColumns"/>
+        <if test="states != null">
+			<![CDATA[
+				WHERE trade_return_goods_.order_id = #{orderId}	AND trade_return_goods_.state in
+				]]>
+			<foreach collection="states" item="state" open="(" separator="," close=")">
+				#{state}
+			</foreach>
+		</if>
+    </select>
+
+    <select id="getCodeNo" resultType="String">
+        <![CDATA[
+			SELECT get_trade_return_no()
+		]]>
+    </select>
+    <insert id="add" parameterType="tradeReturnGoods" useGeneratedKeys="true" keyProperty="id">
+
+        <![CDATA[
+
+		insert into trade_return_goods
+		  (
+				state
+				,code_no
+				,order_id
+				,order_name
+				,buy_id
+				,return_result
+				,remark
+				,buyer_name
+				,buyer_address
+				,buyer_phone
+				,buyer_postcode
+				,apply_dt
+				,auditor_id
+				,auditor_name
+				,audit_dt
+				,audit_remark
+				,express_no
+				,express_name
+				,refund_freight
+				,refund_goods
+				,seller_id
+				,return_address
+				,return_phone
+				,return_postcode
+				,created_dt
+				,created_by
+				,last_upd_dt
+				,last_upd_by
+				,deleted_flag
+				,add1
+				,add2
+				,add3
+				,return_pic
+				,order_price
+				,order_status
+				,is_customer_service
+				,confirm_status
+				,after_service
+				,refund_time
+		   )
+		values
+		  (
+                 #{state}
+				,#{codeNo}
+				,#{orderId}
+				,#{orderName}
+				,#{buyId}
+				,#{returnResult}
+				,#{remark}
+				,#{buyerName}
+				,#{buyerAddress}
+				,#{buyerPhone}
+				,#{buyerPostcode}
+				,#{applyDt}
+				,#{auditorId}
+				,#{auditorName}
+				,#{auditDt}
+				,#{auditRemark}
+				,#{expressNo}
+				,#{expressName}
+				,#{refundFreight}
+				,#{refundGoods}
+				,#{sellerId}
+				,#{returnAddress}
+				,#{returnPhone}
+				,#{returnPostcode}
+				,#{createdDt}
+				,#{createdBy}
+				,#{lastUpdDt}
+				,#{lastUpdBy}
+				,#{deletedFlag}
+				,#{add1}
+				,#{add2}
+				,#{add3}
+				,#{returnPic}
+				,#{orderPrice}
+				,#{orderStatus}
+				,#{isCustomerService}
+				,#{confirmStatus}
+				,#{afterService}
+				,#{refundTime}
+		   )
+
+        ]]>
+    </insert>
+
+
+    <!-- 根据id，修改记录 -->
+    <update id="update" parameterType="tradeReturnGoods">
+		<![CDATA[
+		update trade_return_goods set
+   			id = #{id}
+   			,state = #{state}
+   			,code_no = #{codeNo}
+   			,order_id = #{orderId}
+   			,order_name=#{orderName}
+   			,buy_id = #{buyId}
+   			,return_result = #{returnResult}
+   			,remark = #{remark}
+   			,buyer_name = #{buyerName}
+   			,buyer_address = #{buyerAddress}
+   			,buyer_phone = #{buyerPhone}
+   			,buyer_postcode = #{buyerPostcode}
+   			,apply_dt = #{applyDt}
+   			,auditor_id = #{auditorId}
+   			,auditor_name = #{auditorName}
+   			,audit_dt = #{auditDt}
+   			,audit_remark = #{auditRemark}
+   			,express_no = #{expressNo}
+   			,express_name = #{expressName}
+   			,refund_freight = #{refundFreight}
+   			,refund_goods = #{refundGoods}
+   			,seller_id = #{sellerId}
+   			,return_address = #{returnAddress}
+   			,return_phone = #{returnPhone}
+   			,return_postcode = #{returnPostcode}
+   			,created_dt = #{createdDt}
+   			,created_by = #{createdBy}
+   			,last_upd_dt = #{lastUpdDt}
+   			,last_upd_by = #{lastUpdBy}
+   			,deleted_flag = #{deletedFlag}
+   			,add1 = #{add1}
+   			,add2 = #{add2}
+   			,add3 = #{add3}
+   			,return_pic=#{returnPic}
+   			,order_price=#{orderPrice}
+   			,order_status=#{orderStatus}
+   			,confirm_status=#{confirmStatus}
+   			,after_service=#{afterService}
+   			,refund_time=#{refundTime}
+		 where id = #{id}
+
+
+        ]]>
+	</update>
+
+    <delete id="delete" parameterType="long">
+		<![CDATA[
+
+
+		delete from trade_return_goods where id = #{id}
+
+
+        ]]>
+	</delete>
+    <sql id="updateSelective_set">
+        <set>
+            <trim suffix="" suffixOverrides=",">
+                <if test="tradeReturnGoods.state!= null">
+                    state = #{tradeReturnGoods.state},
+                </if>
+                <if test="tradeReturnGoods.codeNo!= null">
+                    code_no = #{tradeReturnGoods.codeNo},
+                </if>
+                <if test="tradeReturnGoods.orderId!= null">
+                    order_id = #{tradeReturnGoods.orderId},
+                </if>
+                <if test="tradeReturnGoods.orderName!= null">
+                    order_name = #{tradeReturnGoods.orderName},
+                </if>
+                <if test="tradeReturnGoods.buyId!= null">
+                    buy_id = #{tradeReturnGoods.buyId},
+                </if>
+                <if test="tradeReturnGoods.returnResult!= null">
+                    return_result = #{tradeReturnGoods.returnResult},
+                </if>
+                <if test="tradeReturnGoods.remark!= null">
+                    remark = #{tradeReturnGoods.remark},
+                </if>
+                <if test="tradeReturnGoods.buyerName!= null">
+                    buyer_name = #{tradeReturnGoods.buyerName},
+                </if>
+                <if test="tradeReturnGoods.buyerAddress!= null">
+                    buyer_address = #{tradeReturnGoods.buyerAddress},
+                </if>
+                <if test="tradeReturnGoods.buyerPhone!= null">
+                    buyer_phone = #{tradeReturnGoods.buyerPhone},
+                </if>
+                <if test="tradeReturnGoods.buyerPostcode!= null">
+                    buyer_postcode = #{tradeReturnGoods.buyerPostcode},
+                </if>
+                <if test="tradeReturnGoods.applyDt!= null">
+                    apply_dt = #{tradeReturnGoods.applyDt},
+                </if>
+                <if test="tradeReturnGoods.auditorId!= null">
+                    auditor_id = #{tradeReturnGoods.auditorId},
+                </if>
+                <if test="tradeReturnGoods.auditorName!= null">
+                    auditor_name = #{tradeReturnGoods.auditorName},
+                </if>
+                <if test="tradeReturnGoods.auditDt!= null">
+                    audit_dt = #{tradeReturnGoods.auditDt},
+                </if>
+                <if test="tradeReturnGoods.auditRemark!= null">
+                    audit_remark = #{tradeReturnGoods.auditRemark},
+                </if>
+                <if test="tradeReturnGoods.expressNo!= null">
+                    express_no = #{tradeReturnGoods.expressNo},
+                </if>
+                <if test="tradeReturnGoods.expressName!= null">
+                    express_name = #{tradeReturnGoods.expressName},
+                </if>
+                <if test="tradeReturnGoods.refundFreight!= null">
+                    refund_freight = #{tradeReturnGoods.refundFreight},
+                </if>
+                <if test="tradeReturnGoods.refundGoods!= null">
+                    refund_goods = #{tradeReturnGoods.refundGoods},
+                </if>
+                <if test="tradeReturnGoods.sellerId!= null">
+                    seller_id = #{tradeReturnGoods.sellerId},
+                </if>
+                <if test="tradeReturnGoods.returnAddress!= null">
+                    return_address = #{tradeReturnGoods.returnAddress},
+                </if>
+                <if test="tradeReturnGoods.returnPhone!= null">
+                    return_phone = #{tradeReturnGoods.returnPhone},
+                </if>
+                <if test="tradeReturnGoods.returnPostcode!= null">
+                    return_postcode = #{tradeReturnGoods.returnPostcode},
+                </if>
+                <if test="tradeReturnGoods.createdDt!= null">
+                    created_dt = #{tradeReturnGoods.createdDt},
+                </if>
+                <if test="tradeReturnGoods.createdBy!= null">
+                    created_by = #{tradeReturnGoods.createdBy},
+                </if>
+                <if test="tradeReturnGoods.lastUpdDt!= null">
+                    last_upd_dt = #{tradeReturnGoods.lastUpdDt},
+                </if>
+                <if test="tradeReturnGoods.lastUpdBy!= null">
+                    last_upd_by = #{tradeReturnGoods.lastUpdBy},
+                </if>
+                <if test="tradeReturnGoods.deletedFlag!= null">
+                    deleted_flag = #{tradeReturnGoods.deletedFlag},
+                </if>
+                <if test="tradeReturnGoods.add1!= null">
+                    add1 = #{tradeReturnGoods.add1},
+                </if>
+                <if test="tradeReturnGoods.add2!= null">
+                    add2 = #{tradeReturnGoods.add2},
+                </if>
+                <if test="tradeReturnGoods.add3!= null">
+                    add3 = #{tradeReturnGoods.add3},
+                </if>
+                <if test="tradeReturnGoods.returnPic!= null">
+                    return_pic = #{tradeReturnGoods.returnPic},
+                </if>
+                <if test="tradeReturnGoods.orderPrice!= null">
+                    order_price = #{tradeReturnGoods.orderPrice},
+                </if>
+                <if test="tradeReturnGoods.orderStatus!= null">
+                    order_status = #{tradeReturnGoods.orderStatus},
+                </if>
+                <if test="tradeReturnGoods.isCustomerService!= null">
+                    is_customer_service = #{tradeReturnGoods.isCustomerService},
+                </if>
+                <if test="tradeReturnGoods.confirmStatus!= null">
+                    confirm_status = #{tradeReturnGoods.confirmStatus},
+                </if>
+                <if test="tradeReturnGoods.afterService!= null">
+                    after_service = #{tradeReturnGoods.afterService},
+                </if>
+                <if test="tradeReturnGoods.refundTime!= null">
+                    refund_time = #{tradeReturnGoods.refundTime},
+                </if>
+            </trim>
+        </set>
+    </sql>
+    <sql id="updateAll_set">
+        <set>
+            state = #{tradeReturnGoods.state},
+            code_no = #{tradeReturnGoods.codeNo},
+            order_id = #{tradeReturnGoods.orderId},
+            order_name = #{tradeReturnGoods.orderName},
+            buy_id = #{tradeReturnGoods.buyId},
+            return_result = #{tradeReturnGoods.returnResult},
+            remark = #{tradeReturnGoods.remark},
+            buyer_name = #{tradeReturnGoods.buyerName},
+            buyer_address = #{tradeReturnGoods.buyerAddress},
+            buyer_phone = #{tradeReturnGoods.buyerPhone},
+            buyer_postcode = #{tradeReturnGoods.buyerPostcode},
+            apply_dt = #{tradeReturnGoods.applyDt},
+            auditor_id = #{tradeReturnGoods.auditorId},
+            auditor_name = #{tradeReturnGoods.auditorName},
+            audit_dt = #{tradeReturnGoods.auditDt},
+            audit_remark = #{tradeReturnGoods.auditRemark},
+            express_no = #{tradeReturnGoods.expressNo},
+            express_name = #{tradeReturnGoods.expressName},
+            refund_freight = #{tradeReturnGoods.refundFreight},
+            refund_goods = #{tradeReturnGoods.refundGoods},
+            seller_id = #{tradeReturnGoods.sellerId},
+            return_address = #{tradeReturnGoods.returnAddress},
+            return_phone = #{tradeReturnGoods.returnPhone},
+            return_postcode = #{tradeReturnGoods.returnPostcode},
+            created_dt = #{tradeReturnGoods.createdDt},
+            created_by = #{tradeReturnGoods.createdBy},
+            last_upd_dt = #{tradeReturnGoods.lastUpdDt},
+            last_upd_by = #{tradeReturnGoods.lastUpdBy},
+            deleted_flag = #{tradeReturnGoods.deletedFlag},
+            add1 = #{tradeReturnGoods.add1},
+            add2 = #{tradeReturnGoods.add2},
+            add3 = #{tradeReturnGoods.add3},
+            return_pic = #{tradeReturnGoods.returnPic},
+        </set>
+    </sql>
+    <update id="updateSelective" parameterType="tradeReturnGoods">
+        update trade_return_goods
+        <include refid="updateSelective_set"/>
+        where id = #{tradeReturnGoods.id}
+    </update>
+
+    <update id="updateAllWithDateTimeCheck">
+        update trade_return_goods
+        <include refid="updateAll_set"/>
+        where id = #{tradeReturnGoods.id}
+        and LAST_UPD_DT = #{prevUpdDt}
+    </update>
+
+    <update id="updateSelectiveWithDateTimeCheck">
+        update trade_return_goods
+        <include refid="updateSelective_set"/>
+        <![CDATA[
+		 	where id = #{tradeReturnGoods.id}
+		 	and LAST_UPD_DT = #{prevUpdDt}
+		]]>
+    </update>
+    <sql id="searchByCondition_fragement">
+        <include refid="selectAllColumns"/>
+        where 1=1
+        <if test="tradeReturnGoods != null">
+            <if test="tradeReturnGoods.state != null">
+                and state = #{tradeReturnGoods.state}
+            </if>
+            <if test="tradeReturnGoods.codeNo != null">
+                and code_no = #{tradeReturnGoods.codeNo}
+            </if>
+            <if test="tradeReturnGoods.orderId != null">
+                and order_id = #{tradeReturnGoods.orderId}
+            </if>
+            <if test="tradeReturnGoods.orderName != null">
+                and order_name = #{tradeReturnGoods.orderName}
+            </if>
+            <if test="tradeReturnGoods.buyId != null">
+                and buy_id = #{tradeReturnGoods.buyId}
+            </if>
+            <if test="tradeReturnGoods.returnResult != null">
+                and return_result = #{tradeReturnGoods.returnResult}
+            </if>
+            <if test="tradeReturnGoods.remark != null">
+                and remark = #{tradeReturnGoods.remark}
+            </if>
+            <if test="tradeReturnGoods.buyerName != null">
+                and buyer_name = #{tradeReturnGoods.buyerName}
+            </if>
+            <if test="tradeReturnGoods.buyerAddress != null">
+                and buyer_address = #{tradeReturnGoods.buyerAddress}
+            </if>
+            <if test="tradeReturnGoods.buyerPhone != null">
+                and buyer_phone = #{tradeReturnGoods.buyerPhone}
+            </if>
+            <if test="tradeReturnGoods.buyerPostcode != null">
+                and buyer_postcode = #{tradeReturnGoods.buyerPostcode}
+            </if>
+            <if test="tradeReturnGoods.applyDt != null">
+                and apply_dt = #{tradeReturnGoods.applyDt}
+            </if>
+            <if test="tradeReturnGoods.auditorId != null">
+                and auditor_id = #{tradeReturnGoods.auditorId}
+            </if>
+            <if test="tradeReturnGoods.auditorName != null">
+                and auditor_name = #{tradeReturnGoods.auditorName}
+            </if>
+            <if test="tradeReturnGoods.auditDt != null">
+                and audit_dt = #{tradeReturnGoods.auditDt}
+            </if>
+            <if test="tradeReturnGoods.auditRemark != null">
+                and audit_remark = #{tradeReturnGoods.auditRemark}
+            </if>
+            <if test="tradeReturnGoods.expressNo != null">
+                and express_no = #{tradeReturnGoods.expressNo}
+            </if>
+            <if test="tradeReturnGoods.expressName != null">
+                and express_name = #{tradeReturnGoods.expressName}
+            </if>
+            <if test="tradeReturnGoods.refundFreight != null">
+                and refund_freight = #{tradeReturnGoods.refundFreight}
+            </if>
+            <if test="tradeReturnGoods.refundGoods != null">
+                and refund_goods = #{tradeReturnGoods.refundGoods}
+            </if>
+            <if test="tradeReturnGoods.sellerId != null">
+                and seller_id = #{tradeReturnGoods.sellerId}
+            </if>
+            <if test="tradeReturnGoods.returnAddress != null">
+                and return_address = #{tradeReturnGoods.returnAddress}
+            </if>
+            <if test="tradeReturnGoods.returnPhone != null">
+                and return_phone = #{tradeReturnGoods.returnPhone}
+            </if>
+            <if test="tradeReturnGoods.returnPostcode != null">
+                and return_postcode = #{tradeReturnGoods.returnPostcode}
+            </if>
+            <if test="tradeReturnGoods.createdDt != null">
+                and created_dt = #{tradeReturnGoods.createdDt}
+            </if>
+            <if test="tradeReturnGoods.createdBy != null">
+                and created_by = #{tradeReturnGoods.createdBy}
+            </if>
+            <if test="tradeReturnGoods.lastUpdDt != null">
+                and last_upd_dt = #{tradeReturnGoods.lastUpdDt}
+            </if>
+            <if test="tradeReturnGoods.lastUpdBy != null">
+                and last_upd_by = #{tradeReturnGoods.lastUpdBy}
+            </if>
+            <if test="tradeReturnGoods.deletedFlag != null">
+                and deleted_flag = #{tradeReturnGoods.deletedFlag}
+            </if>
+            <if test="tradeReturnGoods.add1 != null">
+                and add1 = #{tradeReturnGoods.add1}
+            </if>
+            <if test="tradeReturnGoods.add2 != null">
+                and add2 = #{tradeReturnGoods.add2}
+            </if>
+            <if test="tradeReturnGoods.add3 != null">
+                and add3 = #{tradeReturnGoods.add3}
+            </if>
+            <if test="tradeReturnGoods.returnPic != null">
+                and return_pic = #{tradeReturnGoods.returnPic}
+            </if>
+            <if test="tradeReturnGoods.orderPrice != null">
+                and order_price = #{tradeReturnGoods.orderPrice}
+            </if>
+            <if test="tradeReturnGoods.orderStatus != null">
+                and order_status = #{tradeReturnGoods.orderStatus}
+            </if>
+            <if test="tradeReturnGoods.confirmStatus != null">
+                and confirm_status = #{tradeReturnGoods.confirmStatus}
+            </if>
+        </if>
+    </sql>
+    <update id="updateSelectiveByIdList">
+        update trade_return_goods
+        <include refid="updateSelective_set"/>
+        where id in
+        <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <update id="updateAllByIdList">
+        update trade_return_goods
+        <include refid="updateAll_set"/>
+        where id in
+        <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <update id="updateByCodeNo" >
+    	update trade_return_goods
+    	<include refid="updateSelective_set"/>
+    	where code_no = #{tradeReturnGoods.codeNo}
+    </update>
+
+
+</mapper>

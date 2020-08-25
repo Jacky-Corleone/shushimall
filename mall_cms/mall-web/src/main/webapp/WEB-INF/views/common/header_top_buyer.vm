@@ -1,0 +1,6 @@
+#parse("/common/header_top_seller.vm")
+<script type="text/javascript">
+	$(function(){
+		selectMenu("buyerLiEle","sellerLiEle");
+	});
+</script>

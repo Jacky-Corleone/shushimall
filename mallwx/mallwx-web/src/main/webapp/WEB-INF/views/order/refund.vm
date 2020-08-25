@@ -1,0 +1,242 @@
+#set($layout = "common/order.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>退款</title>
+#parse("common/scriptAndCss.vm")
+<script type="text/javascript" src="$request.contextPath/assets/js/ajaxfileupload.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	changeIconToRed(2);
+});
+var imgcount=0;
+var sccount=0;
+function startUpload(){
+	if(imgcount>4){
+        alert("最多只能上传5张图片");
+        return false;
+    }
+	//判断图片格式
+    var fileInput = $("#fileInput").val();
+    var extStart = fileInput.lastIndexOf(".");
+    var ext = fileInput.substring(extStart,fileInput.length).toUpperCase();
+    if(ext!=".JPG" && ext!=".jpg" && ext!=".BMP"&&ext!=".bmp"&& ext!=".PNG"&&ext!=".PNG"&& ext!=".JPEG" && ext!=".jpeg"&&ext!=".gif"&&ext!=".GIF"){
+        alert("图片限于JPG,BMP,PNG,JPEG格式");
+        return false;
+    }
+    $.ajaxFileUpload({
+        url: '$request.getContextPath()/orderWx/upload?size=1024000', //用于文件上传的服务器端请求地址
+        secureuri: false, //是否需要安全协议，一般设置为false
+        fileElementId: 'fileInput', //文件上传域的ID
+        dataType: 'text', //返回值类型 一般设置为json
+        type:"post",
+        success: function (data, status){  //服务器成功响应处理函数
+        	console.info(JSON.stringify(data));
+        	var dataStr = data;
+        	if(dataStr.indexOf("<pre>") != -1){
+        		dataStr = dataStr.replace("<pre>","")
+        	}
+        	if(dataStr.indexOf("<pre style=\"word-wrap: break-word; white-space: pre-wrap;\">") != -1){
+        		dataStr = dataStr.replace("<pre style=\"word-wrap: break-word; white-space: pre-wrap;\">","")
+        	}
+        	if(dataStr.indexOf("</pre>") != -1){
+        		dataStr = dataStr.replace("</pre>","")
+        	}
+        	var data = eval("("+dataStr+")");
+        	if(data.success){
+                sccount=sccount+1;
+                var trid="trid"+sccount;
+                appendtable(data.url,trid);
+            }else{
+                alert(data.msg);
+                $("#fileInput").replaceWith('<input type="file" id="fileInput" class="input_3 wid_95 mar_r2" name="file" onchange="startUpload();" />');
+            }
+        },
+        error: function (data, status, e){//服务器响应失败处理函数
+        	console.info(JSON.stringify(data));
+        	alert(JSON.stringify(data));
+        	alert(status);
+        	alert(e);
+            alert("亲系统繁忙，请稍后再试");
+            $("#fileInput").replaceWith('<input type="file" id="fileInput" class="input_3 wid_95 mar_r2" name="file" onchange="startUpload();" />');
+        }
+    });
+}
+
+function appendtable(url,id){
+    var imgtable=$("#imgtable");
+    var urlqd='$!imageServerAddr';
+//     var tr=$("<tr>").attr("id",id);
+    var div=$("<div>").attr("id",id).attr("class","shop_order  mar_l4 fl wid_29 mar_t10");//创建div
+    var p=$("<p>").attr("class","shop_order_img"); //创建<p>
+    var p1=$("<p>").attr("class","lin_24");; //创建<p>
+    var img=$("<img>").attr("src",urlqd+url).attr("width","75px").attr("height","75px");
+    var input=$("<input>").attr("value",url).attr("type","hidden");
+	p.append(img);
+	p.append(input);
+	div.append(p);
+//     tr.append(div);
+    var a=$("<a>").text("删除").attr("href","javascript:cancleimg('"+id+"')");
+    var span=$("<span>").attr("class","pad_l5").text("上传成功").append("&nbsp;&nbsp;&nbsp;");
+    p1.append(a);
+    p1.append(span);
+    div.append(p1);
+//     tr.append(div);
+//     var td3=$("<td>").attr("width","150");
+//     tr.append(td3);
+    imgtable.append(div);
+    imgcount=imgcount+1;
+    $("#fileInput").replaceWith('<input type="file" id="fileInput" class="input_3 wid_95 mar_r2" name="file" onchange="startUpload();" />');
+}
+//清除指定tr
+function cancleimg(id){
+    $("#"+id).remove("");
+    imgcount=imgcount-1;
+}
+
+function refundAgreementSubmit(){
+	var orderId = $("#orderId").val();
+	var returnResult = $("#returnResult").val();//退款原因
+	if(returnResult!=null && $.trim(returnResult)==""){
+		alert("请选择退款原因");
+		return;
+	}else{
+		returnResult = $("#returnResult").find("option:selected").text();
+	}
+	var refundFreight = $("#refundFreight").val();//退款运费金额
+	var remark = $("#remark").val();//退款说明
+	if(remark!=null && $.trim(remark)==""){
+		alert("请填写退款说明");
+		return;
+	}
+	if($.trim(remark).length>300){
+		alert("长度不能超过300");
+		return false;
+	}
+	
+	var imgtable=$("#imgtable input");
+    var picUrl="";
+    if(imgtable){
+        $(imgtable).each(function(){
+            if($(this).val()){
+                picUrl=picUrl+$(this).val()+";";
+            }
+        });
+    }
+    $.ajax({
+		type: "POST",
+		dataType: "json",
+		timeout : 1000*60*5, //超时时间设置，单位毫秒
+		url: "$request.getContextPath()/orderWx/refundAgreementSubmit",
+		data: {
+			orderId: orderId,
+			//jsonRefundItem: jsonRefundItem,
+			returnResult: returnResult,
+			remark:remark,
+			//refundGoods:refundGoods,
+			//refundFreight:refundFreight,
+			picUrl:picUrl
+		},
+		success: function(data){
+// 			$.unblockUI();
+			if(data.success){
+				window.location.href = "$request.getContextPath()/orderWx/refundSubmitSucc?orderId="+orderId;
+			}else{
+				alert("申请退款失败："+data.errorMessages);
+			}
+		}
+	});
+}
+//申请仲裁
+function complain(){
+	window.location.href = "$request.getContextPath()/orderWx/gocomplainadd?tradeReturnid=$!{orderId}";
+}
+</script>
+</head>
+<body>
+<!--包住整个页面的DIV id="content" start -->
+<div id="main">
+    <!--中间内容开始 -->
+    <div class="content" id="wrapper">
+        <div class="stepflex">
+            <dl class="normal doing">
+                <dt class="s-num num-bg-2"><i class="fa-check"></i></dt>
+                <dd class="s-text">退款原因、金额<s></s><b></b></dd>
+            </dl>
+            <dl class="last ">
+                <dt class="s-num num-bg-1">2</dt>
+                <dd class="s-text">退款处理<s></s><b></b></dd>
+            </dl>
+            <dl class="last">
+                <dt class="s-num num-bg-1">3</dt>
+                <dd class="s-text">退款完成<s></s><b></b></dd>
+            </dl>
+            <div class="clear"></div>
+        </div>
+        <div class="td_l">
+        	<input name="orderId" value="$!{orderId}" id="orderId" type="hidden"/>
+          <dl class="hei_34">
+             <dd class="fl font_right wid_35 mar_r2">退款原因<i class="font_e3">※</i></dd>
+             <dt class="fl wid_57">
+             	<select class="input_3 wid_95 mar_r2" id="returnResult">
+             		<option value="">请选择退款原因</option>
+<!--              		<option value="1">等待时间过长</option> -->
+<!--              		<option value="2">订单重复</option> -->
+<!--              		<option value="3">不想要了</option> -->
+					<option value="不想买了">不想买了</option>
+					<option value="信息填写错误重新买">信息填写错误重新买</option>
+					<option value="卖家缺货">卖家缺货</option>
+					<option value="未收到货">未收到货</option>
+					<option value="收到商品破损"> 收到商品破损</option>
+					<option value="商品错发／漏发">商品错发／漏发</option>
+					<option value="商品需要维修">商品需要维修</option>
+					<option value="收到商品与描述不符">收到商品与描述不符</option>
+					<option value="商品质量问题">商品质量问题</option>
+             	</select>
+             </dt>
+           </dl>
+           <div class="clear"></div>
+           <dl class="hei_34 mar_t10">
+             <dd class="fl font_right wid_35 mar_r2 ">需退款的金额<i class="font_e3">※</i></dd>
+             <dt class="fl wid_55"><input class="input_3 wid_50 mar_r2" id="refundFreight" value="$!{refundPriceTotal}" readonly="readonly">元</dt>
+           </dl>
+           <div class="clear"></div>
+           <dl class="min-hei mar_t15">
+             <dd class="fl font_right hei_34 wid_35 mar_r2">退款说明<i class="font_e3">※</i></dd>
+             <dt class="fl wid_57"><textarea class="input_3 wid_95 hh_100" id="remark" placeholder="不能超过300字"></textarea></dt>
+           </dl>
+            <div class="clear"></div>
+           <dl class="hei_34 mar_t15">
+             <dd class="fl font_right wid_35 mar_r2">上传凭证</dd>
+             <dt class="fl wid_57"><input type="file" class="input_3 wid_95 mar_r2" name="file" id="fileInput" onchange="startUpload()"/> </dt>
+           </dl>
+           <div class="clear"></div>
+           <div class="">
+				<table id="imgtable" class="imgtable">
+				
+				</table>
+				
+
+		   </div>
+		   <div class="clear"></div>
+           <div class="fr wid_65 font_7_5 mar_t10 lin_16 mar_b20">最多上传5张，单张大小不超过1M，格式为png、bmp、jpg或gif。</div>
+           <div class="clear"></div>
+           <div class="font_cen">
+              <button class="button_2 hei_34 pad_lr5" onclick="refundAgreementSubmit()">立即申请退款</button>
+<!--               <button class="button_2 hei_34 pad_lr5" onclick="complain()">申请仲裁</button> -->
+           </div>
+        </div>
+        
+    </div> <!--中间内容 end -->
+   
+</div>
+<!-- 底部 -->
+#parse("common/footer.vm")
+<!-- 底部 -->
+<!--包住整个页面的DIV id="content" end -->
+</body>
+</html>

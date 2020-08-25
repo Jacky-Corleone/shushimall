@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+	    <!--店铺 -->
+	<dubbo:reference id="shopExportService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.storecenter.service.ShopExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+        <!--店铺审核-->
+    <dubbo:reference id="shopAudiExportService" registry="qingdaoRegistry"
+                         owner="zhangfan" interface="com.camelot.storecenter.service.ShopAudiExportService"
+                         version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    <!--店铺类目-->
+    <dubbo:reference id="shopCategoryExportService" registry="qingdaoRegistry"
+                         owner="zhangfan" interface="com.camelot.storecenter.service.ShopCategoryExportService"
+                         version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    <!--店铺品牌-->
+    <dubbo:reference id="shopBrandExportService" registry="qingdaoRegistry"
+                     owner="zhangfan" interface="com.camelot.storecenter.service.ShopBrandExportService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    <!--店铺基本信息审核查询列表-->
+    <dubbo:reference id="shopModifyDetailExportService" registry="qingdaoRegistry"
+                     owner="zhangfan" interface="com.camelot.storecenter.service.ShopModifyDetailExportService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    <!--店铺基本信息审核查询明细-->
+    <dubbo:reference id="shopModifyInfoExportService" registry="qingdaoRegistry"
+                     owner="zhangfan" interface="com.camelot.storecenter.service.ShopModifyInfoExportService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    <!--店铺装修-->
+    <dubbo:reference id="shopRenovationExportService" registry="qingdaoRegistry"
+                     owner="zhangfan" interface="com.camelot.storecenter.service.ShopRenovationExportService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    <!--第三方IM即时通讯集成开始-->
+    <dubbo:reference id="shopCustomerServiceService" registry="qingdaoRegistry"
+        owner="storecenter" interface="com.camelot.storecenter.service.ShopCustomerServiceService"
+        version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    <dubbo:reference id="shopAndCustomerService" registry="qingdaoRegistry"
+    	owner="storecenter" interface="com.camelot.storecenter.service.ShopAndCustomerService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<!--第三方IM即时通讯集成结束-->
+	<!--运费模板调用者-->
+	<dubbo:reference id="shopFreightTemplateService" registry="qingdaoRegistry"
+					 owner="storecenter" interface="com.camelot.storecenter.service.ShopFreightTemplateService"
+					 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<dubbo:reference id="shopPreferentialWayService" registry="qingdaoRegistry"
+					 owner="storecenter" interface="com.camelot.storecenter.service.ShopPreferentialWayService"
+					 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<dubbo:reference id="shopDeliveryTypeService" registry="qingdaoRegistry"
+					 owner="storecenter" interface="com.camelot.storecenter.service.ShopDeliveryTypeService"
+					 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<!--QQ客服 -->
+	<dubbo:reference id="qqCustomerService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.storecenter.service.QqCustomerService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+</beans>

@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.aftersale.dao.ComplainDAO">
+
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="complainMap" type="complain">
+		<result property="id" column="id"/>
+		<result property="orderId" column="order_id"/>
+		<result property="skuId" column="sku_id"/>
+		<result property="refundId" column="refund_id"/>
+		<result property="buyerId" column="buyer_id"/>
+		<result property="sellerId" column="seller_id"/>
+		<result property="shopName" column="shop_name"/>
+		<result property="complainContent" column="complain_content"/>
+		<result property="complainPicUrl" column="complain_pic_url"/>
+		<result property="type" column="type"/>
+		<result property="status" column="status"/>
+		<result property="statusText" column="status_text"/>
+		<result property="resolutionTime" column="resolution_time"/>
+		<result property="created" column="created"/>
+		<result property="modified" column="modified"/>
+        <result property="comment" column="comment"/>
+        <result property="complainPhone" column="complain_phone"/>
+        <result property="complainEmail" column="complain_email"/>
+        <result property="returnGoodsId" column="return_goods_id"/>
+        <result property="complainResion" column="complain_resion"/>
+        <result property="complainType" column="complain_type"/>
+        <result property="complainTypeTotal" column="complain_type_total"/>
+        <result property="complainGroup" column="complain_group"/>
+	</resultMap>
+
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from
+	</sql>
+
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,order_id
+ 			,sku_id
+ 			,refund_id
+ 			,buyer_id
+ 			,seller_id
+ 			,shop_name
+ 			,complain_content
+ 			,complain_pic_url
+ 			,type
+ 			,status
+ 			,status_text
+ 			,resolution_time
+ 			,created
+ 			,modified
+ 			,comment
+ 			,complain_phone
+ 			,complain_email
+ 			,return_goods_id
+ 			,complain_resion
+ 			,complain_type
+ 			,complain_group
+		FROM
+		complain complain_
+		]]>
+	</sql>
+
+	<sql id="where_fragement">
+		<include refid="condition_fragement" />
+		 ORDER BY complain_.created DESC,complain_.status ASC
+	</sql>
+
+	<sql id="condition_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.orderId != null">
+				<![CDATA[ and complain_.order_id = #{entity.orderId} ]]>
+			</if>
+			<if test="entity.skuId != null">
+				<![CDATA[ and complain_.sku_id = #{entity.skuId} ]]>
+			</if>
+			<if test="entity.refundId != null">
+				<![CDATA[ and complain_.refund_id = #{entity.refundId} ]]>
+			</if>
+			<if test="entity.buyerId != null">
+				<![CDATA[ and complain_.buyer_id = #{entity.buyerId} ]]>
+			</if>
+			<if test="entity.sellerId != null">
+				<![CDATA[ and complain_.seller_id =#{entity.sellerId} ]]>
+			</if>
+			<if test="entity.type != null">
+				<![CDATA[ and complain_.type  = #{entity.type} ]]>
+			</if>
+			<if test="entity.status != null">
+				<![CDATA[ and complain_.status = #{entity.status} ]]>
+			</if>
+			<if test="entity.createdBegin != null  and entity.createdBegin !=''">
+				<![CDATA[ and complain_.created >= DATE_FORMAT(#{entity.createdBegin},'%Y-%m-%d') ]]>
+			</if>
+			<if test="entity.createdEnd != null  and entity.createdEnd !=''">
+				<![CDATA[ and complain_.created <= DATE_FORMAT(#{entity.createdEnd},'%Y-%m-%d')]]>
+			</if>
+            <if test="entity.comment != null">
+                <![CDATA[ and complain_.comment  = #{entity.comment} ]]>
+            </if>
+            <if test="entity.complainPhone != null">
+                <![CDATA[ and complain_.complain_phone  = #{entity.complainPhone} ]]>
+            </if>
+            <if test="entity.comment != null">
+                <![CDATA[ and complain_.complain_email  = #{entity.complainEmail} ]]>
+            </if>
+            <if test="entity.returnGoodsId != null">
+                <![CDATA[ and complain_.return_goods_id  = #{entity.returnGoodsId} ]]>
+            </if>
+            <if test="entity.complainResion != null">
+                <![CDATA[ and complain_.complain_resion  = #{entity.complainResion} ]]>
+            </if>
+            <if test="entity.complainType != null">
+                <![CDATA[ and complain_.complain_type  = #{entity.complainType} ]]>
+            </if>
+            <if test="entity.complainGroup != null">
+                <![CDATA[ and complain_.complain_group  = #{entity.complainGroup} ]]>
+            </if>
+            <if test="entity.buyIdList != null and entity.buyIdList.size()>0">
+				<![CDATA[ 
+					and complain_.buyer_id in
+					]]>
+				<foreach collection="entity.buyIdList" item="buyerId" open="(" separator="," close=")">
+					#{buyerId}
+				</foreach>
+			</if>
+		</if>
+	</sql>
+
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="complainMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where complain_.id = #{id}
+		]]>
+	</select>
+
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="complainMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		complain complain_
+		<include refid="where_fragement" />
+	</select>
+
+    <select id="getComplainByCondition" resultMap="complainMap" >
+        <include refid="selectAllColumns"/>
+        <include refid="where_fragement" />
+
+    </select>
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="complain" useGeneratedKeys="true" keyProperty="id">
+		<![CDATA[
+		insert into complain (
+	    	 order_id
+	    	 ,sku_id
+	    	 ,refund_id
+	    	 ,buyer_id
+	    	 ,seller_id
+	    	 ,shop_name
+	    	 ,complain_content
+	    	 ,complain_pic_url
+	    	 ,type
+	    	 ,status
+	    	 ,status_text
+	    	 ,resolution_time
+	    	 ,created
+	    	 ,comment
+	    	 ,complain_phone
+ 			,complain_email
+ 			,return_goods_id
+ 			,complain_resion
+ 			,complain_type
+ 			,complain_group
+		   )values(
+	    	#{orderId}
+	    	,#{skuId}
+	    	,#{refundId}
+	    	,#{buyerId}
+	    	,#{sellerId}
+	    	,#{shopName}
+	    	,#{complainContent}
+	    	,#{complainPicUrl}
+	    	,#{type}
+	    	,#{status}
+	    	,#{statusText}
+	    	,#{resolutionTime}
+	    	,now()
+	    	,#{comment}
+	    	,#{complainPhone}
+	    	,#{complainEmail}
+	    	,#{returnGoodsId}
+	    	,#{complainResion}
+	    	,#{complainType}
+	    	,#{complainGroup}
+		   )
+	    ]]>
+	</insert>
+
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="complain">
+		update complain set modified = now()
+		<if test="orderId !=null">
+   			,order_id = #{orderId}
+   		</if>
+   		<if test="skuId !=null">
+   			,sku_id = #{skuId}
+   		</if>
+   		<if test="refundId !=null">
+   			,refund_id = #{refundId}
+   		</if>
+   		<if test="buyerId !=null">
+   			,buyer_id = #{buyerId}
+   		</if>
+   		<if test="sellerId !=null">
+   			,seller_id = #{sellerId}
+   		</if>
+   		<if test="complainContent !=null">
+   		,complain_content = #{complainContent}
+   		</if>
+   		<if test="complainPicUrl !=null">
+   			,complain_pic_url = #{complainPicUrl}
+ 		</if>
+   		<if test="type !=null">
+   			,type = #{type}
+   		</if>
+   		<if test="status !=null">
+   			,status = #{status}
+   		</if>
+   		<if test="statusText !=null and statusText !=''">
+   			,status_text = #{statusText}
+   		</if>
+   		<if test="resolutionTime !=null">
+   		,resolution_time = #{resolutionTime}
+   		</if>
+        <if test="comment !=null">
+            ,comment = #{comment}
+        </if>
+        <if test="complainPhone !=null">
+            ,complain_phone = #{complainPhone}
+        </if>
+        <if test="complainEmail !=null">
+            ,complain_email = #{complainEmail}
+        </if>
+        <if test="returnGoodsId !=null">
+            ,return_goods_id = #{returnGoodsId}
+        </if>
+        <if test="complainResion !=null">
+            ,complain_resion = #{complainResion}
+        </if>
+        <if test="complainType !=null">
+            ,complain_type = #{complainType}
+        </if>
+        <if test="complainGroup !=null">
+            ,complain_group = #{complainGroup}
+        </if>
+        where id = #{id}
+	</update>
+
+	<!-- 分页查询 -->
+	<select id="findEarlyComplainListByCondition" resultMap="complainMap" >
+		SELECT t.*,p.complainTypeTotal FROM
+		<include refid="from_early_fragement" />
+		ORDER BY t.created DESC
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+
+	<select id="getCountEarlyComplainByCondition" resultType="long">
+		select count(1) from 
+		<include refid="from_early_fragement" />
+	</select>
+
+	<sql id="from_early_fragement">
+		<![CDATA[
+			 (
+				select * 
+				from complain complain_
+		]]>
+				<include refid="condition_fragement" />
+		<![CDATA[
+				) t INNER JOIN 
+				(SELECT complain_group,MIN(id) id,COUNT(1) complainTypeTotal
+					 FROM complain 
+					 GROUP BY complain_group 
+					 HAVING complain_group IS NOT NULL) p
+			ON t.complain_group=p.complain_group 
+			AND t.id=p.id
+		]]>
+	</sql>
+
+</mapper>

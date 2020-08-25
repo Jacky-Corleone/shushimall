@@ -1,0 +1,377 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<script type="text/javascript" src="$staticPath/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/jquery-migrate-1.1.0.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.shadow.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.ifixpng.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.fancyzoom.js"></script>
+<script type="text/javascript">
+	$(function(){
+		//加载左侧菜单
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+		//图片查看
+		$("img[showImg='findImg']").fancyzoom({
+			Speed:400,
+			showoverlay:false,
+			imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+		})
+		
+		$("#toEditBtn").bind("click",function(){
+			window.location.href = "$request.contextPath/shopBaseInfoController/toIndex";
+		});
+
+		$("input[name='runStatus']").bind("change",function(){
+            var origStatus = $("#origStatus").val();//店铺原始状态
+			var status = $(this).val();
+			var requestUrl = "$request.contextPath/shopBaseInfoController/openShop";//请求url
+			var confirmMsg = "确认开启店铺？";//确实提示信息
+			var responseMsg = "店铺开启成功";//响应信息
+			if(status==2){//店铺关闭
+				requestUrl = "$request.contextPath/shopBaseInfoController/closeShop";
+				confirmMsg = "确定要关闭店铺？关闭店铺后，该店铺的所有商品会下架";
+				responseMsg = "店铺关闭成功！";
+			}
+			var retVal = window.confirm(confirmMsg);
+			if(retVal){
+				$.post(requestUrl,{},function(response){
+					if(response.result=='success'){
+						alert(responseMsg);
+                        $("#origStatus").val(status);//重置原始状态
+					}else{
+                        if(response.message){
+                            alert(response.message);
+                        }else{
+                            alert("系统繁忙，请稍后再试");
+                        }
+                        //取消时，退回到选中前的状态
+                        statusRecover(origStatus);
+					}
+				},"json");
+			}else{
+                //取消时，退回到选中前的状态
+                statusRecover(origStatus);
+            }
+		});
+	});
+
+    //状态恢复到操作前状态
+    function statusRecover(origStatus){
+        $("input[name='runStatus']:eq("+(origStatus-1)+")").attr("checked","checked");
+    }
+
+	//绑定       type（phone代表绑定手机  mail代表邮箱 ） backUrl：修改完成后要跳转的地址
+	function bundMailOrPhone(type){
+		window.location.href="$request.contextPath/sellcenter/information/newAuth?changeType="+type+"&uid=$!userInfo.uid&backUrl=/shopBaseInfoController/toView";
+	}
+	//修改       type（phone代表绑定手机  mail代表邮箱 ） backUrl：修改完成后要跳转的地址
+	function editMailOrPhone(type){
+		window.location.href="$request.contextPath/sellcenter/information/authenticate?changeType="+type+"&uid=$!userInfo.uid&backUrl=/shopBaseInfoController/toView";
+	}
+	//跳转到店铺基本信息首页
+	function forwardToShopIndex(){
+		window.location.href = "$request.getContextPath()/shopBaseInfoController/toView";
+	}
+</script>
+<div id="main">
+<!--中间部分开始-->
+<!-- left start -->
+<div id="leftSeller" class="border-4">
+</div>
+<!--left end -->
+<!--右边部分开始-->
+<div id="right" class="bg_06">
+    <input type="hidden" id="origStatus" value="$!shopInfo.runStatus" />
+    <div class="tit">店铺信息</div>
+    <div class="wid_500 fl hei_180 mar_lr10">	
+		<h3 class="font_1c pad_l10">$!shopInfo.shopName</h3>
+		<p class="fl mar_l10 wid_200"><img src="$!imageServerAddr$!shopInfo.logoUrl" width="200" height="90" style="cursor:pointer;" showImg="findImg" title="点击查看原图" alt="店铺logo" /></p>
+		<div class="fl wid_280">
+			<p class="hei_30 mar_20 over_ell" title="$!shopInfo.shopName" style="cursor:pointer">用户名：$!userInfo.loginname</p>
+			<p class="hei_30 mar_20">联系手机： 
+				#if(!$!userInfo.userMobile || $!userInfo.userMobile == '')
+	            	未绑定  <a href="#" class="font_fe" onclick="bundMailOrPhone('phone')"> 点此绑定</a>
+	            #else
+	            	$!userInfo.userMobile <a href="#" class="font_fe" onclick="editMailOrPhone('phone')"> 点此修改</a>
+	            #end
+			<p class="hei_30 mar_20">认证邮箱： 
+				#if(!$!userInfo.userEmail || $!userInfo.userEmail == '')
+                	未绑定  <a href="#" class="font_fe" onclick="bundMailOrPhone('mail')">点此绑定</a>
+                #else
+                  	$!userInfo.userEmail <a href="#" class="font_fe" onclick="editMailOrPhone('mail')">点此修改</a>
+                #end
+			</p>
+		</div>
+		
+    </div>
+    <div class="wid_230 hei_180 fl mar_r10">	
+		<h3 class="pad_l10 " style=" width: auto; ">店铺评分</h3>
+		<p class="hei_30 mar_20">服务评价：
+			<span class="font_65"> 
+				#if("$!shopEvaluationResult.shopReputation" != "")
+					$!shopEvaluationResult.shopReputation
+				#else
+					0
+				#end
+			</span> 分
+		</p>
+		<p class="hei_30 mar_20">描述相符：<span class="font_65"> $!shopEvaluationResult.shopDescription </span> 分</p>
+		<p class="hei_30 mar_20">送货速度： <span class="font_65"> $!shopEvaluationResult.shopArrival </span> 分</p>
+		<p class="hei_30 mar_20">态度服务： <span class="font_65"> $!shopEvaluationResult.shopService </span>分</p>
+    </div>
+    <div class="wid_150 fl hei_90  font_cen">	
+		<button class="button_2 hei_35 font_14b wid_80" id="toEditBtn">店铺信息修改</button>
+    </div>
+    <!--文字段落开始-->
+    <div class="Notice pad_tb20">
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>营业状态：</dt>
+               <dd>
+                   <span class="mar_r10"><i class="demo-icons"><input name="runStatus" type="radio" #if($!shopInfo.runStatus==1) checked="checked" #end value="1" /></i>开启</span>
+               	   <span><i class="demo-icons"><input name="runStatus" type="radio" #if($!shopInfo.runStatus==2) checked="checked" #end value="2" /></i>关闭</span>
+               </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+    
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>店铺名称：</dt>
+               <dd>$!shopInfo.shopName</dd>
+            </dl>
+           #*
+			<dl>
+               <dt>店铺域名：</dt>
+               <dd><span>$!shopInfo.shopUrl</span>.shushi100.com</dd>
+            </dl>
+			*#
+    <!--每一行基本信息 结束-->
+			<dl>
+               <dt>基本信息状态：</dt>
+               <dd>基本信息修改 
+               		<i class="demo-icons font_fe">
+               			#if($!auditStatus==0)
+               			审核中
+               			#elseif($!auditStatus==1)
+               			审核通过
+               			#elseif($!auditStatus==2)
+               			驳回 [原因：$!shopInfo.comment]
+               			#elseif($!auditStatus==-1)
+               			
+               			#end
+               		</i>
+               </dd>
+            </dl>
+    <!--每一行基本信息开始-->
+            <!--每一行基本信息-->
+            <dl>
+              <dt>店铺经营类目：</dt>
+              <dd>
+                <ol>
+                #foreach($entity in $!categoryNameList.entrySet())
+                  <li>$entity.value</li>
+                #end
+              </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+    <!--每一行基本信息开始-->
+            <dl class="mar_t">
+               <dt>关键字：</dt>
+               <dd>
+                $!shopInfo.keyword
+               </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>店铺简介：</dt>
+               <dd>$!shopInfo.introduce</dd>
+            </dl>
+            <dl>
+               <dt>店铺主营：</dt>
+               <dd>$!shopInfo.mainSell            
+               </dd>
+            </dl>
+
+            <dl>
+                <dt>店铺类型：</dt>
+                <dd>
+                    #if($!shopInfo.shopType==1) 品牌商 #end
+                    #if($!shopInfo.shopType==2) 经销商 #end
+                </dd>
+            </dl>
+
+            <dl>
+                <dt>品牌类型：</dt>
+                <dd>
+                    #if($!shopInfo.brandType==1) 国内品牌 #end
+                    #if($!shopInfo.brandType==2) 国际品牌 #end
+                </dd>
+            </dl>
+
+            <dl>
+                <dt>经营类型：</dt>
+                <dd>
+                    #if($!shopInfo.businessType==1) 自有品牌 #end
+                    #if($!shopInfo.businessType==2) 代理品牌 #end
+                </dd>
+            </dl>
+
+            <dl>
+                <dt>免责声明：</dt>
+                <dd>
+                    <img id="disclaimer" src="$!imageServerAddr$!shopInfo.disclaimer" width="100" height="100" style="cursor:pointer;" showImg="findImg" title="点击查看原图" alt="免责声明" />
+                </dd>
+            </dl>
+
+            <dl>
+                <dt>商品注册申请书扫描件：</dt>
+                <dd><img id="trademarkRegistCert" src="$!imageServerAddr$!shopInfo.trademarkRegistCert" width="100" height="100" style="cursor:pointer;" showImg="findImg" title="点击查看原图" alt="商品注册申请书扫描件" />
+                </dd>
+            </dl>
+
+            <dl>
+                <dt>报关单类扫描件：</dt>
+                <dd><img id="inspectionReport" src="$!imageServerAddr$!shopInfo.inspectionReport" width="100" height="100" style="cursor:pointer;" showImg="findImg" title="点击查看原图" alt="报关单类扫描件" />
+                </dd>
+            </dl>
+
+            <dl>
+                <dt>卫生/生产许可证扫描件：</dt>
+                <dd><img id="productionLicense" src="$!imageServerAddr$!shopInfo.productionLicense" width="100" height="100" style="cursor:pointer;" showImg="findImg" title="点击查看原图" alt="卫生/生产许可证扫描件" />
+                </dd>
+            </dl>
+            #if($!shopInfo.shopType==2)
+            <dl>
+                <dt>销售授权书扫描件：</dt>
+                <dd>
+					#if($shopInfo.marketingAuth)
+						#if($!shopInfo.marketingAuth.indexOf(".JPG")!=-1 || $!shopInfo.marketingAuth.indexOf(".jpg")!=-1
+							|| $!shopInfo.marketingAuth.indexOf(".JPEG")!=-1 || $!shopInfo.marketingAuth.indexOf(".jpeg")!=-1
+							|| $!shopInfo.marketingAuth.indexOf(".BMP")!=-1 || $!shopInfo.marketingAuth.indexOf(".bmp")!=-1
+							|| $!shopInfo.marketingAuth.indexOf(".PNG")!=-1 || $!shopInfo.marketingAuth.indexOf(".png")!=-1)
+        					<img id="marketingAuth" src="$!imageServerAddr$!shopInfo.marketingAuth" width="100" height="100" style="cursor:pointer;" showImg="findImg" title="点击查看原图" alt="销售授权书扫描件" />
+						#elseif($!shopInfo.marketingAuth.indexOf(".RAR")!=-1 || $!shopInfo.marketingAuth.indexOf(".rar")!=-1
+    						|| $!shopInfo.marketingAuth.indexOf(".zip")!=-1 || $!shopInfo.marketingAuth.indexOf(".zip")!=-1
+    						|| $!shopInfo.marketingAuth.indexOf(".7Z")!=-1 || $!shopInfo.marketingAuth.indexOf(".7z")!=-1)
+							<a href='$!imageServerAddr$!shopInfo.marketingAuth'><img src='$staticPath/images/zip.png' style='width:32px;height:32px'></a>
+        				#end
+					#end
+                </dd>
+            </dl>
+            #end
+            <dl>
+               <dt>店铺品牌：</dt>
+               <dd> 
+                   <p>
+                   		<!-- <img src="" class="mar_r10" width="90" height="40" name=""> -->
+                   		#foreach($entity in $!shopBrandList)
+                   			<img src="$!imageServerAddr$entity.brandLogoUrl" width="90" height="40" style="cursor:pointer;" showImg="findImg" title="$entity.brandName" alt="$entity.brandName" />
+                   		#end
+                   </p>
+               </dd>
+            </dl>
+           #*
+			<dl>
+               <dt>购买设置：</dt>
+               <dd>
+               	   <p><b>起批设置：</b></p>
+                   <p class="mar_t10">
+                   金额要求：订单总价大于 $!shopInfo.initialPrice 元 #if($!shopInfo.initialCondition==1)或 #else 且 #end 数量要求：货品总数大于 $!shopInfo.initialMount件
+                   </p>
+               	   <p><b>其他设置：</b></p>
+                   #if($shopInfo.mutilPrice==1)
+                   <p><i class="demo-icons"><input name="mixedBatch" type="checkbox" checked="checked" /></i>混批</p>
+                   <p class="mar_t10">
+                    金额要求：订单总价大于  $!shopInfo.priceMin 元 #if($!shopInfo.mutilCondition==1)或 #else 且 #end 数量要求：货品总数大于 $!shopInfo.mountMin件
+                   </p>
+                   #else
+                    <p>无</p>
+                   #end                                     
+                </dd>
+            </dl>
+			*#
+    <!--每一行基本信息 结束-->
+
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>发货(退货)地址：</dt>
+               <dd> 
+               $!shopInfo.provinceName $!shopInfo.cityName <!-- $!shopInfo.districtName --> 
+                </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>邮政编码：</dt>
+               <dd>
+					$!shopInfo.zcode
+                </dd> 
+            </dl>
+    <!--每一行基本信息 结束-->
+
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>街道地址：</dt>
+               <dd>$!shopInfo.streetName</dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>手机号码：</dt>
+               <dd>$!shopInfo.mobile</dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+    
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>座机号码：</dt>
+               <dd>$!shopInfo.areaCode 
+               	   #if($!shopInfo.areaCode && $!shopInfo.areaCode!='') - #end 
+               	   $!shopInfo.landline 
+               	   #if($!shopInfo.landline && $!shopInfo.landline!='') - #end 
+               	   $!shopInfo.extensionNumber
+               </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+    
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>销售负责人：</dt>
+               <dd>$!shopInfo.linkMan1</dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+    
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>销售负责人电话：</dt>
+               <dd>$!shopInfo.linkPhoneNum1</dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+    
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>其他联系人：</dt>
+               <dd>$!shopInfo.linkMan2</dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+    
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>其他联系人电话：</dt>
+               <dd>$!shopInfo.linkPhoneNum2</dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+    
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>备注：</dt>
+               <dd>$!shopInfo.remark</dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+         </div><!--Notice end-->
+    <!--文字段落结束-->         
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->

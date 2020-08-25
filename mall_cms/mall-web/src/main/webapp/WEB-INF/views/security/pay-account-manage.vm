@@ -1,0 +1,245 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+<style type="text/css">
+
+#withdraw_submit.unchick_btn {
+	background-color: #e8e8e8;
+	cursor: default;
+}
+
+#withdraw_submit.unchick_btn:hover {
+	background-color: #e8e8e8;
+}
+
+</style>
+
+<script type="text/javascript">
+	$(function(){
+		$("#leftBuyer").load("$request.contextPath/leftBuyer");
+	});
+</script>
+<div id="main">
+<!--中间部分开始-->
+
+<!-- left start -->
+<div id="leftBuyer"></div>
+<!-- left end -->
+
+<!--以下为弹出层-->
+<!-- 提现操作 -->
+<div class="po_fai" style="display: none;">
+    <div class="po_fai_bg"></div>
+    <div class="po_main pad_t10" style="top: 40%;">
+    <div class=" hei_32 bg_05 pad_l10 "><i onclick="closePopup()" class="demo-icons fa-times-circle font_16 fr mar_r10" style="cursor: pointer;"></i>登录密码</div>
+    <div class="clear"></div>
+    <div class="register_content" style="width:450px;height:450px;margin:auto;">
+    	<form action="$request.contextPath/security/withdraw" method="post">
+          <div class="register_box_mid" >
+            <dl>
+                    <dt>提取金额：</dt>
+                    <dd style="border:none; padding-bottom: 0px;">
+                    	<input name="withdrawPrice" id="withdrawPrice_id" type="text" class="input_Style2 wid_180 hei_30" /><br />
+                    	<span style="color: red;">#if($!usableMoney) 可用余额：$usableMoney #else  #end</span>
+                    </dd>
+                </dl>
+
+                <!--如需增加可循环dl结束-->
+                <dl>
+                    <dt>账户信息：</dt>
+                    <dd style="border:none"><br />
+                    	<span>账户名：</span><span id="accountName"></span><br />
+                    	<span>卡&nbsp;&nbsp;&nbsp;号：</span><span id="cardNumber"></span><br />
+                    	<span>开户行：</span><span id="openingBank"></span><br />
+                    </dd>
+                </dl>
+<!--                 <dl> -->
+<!--                     <dt>验证码：</dt> -->
+<!--                     <dd style="border:none"> -->
+<!--                     	<input name="captcha" type="text"  class="input_Style2 wid_180 hei_30" /> -->
+<!--                     </dd> -->
+<!--                 </dl> -->
+                <dl>
+                    <dt>支付密码：</dt>
+                    <dd style="border:none">
+                    	<input name="paypwd" type="password" id="paypwd_id" class="input_Style2 wid_180 hei_30" />
+                    </dd>
+                </dl>
+                <p class="mar_t10 font_fe"><input name="protocol" type="checkbox" checked="checked" id="protocol_id"/><a href="$request.contextPath/user/agreement">同意舒适100协议商城《用户协议》和《隐私声明》</a></p>
+                <button type="button" id="withdraw_submit" style="margin:20px 0 0 150px; width:150px;" class="button_1 hei_40 font_16">提交</button>
+            </div><!--register_box-->
+          </form>
+    </div>
+    </div>
+</div>
+<!-- 修改登陆密码 end-->
+
+<!--右边部分开始-->
+<div id="right">
+    <div id="right_top" class="right_top border-4 bg_06">
+			<ul class="list mar_lr20">
+                <li class="wid_300">
+                    <span class="font_wid">支付账户：</span>
+                    $!buyerPaysAccount
+                </li>
+                <li class="wid_300">
+                    <span class="font_wid">账户状态：</span>
+                    $!state
+                </li>
+				<li class="wid_940">
+					支付账户可提现金额：<i class="font_fe"> #if($!usableMoney) $usableMoney #else 查询余额失败，请稍后再试  #end </i>
+				</li>
+				<li class="wid_940">
+					<button id="recharge" class="button_2 hei_35" type="button" >充 值</button>
+					<!--1、如果查询余额失败，则不显示提现按钮 ，2、如果是舒适100——买家则不显示提现按钮，3、如果是买家，则显示提现按钮 -->
+					#if(($!userInfoDTO.userDTO.userstatus == 4 || $!userInfoDTO.userDTO.userstatus == 6) && $!isysj)
+					<button id="withdraw_id" class="button_2 hei_35" type="button">提 现</button>【提现时间为：<i class="font_fe">9:00-16:00</i>，其余时间均会失败】
+					#end
+				</li>
+			</ul>
+	</div> <!-- right_top 结束-->
+
+
+	#if($!isysj==true)
+	<div id="right_bot" class="right_bot border-4 mar_t10 bg_06">
+    <!-- 商品列表开头 -->
+		<div class="right_xinxi mar_l14" style="min-height: 330px;">
+        <h3>提现记录</h3>
+			<ul class="list_top bg_08 font_cen font_14b">
+				<li class="wid_40">编号</li>
+				<li class="wid_300">提现金额</li>
+                <li class="wid_400">提交时间</li>
+                <li class="wid_200">状态</li>
+            </ul>
+      <!-- 类型选择 -->
+      <!-- 商品信息 -->
+      <table class="information mar_b10" id="information"><!--单双行变色加bg_05这个样式-->
+        #foreach($d in $data)
+        <tr #if($!velocityCount % 2 == 0) class="bg_05" #end>
+          <td class="wid_40 font_cen">
+            <input type="checkbox"/>
+          </td>
+          <td class="wid_300 font_cen">$d.amount</td>
+          <td class="wid_400 font_cen">$d.createdTime</td>
+          <td class="wid_200 font_cen">$d.status</td>
+        </tr>
+        #end
+      </table>
+      </div>  <!--right_xinxi end -->
+      <form action="$request.getContextPath()/security/payaccount" method="post">
+		  <input type="hidden" name="page" value="$!page.page" />
+	  </form>
+      #pageVelocity($pager)
+		</div><!--right_bot end -->
+		#end
+
+
+</div> <!--id="right" end-->
+
+<!--右边部分结束-->
+</div><!--#main end -->
+
+<script type="text/javascript">
+
+	//到指定的分页页面
+	function topage(page){
+		var form = document.forms[0];
+		form.page.value=page;
+		form.submit();
+	}
+	$("#recharge").click(function(){
+		if("$!{buyerPaysAccount}"==null||"$!{buyerPaysAccount}"==''){
+			alert('尊敬的用户，您还没有进行买家认证，没有可用的中信账户，不能进行充值！');
+			retrun ;
+		}
+		window.location.href='$request.contextPath/security/selectBank'
+	});
+	$("#withdraw_id").click(function(){
+		$.ajax({
+			url:"$request.contextPath/security/account",
+			type:"post",
+			data:null,
+			success:function(data){
+				if(data != null){
+					$("#accountName").html(data.userAccountDTO.bankAccountName);
+					$("#cardNumber").html(data.userAccountDTO.bankAccount);
+					$("#openingBank").html(data.userAccountDTO.bankBranchIsLocated);
+				} else {
+					alert("没数据");
+				}
+			}
+		});
+		$(".po_fai").show();
+	});
+
+	function closePopup(){
+		$(".po_fai").hide();
+	}
+
+	var stats = 1;
+	$("#withdraw_submit").click(function(){
+		if(!checkProtocol()){
+			return;
+		}
+		if(stats != 1){
+			return;
+		}
+		var withdrawPrice = $("#withdrawPrice_id").val();
+		var moneyFormat1 = /^[0-9]+\.[0-9]{1,2}$/;
+		var moneyFormat2 = /^[1-9]{1}[0-9]*$/;
+		if(!moneyFormat1.test(withdrawPrice) && !moneyFormat2.test(withdrawPrice)){
+			alert("提现金额格式不对");
+			return;
+		}
+		if("$!usableMoney" != "" && "$!usableMoney" < withdrawPrice) {
+			alert("提现金额超出可用余额");
+			return;
+		}
+		var paypwd = $("#paypwd_id").val();
+		if(paypwd.length < 1){
+			alert("请输入支付密码");
+			return;
+		}
+		stats = 0;
+		$("#withdraw_submit").addClass("unchick_btn");
+		$.ajax({
+			url:"$request.contextPath/security/withdraw",
+			type:"post",
+			data:{withdrawPrice:withdrawPrice,paypwd:paypwd},
+			success:function(data){
+				if(data == 1){
+					$(".po_fai").hide();
+					window.location.href="$request.contextPath/security/payaccount";
+				} else if(data == 2) {
+					$(".po_fai").hide();
+					alert("支付密码错误！");
+				} else {
+					$(".po_fai").hide();
+					alert("提现失败，请稍后重试！");
+				}
+				stats = 1;
+				$("#withdraw_submit").removeClass("unchick_btn");
+			}
+		});
+	});
+
+
+	$("#protocol_id").change(checkProtocol);
+
+	function checkProtocol(){
+		var status = $("#protocol_id").prop("checked");
+		if(status && stats == 1){
+			$("#withdraw_submit").removeClass("unchick_btn");
+			return true;
+		} else {
+			$("#withdraw_submit").addClass("unchick_btn");
+			return false;
+		}
+	}
+
+	function topage(page){
+		var form = document.forms[1];
+		form.page.value=page;
+		form.submit();
+	}
+
+</script>

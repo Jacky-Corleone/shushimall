@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.cmscenter.dao.CMSCategoryDAO">
+	<resultMap id="CmsCatetoryMapper" type="com.camelot.cmscenter.dto.CmsCategoryDTO">
+			<result property="id" column="id" />
+			<result property="siteId" column="site_id" />
+			<result property="officeId" column="office_id" />
+			<result property="parentId" column="parent_id" />
+			<result property="parentIds" column="parent_ids" />
+			<result property="module" column="module" />
+			
+			<result property="name" column="name" />
+			<result property="staticpath" column="staticpath" />
+			<result property="image" column="image" />
+			<result property="href" column="href" />
+			<result property="target" column="target" />
+			<result property="description" column="description" />
+			<result property="keywords" column="keywords" />
+			<result property="sort" column="sort" />			
+			<result property="inMenu" column="in_menu" />
+			<result property="inList" column="in_list" />			
+			<result property="showModes" column="show_modes" />
+			<result property="isAudit" column="is_audit" />
+			<result property="customListView" column="custom_list_view" />			
+			<result property="customContentView" column="custom_content_view" />
+			<result property="viewConfig" column="view_config" />			
+
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			<result property="delFlag" column="del_flag" />
+			<result property="createBy" column="create_by" />
+			
+	</resultMap>
+
+	<select id="queryById" resultMap="CmsCatetoryMapper" >
+		select * from cms_category where id = #{id}
+	</select>
+	
+	
+
+	<select id="queryCount" resultType="long">
+		select count(1) from cms_category 
+		<include refid="where_fragement" />
+	</select>
+
+	<!-- 查询 -->
+	<select id="queryCategoryList" resultMap="CmsCatetoryMapper">
+		select * from cms_category
+		<include refid="where_fragement" />
+		ORDER BY create_date DESC
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+
+	<sql id="where_fragement">
+		where 1 = 1
+		<if test="cmsCategoryDTO.id!=null and cmsCategoryDTO.id!=''">
+			and id = #{cmsCategoryDTO.id}
+		</if>
+		<if test="cmsCategoryDTO.siteId!=null and cmsCategoryDTO.siteId!=''">
+			and site_id = #{cmsCategoryDTO.siteId}
+		</if>
+		<if test="cmsCategoryDTO.parentId!=null and cmsCategoryDTO.parentId!=''">
+			and parent_id = #{cmsCategoryDTO.parentId}
+		</if>
+		<if test="cmsCategoryDTO.delFlag!=null and cmsCategoryDTO.delFlag!=''">
+			and del_flag = #{cmsCategoryDTO.delFlag}
+		</if>
+		<if test="cmsCategoryDTO.name!=null and cmsCategoryDTO.name!=''">
+			and name like CONCAT('%',TRIM(#{cmsCategoryDTO.name}),'%')
+		</if>
+	</sql>
+
+	<sql id="pagination_tail">
+		limit #{page.pageOffset} , #{page.rows}
+	</sql>
+</mapper>

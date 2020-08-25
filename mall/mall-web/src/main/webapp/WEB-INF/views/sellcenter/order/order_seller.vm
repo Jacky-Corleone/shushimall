@@ -1,0 +1,974 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<script language="javascript" type="text/javascript" src="$request.getContextPath()/assets/js/tab.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/My97DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="$staticPath/js/order/order_seller.js"></script>
+<!-- 防止重复提交AJAX控件 -->
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<style>
+
+</style>
+<script type="text/javascript">
+
+	$(function(){
+		//加载左侧菜单
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+		//延期付款 和  待付款 选项卡切换
+		$('#tabs li').click(function(){
+		  var $this = $(this);
+		  var $t = $this.index();
+		  $li.removeClass();
+		  $this.addClass('active');
+		});
+		//订单改价提交
+		$(".js_changePrice_submit").click(function(){
+			var orderId = $("#changePrice_orderId").val();
+			var pay_price_total = $("#pay_price_total").val();//商品金额改价
+			var changedPrice = $("#changedPrice").val();//商品改价后金额
+			var promotionDiscount = $("#promotionDiscount").val();//优惠金额改价
+			//var freight = $("#freight").val();//运费改价
+			var itemId = $("#changePrice_itemId").val();
+			var skuId = $("#changePrice_skuId").val();
+			var primitivePrice = $("#primitivePrice").val();
+			if(parseFloat(primitivePrice) < parseFloat(promotionDiscount)){
+				alert("优惠金额不能大于商品金额");
+				return;
+			}
+			var oldPrice = $("#original_pay_price").val();
+			var newPrice = $("#changedPrice").val();
+            var integralDiscount = $("#integralDiscount").val();
+			if(parseFloat(oldPrice) < parseFloat(newPrice)){
+        		alert("改价金额不允许大于原价!");
+        		return;
+        	}
+			$.ajax({
+				type: "POST",
+				dataType: "json",
+				url: "$request.getContextPath()/order/modifyOrderPrice",
+				data: {
+					orderId: orderId,
+					itemId: itemId,
+					skuId: skuId,
+					changedPrice:changedPrice,
+					payPriceTotal: pay_price_total,
+					promotionDiscount: $("#promotionDiscount_old").val(),
+					oldPrice:oldPrice
+					//freight: freight
+				},
+				success: function(data){
+					if(data.success){
+						$(".js_changePrice").hide();
+						var pageState = $("#pageState").val();
+						if(!pageState||pageState==0||pageState==''){
+							$("#shipmentType").val("");
+						}
+						submitGoodsForm();
+					}else{
+						alert("改价失败："+data.errorMessages);
+					}
+					
+				}
+			});
+		});
+		//订单改价取消
+		$(".js_changePrice_cancle").click(function(){
+			$(".js_changePrice").hide();
+		});
+
+		//确认付款
+		/*
+		$(".js_confirmPayment_submit").click(function(){
+			var orderId = $("#confirmPayment_orderId").val();
+			var paymentType = $(".paymentType").val();
+			if($.trim(paymentType) == ""){alert("请选择支付类型"); return;}
+			$.ajax({
+				type: "POST",
+				dataType: "json",
+				url: "$request.getContextPath()/order/modifyOrderPayStatus",
+				data: {
+					orderId: orderId,
+					paymentType: 3
+				},
+				success: function(data){
+					if(data.success){
+						$(".js_confirmPayment").hide();
+						submitGoodsForm();
+					}else{
+						alert("物流信息添加失败："+data.errorMessages);
+					}
+				}
+			});
+		});
+		*/
+		//确认付款 弹框取消
+		/*
+		$(".js_confirmPayment_cancle").click(function(){
+			$(".js_confirmPayment").hide();
+		});
+		*/
+		
+		
+		$("#deliveryNumber").keydown(
+				function(event) {
+					if(!event.shiftKey){
+						if ((event.which > 47 && event.which < 58) || (event.which > 65 && event.which < 90) || (event.which > 97 && event.which < 122)
+								|| event.which == 8 || event.which == 37 || event.which == 39 ) {
+							return true;
+						} else if (event.which == 86 && previouskey == 17) {
+							return true;
+						}
+					}
+					previouskey = event.which;
+					
+					return false;
+				});
+            
+            // 禁止粘贴非数字的字符
+            $('#deliveryNumber').bind('paste',function(e){
+				var pastedText = undefined;
+				if (window.clipboardData && window.clipboardData.getData) { // IE
+					pastedText = window.clipboardData.getData('Text');
+				} else {
+					pastedText = e.originalEvent.clipboardData.getData('Text');//e.clipboardData.getData('text/plain');
+				}
+				if (/^[A-Za-z0-9]*$/.test(pastedText)) {
+					return true;
+				} else {
+					return false;
+				}
+		    });
+	});
+	//条件查询
+    function submitGoodsForm(){
+		//条件查询初始化页码
+		$("input[name='page']").val("1");
+		var form = document.all.queryForm;
+        form.action="$request.getContextPath()/order/querySeller";
+		form.submit();
+    };
+
+    function exportall(){
+        var form = document.all.queryForm;
+        form.action="$request.getContextPath()/order/export"
+        form.submit();
+        form.action="$request.getContextPath()/order/querySeller";
+    }
+	//到指定的分页页面
+	function topage(page){
+		$("input[name='page']").val(page);
+		$("#queryForm").submit();
+	}
+	//查看
+  function getLastMonthYestdy() {
+	var select_time = document.all.select_time.value;
+	var daysInMonth = new Array([ 0 ], [ 31 ], [ 28 ], [ 31 ], [ 30 ], [ 31 ],
+			[ 30 ], [ 31 ], [ 31 ], [ 30 ], [ 31 ], [ 30 ], [ 31 ]);
+	var date = new Date();
+	var strYear = date.getFullYear();
+	var strDay = date.getDate();
+	var strMonth = date.getMonth() + 1;
+	
+	if (select_time == 0) {
+		document.all.createStart.value = "";
+		document.all.createEnd.value = "";
+		return ;
+	} else if (select_time == 2) {
+		select_time = 3;
+	} else if (select_time == 3) {
+		strYear = strYear -1;
+		datastr = strYear + "-" + strMonth + "-" + strDay;
+		document.all.createStart.value = datastr;
+		document.all.createEnd.value = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
+		return ;
+	}
+
+	strMonth = strMonth - select_time+1;
+	if (strYear % 4 == 0 && strYear % 100 != 0) {
+		daysInMonth[2] = 29;
+	}
+	if (strMonth - 1 <= 0) {
+		strYear -= 1;
+		strMonth = strMonth - 1 + 12;
+	} else {
+		strMonth -= 1;
+	}
+	strDay = daysInMonth[strMonth] >= strDay ? strDay : daysInMonth[strMonth];
+	datastr = strYear + "-" + strMonth + "-" + strDay;
+	document.all.createEnd.value = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
+	document.all.createStart.value = datastr;
+  };
+  
+  //调整tab页签效果
+function changeTabs(thisObj, Num) {
+	if (thisObj.className == "active"){
+		return;
+	}
+	$("input[name='state']").val(Num);
+	$("input[name='page']").val("1");
+	
+	$("input[name='shopName']").val("");
+	$("input[name='orderId']").val("");
+	$("#select_time").val(0);
+	$("input[name='createStart']").val("");
+	$("input[name='createEnd']").val("");
+	$("#shipmentType").val("");
+	$("#queryForm").submit();
+};
+//待付款  和  分期付款
+function changeShipmentype(thisObj, Num, state) {
+	if (thisObj.className == "active"){
+		return;
+	}
+	$("#shipmentType").val(Num);
+	$("input[name='state']").val(state);
+	$("input[name='page']").val("1");
+	
+	$("input[name='shopName']").val("");
+	$("input[name='orderId']").val("");
+	$("#select_time").val(0);
+	$("input[name='createStart']").val("");
+	$("input[name='createEnd']").val("");
+	$("#queryForm").submit();
+};
+//确定发货
+function orderStatusHandle(obj, orderId, state, refund){
+	if(refund==2){
+		if(confirm("点击"+$.trim(obj.text)+"将关闭您未同意的退款申请，请谨慎操作，是否继续？")){
+			$.ajax({
+				type: "POST",
+				dataType: "json",
+				url: "$request.getContextPath()/order/deliverOrder",
+				data: {
+					orderId: orderId,
+					state: state
+				},
+				success: function(data){
+					if(data.success){
+						$("#queryForm").submit();
+					}
+				}
+			});
+		}
+	}else{
+		if(confirm("您"+$.trim(obj.text)+"吗？")){
+			$.ajax({
+				type: "POST",
+				dataType: "json",
+				url: "$request.getContextPath()/order/deliverOrder",
+				data: {
+					orderId: orderId,
+					state: state
+				},
+				success: function(data){
+					if(data.success){
+						$("#queryForm").submit();
+					}
+				}
+			});
+		}
+	}
+}
+
+//确认付款
+function confirmPayment(obj, orderId){
+	if(confirm("请确认您是否收到了货款")){
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "$request.getContextPath()/order/modifyOrderPayStatus",
+			data: {
+				orderId: orderId,
+				paymentType: 3
+			},
+			success: function(data){
+				if(data.success){
+					submitGoodsForm();
+				}else{
+					alert("失败："+data.errorMessages);
+				}
+				
+			}
+		});
+	}
+}
+
+function deleteOrderById(orderId){
+	if(confirm("您确定要删除此订单吗？")){
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "$request.getContextPath()/order/deleteOrderById",
+			data: {
+				orderId: orderId
+			},
+			success: function(data){
+				if(data.success){
+					$("#queryForm").submit();
+				}else{
+					alert(data.errorMessages);
+				}
+			}
+		});
+	}
+}
+//订单改价
+function changePrice(orderId, itemId, skuId, payPriceTotal, promotionDiscount, sumDiscount, freight,primitivePrice,integralDiscount){
+	if (integralDiscount == 0) { // 商品未使用积分抵扣
+		$("#integralDiscountText").parent().hide();
+	} else {
+		$("#integralDiscountText").parent().show();
+		$("#integralDiscountText").val(integralDiscount);
+	}
+	$(".js_changePrice").show();
+	$("#changePrice_orderId").val(orderId);
+	$("#changePrice_itemId").val(itemId);
+	$("#changePrice_skuId").val(skuId);
+	$("#pay_price_total").val(primitivePrice); // 是否应该是原价
+	$("#primitivePrice").val(primitivePrice);
+	var changePrice_old = new Number(primitivePrice-sumDiscount-integralDiscount).toFixed(2);
+	$("#changedPrice").val(new Number(payPriceTotal).toFixed(2));
+	$("#original_pay_price").val(changePrice_old);
+	$("#integralDiscount").val(integralDiscount);
+	$("#promotionDiscount").val(new Number(primitivePrice-payPriceTotal-integralDiscount).toFixed(2));
+	$("#promotionDiscount_old").val(promotionDiscount);
+	
+	$("#freight").val(freight);
+}
+function numInput4Discount(obj) {
+	if (obj.value2===undefined) {
+		obj.value2='';
+	}
+	if(!obj.value)
+		return;
+	if(obj.value.search(/^\d*(\.\d{0,2})?$/)==-1) { // 找不到x.xx
+		obj.value=obj.value2;
+	} else {
+		obj.value2=obj.value;
+	}
+	
+}
+function checkNum(obj){
+	//为了去除最后一个.
+	obj.value = obj.value.replace(/\.$/g,"");
+	if(obj.value == ''){
+		return ;
+	}
+	//使用改价后，重新计算优惠金额
+	var integralDiscount = $("#integralDiscount").val();
+	var oldPrice = $("#original_pay_price").val();
+	var newPrice = $("#changedPrice").val();
+	//var promotionDiscount = $("#promotionDiscount_old").val();
+	var newPromotionDiscount =parseFloat(oldPrice) - parseFloat(newPrice);
+	newPromotionDiscount = parseFloat(newPromotionDiscount).toFixed(2);
+	if(parseFloat(oldPrice) < parseFloat(newPrice)){
+		alert("改价金额不允许大于原价!");
+		return;
+	}
+	var pay_price_total = parseFloat($("#pay_price_total").val());
+	var promotionDiscount = pay_price_total-parseFloat(newPrice);
+	$("#promotionDiscount").val(parseFloat(promotionDiscount).toFixed(2));
+	
+}
+
+function checkOrderCode(obj){
+   var aa=  /^[0-9a-zA-Z]*$/g;
+   if(!aa.test(obj.value)){
+       $("#deliveryNumber").css("border-color","red");
+       $("#errorMeg").css("display","block");
+   }else{
+       $("#deliveryNumber").css("border-color"," #e8e8e8");
+       $("#errorMeg").css("display","none");
+   }
+}
+
+function checkMobiletelephone(obj){
+   var aa=  /^[0-9]{11}$/g;
+   if(!aa.test(obj.value)){
+       $("#mobiletelephone").css("border-color","red");
+       $("#errorMegPhone").css("display","block");
+   }else{
+       $("#mobiletelephone").css("border-color"," #e8e8e8");
+       $("#errorMegPhone").css("display","none");
+   }
+}
+
+</script>
+<div id="main">
+<!--left start -->
+<div id="leftSeller" class="border-4">                    </div>
+<!--left end -->
+<!--右边部分开始-->
+<div id="right">
+      <div class="nTab">
+            <!-- 标题开始 -->
+            <div class="TabTitle">
+            <input  name="pageState" id="pageState" type="hidden" value="$!pageState"/>
+				#set($pageState = $pageState) 
+				<ul id="myTab0">
+					<li #if(!$pageState||$pageState==0||$pageState=='') class="active" #else class="normal" #end onclick="changeTabs(this,0);"> 全部订单（$!allOrdersCount）</li>
+					<li #if($pageState == 1 ) class="active" #else class="normal" #end onclick="changeShipmentype(this,1,1);">待付款（$!stayPayment）</li>
+					<li #if($pageState == 2 ) class="active" #else class="normal" #end onclick="changeShipmentype(this,1,2);">待配送/服务（$!stayDelivery）</li>
+					<li #if($pageState == 3 ) class="active" #else class="normal" #end onclick="changeTabs(this,3);">待收货/验收（$!stayReceipt）</li>
+					<li #if($pageState == 4 ) class="active" #else class="normal" #end onclick="changeTabs(this,4);">待评价（$!evaluation）</li>
+					<li #if($pageState == 5 ) class="active" #else class="normal" #end onclick="changeTabs(this,5);">已完成（$!successOrder）</li>
+					<li #if($pageState == 6 ) class="active" #else class="normal" #end onclick="changeTabs(this,6);">已取消（$!cancleOrder）</li>
+				</ul>
+            </div>
+            <!-- 内容开始 -->
+            <div class="TabContent">
+               <!-- 全部订单 下的内容开始 -->
+                <div id="myTab0_Content0">
+					#if($pageState == 1 )
+					<ul id="tabs" class="TabTitle2 mar_t10 hide">
+						<li onclick="changeShipmentype(this,1,$pageState);" #if($shipmentType == 1 ) class="active" #else class="normal" #end>待付款</li>
+						<li onclick="changeShipmentype(this,2,$pageState);" #if($shipmentType == 2 ) class="active" #else class="normal" #end>延期付款</li>
+					</ul>
+					#end
+					#if($pageState == 2 )
+					<ul id="tabs" class="TabTitle2 mar_t10 hide">
+						<li onclick="changeShipmentype(this,1,$pageState);" #if($shipmentType == 1 ) class="active" #else class="normal" #end>已付款订单</li>
+						<li onclick="changeShipmentype(this,2,$pageState);" #if($shipmentType == 2 ) class="active" #else class="normal" #end>延期付款订单</li>
+					</ul>
+					#end
+                <!--每一个下面的内容复制开始-------------------------------- -->
+                <!--搜索条件 开始-->
+			<form id="queryForm" action="$request.getContextPath()/order/querySeller" method="post">
+                <div id="right_top" class="right_top ">
+                    <div class="right_top_l">
+                        <ul class="list">
+                        	 <li class="wid_260">
+                                <span class="font_wid">商品：</span>
+                                <input class="wid_135 hei_30 input_Style2" name="itemName" type="text" value="$!tradeOrdersQueryInDTO.itemName"/>
+                            </li>
+                            <li class="wid_260">
+                                <span class="font_wid">订 单 号：</span>
+								<input class="wid_135 hei_30 input_Style2" name="orderId" type="text" onkeyup="this.value=this.value.replace(/\D/g,'')" value="$!tradeOrdersQueryInDTO.orderId"  />
+                            </li>
+                            #if($pageState == 1 && $shipmentType == 2)
+                            <li class="wid_260">
+                             	<!-- 用于延期支付的页面，如果是延期支付，则显示订单状态的查询条件 -->	
+                             	<span class="font_wid" >订单状态：</span>
+                           		<select id="yq_state" name="yq_state"  class="wid_165 hei_30 input_Style2" >
+                                	<option value="" #if($!yq_state=="") selected="selected" #end>请选择</option>
+									<option value="2" #if($!yq_state==2) selected="selected" #end>待配送未付款</option>
+									<option value="3" #if($!yq_state==3) selected="selected" #end>已发货未付款</option>
+									<option value="4" #if($!yq_state==4) selected="selected" #end>已收货未付款</option>
+									<option value="5" #if($!yq_state==5) selected="selected" #end>已评价未付款</option>
+								</select>
+							</li>
+							#end
+                            #if(!$pageState||$pageState==0||$pageState=='')
+                            <li class="wid_260">
+                             	<!-- 用于全部订单的页面，显示订单状态的查询条件 -->	
+                             	<span class="font_wid" >订单状态：</span>
+                           		<select id="yq_state" name="yq_state"  class="wid_165 hei_30 input_Style2" >
+                           			<option value="" #if($!yq_state=="") selected="selected" #end>请选择</option>
+                                	<option value="1" #if($!yq_state==1) selected="selected" #end>待付款</option>
+									<option value="2" #if($!yq_state==2) selected="selected" #end>待配送/服务</option>
+									<option value="3" #if($!yq_state==3) selected="selected" #end>待收货/验收</option>
+									<option value="4" #if($!yq_state==4) selected="selected" #end>待评价</option>
+									<option value="5" #if($!yq_state==5) selected="selected" #end>已完成</option>
+									<option value="6" #if($!yq_state==6) selected="selected" #end>已取消</option>
+									<option value="7" #if($!yq_state==7) selected="selected" #end>已关闭</option>
+								</select>
+							</li>
+							#end
+                            <div class="clear"></div>
+							<li class="wid_260">
+                                <span class="font_wid" >查看：</span>
+								<select id="select_time" name="selectTime"  class="wid_165 hei_30 input_Style2" onchange="getLastMonthYestdy()" >
+									<option value="0" #if($!selectTime==0) selected="selected" #end>请选择</option>
+									<option value="1" #if($!selectTime==1) selected="selected" #end>一个月以内订单</option>
+									<option value="2" #if($!selectTime==2) selected="selected" #end>三个月以内订单</option>
+									<option value="3" #if($!selectTime==3) selected="selected" #end>一年以内订单</option>
+								</select>
+                            </li>
+							<li class="wid_500">
+                                <span class="font_wid">下单时间：</span>
+								<input name="createStart" id="createStart" readonly="readonly"  type="text"  
+									value="$!date.format('yyyy-MM-dd ',$!tradeOrdersQueryInDTO.createStart )"
+									class="wid_135 hei_30 input_Style2" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/>
+								<i class="demo-icons">-</i>
+							    <input name="createEnd"  type="text" readonly="readonly"   id="createEnd"
+									value="$!date.format('yyyy-MM-dd ',$!tradeOrdersQueryInDTO.createEnd )"
+									class="wid_135 hei_30 input_Style2" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});" />
+                            </li>
+							<li class="wid_260" style="display:none;" >
+                                <span class="font_wid">订单状态：</span>
+								<input type="text" class="input_Style2 wid_120 hei_30" name="state" id="state" value="$!pageState" />
+								<input type="hidden" name="page" value="$!pager.page">
+								<input type="hidden" name="shipmentType" id="shipmentType" value="$!shipmentType">							
+                            </li>
+
+                        </ul>
+                    </div><!--right_top_l end -->
+                    
+                    <div class="right_top_r">
+                        <button type="button" onclick="submitGoodsForm();" class="button_4 but_cx3">
+                            <a class="font_1c hei_24">搜  索</a>
+                        </button>
+                    </div> <!--right_top_l end -->
+                    <div class="right_top_r">
+
+                        #if((!$pageState||$pageState==0||$pageState=='') && $shipmentType != 2)
+                            <button type="button" onclick="exportall();" class="button_4 but_cx3">
+                                <a class="font_1c hei_24">导  出</a>
+                            </button>
+                        #end
+                    </div> <!--right_top_l end -->
+                    </div> 
+                </form>
+				<!-- 搜索条件end -->
+					
+				<div id="right_bot" class="right_bot">
+					<!-- 商品列表开头 -->
+					<div class="right_xinxi mar_l14">
+						<ul class="list_top bg_08 font_14b mar_b10">
+							<li class="wid_270 font_cen hei_40">商品信息</li>
+							<li class="wid_100 font_cen hei_40">单价</li>
+							<li class="wid_50 font_cen hei_40">数量</li>
+							<li class="wid_60 font_cen hei_40">商品操作</li>
+							<li class="wid_90 font_cen hei_40">售后服务</li>
+							<li class="wid_100 font_cen hei_40">总金额</li>
+							<li class="wid_60 font_cen hei_40">订单状态</li>
+							<li class="wid_70 font_cen hei_40">订单类型</li>
+							<li class="wid_70 font_cen hei_40">收货人</li>
+							<li class="wid_60 font_cen hei_40">交易操作</li>
+						</ul>
+						#if($!pager.records.size() == 0)
+							<p class="hei_40 mar_20 font_cen" >没有搜索到该信息&nbsp;</p>
+						#end
+						#foreach($entity in $pager.records)
+						<div class="mar_b10">
+							<ul class="list_top bg_05 font_14b mar_b10 border">
+								<li class="wid_300 hei_40 mar_20">订单号：<a href="$request.getContextPath()/order/queryOrderInfoSeller?orderId=$!entity.orderId&passKey=$!entity.passKey" target="_blank"> $!entity.orderId</a></li>
+								<li class="wid_220 hei_40 fr">下单时间：$!date.format('yyyy-MM-dd HH:mm:ss ',$!entity.createTime )</li>
+								<li class="wid_180 hei_40 over_ell fr">
+								#foreach($json in $!jsonArray)
+									#if($!entity.orderId == $!json.orderId)
+										<span title="$!json.shopName">$!json.shopName</span>
+									#end
+								#end
+								</li>
+							</ul>
+							
+							<table class="information" id="information">
+								<tr>
+									<td class="wid_430 border-1 orderItems_js">
+										#set($count=0)
+										#foreach($entityItem in $!entity.items)
+											#set($count=$count+1)
+											#foreach($json in $!jsonArray)
+												#if($!entity.orderId == $!json.orderId)
+													#foreach($jsonItem in $!json.items)
+														#if($!entityItem.skuId == $!jsonItem.skuId)
+                										<ul class="Refund_one #if($count<$!entity.items.size()) border-6 #end" style="width:566px">
+                											<li class="wid_260">
+                												<a href="$request.getContextPath()/productController/details?id=$!entityItem.itemId&skuId=$!entityItem.skuId" target="_blank">
+                													<img class="fl mar_l10 skuPicUrl_js" src="$!imageServerAddr$!jsonItem.skuPicUrl" name="" width="82" height="82" />
+                												</a>
+                												<div class="fl wid_160 baobei_container">
+                													<div class="fl wid_160 baobei_name" style="margin-top:20px">
+                    													<p class="mar_l10 itemName_js" title="$!jsonItem.itemName">
+                    														<a href="$request.getContextPath()/productController/details?id=$!entityItem.itemId&skuId=$!entityItem.skuId" target="_blank">
+                    															#set($str=$!jsonItem.itemName)
+                    															#if($str.length()>30)
+                    																#set($str=$str.substring(0,30))
+                    																$str ...
+                    															#else
+                    																$!jsonItem.itemName
+                    															#end
+                    														</a>
+                    													</p>
+                    												</div>
+                													<div class="fl wid_170 baobei_spec">
+                    													<p class="mar_l10 itemName_js" title="$!jsonItem.itemAttrTitle">
+                    														#foreach($itemAttrName in $!jsonItem.itemAttr)
+                                                                        		<span style="margin-right:5px">
+                                                                				    $itemAttrName.name :
+                                                                				#foreach($itemAttrValue in $itemAttrName.values)
+                                                                					$itemAttrValue.name 
+                    															#end
+                    															</span>
+                                                                			#end
+                    													</p>
+                    												</div>
+                                                                </div>
+                											</li>
+                											#if($!entity.paymentMethod == 3)
+                												<li class="wid_100 font_cen hei_80 payPrice_js" style="overflow:hidden" title="$!jsonItem.payPrice积分">
+                												$!jsonItem.payPrice积分
+                											#else
+                												<li class="wid_100 font_cen hei_80 payPrice_js" style="overflow:hidden" title="￥$!jsonItem.payPrice">
+            													￥$!jsonItem.payPrice
+            												#end
+                											</li>
+                											<li class="wid_60 font_cen hei_80 num_js" style="overflow:hidden" title="$!jsonItem.num">
+																$!jsonItem.num
+                											</li>
+                											<li class="wid_60 font_cen hei_80 num_js" >
+                												#if($!entity.locked == 1)
+                													#if ($entity.state == 1 || $entity.paid == 1)  <!-- 待付款 -->  
+	                													#if($jsonItem.promotionDiscount)
+	                														#set($promotionDiscount=$jsonItem.promotionDiscount)
+	                													#else
+	                														#set($promotionDiscount="0.00")
+	                													#end
+	                													<a class="font_1c cursor" onclick="changePrice('$!entity.orderId', $!entityItem.itemId, $!entityItem.skuId, '$!jsonItem.payPriceTotal', '$!jsonItem.promotionDiscount', '$!jsonItem.sumDiscount', '$!entity.freight','$!jsonItem.primitivePrice','$!jsonItem.integralDiscount');">商品改价</a>
+																	#elseif ($entity.state == '3' )<!-- 待确认送货--> 
+																		<!-- 如果物流ID为空，添加物流 -->
+																		#if($jsonItem.deliveryId == '')
+																			#if($jsonItem.isShowDely)
+																			<a class="font_1c cursor" onclick="addDeliveryInfo('$!entity.orderId', $!entityItem.itemId, '$!jsonItem.orderItemId', '$!jsonItem.shopFreightTemplateId','$!entity.mobile');"><span style="">添加物流</span></a>
+																		   #else
+																			  无 
+																			#end
+																			<!-- 如果物流ID不为空，修改物流 -->
+																		#else
+																			<a class="font_1c cursor" onclick="addDeliveryInfo('$!entity.orderId', $!entityItem.itemId, '$!jsonItem.orderItemId', '$!jsonItem.shopFreightTemplateId');"><span style="">修改物流</span></a>
+																		#end
+																	#else无
+																	#end
+																#else
+																	<span>已冻结</span>
+																#end
+                											</li>
+                											<li class="wid_80 border-1 font_cen hei_80 payPrice_js" style="overflow:hidden">
+	                											#if($jsonItem.afterService == '1'||!$jsonItem.afterService )无
+					        									#elseif ($jsonItem.afterService == '2' )进行中
+					        									#elseif ($jsonItem.afterService == '3' )已完成
+					        									#elseif ($jsonItem.afterService == '4' )已关闭
+					        									#elseif ($jsonItem.afterService == '5' )<p style="line-height:22px;padding-top:20px">部分商品</br>已退款</p>
+					        									#else &nbsp;
+	    				        								#end
+                											</li>
+                										</ul>
+														#end
+													#end
+												#end
+											#end
+										#end
+									</td>
+									<td class="wid_100 border-1 font_cen">
+										#if($entity.paymentMethod == 3)
+											<div class="wid_80" style="overflow:hidden" title="$entity.integral积分">
+	        									<span class="hei_30">$!entity.integral积分</span><br/>
+        									</div>
+										#else
+											<div class="wid_80" style="overflow:hidden" title="￥$entity.paymentPrice">
+	        									<span class="hei_30">￥$entity.paymentPrice</span><br/>
+	        									#if($entity.discountAmount)
+	        										<span title="VIP优惠" class="cursor">惠:￥$entity.discountAmount</span>
+	        									#end
+        									</div>
+										#end
+									</td>
+									<td class="wid_60 border-1 font_cen">
+										<div class="wid_60" style="overflow:hidden">
+											#if($entity.state == '1' )  待付款
+											#elseif ($entity.state == '2' )
+												<!--  判断是纯服务还是其他商品-->
+												#set($count=1)
+												#foreach($entityItem in $!entity.items)
+														#foreach($json in $!jsonArray)
+															#if($!entity.orderId == $!json.orderId)
+																#foreach($jsonItem in $!json.items)
+																	#if($!entityItem.skuId == $!jsonItem.skuId)
+																		#if($!jsonItem.addSource > 3)
+																			#if($count == 1)
+																				待服务
+																				#set($count=2)
+																			#end
+																		#else
+																			#if($count == 1)
+																				待配送
+																				#set($count=2)
+																			#end
+																		#end
+																	#end
+																#end
+															#end
+														#end
+													#end
+											#elseif ($entity.state == '3' )
+												<!--  判断是纯服务还是其他商品-->
+												#set($count=1)
+												#foreach($entityItem in $!entity.items)
+														#foreach($json in $!jsonArray)
+															#if($!entity.orderId == $!json.orderId)
+																#foreach($jsonItem in $!json.items)
+																	#if($!entityItem.skuId == $!jsonItem.skuId)
+																		#if($!jsonItem.addSource > 3)
+																			#if($count == 1)
+																				待验收
+																				#set($count=2)
+																			#end
+																		#else
+																			#if($count == 1)
+																				待收货
+																				#set($count=2)
+																			#end
+																		#end
+																	#end
+																#end
+															#end
+														#end
+													#end
+											#elseif ($entity.state == '4' )待评价
+											#elseif ($entity.state == '5' )已完成
+											#elseif ($entity.state == '6' )已取消
+											#elseif ($entity.state == '7' )已关闭
+											#else &nbsp;
+											#end
+										</div>
+									</td>
+									<td class="wid_60 border-1 font_cen">
+        								<div class="wid_60" style="overflow:hidden">
+        									#if($!entity.orderType == '0' )  询价订单
+            									#elseif ($!entity.orderType == '1' ) 协议订单
+            									#elseif($entity.paymentMethod == 3) 积分订单
+            									#else 普通订单
+											#end
+                                        </div>
+        							</td>
+									<td class="wid_60 border-1 font_cen">
+										<div class="wid_60" style="overflow:hidden" title="$!entity.name">
+        									$!entity.name
+                                        </div>
+									</td>
+									<td class="wid_80 border-1 font_cen">
+										#if($!entity.locked == 1)
+											<a class="font_1c cursor" href="$request.getContextPath()/order/queryOrderInfoSeller?orderId=$!entity.orderId&passKey=$!entity.passKey" target="_blank">订单详情</a><br/>
+	                                        #if($!entity.paid == 1 && $!entity.state != 6)
+												<!--<a class="font_1c cursor" onclick="confirmPayment(this, '$!entity.orderId');">确认收到货款</a><br/> -->
+											#end			
+											#if($entity.state == '1' )  <!-- 待付款 -->
+											#elseif ($entity.state == '2' )<!-- 待配送 -->
+												<a class="font_1c cursor" onclick="orderStatusHandle(this, '$!entity.orderId', 3, $!entity.refund);">
+													<!--  判断是纯服务还是其他商品-->
+													#set($count=1)
+													#foreach($entityItem in $!entity.items)
+														#foreach($json in $!jsonArray)
+															#if($!entity.orderId == $!json.orderId)
+																#foreach($jsonItem in $!json.items)
+																	#if($!entityItem.skuId == $!jsonItem.skuId)
+																		#if($!jsonItem.addSource > 3)
+																			#if($count == 1)
+																				确认服务
+																				#set($count=2)
+																			#end
+																		#else
+																			#if($count == 1)
+																				确认发货
+																				#set($count=2)
+																			#end
+																		#end
+																	#end
+																#end
+															#end
+														#end
+													#end
+												</a><br/>
+											#elseif ($entity.state == '4' )<!-- 待评价 -->
+											#elseif ($entity.state == '5' )<!-- 已完成 -->
+												#if($entity.sellerEvaluate=='1')
+													<a class="font_1c cursor" href="$request.getContextPath()/sellerEvaluation/initSellerToBuyers?orderId=$!entity.orderId">评价</a><br/>
+												#else
+													已评价<br/>
+												#end
+											#elseif ($entity.state == '6' )<!-- 已取消 -->
+												<span>已取消</span><br/>
+											#else 
+											#end
+	                                        <a class="font_1c cursor" href="$request.getContextPath()/order/toPrint?orderId=$!entity.orderId&passKey=$!entity.passKey" target="_blank">打印发货单</a><br/>
+										#else
+											<span>订单已被冻结</span><br/>
+										#end
+									</td>
+								</tr>
+							</table>
+						</div>
+						#end
+						<div class="clear"></div>
+						#pageVelocity($pager)
+					</div>
+				</div>
+            
+				<!--循环列表end-->
+					</div>
+				</div>
+			</div><!-- tab页签开始 -->
+		<div class="clear"></div>
+	</div>
+<!--id="right" end--> 
+</div>
+
+<!--===========================商品改价DIV start================================-->
+<div class="po_fai js_changePrice" style="display:none">
+    <div class="po_fai_bg"></div>
+    <div class="po_main pad_t10">
+    <div class="hei_32 bg_05 pad_l10 "><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor js_changePrice_cancle"></i>订单改价：请您填写改价金额</div>
+        <input type="hidden" id="changePrice_orderId" value=""/>
+		<input type="hidden" id="changePrice_itemId" value=""/>
+		<input type="hidden" id="changePrice_skuId" value=""/>
+		<input type="hidden" id="promotionDiscount_old" value=""/>
+		<input type="hidden" id="original_pay_price" value=""/>
+		<input type="hidden" id="integralDiscount" value=""/>
+		<input type="hidden" id="primitivePrice" value=""/>
+		<ul style="height:260px;">
+        	<li>
+        		<div class="wid_410 fl">商品总额：<input type="text" class="input_Style2 hei_30" style="background:#cccccc;" maxlength="10" id="pay_price_total" readonly="readonly"/>元</div>
+                <div class="clear"></div>
+        	</li>
+			<li>
+        		<div class="wid_410 fl">&nbsp;&nbsp;优惠金额：<input type="text" class="input_Style2 hei_30" style="background:#cccccc;" maxlength="10" id="promotionDiscount" readonly="readonly" />元</div>
+                <div class="clear"></div>
+        	</li>
+			<li>
+        		<div class="wid_410 fl">&nbsp;&nbsp;积分抵扣：<input type="text" class="input_Style2 hei_30" style="background:#cccccc;" maxlength="10" id="integralDiscountText" readonly="readonly" />元</div>
+                <div class="clear"></div>
+        	</li>
+        	<li>
+        		<div class="wid_410 fl">&nbsp;&nbsp;改价金额：<input type="text" class="input_Style2 hei_30" maxlength="10" id="changedPrice" onKeyUp="numInput4Discount(this)" onBlur="checkNum(this)"/>元</div>
+                <div class="clear"></div>
+        	</li>
+			<!--
+			<li>
+        		<div class="wid_410 fl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;运费：<input type="text" maxlength="10" class="input_Style2 hei_30" id="freight" onKeyUp="clearNoNum(event,this)" onBlur="checkNum(this)"/>元</div>
+                <div class="clear"></div>
+        	</li>
+        	-->
+            <li>
+				<div class="wid_200 mar_cen">
+					<button class="button_1 hei_30 js_changePrice_submit">确定</button>
+					<button class="button_5 hei_30 mar_l10 demo-icons js_changePrice_cancle"><a href="#">取消</a></button>
+				</div>
+            </li>
+        </ul>
+    </div>
+</div>
+<!--===========================商品改价DIV end================================-->
+
+<!--===========================添加物流信息DIV start================================-->
+<div id="deliveryAddPage_div" class="po_fai moban js_logistics" style="display:none;">
+    <!-- 物流信息 开始-->
+    <div class="po_main">
+    	<div class="hei_32 bg_05 pad_l10 "><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor js_logistics_cancle"></i>物流信息</div>
+        <input type="hidden" id="deliveryOrderItemId" value=""/>
+        <input type="hidden" id="deliveryItemId" value=""/>
+        <input type="hidden" id="deliveryOrderId" value=""/>
+        <input type="hidden" id="deliveryShopFreightTemplateId" value=""/>
+		<dl class="wid_500 hei_40 mar_t20 po_re" >
+			<dt style="height:30px;" class="fl wid_90 font_right">物流编号：</dt>
+			<dd class="fl ">
+				<input type="text" class="wid_150 hei_30 input_Style2" id="deliveryNumber" name="deliveryNumber" maxlength="30" onblur="checkOrderCode(this)" />
+			</dd>
+            <dd  class="fl ">
+                <input type="text" id="errorMeg" style="color:red;padding-top: 12px;display: none;" value="不允许输入字母、数字之外的字符！" size="30"/>
+            </dd>
+       	</dl>
+		<dl class="wid_500 hei_40 mar_t20 po_re">
+			<dt style="height:30px;" class="fl wid_90 font_right">物流公司：</dt>
+			<dd class="fl ">
+				<input type="hidden" id="deliveryCompanyCode" name="deliveryCompanyCode" value=""/>
+				<input type="text" class="wid_150 input_Style2 hei_30 cursor" value="" 
+                   onclick="getDeliveryCompany(1)"
+                   readonly="true" placeholder="点击此处选择物流公司" id="deliveryCompanyName" name="deliveryCompanyName"/>
+                                       
+				<!-- 
+				<select class="input_Style2 wid_120 mar_r10 hei_30" id="deliveryCompanyCode" name="deliveryCompanyCode">
+					<option value="">请选择</option>
+					#foreach( $dto in $deliveryCompanyList)
+                	 	<option value="$!dto.code"> $!dto.name </option>
+					#end
+				</select>
+				-->
+				
+			</dd>
+		</dl>
+		<dl class="wid_500 hei_40 mar_t20 po_re" >
+			<dt style="height:30px;" class="fl wid_90 font_right">买家电话：</dt>
+				<dd class="fl ">
+					<input type="text" class="wid_150 hei_30 input_Style2" id="mobiletelephone" name="mobile" maxlength="30" onblur="checkMobiletelephone(this)" />
+				</dd>
+				<dd  class="fl ">
+	                <input type="text" id="errorMegPhone" style="color:red;padding-top: 12px;display: none;" value="不允许11位数字之外的字符！" size="30"/>
+	            </dd>
+			</dt>
+		</dl>
+		<dl class="wid_500 hei_80 mar_t20 po_re">
+			<dt style="height:30px;" class="fl wid_90 font_right">备注：</dt>
+			<dd class="fl">
+				<textarea class="input_Style2 wid_350 mar_r10" style="height: 80px;" id="deliveryRemark" maxlength="100" placeholder="不能超过100字" rows="4" /></textarea>
+			</dd>				
+		</dl>
+		<dl class="wid_500 hei_40 mar_t20 po_re" >
+			<dt class="fl font_right" style="height:30px;">&nbsp;&nbsp;&nbsp;是否将物流信息应用到该订单下相同运费模版的其他商品：</dt>
+			<dd class="fl">
+				<input type="radio" style="height:30px;" class="radio_Style2 mar_r10 font_right" id="isSametemplate_yes" name="isSametemplate" value="yes"/><span style="height:30px;">是</span>
+				<input type="radio" style="height:30px;" class="radio_Style2 mar_r10 font_right" id="isSametemplate_no" name="isSametemplate" value="no"/><span style="height:30px;">否</span>
+			</dd>
+		</dl>
+		<dl class="wid_500 hei_30 po_re" >
+			<span style="color:red;margin-left: 10px;">提示：单独编辑商品物流信息时，请选择“否”。</span>
+		</dl>
+		<br/>
+		<div class=" mar_tb10 mar_r20 font_cen">
+			<button class="button_1 hei_30 js_logistics_submit" loadMsg="正在保存...">确定</button>
+			<button class="button_5 hei_30 mar_l10 demo-icons js_logistics_cancle"><a href="#">取消</a></button>
+		</div>
+    </div>
+    <!-- 物流信息 end -->
+    
+    <!--========================物流信息DIV内部，物流公司列表信息DIV start==============-->
+    <input id="contextPath" type="hidden" value="$request.contextPath">
+    <div class="" id="DeliveryCompanyDIV" style="display:none">
+	    <div class="po_main_Mess pad_t10" style="width:475px;margin-left: -260px;margin-top: -180px;">
+	        <div class="hei_32 bg_05 pad_l10 font_14b">
+	        	<i class="demo-icons fa-times-circle font_16 fr mar_r10 no cursor" onclick="closeDiv(this)"></i>
+	       		物流公司名称：
+	        	<input class="wid_200 hei_30 input_Style2 " id="deliveryCompany_DIV" name="deliveryCompany_DIV" placeholder="请输入要查询的名称">
+	            
+	            <button class="button_1 hei_24" onclick="getDeliveryCompany(1)">查询</button>
+	        </div>
+	        <!--标题 end -->
+	        <div id="partBDetail">
+	        
+	        </div>
+	        <!--内容div end -->
+	    </div>
+	    <!--po_main_Mess end-->
+	</div>
+	<!--========================物流信息DIV内部，物流公司列表信息DIV end==============-->
+</div>
+<!--===========================添加物流信息DIV end================================-->
+
+
+
+
+<!-- 确认付款 开始-->
+<!-- 
+<div class="po_fai js_confirmPayment" style="display:none">
+    <div class="po_fai_bg"></div>
+    <div class="po_main pad_t10" style="width: 430px;">
+    <div class="hei_32 bg_05 pad_l10 "><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor js_confirmPayment_cancle"></i>确认收到货款</div>
+        <input type="hidden" id="confirmPayment_orderId" value=""/>
+		<ul style="height:170px;">
+			<li>
+        		<div class="wid_410 fl">支付类型：
+				<input type="radio" name="paymentType" checked="checked" class="paymentType" value="1"/>网银
+				<input type="radio" name="paymentType" class="paymentType" value="2"/>中信
+				</div>
+                <div class="clear"></div>
+        	</li>
+            <li>
+				<div class="wid_200 mar_cen">
+					<button class="button_1 hei_30 js_confirmPayment_submit">确定</button>
+					<button class="button_5 hei_30 mar_l10 demo-icons js_confirmPayment_cancle"><a href="#">取消</a></button>
+				</div>
+            </li>
+        </ul>
+    </div>
+</div> 
+-->
+<!-- 确认付款 end -->

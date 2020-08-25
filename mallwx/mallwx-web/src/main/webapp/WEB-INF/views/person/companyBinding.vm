@@ -1,0 +1,49 @@
+#set($ctxPath="$request.contextPath")
+#set($layout = "common/blanklayout.vm")
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>个人中心 - 绑定公司账户</title>
+<link href="$ctxPath/assets/css/detail.css" rel="stylesheet" type="text/css"/>
+<style >
+.content{
+	position : static;
+}
+</style>
+<script type="text/javascript" src="$ctxPath/assets/js/style.js"></script>
+<script type="text/javascript" src="$ctxPath/assets/js/iscroll.js"></script>
+<script type="text/javascript" src="$ctxPath/assets/js/zepto.js"></script>
+<script >
+//清空历史记录
+function clearHistory(){
+	alert('清空历史记录');
+}
+
+</script>
+</head>
+<body>
+<div id="main" class="po_re">
+    <!-- 中间内容 -->
+    <div class="content" id="wrapper">
+        <h3 class="hei_50 font_cen bg_01 font_1_2 bg_02">绑定公司账户</h3>
+        <div class="news bg_01">
+            <div class="hei_50 mar_t20"><select class="hei_32 wid_30"><option>名称</option><option>供应商名称</option><option>微信账号</option><option>供应商名称</option></select><input type="text" class="input_2 hei_32 wid_40 mar_lr5" /><i class="fa fa-search"></i></div>
+            <h4 class="hei_50 border_2 mar_t20">历史记录</h4>
+            <ul class="individual">
+                <li class="border_2" onmouseover="this.style.background='#bbb'" onmouseout="this.style.background='#fff'" onclick="window.location.href='$ctxPath/person/sendPerMsg'"><span class="wid_95 fl">个人信息</span><i class="fa fa-angle-right fr"></i></li>
+                <li class="border_2" onmouseover="this.style.background='#bbb'" onmouseout="this.style.background='#fff'" onclick="window.location.href='$ctxPath/person/bindingAccount'"><span class="wid_95 fl">帐号绑定</span><i class="fa fa-angle-right fr"></i></li>
+                <li class="border_2" onmouseover="this.style.background='#bbb'" onmouseout="this.style.background='#fff'" onclick="window.location.href='$ctxPath/person/modifyPwd'"><span class="wid_95 fl">修改密码</span><i class="fa fa-angle-right fr"></i></li>
+                <li class="border_2" onmouseover="this.style.background='#bbb'" onmouseout="this.style.background='#fff'" onclick="window.location.href='$ctxPath/person/hisMsg'"><span class="wid_95 fl">历史信息</span><i class="fa fa-angle-right fr"></i></li>
+            </ul>
+        </div>
+        <div class="font_cen">
+            <button class="button_2 hei_34 pad_lr10 clear_btn" type="button" onclick="clearHistory()">清空历史记录</button>
+        </div>
+         
+    </div><!-- 中间内容 end-->
+</div>
+</body>
+</html>

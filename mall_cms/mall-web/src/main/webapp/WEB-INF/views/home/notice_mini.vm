@@ -1,0 +1,15 @@
+#set($layout = "/none_layout.vm")
+#foreach($notice in $notices)
+	<!-- 公告类型 1 文字公告 2 链接公告 -->
+	#if($notice.noticeType == 2 && $notice.url)
+	<a href="$!notice.url" target="_blank" >
+		<i class="demo-icons fa-caret-right mar_r10"></i>
+		$notice.noticeTitle
+	</a>
+	#else
+	<a href="$request.contextPath/notice/toView/$notice.noticeId" >
+		<i class="demo-icons fa-caret-right mar_r10"></i>
+		$notice.noticeTitle
+	</a>
+	#end
+#end

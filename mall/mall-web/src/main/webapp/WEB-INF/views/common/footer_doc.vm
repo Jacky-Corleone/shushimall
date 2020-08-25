@@ -1,0 +1,132 @@
+#set($layout = "/none_layout.vm")
+#set($assetsPath="$request.contextPath/assets")
+<script type="text/javascript">
+<!--
+	$(document).ready(function(){
+		goTopEx();
+		var addressCode = $.cookie('regionCode');
+		var salesProcessUrl = "$request.contextPath/getSalesProcess";
+		//底部广告
+		$.ajax({
+			url:salesProcessUrl+"?_="+new Date(),
+			type:'POST',
+			data:{"addressCode":addressCode,"adType":11,"rows":6},
+			dataType:'JSON',
+			success:function(d){
+				if(d!=null&&d.length>0){
+					var footGGHtml = "";
+					$.each(d,function(idx,ele){
+						var url = "";
+						if(ele.adURL.indexOf("http") == 0){	
+							url = ele.adURL;
+						}else{
+							url =  "http://" + ele.adURL;
+						}
+		        		footGGHtml+="<dd><a onclick=\"return adVisit('"+ele.id+"',11);\" href=\""+url+"\" target=\"_blank\" ><img width=\"200px\" height=\"40px\" src=\"$!imageServerAddr"+ele.adSrc+"\"></a></dd>";
+					});
+					$("#footGG").html(footGGHtml);
+				}else{
+					$("#footGG").hide();
+				}
+			},
+			complete:function(){
+			
+			}
+		});
+	});
+	function goTopEx(){
+		window.onscroll=function(){
+			$(document).scrollTop()>0?$("#goTopBtn").css("display",""):$("#goTopBtn").css("display","none");
+		}
+		$("#goTopBtn").click(function(){
+				var goTop=setInterval(scrollMove,18);
+				function scrollMove(){
+					$(document).scrollTop($(document).scrollTop()/2.3);
+					if($(document).scrollTop() < 1)clearInterval(goTop);
+				}
+		});
+	}
+-->
+</script>
+    <div class="city_list_com">
+        <dl class="clearfix" id="footGG">
+        </dl>
+    </div>
+<script type="text/javascript">goTopEx();</script>
+<div class="foot_bottom2">
+<ul id="document">
+	#set( $cCount = 0 )
+	#foreach($document in $documents)
+		#if( $cCount < 7 ) 
+		#if( $document.mallClassifyId == $cur.mallClassifyId )
+		
+			<dd><a href="$request.contextPath/document/$document.mallType?mallId=$document.mallId" onclick="openDocs($document.mallId)">$document.mallTitle</a></dd>
+			
+			#if( $velocityCount == $documents.size() )
+					</dl>
+				</li>
+			#end
+			
+		#else
+			#set( $cur = $document )
+			#set( $cCount = $cCount + 1 )
+			
+			#if( $velocityCount > 1 )
+					</dl>
+				</li>
+			#end
+			
+			<li>
+				<dl>
+					<dt class='po_re' style="cursor: default;">
+						<i class="po_ab pa_02 icon_$cCount"></i>
+						$document.mallClassifyTitle
+					</dt>
+					<dd>
+						<a href="$request.contextPath/document/$document.mallType?mallId=$document.mallId" onclick="openDocs($document.mallId)">$document.mallTitle</a></dd>			
+		#end
+		#end
+	#end
+	
+</ul>
+<div class="foot_right">
+	<a href="javascript:;"><img src="$assetsPath/images/QRcode.png"></a>
+	<div class="footer_img">
+		<a href="javascript:;" class="mar_r10"><img src="$assetsPath/images/QRcodeq.png"></a>
+		<a href="javascript:;"><img src="$assetsPath/images/QRcodexl01.png"></a>
+	</div>
+</div>
+</div>
+<!--
+<p>
+	#foreach($fd in $footDocs)
+		<a href="$request.contextPath/document/$fd.mallType?mallId=$fd.mallId">$fd.mallTitle</a>
+		#if( $velocityCount != $footDocs.size() )|#end
+	#end
+</p>
+<div class="clear"></div>
+--!>
+
+<!--底部start-->
+<div class="footer_box">
+    <div class="footer_com">
+            <div class="footer_com_top">
+                <a href="javscript:;">关于我们</a>
+                <a href="javscript:;">联系我们</a>
+                <a href="javscript:;">人才招聘</a>
+                <a href="javscript:;">招商加盟</a>
+                <a href="javscript:;">商务合作</a>
+                <a href="javscript:;">帮助中心</a>
+                <a href="javscript:;">专家答疑</a>
+                <a href="javscript:;">友情链接</a>
+            </div>
+            <div class="footer_com_com">
+                <a href="javascript:;"><img src="$assetsPath/images/img_12_A1.png"></a>
+                <a href="javascript:;"><img src="$assetsPath/images/img_12_A2.png"></a>
+                <a href="javascript:;"><img src="$assetsPath/images/img_12_A3.png"></a>
+            </div>
+            <p>Copyright©2009-2015 ShuShi100 舒适100网 版权所有</p>
+    </div>
+</div>
+<!--底部end-->
+

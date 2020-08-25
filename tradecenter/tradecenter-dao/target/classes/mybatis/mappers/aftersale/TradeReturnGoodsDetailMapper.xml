@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 
+<typeAlias alias="tradeReturnGoodsDetail" type="com.camelot.tradecenter.entity.dto.TradeReturnGoodsDetail" />
+ -->
+<mapper namespace="com.camelot.aftersale.dao.TradeReturnGoodsDetailMybatisDAO">
+
+    <!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+    <resultMap id="tradeReturnGoodsDetailMap" type="tradeReturnGoodsDetail">
+        <result property="id" column="id"/>
+        <result property="returnGoodsId" column="return_goods_id"/>
+        <result property="skuName" column="sku_name"/>
+        <result property="skuId" column="sku_id"/>
+        <result property="goodsId" column="goods_id"/>
+        <result property="goodsName" column="goods_name"/>
+        <result property="payPrice" column="pay_price"/>
+        <result property="goodsPicUrl" column="goods_pic_url"/>
+        <result property="returnAmount" column="return_amount"/>
+        <result property="rerurnCount" column="rerurn_count"/>
+        <result property="returnIntegral" column="return_integral"/>
+        <result property="remark" column="remark"/>
+        <result property="createdDt" column="created_dt"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="add1" column="add1"/>
+        <result property="add2" column="add2"/>
+        <result property="add3" column="add3"/>
+    </resultMap>
+
+    <!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+    <!-- mysql 分页 -->
+    <sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+    <!-- mysql 查询总数 -->
+    <sql id="count_Tail">
+		select count(1) from 
+	</sql>
+
+    <sql id="selectAllColumns">
+		<![CDATA[
+
+		select
+ 			id
+ 			,return_goods_id
+ 			,goods_id
+ 			,sku_name
+ 			,sku_id
+ 			,goods_name
+ 			,pay_price
+ 			,goods_pic_url
+ 			,return_amount
+ 			,rerurn_count
+ 			,return_integral
+ 			,remark
+ 			,created_dt
+ 			,created_by
+ 			,add1
+ 			,add2
+ 			,add3
+		FROM 
+		trade_return_goods_detail trade_return_goods_detail_
+
+        ]]>
+	</sql>
+
+    <sql id="where_fragement">
+        where 1=1
+        <if test="entity!=null">
+            <if test="entity.id != null  and entity.id !=''">
+                <![CDATA[ and trade_return_goods_detail_.id =#{entity.id}]]>
+            </if>
+            <if test="entity.returnGoodsId != null  and entity.returnGoodsId !=''">
+                <![CDATA[ and trade_return_goods_detail_.return_goods_id  =#{entity.returnGoodsId}]]>
+            </if>
+            <if test="entity.skuName != null  and entity.skuName !=''">
+                <![CDATA[ and trade_return_goods_detail_.sku_name  LIKE CONCAT('%',#{entity.skuName},'%')]]>
+            </if>
+            <if test="entity.skuId != null  and entity.skuId !=''">
+                <![CDATA[ and trade_return_goods_detail_.sku_id =#{entity.skuId}]]>
+            </if>
+            <if test="entity.goodsId != null  and entity.goodsId !=''">
+                <![CDATA[ and trade_return_goods_detail_.goods_id  =#{entity.goodsId}]]>
+            </if>
+            <if test="entity.goodsName != null  and entity.goodsName !=''">
+                <![CDATA[ and trade_return_goods_detail_.goods_name  LIKE CONCAT('%',#{entity.goodsName},'%')]]>
+            </if>
+            <if test="entity.returnAmount != null  and entity.returnAmount !=''">
+                <![CDATA[ and trade_return_goods_detail_.return_amount  LIKE CONCAT('%',#{entity.returnAmount},'%')]]>
+            </if>
+            <if test="entity.rerurnCount != null  and entity.rerurnCount !=''">
+                <![CDATA[ and trade_return_goods_detail_.rerurn_count  LIKE CONCAT('%',#{entity.rerurnCount},'%')]]>
+            </if>
+            <if test="entity.remark != null  and entity.remark !=''">
+                <![CDATA[ and trade_return_goods_detail_.remark  LIKE CONCAT('%',#{entity.remark},'%')]]>
+            </if>
+            <if test="entity.createdDt != null  and entity.createdDt !=''">
+                <![CDATA[ and trade_return_goods_detail_.created_dt  LIKE CONCAT('%',#{entity.createdDt},'%')]]>
+            </if>
+            <if test="entity.createdBy != null  and entity.createdBy !=''">
+                <![CDATA[ and trade_return_goods_detail_.created_by  LIKE CONCAT('%',#{entity.createdBy},'%')]]>
+            </if>
+            <if test="entity.add1 != null  and entity.add1 !=''">
+                <![CDATA[ and trade_return_goods_detail_.add1  LIKE CONCAT('%',#{entity.add1},'%')]]>
+            </if>
+            <if test="entity.add2 != null  and entity.add2 !=''">
+                <![CDATA[ and trade_return_goods_detail_.add2  LIKE CONCAT('%',#{entity.add2},'%')]]>
+            </if>
+            <if test="entity.add3 != null  and entity.add3 !=''">
+                <![CDATA[ and trade_return_goods_detail_.add3  LIKE CONCAT('%',#{entity.add3},'%')]]>
+            </if>
+            <if test="entity.returnGoodsIds != null">
+                <![CDATA[ and trade_return_goods_detail_.return_goods_id in]]>
+                <foreach collection="entity.returnGoodsIds" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </if>
+    </sql>
+
+    <!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+    <select id="getAll" resultMap="tradeReturnGoodsDetailMap">
+        <include refid="selectAllColumns"/>
+    </select>
+    <select id="get" resultMap="tradeReturnGoodsDetailMap" parameterType="long">
+        <include refid="selectAllColumns"/>
+        <![CDATA[
+		where trade_return_goods_detail_.id = #{id}
+		]]>
+    </select>
+    <!-- 根据id查询 -->
+    <select id="selectById" resultMap="tradeReturnGoodsDetailMap" parameterType="long">
+        <include refid="selectAllColumns"/>
+        <![CDATA[
+		where trade_return_goods_detail_.id = #{id}
+		]]>
+    </select>
+
+    <!-- 分页查询 -->
+    <select id="selectList" resultMap="tradeReturnGoodsDetailMap">
+        <include refid="selectAllColumns"/>
+        <include refid="where_fragement"/>
+        <if test="page!=null">
+            <include refid="pagination_tail"/>
+        </if>
+    </select>
+
+    <select id="selectCount" resultType="long">
+        <include refid="count_Tail"/>
+        trade_return_goods_detail trade_return_goods_detail_
+        <include refid="where_fragement"/>
+    </select>
+
+    <select id="searchByCondition" resultMap="tradeReturnGoodsDetailMap">
+        <include refid="selectAllColumns"/>
+        <include refid="where_fragement"/>
+
+    </select>
+
+    <insert id="add" parameterType="tradeReturnGoodsDetail" useGeneratedKeys="true" keyProperty="id">
+		
+		<![CDATA[
+
+		insert into trade_return_goods_detail
+		  (
+				return_goods_id
+				,sku_name
+				,sku_id
+				,goods_id
+				,pay_price
+				,goods_pic_url
+				,goods_name
+				,return_amount
+				,rerurn_count
+				,return_integral
+				,remark
+				,created_dt
+				,created_by
+				,add1
+				,add2
+				,add3
+		   )
+		values
+		  (
+				#{returnGoodsId}
+				,#{skuName}
+				,#{skuId}
+				,#{goodsId}
+				,#{payPrice}
+				,#{goodsPicUrl}
+				,#{goodsName}
+				,#{returnAmount}
+				,#{rerurnCount}
+				,#{returnIntegral}
+				,#{remark}
+				,#{createdDt}
+				,#{createdBy}
+				,#{add1}
+				,#{add2}
+				,#{add3}
+		   )
+
+        ]]>
+	</insert>
+
+
+    <!-- 根据id，修改记录 -->
+    <update id="update" parameterType="tradeReturnGoodsDetail">
+		<![CDATA[
+
+			update trade_return_goods_detail set
+   			id = #{id}
+   			,return_goods_id = #{returnGoodsId}
+   			,sku_name = #{skuName}
+   			,sku_id = #{skuId}
+   			,goods_id = #{goodsId}
+   			,pay_price = #{payPrice}
+   			,goods_pic_url = #{goodsPicUrl}
+   			,goods_name = #{goodsName}
+   			,return_amount = #{returnAmount}
+   			,rerurn_count = #{rerurnCount}
+   			,return_integral = #{returnIntegral}
+   			,remark = #{remark}
+   			,created_dt = #{createdDt}
+   			,created_by = #{createdBy}
+   			,add1 = #{add1}
+   			,add2 = #{add2}
+   			,add3 = #{add3}
+		 where id = #{id}
+
+        ]]>
+	</update>
+
+    <delete id="delete" parameterType="long">
+		<![CDATA[
+
+		delete from trade_return_goods_detail where id = #{id}
+
+        ]]>
+	</delete>
+    <sql id="updateSelective_set">
+        <set>
+            <if test="tradeReturnGoodsDetail.returnGoodsId!= null">
+                return_goods_id = #{tradeReturnGoodsDetail.returnGoodsId},
+            </if>
+            <if test="tradeReturnGoodsDetail.skuName!= null">
+                sku_name = #{tradeReturnGoodsDetail.skuName},
+            </if>
+            <if test="tradeReturnGoodsDetail.skuId!= null">
+                sku_id = #{tradeReturnGoodsDetail.skuId},
+            </if>
+            <if test="tradeReturnGoodsDetail.goodsId!= null">
+                goods_id = #{tradeReturnGoodsDetail.goodsId},
+            </if>
+            <if test="tradeReturnGoodsDetail.payPrice!= null">
+                pay_price = #{tradeReturnGoodsDetail.payPrice},
+            </if>
+            <if test="tradeReturnGoodsDetail.goodsPicUrl!= null">
+                goods_pic_url = #{tradeReturnGoodsDetail.goodsPicUrl},
+            </if>
+            <if test="tradeReturnGoodsDetail.goodsName!= null">
+                goods_name = #{tradeReturnGoodsDetail.goodsName},
+            </if>
+            <if test="tradeReturnGoodsDetail.returnAmount!= null">
+                return_amount = #{tradeReturnGoodsDetail.returnAmount},
+            </if>
+            <if test="tradeReturnGoodsDetail.rerurnCount!= null">
+                rerurn_count = #{tradeReturnGoodsDetail.rerurnCount},
+            </if>
+            <if test="tradeReturnGoodsDetail.returnIntegral!= null">
+                return_integral = #{tradeReturnGoodsDetail.returnIntegral},
+            </if>
+            <if test="tradeReturnGoodsDetail.remark!= null">
+                remark = #{tradeReturnGoodsDetail.remark},
+            </if>
+            <if test="tradeReturnGoodsDetail.createdDt!= null">
+                created_dt = #{tradeReturnGoodsDetail.createdDt},
+            </if>
+            <if test="tradeReturnGoodsDetail.createdBy!= null">
+                created_by = #{tradeReturnGoodsDetail.createdBy},
+            </if>
+            <if test="tradeReturnGoodsDetail.add1!= null">
+                add1 = #{tradeReturnGoodsDetail.add1},
+            </if>
+            <if test="tradeReturnGoodsDetail.add2!= null">
+                add2 = #{tradeReturnGoodsDetail.add2},
+            </if>
+            <if test="tradeReturnGoodsDetail.add3!= null">
+                add3 = #{tradeReturnGoodsDetail.add3},
+            </if>
+        </set>
+    </sql>
+    <sql id="updateAll_set">
+        <set>
+            return_goods_id = #{tradeReturnGoodsDetail.returnGoodsId},
+            sku_name = #{tradeReturnGoodsDetail.skuName},
+            sku_id = #{tradeReturnGoodsDetail.skuId},
+            goods_id = #{tradeReturnGoodsDetail.goodsId},
+            pay_price = #{tradeReturnGoodsDetail.payPrice},
+            goods_pic_url = #{tradeReturnGoodsDetail.goodsPicUrl},
+            goods_name = #{tradeReturnGoodsDetail.goodsName},
+            return_amount = #{tradeReturnGoodsDetail.returnAmount},
+            rerurn_count = #{tradeReturnGoodsDetail.rerurnCount},
+            return_integral = #{tradeReturnGoodsDetail.returnIntegral},
+            remark = #{tradeReturnGoodsDetail.remark},
+            created_dt = #{tradeReturnGoodsDetail.createdDt},
+            created_by = #{tradeReturnGoodsDetail.createdBy},
+            add1 = #{tradeReturnGoodsDetail.add1},
+            add2 = #{tradeReturnGoodsDetail.add2},
+            add3 = #{tradeReturnGoodsDetail.add3},
+        </set>
+    </sql>
+    <update id="updateSelective" parameterType="tradeReturnGoodsDetail">
+        update trade_return_goods_detail
+        <include refid="updateSelective_set"/>
+        where id = #{tradeReturnGoodsDetail.id}
+    </update>
+
+    <update id="updateAllWithDateTimeCheck">
+        update trade_return_goods_detail
+        <include refid="updateAll_set"/>
+        where id = #{tradeReturnGoodsDetail.id}
+        and LAST_UPD_DT = #{prevUpdDt}
+    </update>
+
+    <update id="updateSelectiveWithDateTimeCheck">
+        update trade_return_goods_detail
+        <include refid="updateSelective_set"/>
+        <![CDATA[
+		 	where id = #{tradeReturnGoodsDetail.id}
+		 	and LAST_UPD_DT = #{prevUpdDt}
+		]]>
+    </update>
+
+
+    <update id="updateSelectiveByIdList">
+        update trade_return_goods_detail
+        <include refid="updateSelective_set"/>
+        where id in
+        <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <update id="updateAllByIdList">
+        update trade_return_goods_detail
+        <include refid="updateAll_set"/>
+        where id in
+        <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+
+</mapper>

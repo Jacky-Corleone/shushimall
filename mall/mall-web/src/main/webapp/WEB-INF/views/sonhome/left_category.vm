@@ -1,0 +1,174 @@
+#set($layout = "/none_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<script type="text/javascript" src="$staticPath/js/all_classify.js"></script>
+<!-- js 扩展的 map 对象 -->
+<script src="$staticPath/js/goodscenter/map.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	$("#categParentName").html("$!{itemCategoryDTO.categoryCName}");
+	// 2016-01-12 js start
+	$('#ky_c_left .ky_dd').each(function(ev,index){
+		var tack=$(this);
+		var _index=$(this).index();
+		tack.on('mouseover',function(){
+			$(this).children('div').addClass('Tab_list');
+		});	
+		tack.on('mouseout',function(){
+			$(this).children('div').removeClass('Tab_list');
+		});	
+	});
+	$('.mc_prompt_close').click(function(){
+		$(this).parent().parent().removeClass('Tab_list');
+	});
+	// 2016-01-12 js end
+	$(".aa01").bind("click",function(){
+    	//属性查询提交格式2:4;5:3;10:2;12:5;按key值从小到大排序
+    	var map = new Map();
+    	//获取用户点击的属性值
+    	var attrKey = $(this).parent().prev().attr("id");
+    	var attrValId = $(this).attr("id");
+    	if(attrValId!=null && attrValId == "-1"){
+    		//值等于-1，是不限属性值
+    		map.remove(attrKey);
+    	}else{
+    		map.remove(attrKey);
+    		map.put(attrKey,attrValId);
+    	}
+    	var input_attrKeyVal = "";
+    	if(map.size()>0){
+    		//获取所有key值，返回一个数组
+    		var arrkeys = map.keys();
+    		//从小到大排序
+    		arrkeys = arrkeys.sort(function(a,b){return a>b?1:-1});
+    		for(var i=0; i<arrkeys.length; i++){
+    			input_attrKeyVal += arrkeys[i]+":"+map.get(arrkeys[i])+";";
+    		}
+    	}
+    	$("input[name='attributes']").val(input_attrKeyVal);
+    	$("#productForm").submit();
+    })
+	$(".attrAttr").bind("click",function(){
+    	//属性查询提交格式2:4;5:3;10:2;12:5;按key值从小到大排序
+    	var map = new Map();
+    	//获取用户点击的属性值
+    	var attrKey = $(this).attr("id");
+    	var attrValId = '';
+    	if(attrValId!=null && attrValId == "-1"){
+    		//值等于-1，是不限属性值
+    		map.remove(attrKey);
+    	}else{
+    		map.remove(attrKey);
+    		map.put(attrKey,attrValId);
+    	}
+    	var input_attrKeyVal = "";
+    	if(map.size()>0){
+    		//获取所有key值，返回一个数组
+    		var arrkeys = map.keys();
+    		//从小到大排序
+    		arrkeys = arrkeys.sort(function(a,b){return a>b?1:-1});
+    		for(var i=0; i<arrkeys.length; i++){
+    			input_attrKeyVal += arrkeys[i]+";";
+    		}
+    	}
+    	$("input[name='attributes']").val(input_attrKeyVal);
+    	$("#productForm").submit();
+	})
+});
+// 广告点击量统计
+function adVisit(id,type,url){
+	$.ajax({
+		url: "$request.contextPath/adVisit",
+		type: "post",
+		data: {
+			"id": id,
+			"type": type
+		}
+	});
+	if(url!=""&&url!=null&&url!=undefined){
+		if(url.indexOf("http") != 0){
+			url = "http://"+url;
+		}
+		window.open(url);
+	}
+}
+</script>
+
+<div class="ky_c_left" id="ky_c_left">
+    <dl>
+		#set($num=[0 .. 2])
+		#foreach($i in $num)
+			#if( $i < $categoryes.size() )
+                <dt #if($i==0) style="border-top:none;" #end>
+					<a href="$request.contextPath/searchController/searchItemByCategory?cid=$categoryes[$i].categoryCid" class="over_ell" style="width:20px;" title="$categoryes[$i].categoryCName" target="_blank" style='color:#bd000f'>$categoryes[$i].categoryCName</a>
+				</dt>
+                <dd class="ky_dd" #if($i==2) style="height:83px;line-height:25px;border-bottom:none;overflow:hidden;"#else style="height:83px;line-height:25px;overflow:hidden;" #end>
+        			#foreach($cate in $categoryes[$i].children)
+        				#if( $velocityCount < 10 )
+        					<a class="attrAttr cursor over_ell" id="$cate.attrAttrId" title="$cate.attrAttrName" target="_blank">$!{cate.attrAttrName}</a>
+        				#end
+					#end
+					<div class="kl_tab_list">
+                        <div class="kl_tab_l fl">
+                            <span class="mc_prompt_close" style="margin:5px 0 0 0;"><i class="fa fa-close"></i></span>
+                            <dl>
+								#foreach($cate in $categoryes[$i].children)
+            					    <dt id='$cate.attrAttrId' class="attrAttr cursor" title="$cate.attrAttrName" target="_blank" >$cate.attrAttrName</dt>
+            					    <dd>
+            						   	#foreach($ca in $cate.valueList)
+											<a id="$ca.attrValueId" class="aa01 cursor over_ell" title="$ca.attrValueName" style="max-width:145px">$ca.attrValueName</a>
+            						   	#end
+            			           </dd>
+            					#end
+                             </dl>
+                        </div>
+                        <div class="kl_tab_r fr">
+							#foreach($bunner in $categoryes[$i].bunners)
+								<div>
+									<a onclick="adVisit('$!bunner.id','$!bunner.adURL',1)" target="_blank" class="cursor">
+										<img src="${imageServerAddr}$bunner.adSrc" width="168" height="98">
+									</a>
+								</div>
+    					    #end
+                        </div>
+                    </div>
+                </dd>
+			#end
+		#end
+    </dl>
+	<div class="mc_classify_prompt" pref="1" style="z-index:999; min-height: 360px; overflow: hidden;">
+		<div class="item-channels">
+			<div class="channels"> 		
+                <a href="$request.contextPath/sonHome/index?cid=$!mallTheme.cId&lev=$!mallTheme.clev" title="$!mallTheme.cName" target="_blank">$!mallTheme.cName<i class="fa-angle-right"></i></a>
+		  	</div>
+		</div> 
+	    <span class="mc_prompt_close"><i class="fa-times-circle font_18"></i></span>
+		<div class="mc_subitem" style="height: auto;">
+			<dl>
+	            <dt><a href="$request.contextPath/sonHome/forward/$!cate.categoryCid/$!cate.categoryLev" title="$cate.categoryCName" target="_blank">$!cate.categoryCName</a></dt>
+				<dd>
+ 					<b><a href="$request.contextPath/searchController/searchItemByCategory?cid=$!c.categoryCid">$!c.categoryCName</a></b>
+				</dd>
+			</dl>
+		</div>
+		#if( $category.bunners )
+ 			<div class="mc_subitem mc_itemright">
+   				<div class="mc_subitem mc_itemright">
+    				<ul class="mc_subitem_img wid_250 mc_subitem_img1">
+   						<li>
+   							<a href="$!bunner.adURL" onclick="adVisit('$!bunner.id','$!bunner.adURL',1)" target="_blank">
+   								<img src="${imageServerAddr}$bunner.adSrc"width="100" height="40">
+   							</a>
+   						</li>
+     				</ul>
+   				</div>
+ 			</div>
+		#end
+	</div>
+</div>
+<form id="productForm" action="$request.getContextPath()/searchController/searchItem" method="post">
+<input type="hidden" name="attributes" value="$!attributes" />
+<input type="hidden" name="page" value="1" />
+<input type="hidden" name="cid" value="$!{itemCategoryDTO.categoryCid}" />		
+<input type="hidden" name="orderSort" value="0" />
+<input type="hidden" name="keyword" id="keyword_hidden" value="$!keyword" />
+</form>

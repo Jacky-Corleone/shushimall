@@ -1,0 +1,89 @@
+#set($layout = "common/order.vm")
+#if(${orderInfo})
+	#foreach($order in ${orderInfo})
+		#if(${order})
+			<div class="pad_lr5 bg_01 mar_b10">
+				<!-- 订单号 -->
+				<div class="hei_32 border_2">
+					<p class="fl wid_57">
+						<span>订单号:$!{order.orderId}</span>
+					</p>
+					<p class="fr wid_35 font_right">
+<!-- 						<a href="$request.getContextPath()/orderWx/queryOrderInfoBuyer?orderId=$!order.orderId" target="_blank" class="mar_r2">订单详情</a> -->
+<!-- 								<a class="font_e5 mar_l5" id="$!order.orderId">$!{order.ordreStatus}</a> -->
+						<i class="font_1c">
+							#if($!order.refundState == 1)待确认				<!-- 退款申请，等待卖家确认中 -->
+							#elseif ($order.refundState == 2 )拒绝退款/退货			<!-- 卖家不同意协议，等待买家修改 -->
+							#elseif ($order.refundState == 3 )等待买家发货	<!-- 退款申请达成，等待买家发货 -->
+							#elseif ($order.refundState == 4 )待收货			<!-- 买家已退货，等待卖家确认收货 -->
+							#elseif ($order.refundState == 7 )等待买家收款
+							#elseif ($order.refundState == 5 )已关闭			<!-- 退款关闭 -->
+							#elseif ($order.refundState == 6 )退款成功		<!-- 退款成功 -->
+							#end
+						</i>
+					</p>
+					<input type="hidden" id="totalItem" value="$!{totalItem}">
+				</div>
+				<!-- 订单号 -->
+				#if(${order.items})
+					#foreach($item in ${order.items})
+						<!-- 商品信息 -->
+						<div class="border_2 shop_order pad_tb5">
+							<p class="fl shop_order_img">
+								<a href="$request.contextPath/product/toDetail?id=$!item.itemId&skuId=$!item.skuId">
+									<img src="$!imageServerAddr$!item.skuPicUrl" width="75px" height="75px"/>
+								</a>
+							</p>
+							<div class="wid_50 fl shop_order_p">
+								<p>
+									<a href="$request.contextPath/product/toDetail?id=$!item.itemId&skuId=$!item.skuId">
+										$!{item.itemName}
+									</a>
+								</p>
+								<p>商品属性：$!{item.skuName}</p>
+							</div>
+							<div class="fl lin_24">
+								<p>￥$!{item.payPrice}</p>
+								<p class="font_66">x$!{item.num}</p>
+							</div>
+							
+							<div class="clear"></div>
+						</div>
+						<!-- 商品信息 -->
+					#end
+				#else
+					没有商品
+				#end
+				<p class="hei_34">下单时间：$!{order.createTime}&nbsp;&nbsp;&nbsp;&nbsp;<span class="fr">总价：$!{order.paymentPrice}</span></p>
+				<!-- 按钮 -->
+				<div class="pad_tb5">
+						<button class="button_3 pad_mlr5" id="orderDetail" onclick="orderDetail('$!{order.orderId}')">订单详情</button>
+						$order.refund   $!{orderSource}   $order.ordreStatus
+						#if($order.refund != 2)
+							#if("buyers" == $!{orderSource})
+								#if($order.ordreStatus == '待配送' || $order.ordreStatus == '待收货')
+	<!-- 							<a href="$request.getContextPath()/orderWX/refundAgreement?orderId=$!entity.orderId" class="font_1c cursor">申请退款/退货</a><br/> -->
+									<button class="button_3 pad_mlr5" style="width: 130px;" onclick="refundAgreement($order.orderId);">申请退款/退货</button>
+								#elseif($order.ordreStatus == '待评价' || $order.ordreStatus == '已完成')
+	<!-- 							<a href="$request.getContextPath()/orderWx/refundAgreement?orderId=$!entity.orderId" class="font_1c cursor">申请售后</a><br/> -->
+									<button class="button_3 pad_mlr5" onclick="refundAgreement($order.orderId);">申请售后</button>
+								#end
+							#end
+						#else
+<!-- 									<a href="$request.getContextPath()/orderWx/refundSubmitSucc?returnId=$!json.refundId" target="_blank" class="font_1c cursor">查看退款/退货进度</a><br/> -->
+								<button class="button_3 pad_mlr5" onclick="refundSubmitSucc($order.orderId,'$!order.refundId');">退货进度</button>
+						#end
+						
+						#if($order.refundId)
+								<button class="button_3 pad_mlr5" onclick="refundSubmitSuccDetail($order.orderId,'$!order.refundId');">退货详情</button>
+						#end
+					<div class="clear"></div>
+				</div>
+			</div>
+		#else
+			没有订单
+		#end
+	#end
+#else
+	没有数据
+#end

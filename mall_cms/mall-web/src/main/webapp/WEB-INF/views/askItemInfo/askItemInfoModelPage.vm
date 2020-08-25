@@ -1,0 +1,75 @@
+#set($layout = "/none_layout.vm")		
+			<ul class="list_top bg_08 font_cen font_14b">
+				<li class="wid_50">全选</li>
+				<li class="wid_150">求购编号</li>
+				<li class="wid_90">状态</li>
+                <li class="wid_110">录入方</li>
+				<li class="wid_110">创建日期</li>
+				<li class="wid_110">截至报价日期</li>
+				<li class="wid_130">备注</li>
+				
+            </ul>
+      <!-- 类型选择 -->
+	  <!--买家卖家分开-->
+	  #if($!sellerFlag == "1")
+          <ul class="right_select">
+            <li class="wid_50 font_cen"><input type="checkbox" class="mar_l10 hei_22" id="all_select" onclick="select_all(this);"/></li>
+            <li><button type="button" class="button_4 mar_l10 hei_24" id="button_update_response">报价</button></li>
+            <li><button type="button" class="button_4 mar_l10 hei_24" onclick="lookAskItemInfo('response');">查看</button></li>
+            <!--  <li><button type="button" class="button_4 mar_l10 hei_24" id="button_commit_response">确认价格</button></li> -->
+         <!--   <li><button type="button" class="button_4 mar_l10 hei_24">下单</button></li>-->
+          </ul>
+	  #else
+    		<!-- 类型选择 -->
+          <ul class="right_select">
+            <li class="wid_50 font_cen"><input type="checkbox" class="mar_l10 hei_22" id="all_select"/></li>
+              <li><button type="button" class="button_4 mar_l10 hei_24" onclick="lookAskItemInfo('request');">查看</button></li>
+              <li><button type="button" class="button_4 mar_l10 hei_24" id="button_update" >修改</button></li>
+              <li><button type="button" class="button_4 mar_l10 hei_24" id="button_delete" onclick="button_delete(this)">删除</button></li>
+              <li><button type="button" class="button_4 mar_l10 hei_24" id="button_commit">提交</button></li>
+              <li><button type="button" class="button_4 mar_l10 hei_24" id="button_commit_re">重新求购</button></li>
+              <li><button type="button" class="button_4 mar_l10 hei_24" id="button_commit_yes">接受价格</button></li>
+         <!--   <li><button type="button" class="button_4 mar_l10 hei_24">下单</button></li>-->
+            <span class="fr mar_tb10"><button type="button" class="button_2 hei_24 " onclick="toAskItemInfoCreatePage()">+创建求购</button></span>
+          </ul>
+	  #end
+      <!-- 内容开始 -->
+		 #foreach($page in $pager.records)
+			#if($!sellerFlag == "1")
+				<ul class="list_top hei_40 list_li" onclick="translationInfoShow(this,'response','$page.translationNo');">
+			#else
+				<ul class="list_top hei_40 list_li" onclick="translationInfoShow(this,'request','$page.translationNo');">
+			#end
+              <li class="wid_50 font_cen">
+				<input type="hidden" name = "status" value="$page.status"/>
+                  <input type="hidden"  name = "endDate" value="$!date.format('yyyy-MM-dd HH:mm:ss', $page.endDate)"/>
+                <input type="checkbox" class="mar_l10 hei_22" name = "translationNo" value="$page.translationNo"/>
+              </li>
+              <li class="wid_150">$!page.translationNo</li>
+              #if($!page.status == "0")
+					<li class="wid_90 font_cen">待提交</li>
+			  #elseif($!page.status == "1")
+					<li class="wid_90 font_cen">待审核</li>
+			  #elseif($!page.status == "2")
+					<li class="wid_90 font_cen">待报价</li>
+			  #elseif($!page.status == "3")
+					<li class="wid_90 font_cen">已确认</li>
+			  #elseif($!page.status == "4")
+                  <li class="wid_90 font_cen">已驳回</li>
+			  #else
+					<li class="wid_90 font_cen"></li>
+			  #end
+              <li class="wid_110 font_cen" style="white-space: nowrap;text-overflow:ellipsis; overflow:hidden;">$!page.alternate1</li>
+              <li class="wid_110 font_cen">$!date.format('yyyy-MM-dd',$!page.createDate)</li>
+              <li class="wid_110 font_cen">
+                 $!date.format('yyyy-MM-dd',$!page.endDate)
+              </li>
+			     <li class="wid_130 font_cen" style="white-space: nowrap;text-overflow:ellipsis; overflow:hidden;">$!page.remarks</li>
+         </ul>  
+		 #end
+      <!-- 内容结束 -->
+	        <form id="categoryItemsForm"  method="post">
+				<input name="page" type="hidden">
+			</form>
+		    	<!-- 分页 --> 
+            #pageVelocity($pager)

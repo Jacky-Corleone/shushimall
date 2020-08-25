@@ -1,0 +1,74 @@
+#set($layout = "common/order.vm")
+#foreach($translation in $!pager.records)
+<div class="mar_b10 bg_01 pad_lr5">
+        <!-- 发货商城 -->
+        <div class="hei_32 border_2">
+            <p class="fl" style="font-weight:bold;"><span>求购名称：$!translation.translationName</span></p>
+			#if($!translation.status == "0")
+				<p class="fr font_e5">待提交</p>
+			#elseif($!translation.status == "1")
+				<p class="fr font_e5">待审核</p>
+			#elseif($!translation.status == "2")
+				<p class="fr font_e5">待报价</p>
+			#elseif($!translation.status == "3")
+				<p class="fr font_e5">已确认</p>
+			#elseif($!translation.status == "4")
+                <p class="fr font_e5">已驳回</p>
+			#else
+				<p class="fr font_e5"></p>
+			#end
+			
+        </div><!-- 发货商城 -->
+		<!--物品信息展示-->
+		<div id="$!translation.translationNo"><p class="hei_32" >商品信息：</p>
+		#if($!translation.status == "2")
+			<input type="checkbox"  onclick="checkAll('$!translation.translationNo',this);"/>全选
+		#end
+		#foreach($listDetail in $translation.translationMatDTOs )
+            <!-- 发货信息 -->
+            <div class="border_2 shop_order pad_tb3" >
+                <p class="wid_87 shop_order_p">
+					#if($!listDetail.alternate1 != "")
+					<input type="checkbox" name="$!translation.translationNo" value="$listDetail.id" /> 
+					#end 
+				商品名称：$listDetail.matDesc</p>
+                <p class="wid_87 shop_order_p">类目名称：$!listDetail.alternate2</p>
+				<p class="wid_87 shop_order_p">商品属性：$!listDetail.matAttribute</p>
+				 <p class="wid_87 shop_order_p">数   　量：$!listDetail.quantity</p>
+				 #if($!listDetail.alternate1 != "")
+				 <div id="$!listDetail.id" >
+					<p class="wid_87 shop_order_p">供应商：$!listDetail.alternate1</p>
+					 #if($!listDetail.status == "1")
+                         <p class="wid_87 shop_order_p">状   态：已接收</p>
+					 #else
+                         <p class="wid_87 shop_order_p">状   态：未接收</p>
+					 #end
+					<p class="wid_87 shop_order_p">价   格：$!listDetail.matPrice</p>
+				</div>
+				#end
+                <div class="clear"></div>
+            </div>
+            <!-- 发货信息 -->
+		#end
+        </div>
+	    <!--物品信息展示end-->
+   		 <p>&nbsp;</p>
+	    <p>截止报价时间：$!date.format('yyyy-MM-dd', $!translation.endDate)</p>
+            <!-- 按钮 -->
+            <div class="pad_tb5">
+				#if($!translation.status == "0" || $!translation.status == "4")
+				<button class="button_3 pad_mlr5" onclick="updateTranslation('$!translation.translationNo','$!translation.status');">编辑</button>
+				<button class="button_3 pad_mlr5" onclick="commitTranslation('$!translation.translationNo','$!translation.status');">提交</button>
+				<button class="button_3 pad_mlr5" onclick="deleteTranslation('$!translation.translationNo','$!translation.status');">删除</button>
+				#end
+				#if($!translation.status == "2" || $!translation.status == "3" )
+					<button class="button_3 pad_mlr5" onclick="committranslationRe('$!translation.translationNo','$!translation.status');">重新求购</button>
+				#end
+				#if($!translation.status == "2")
+					<button class="button_3 pad_mlr5" onclick="commitRequestTranslation('$!translation.translationNo','$!translation.status','$!translation.translationNo');">接收价格</button>
+				#end
+				<button class="button_3 pad_mlr5" onclick="lookTranslationInfo('$!translation.translationNo','request');">查看</button>
+				<div class="clear"></div>
+				</div>
+				</div>
+	#end

@@ -1,0 +1,9 @@
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<link type="text/css" rel="stylesheet" href="$request.contextPath/assets/css/detail.css" />
+<script type="text/javascript" src="$request.contextPath/assets/js/jquery-v1.10.2.min.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/iscroll.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/tab.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/zepto.js"></script>

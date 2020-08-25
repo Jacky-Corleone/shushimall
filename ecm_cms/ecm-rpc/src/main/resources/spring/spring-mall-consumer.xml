@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+	<!-- 帮助文档服务调用 -->
+	<dubbo:reference id="mallDocumentService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.basecenter.service.MallDocumentService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+	<!-- 商城广告服务调用 -->
+	<dubbo:reference id="mallAdService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.sellercenter.malladvertise.service.MallAdExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+	<dubbo:reference id="mallRecAttrService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.sellercenter.mallrecattr.service.MallRecAttrExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<!-- 公告服务调用 -->
+ 	<dubbo:reference id="noticeExportService" registry="qingdaoRegistry" 
+ 		owner="zhangfan" interface="com.camelot.sellercenter.notice.service.NoticeExportService" 
+ 		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+    <!--商城信息调用 -->
+
+    <!--商城类目-->
+    <dubbo:reference id="itemCategoryService" registry="qingdaoRegistry"
+                     owner="zhangfan" interface="com.camelot.goodscenter.service.ItemCategoryService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    <!--商城类目品牌-->
+    <dubbo:reference id="itemBrandExportService" registry="qingdaoRegistry"
+                     owner="zhangfan" interface="com.camelot.goodscenter.service.ItemBrandExportService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<!-- 卖场中心logo服务调用 -->
+	<dubbo:reference id="logoExportService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.sellercenter.logo.service.LogoExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true"/>
+		
+	<!-- 卖场中心轮播服务调用 -->
+	<dubbo:reference id="mallBannerExportService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.sellercenter.mallBanner.service.MallBannerExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true"/>
+        
+	<!--文档分类调用 -->
+	<dubbo:reference id="mallClassifyService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.basecenter.service.MallClassifyService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<!-- 商城楼层信息调用 -->
+	<dubbo:reference id="mallRecExportService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.sellercenter.mallRec.service.MallRecExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    
+    <!-- 商城热门关键词 -->
+    <dubbo:reference id="mallWordExportService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.sellercenter.mallword.service.MallWordExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    
+	<!--帮助文档调用 -->
+	<dubbo:reference id="baseSmsConfigService" registry="qingdaoRegistry"
+		owner="basecenter" interface="com.camelot.basecenter.service.BaseSmsConfigService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<!-- 生成远程服务代理，可以像使用本地bean一样使用demoService -->
+ 	<dubbo:reference id="baseWebSiteMessageService" registry="qingdaoRegistry" 
+ 		owner="zhangfan" interface="com.camelot.basecenter.service.BaseWebSiteMessageService" 
+ 		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+</beans>

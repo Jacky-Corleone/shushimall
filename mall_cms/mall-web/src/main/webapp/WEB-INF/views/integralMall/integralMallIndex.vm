@@ -1,0 +1,150 @@
+#set($staticPath="$request.contextPath/assets")
+#set($header = "/header.vm")
+<link rel="stylesheet" type="text/css" href="$staticPath/css/basic.css">
+<link rel="stylesheet" type="text/css" href="$staticPath/css/integral.css">
+<script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript">
+	/*滚动效果*/
+	$(function(){
+		var overTie = $(".over_tit");
+		$.each(overTie,function(idx,ele){
+			var text = $(ele).html();
+			if(text.length>40){
+				$(ele).html(text.substring(0,30)+"...");
+			}
+		});
+		var imgSize = $!bannerSize;
+		if(imgSize<1){
+			imgSize =1;
+		}
+		var myFn = function(){ 
+			olKey++;
+			if(olKey > (imgSize-1)){
+				olKey = 0;
+			};
+			$('.banner ol li').eq(olKey).addClass('current').siblings().removeClass('current');
+			imgKey++;
+			if(imgKey > imgSize){
+				imgKey = 1;
+				$('.banner ul').css('left','0px');
+			};
+			var move = imgKey * -1000;
+			$('.banner ul').stop().animate({'left':move + 'px'},500);
+		};
+		var timer01 = null;
+		timer01 = setInterval(myFn,2000);
+		$('.banner').hover(function(e) {
+            clearInterval(timer01);
+        },function(){
+			timer01 = setInterval(myFn,2000);
+		});
+		var olKey = 0;
+		var imgKey = 0;
+	 	$('.banner ol li').mouseover(function(e) {
+			$(this).addClass('current').siblings().removeClass('current');
+			var move = $(this).index() * -1000;
+			$('.banner ul').stop().animate({'left':move + 'px'},500);
+			olKey = $(this).index();
+			imgKey = $(this).index();
+        });	
+	});
+	
+	function openDetail(id,skuId,integralItemType){
+	
+		var url = "$request.contextPath/integralMall/integralItemDetail?id="+id+"&skuId="+skuId+"&integralType="+integralItemType;
+		window.open(url);
+	};
+</script>
+
+<!--int-content start-->
+<div class="int-content mar bg_05">
+	<div class="wrap mar">
+    	<!--banner start-->
+        <div class="banner mar po_re">
+        	<div class="bannerIn po_re">
+                <ul class="po_ab">
+               	 #foreach($banner in $banners)
+               	 	<a onclick="openDetail('$!banner.id','$!banner.skuId',1)" class="cursor lbp" style="display: block;" title="$!bunner.title">
+                    	<li class="fl"><img src="$!imageServerAddr$banner.bannerUrl" width="1000" height="400"></li>
+                    </a>
+                 #end
+                 <!--为了不留白克隆的第一张图-->
+                 #foreach($banner in $banners)
+                 	#if($velocityCount == 1)
+               	 	<a onclick="openDetail('$!banner.id','$!banner.skuId',1)" class="cursor lbp" style="display: block;" title="$!bunner.title">
+                    	<li class="fl"><img src="$!imageServerAddr$banner.bannerUrl" width="1000" height="400"></li>
+                    </a>
+                    #end
+                 #end
+                </ul>
+            </div>
+            <ol class="wid_100 hei_20 po_ab">
+            	#foreach($banner in $banners)
+                    #if($velocityCount == 1)
+               	 	 	<li class="fl current mar_l10"></li>
+               	 	#else
+               	 		<li class="fl mar_l10"></li>
+               	 	#end
+               	 	 
+                 #end
+            </ol>
+        </div>
+        <!--banner end-->
+        <!--wrap-pic start-->
+        <div class="wrap-pic">
+        	<div class="wrap-pic-t border-1">
+            	<!--积分活动部分 start-->
+            	<ul class="mar_t10">
+	            	 #foreach($advertise in $advertises)
+	               	 	<a onclick="openDetail('$!advertise.mallAdDTO.id','$!advertise.mallAdDTO.skuId',2)" class="cursor lbp" style="display: block;" title="$!bunner.mallAdDTO.title">
+	                    	<li class="fl"><img src="$!imageServerAddr$advertise.mallAdDTO.adSrc" width="198" height="198"></li>
+	                    </a>
+	                 #end
+                </ul>
+                <!--积分活动部分 end-->
+            </div>
+            <div class="wrap-pic-b mar_t10">
+            	<!--淘新品部分 start-->
+				
+            	<div class="wrap-pic-b-l fl mar_r10 bg_06 border-1">
+                	<h1 class="hei_30 font_14">淘新品</h1>
+                    <ul>
+                    
+                    #foreach($advertisItem in $advertisItems)
+		               	 	<a onclick="openDetail('$!advertisItem.mallAdDTO.id','$!advertisItem.mallAdDTO.skuId',2)" class="cursor lbp" style="display: block;" title="$!advertise.mallAdDTO.title">
+			               	 	<li class="fl">
+			                    	<img src="$!imageServerAddr$!advertisItem.mallAdDTO.adSrc" width="160" height="160">
+		                            <p class="tit over_tit" title="$!advertisItem.itemDTO.itemName">$!advertisItem.itemDTO.itemName</p>
+		                            <p class="jif"><span>$!advertisItem.mallAdDTO.integral</span>积分</p>
+		                            <p class="scj">市场价￥$!advertisItem.itemDTO.guidePrice</p>
+	                            </li>
+		                    </a>
+		                 #end
+                    </ul>
+                </div>
+                <!--淘新品部分 end-->
+                <!--兑你喜欢部分 start-->
+                <div class="wrap-pic-b-r fr bg_06 border-1">
+                	<h2 class="hei_30 border-5">兑你喜欢</h2>
+                    <ul>
+                     	#foreach($advertisLike in $advertisLikes)
+							#if($velocityCount < 11)
+		               	 	<a onclick="openDetail('$!advertisLike.mallAdDTO.id','$!advertisLike.mallAdDTO.skuId',2)" class="cursor lbp"  title="$!advertisLike.mallAdDTO.title" >
+			               	 	<li class="border-5 po_re">
+			               	 		<span class="bg_06 sp01 po_ab">$!{velocityCount}</span>
+			                    	<img src="$!imageServerAddr$!advertisLike.mallAdDTO.adSrc" width="160" height="160" class="po_ab">
+		                            <p class="tit lin_18 over_ell" title="$!advertisLike.itemDTO.itemName">$!advertisLike.itemDTO.itemName</p>
+		                            <p class="jif lin_18"><span>$!advertisLike.mallAdDTO.integral</span>积分</p>
+		                            <p class="scj lin_18">市场价￥$!advertisLike.itemDTO.guidePrice</p>
+	                            </li>
+		                    </a>
+							#end
+		                 #end
+                    </ul>
+                </div>
+                <!--兑你喜欢部分 end-->
+            </div>
+        </div>
+        <!--wrap-pic end-->
+    </div>	
+</div><!--int-content end-->

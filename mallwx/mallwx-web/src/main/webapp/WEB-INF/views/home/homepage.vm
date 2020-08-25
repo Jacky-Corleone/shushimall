@@ -1,0 +1,146 @@
+#set($layout = "common/blanklayout.vm")
+<!DOCTYPE html >
+<html>
+<head>
+<base href="${request.getContextPath()}/"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta http-equiv="cache-control" content="max-age=0" />
+<meta http-equiv="cache-control" content="no-cache" />
+<meta http-equiv="expires" content="-1" />
+<meta http-equiv="pragma" content="no-cache" />
+<title>【印刷家】印刷采购好管家！</title>
+<link href="assets/css/detail.css" rel="stylesheet" type="text/css"/>
+<link href="assets/css/swiper.min.css" rel="stylesheet" type="text/css"/>
+<script src="assets/js/jquery-2.1.4.min.js" type="text/javascript"></script>
+<script src="assets/js/jqm/jquery.mobile.custom.min.js" type="text/javascript"></script>
+<script src="assets/js/jQueryDoCookie.js" type="text/javascript"></script>
+<script type="text/javascript" src="assets/js/iscroll.js"></script>
+<script type="text/javascript" src="assets/js/swiper-jquery-min.js"></script>
+<script src="assets/js/home/homePage.js" type="text/javascript"></script>
+</head>
+<body class="bg_02" >
+	<!--类目  start -->
+	<div id="navigation" class="" style="z-index:99;position:absolute;top:50px; #if($showMenu == $0)display:none;#end">
+    	<ul id="list">
+    		#foreach($item1 in $itemList)
+    		<li><a href="#" onclick="showItem(this,2);return false;"  categoryCid="$item1.categoryCid"><span class="font_e5 mar_r2">|</span>$item1.categoryCName</a>
+                <ul class="myHide" isItem2 parentId="$item1.categoryCid">
+    				#foreach($item2 in $item1.children)
+                    <li><a href="#" onclick="return false;" class="font_e5_no_bold font_8_5">$item2.categoryCName</a></li>
+                    <li class="border_2" isItem3 parentId="$item2.categoryCid">
+    					<a>
+    						#foreach($item3 in $item2.children)
+    						<span style="" onclick="loadProducts('$item3.categoryCid')">$item3.categoryCName</span>
+    						#end
+    					</a>
+    				</li>
+    				#end
+                </ul>
+    		</li>
+    		#end
+        </ul>
+     </div>
+		<!--类目   end -->
+	   ##parse("home/loginWindow.vm")
+    <div id="main" class="po_ab">
+        <!-- 中间内容 -->
+        <!-- 头部 -->
+        <div class="purchase">
+            <div id="unseebg" class="unseebg none" onclick="changeType(1)">
+            ##拦截点击事件的
+            </div>
+            <p class="fl mar_lr4 font_cen" style="line-height: 14px;  padding-top: 12px;" onclick="toggleMenu();">
+                        <i class="fa fa-list-ul font_1_5" ></i>
+                <br/>
+                    <i class="font_7_5" style="margin-left: -4px;">频道</i>
+            </p>
+            <div class="fl po_ab " style="left: 46px;right:35px;top:0;bottom: 0;">
+
+                <div class="select_1 fl po_ab bg_01"  style="top:16px;left:5px;z-index: 102">
+                    <span id="typeTitle" onclick="changeType(0)" style="font-size: 1.25em">商品</span><i class="fa fa-sort-desc po_ab" style="top: 5px;height:5px;line-height: 5px;"></i>
+                    <ul id="typePanel" class="typePanel block_bg none">
+                        <li onclick="typeClick(0);">商品</li>
+                        <li onclick="typeClick(1);">店铺</li>
+                    </ul>
+                </div>
+
+                <div class="po_ab form-contro3" style="">
+                    <input type="text" id="searchInput" #*onchange="toSearch();"*# class="form-contro2 po_ab" style="left:62px;top:5px;width:58%;"/>
+                </div>
+                <i onclick="" class="fa-search font_1_2 fa-user3 po_ab" style="top:0px;"></i>
+                <i onclick="toSearch()" class="font_1_2 po_ab" style="right: 12px;">搜索</i>
+            </div>
+            #if($userId == $null)
+                <div class="fl mar_l5 font_1_2 po_ab" style="right:5px;" onclick="$('#targetUrl').val('');showLogin();">登录</div>
+            #else
+                <div  class="fl mar_l5 po_ab" style="right:5px;" onclick="toPersonCenter(this);" ahref="user/queryUserInfoById?uid=$!{userInfo.uid}">
+                #*<i class="font_1_8 fa-user"></i>*#
+                    <img style="width: 30px;height: 25px;margin-top: 12px;" src="assets/images/kyelephent.jpg"></img>
+                </div >
+            #end
+        </div><!-- 头部 -->
+        <div class="content pad_b20" id="wrapper" style="top:50px;">
+            <!-- 轮播图 -->
+            #*<div class="flicker-example po_re pad_t50" data-block-text="false">
+              <ul>
+    			#foreach($banner in $banners)##轮播图的尺寸定义在detail.css中的.flick-content img项
+				<li><a href="//$!banner.bannerLink"><img src="$!{gix}$!{banner.bannerUrl}"></a></li>
+    			#end
+              </ul>
+            </div>*#
+			<!-- 轮播图 end-->
+			
+			<div>
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        #foreach($banner in $banners)##轮播图的尺寸定义在detail.css中的.flick-content img项
+                        <div class="swiper-slide" style="text-align: center">
+                            <a href="//$!banner.bannerLink">
+                                <img style="width: 100%;height:300px;"   src="$!{gix}$!{banner.bannerUrl}">
+                            </a>
+                        </div>
+                        #end
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+
+            <div class="pad_l2 mar_t10" id="floorBoard">
+                #*<!-- 列表 -->
+                <ul class="li_fl list_top ">
+                    <li class="font_e5">耗材</li><p>|</p>
+                    <li>印刷包装设备</li><p>|</p>
+                    <li>印刷器材及配件</li>
+                </ul>
+                <div class="clear"></div>
+                <ul class="li_fl hei_50 ">
+                    <li class="wid_40 font_1_0">数码印刷专区</li>
+                    <li class="wid_40 font_1_0">标签印刷专区</li>
+                </ul>
+                <p class=" lin_24"> 图书/期刊/软件/培训</p>
+                <!-- banner图片 -->
+                <div class="banner_img mar_lr5">
+                    <img src="">
+                    
+                </div>
+                <!-- banner图片 end-->*#
+				#set($floorcount = $1)
+    			#foreach($floor in $floors)
+                <!-- 楼层1 -->
+                <div class="mar_t20" floorflag="$!{floor.idDTO}" id="floor$!{floor.idDTO}" floorcount="$!{floorcount}">
+
+                </div><!-- 楼层1end -->
+    			<div class="clear"></div>
+				#set($floorcount = $floorcount + $1)
+    			#end
+            </div>
+            <!-- 头部 end-->
+        </div><!-- 中间内容 end-->
+
+    </div>
+        #parse("common/footer.vm")
+</body>
+</html>

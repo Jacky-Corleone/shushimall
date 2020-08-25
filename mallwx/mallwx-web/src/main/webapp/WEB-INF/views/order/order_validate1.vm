@@ -1,0 +1,72 @@
+#set($layout="common/order.vm")
+<!-- 订单提交失败提示页面 -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>订单提交失败</title>
+#parse("common/scriptAndCss.vm")
+</head>
+<body>
+<!--包住整个页面的DIV id="content" start -->
+<div id="main">
+    <!--中间内容开始 -->
+    <div class="content" id="wrapper">
+        <div class="fail_img">
+            <img src="$request.contextPath/assets/images/fail.png" />
+        </div>
+        <div class="font_cen">
+            <p class="font_2_0">订单提交失败</p>
+            
+            <p class="font_1_5 mar_t15 font_c3">
+	            #foreach( $shop in $myCart.shops )
+					#if( $shop.unusualCount > 0 )
+<!-- 						<div class="man1_con"> -->
+		    				#foreach( $product in $shop.products )
+		    					#if($product.unusualState)
+<!-- 					        		<div style="margin-bottom: 5px; height: 70px; line-height: 70px;"> -->
+<!-- 					 	          		<div style="float:left; width: 64px;height: 64px; margin-right: 5px;"> -->
+<!-- 					 		               	<img src="$!imageServerAddr$!product.src" style="width: 64px;height: 64px;"/> -->
+<!-- 					        	   		</div> -->
+<!-- 					    	            <div style="float:left; line-height: 35px; width: 180px;"> -->
+<!-- 					     		           	<span>$product.title</span><br> -->
+<!-- 					      		      		<span style="height: 30px;width: 180px; white-space:nowrap; overflow: hidden; text-overflow: ellipsis;"> -->
+					           		 			#foreach( $attr in $product.attrs )
+					            					$attr.name:$attr.value &nbsp;
+					            				#end
+<!-- 					            			</span> -->
+<!-- 					                	</div> -->
+<!-- 					                	<div style="float:left; width: 230px; height: 70px; line-height: 35px; white-space:nowrap; overflow: hidden; text-overflow: ellipsis;"> -->
+<!-- 											<span style="color: #c90202;"> -->
+												#foreach($unusualMsg in $product.unusualMsg )
+													$unusualMsg &nbsp;
+												#end
+<!-- 											</span> -->
+<!-- 					               		</div> -->
+<!-- 					             	</div> -->
+					         	#end
+		    				#end
+<!-- 		    			</div> -->
+		    		#end
+	    		#end
+        	</p>
+<!--         <p class="font_1_5 mar_t15 font_c3">[501]-业务参数缺失：交易记录不存在！</p> -->
+        
+        </div>
+        <div class="pad_lr5 lin_24 mar_t20">
+            <p class="font_c3">重要提示：印刷家平台不会以<span class="font_66">订单异常、系统升级</span>为由，要求您点击任何链接进行退款。</p>
+        </div>
+        <div class="font_cen mar_t120">
+          <a href="$request.getContextPath()/orderWx/toOrderSubmit?orderSource=buyers">查看订单</a><span> | </span><a href="$request.contextPath/">继续购物</a>
+        </div>
+    </div> <!--中间内容 end -->
+</div>
+<!-- 底部 -->
+#parse("common/footer.vm")
+<!-- 底部 -->
+<!--包住整个页面的DIV id="content" end -->
+</body>
+</html>

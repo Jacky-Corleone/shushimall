@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+	<!-- dubbo服务取调用用户扩展信息模块的dubbo服务 -->
+    <dubbo:reference id="userExportService" registry="qingdaoRegistry"
+                     owner="zhangfan" interface="com.camelot.usercenter.service.UserExportService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<dubbo:reference id="userExtendsService" registry="qingdaoRegistry" 
+		owner="zhangfan" interface="com.camelot.usercenter.service.UserExtendsService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<!-- 用户积分 -->
+	<dubbo:reference id="userCreditExportService" registry="qingdaoRegistry" 
+		owner="zhangfan" interface="com.camelot.usercenter.service.UserCreditExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<dubbo:reference id="userIntegralTrajectoryService" registry="qingdaoRegistry" 
+		owner="zhangfan" interface="com.camelot.usercenter.service.UserIntegralTrajectoryExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+</beans>

@@ -1,0 +1,60 @@
+#set($layout = "/sonhome/category_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<link href="$staticPath/css/Details.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+$(document).ready(function(){
+	// 左侧导航菜单
+	$(".Nav_classify").load("$request.contextPath/sonHome/allCategory?type=show&cid=$!cid&themId=$!themId");
+})
+</script>
+<div id="content">
+	<div class="all_shop">
+		<!-- 每一个大类循环 li 开始-->
+		<ul>
+			#foreach($category in $categoryes)
+				#set( $tmp = $velocityCount%2 )
+				#if( $tmp != 0 )
+					<li class="border-4">
+						<h3 class="bg_05 border-6">
+							<i class="demo-icons fa-angle-double-right font_16"></i>
+							<a href="$request.contextPath/searchController/searchItemByCategory?cid=$category.categoryCid" class="over_ell" title="$category.categoryCName" target="_blank">$category.categoryCName</a>
+						</h3> 
+						#foreach($cate in $category.children)
+							<dl #if( $velocityCount != $category.children.size() ) class="border-5" #end >
+								<dt class="font_fe font_14b"><a class="attrAttr cursor over_ell" id="$cate.attrAttrId" title="$cate.attrAttrName" target="_blank">$!{cate.attrAttrName}</a></dt>
+								<dd>
+									#foreach($c in $cate.valueList) 
+										<span><a id="$!c.attrValueId" class="aa01 cursor over_ell" title="$!c.attrValueName">$!c.attrValueName</a></span> 
+									#end
+								</dd>
+							</dl> 
+						#end
+					</li> 
+				#end
+			#end
+		</ul>
+		<ul >
+			#foreach($category in $categoryes)
+				#set( $tmp=$velocityCount%2 )
+				#if( $tmp==0 )
+					<li class="border-4">
+						<h3 class="bg_05 border-6">
+							<i class="demo-icons fa-angle-double-right font_16"></i>
+							<a href="$request.contextPath/searchController/searchItemByCategory?cid=$category.categoryCid" class="over_ell" title="$category.categoryCName" target="_blank">$category.categoryCName</a>
+						</h3> 
+						#foreach($cate in $category.children)
+							<dl #if( $velocityCount != $category.children.size() ) class="border-5" #end >
+								<dt class="font_fe font_14b"><a class="attrAttr cursor over_ell" id="$cate.attrAttrId" title="$cate.attrAttrName" target="_blank">$!{cate.attrAttrName}</a></dt><!--二级类目是dt不动 -->
+								<dd>
+									#foreach($c in $cate.children) 
+										<span><a id="$!c.attrValueId" class="aa01 cursor over_ell" title="$!c.attrValueName">$!c.attrValueName</a></span> 
+									#end
+								</dd>
+							</dl> 
+						#end
+					</li> 
+				#end
+			#end
+		</ul>
+	</div>
+</div>

@@ -1,0 +1,209 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/configuration_layout.vm")
+<div>
+<!--内容start-->
+    <div class="stepflex">
+        <dl class="first done"><!--流程已走完就加入 done 这个样式 -->
+            <dt class="s-num">1</dt>
+            <dd class="s-text">填写账户名<s></s><b></b></dd>
+        </dl>
+        <dl class="normal done"><!--流程已走完就加入 done 这个样式 -->
+            <dt class="s-num">2</dt>
+            <dd class="s-text">验证身份<s></s><b></b></dd>
+        </dl>
+        <dl class="normal doing"><!--正在哪个流程就加入 doing 这个样式 -->
+            <dt class="s-num">3</dt>
+            <dd class="s-text">设置新密码<s></s><b></b></dd>
+        </dl>
+        <dl class="last">
+            <dt class="s-num"><i class="fa-check"></i></dt>
+            <dd class="s-text">完成<s></s><b></b></dd>
+        </dl>
+    </div><!--stepflex end -->
+    <div class="clear"></div> 
+    <!--流程结束 -->  
+    <div class="register_content"><!--register_nav-->
+    	<form action="$request.contextPath/findpwd/modifypwd" method="post" id="from_info_pwd">
+            <input type="hidden" name="logname" id="logname_id"/>
+        	<div class="register_box_mid" style="margin-top:40px; width:640px">
+                <!--如需增加可循环dl开始-->
+            	<dl>
+                    <dt>输入新密码：</dt>
+                    <dd style="border:none; width:470px" class="po_re"><input name="loginpwd" id="loginpwd_id" type="password" maxlength="25" class="input_Style1 wid_180" onKeyUp="pwStrength(this.value)" onBlur="pwdStrength(this.value)" />
+                    <i id="icon_pwd1_hint" style="display: none;" class="fa-check-circle font_16 font_7a"></i><!--前面图标若信息正确就用此图标--> <i id="loginpwd_span" class="msg_span"></i>
+                <!--表示密码长度的div -->
+                        <div class="password_length" style="margin-top: 5px; position: assets;">
+                            <span id="pwd_level_1" class="bg_09 font_12" style="display:none">弱</span>	<!-- 密码长度为短就用第一个span -->
+                            <span id="pwd_level_2" class="bg_10 font_12" style="display:none">中</span>	<!-- 密码长度为中就用到第一个和第二个span -->
+                            <span id="pwd_level_3" class="bg_11 font_12" style="display:none">强</span>	<!-- 密码长度为高就用到第一个和第二个和第三个span -->
+                        </div>
+                        <!--password_length end-->
+                    </dd>
+                </dl>
+                <!--如需增加可循环dl结束-->
+            	<dl>
+                    <dt>再次输入新密码：</dt>
+                    <dd style="border:none" class="po_re"><input name="pwd" id="pwd_id" type="password" maxlength="25" class="input_Style1 wid_180" />
+                    <i id="icon_pwd_hint" style="display: none;" class="fa-check-circle font_16 font_7a"></i><!--前面图标若信息正确就用此图标--> <i id="pwd_span" class="msg_span"></i>               
+                    </dd>
+                </dl>
+                    <div class="clear"></div>
+                    <div class="button_1 hei_40 font_16" style="width: 280px;" id="btn_submit">提 交</div>
+            </div><!--register_box-->
+        </form>
+    </div><!--register_content-->
+<!--内容end-->
+</div>
+ <script type="text/javascript" src="$staticPath/plugin/common/checkPwd.js"></script>
+ <script type="text/javascript">
+	
+ $(function()
+ {
+	 passwordCheck.initEvent.initPage(); 
+ });
+ 
+ //密码强度校验
+ var passwordCheck = 
+	{
+			initEvent:
+			{
+				//初识化
+				initPage:function()
+				{
+					//初识化新密码输入框
+					this.initNewPwdInp();
+					//初识化重复新密码输入框
+					this.initReNewPwdInp();
+					//初识化提交按钮
+					this.initSubmitBtn();
+				},
+				initNewPwdInp:function()
+				{
+					$('#loginpwd_id').keydown(passwordCheck.newPwdkeydown).keyup(passwordCheck.newPwdkeyup).focus(passwordCheck.newPwdfocusOn).blur(passwordCheck.newPwdfocusOut);
+				},
+				initReNewPwdInp:function()
+				{
+					$('#pwd_id').focus(passwordCheck.reNewPwdfocusOn).blur(passwordCheck.reNewPwdfocusOut);
+				},
+				initSubmitBtn:function()
+				{
+					$('#btn_submit').click(passwordCheck.sumitBtnClick);
+				}
+			},
+			
+			newPwdkeydown:function()
+			{
+				
+			},
+			
+			newPwdkeyup:function()
+			{
+				$('#loginpwd_id').checkPwdStrong();
+			},
+			
+			newPwdfocusOut:function()
+			{
+				$('#loginpwd_id').checkPwdOut();
+			},
+			
+			newPwdfocusOn:function()
+			{
+				
+			},
+			
+			reNewPwdfocusOn:function()
+			{
+				$('#pwd_id').reNewPwdfocusOn();
+			},
+			
+			reNewPwdfocusOut:function()
+			{
+				$('#pwd_id').checkPwdToo();
+			},
+			
+			sumitBtnClick:function()
+			{
+				if($('#loginpwd_id').checkPwdOut() && $('#pwd_id').checkPwdToo())
+				{
+					var logname = "$!logname";
+					$("#logname_id").val(logname);
+					$("#from_info_pwd").submit();
+				}
+			}
+	};
+	
+ 
+ 
+ 
+ 
+ 
+//验证密码格式
+//$("#loginpwd_id").focus(checkPwdIn).focusout(checkPwdOut);
+
+function checkPwdIn(){
+	$("#loginpwd_span").html("6-20位字符，必须由字母数字和符号组合");
+	$("#loginpwd_span").css("color", "#dedede");
+}
+
+function checkPwdOut(){
+	var pwd = $("#loginpwd_id").val();
+	if(pwd.length == 0){
+		$("#loginpwd_span").html("请输新密码");
+		$("#loginpwd_span").css("color","red");
+		return false;
+	}
+	if(pwd.length < 6){
+		$("#loginpwd_span").html("密码不得少于六位，请重新输入");
+		$("#loginpwd_span").css("color","red");
+		return false;
+	} else {
+		var pwdFormat = /^(\d+[a-zA-z.,_!@#$^%&*?]+)|([a-zA-z]+[0-9.,_!@#$^%&*?]+)|([.,_!@#$^%&*?]+[0-9a-zA-z]+)$/;
+		if(!pwdFormat.test(pwd)){
+			$("#loginpwd_span").html("至少由数字、字母、符号两个以上组合");
+			$("#loginpwd_span").css("color","red");
+			return false
+		} else {
+			return true;
+		}
+	}
+}
+
+//$("#pwd_id").focusout(checkPwdToo);
+
+function checkPwdToo(){
+	var pwdToo = $("#pwd_id").val();
+	if(pwdToo.length == 0){
+		$("#pwd_span").html("请输入确认密码");
+		$("#pwd_span").css("color","red");
+		$("#icon_pwd_hint").removeClass("fa-check-circle font_7a").addClass("fa-exclamation-circle font_fe").show();
+		return false;
+	}
+	var pwd = $("#loginpwd_id").val();
+	if(pwdToo != pwd){
+		$("#pwd_span").html("两次密码不同，请重新输入");
+		$("#pwd_span").css("color","red");
+		$("#icon_pwd_hint").removeClass("fa-check-circle font_7a").addClass("fa-exclamation-circle font_fe").show();
+		return false;
+	} else {
+		$("#pwd_span").html("");
+		$("#icon_pwd_hint").removeClass("fa-exclamation-circle font_fe").addClass("fa-check-circle font_7a").show();
+		return true;
+	}
+}
+
+/* $("#btn_submit").click(function(){
+	var pwd = $("#loginpwd_id").val();
+	if(checkPwdOut() && checkPwdToo()){
+		var logname = "$!logname";
+		$("#logname_id").val(logname);
+		$("#from_info_pwd").submit();
+	}
+});
+ */
+document.onkeydown = function(e){
+   if(!e) e = window.event;//火狐中是 window.event
+   if((e.keyCode || e.which) == 13){
+	   checkCaptcha();
+   }
+}
+</script>

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.report.dao.OrderDealReportDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="orderDealReportMap" type="com.camelot.report.dto.OrderDealReportOut">
+			<result property="payPriceTotal" column="payPriceTotal"/>
+			<result property="buyPersonNum" column="buyPersonNum"/>
+			<result property="payGoodsNum" column="payGoodsNum"/>
+			<result property="orderNum" column="orderNum"/>
+			<result property="payConversion" column="payConversion"/>
+			<result property="dealDate" column="dealDate"/>
+	</resultMap>
+	
+	<!-- 查询 成交金额 、 成交人数、 商品数  总数 -->
+	<select id="getOrderDealPaySum"  resultMap="orderDealReportMap">
+		SELECT 
+			ifnull(SUM(t.payment_price),0) payPriceTotal, 
+			COUNT(DISTINCT buyer_id) buyPersonNum,
+			ifnull(SUM(s.num),0) payGoodsNum
+		FROM  
+		(SELECT order_id,buyer_id,payment_price,DATE_FORMAT(payment_time,'%Y%m%d') dealDate
+			FROM trade_orders 
+			WHERE state>=4  AND paid=2 AND parent_order_id!='0' 
+			<include refid="pay_condition" />
+		) t
+		INNER JOIN (SELECT order_id,sum(num) num FROM trade_order_items group by order_id) s 
+		ON t.order_id=s.order_id
+	</select>
+	
+	<!-- 查询 订单数 、 成交转换率  总数 -->
+	<select id="getOrderDealNumSum"  resultMap="orderDealReportMap">
+		SELECT  
+			COUNT(1) orderNum,
+			ifnull(ROUND(SUM(CASE WHEN t.paid=2 THEN 1 ELSE 0 END)/COUNT(1),4),0) payConversion
+		FROM  
+		(SELECT buyer_id,paid,DATE_FORMAT(order_time,'%Y%m%d') dealDate
+		FROM trade_orders 
+		WHERE parent_order_id!='0'  
+			<include refid="order_condition" />
+		) t
+	</select>
+	
+	<!--  查询总数 -->
+	<select id="queryOrderDealReportCount" resultType="long">
+		SELECT COUNT(1) FROM (
+			SELECT d.dealDate FROM 
+			(SELECT DATE_FORMAT(payment_time,'%Y%m%d') dealDate
+			FROM trade_orders 
+			WHERE state>=4  AND paid=2 AND parent_order_id!='0'
+			 <include refid="pay_condition" />
+			
+			UNION ALL 
+			
+			SELECT DATE_FORMAT(order_time,'%Y%m%d') dealDate
+			FROM trade_orders 
+			WHERE parent_order_id!='0'
+			 <include refid="order_condition" />
+			  ) d where d.dealDate>0 GROUP BY d.dealDate ) t
+	</select>
+	
+	
+	<!-- 分页查询 -->
+	<select id="queryOrderDealReportList"  resultMap="orderDealReportMap">
+		SELECT a1.dealDate,IFNULL(a2.payPriceTotal,0) payPriceTotal,IFNULL(a2.buyPersonNum,0) buyPersonNum,
+			IFNULL(a2.payGoodsNum,0) payGoodsNum,IFNULL(a3.orderNum,0) orderNum,IFNULL(a3.payConversion,0) payConversion 
+		FROM
+			(SELECT d.dealDate FROM 
+				(SELECT DATE_FORMAT(payment_time,'%Y%m%d') dealDate
+					FROM trade_orders 
+					WHERE state>=4  AND paid=2 AND parent_order_id!='0' 
+						<include refid="pay_condition" />
+					
+					UNION ALL 
+		
+					SELECT DATE_FORMAT(order_time,'%Y%m%d') dealDate
+					FROM trade_orders 
+					WHERE parent_order_id!='0' 
+						<include refid="order_condition" />
+				) d where d.dealDate>0
+			GROUP BY d.dealDate ORDER BY d.dealDate DESC) a1
+			LEFT JOIN 
+			(SELECT  t.dealDate,
+					SUM(t.payment_price) payPriceTotal, 
+					COUNT(DISTINCT buyer_id) buyPersonNum,
+					SUM(s.num) payGoodsNum
+			FROM  
+				(SELECT order_id,buyer_id,payment_price,DATE_FORMAT(payment_time,'%Y%m%d') dealDate
+					FROM trade_orders 
+					WHERE state>=4  AND paid=2 AND parent_order_id!='0' 
+						<include refid="pay_condition" />
+				) t
+				INNER JOIN (SELECT order_id,sum(num) num FROM trade_order_items group by order_id) s 
+							ON t.order_id=s.order_id
+							GROUP BY t.dealDate
+				) a2  ON a1.dealDate=a2.dealDate
+		
+			LEFT JOIN 
+		
+				(SELECT  t.dealDate,
+					COUNT(1) orderNum,
+					ROUND(SUM(CASE WHEN t.paid=2 THEN 1 ELSE 0 END)/COUNT(1),4) payConversion
+				FROM  
+					(SELECT buyer_id,paid,DATE_FORMAT(order_time,'%Y%m%d') dealDate
+					FROM trade_orders 
+					WHERE parent_order_id!='0' 
+						<include refid="order_condition" />
+					) t
+				GROUP BY t.dealDate) a3 ON a1.dealDate=a3.dealDate
+				 <if test="page != null ">
+					<include refid="pagination_tail" />
+				</if>
+	</select>
+	
+	<sql id="order_condition">
+		<if test="reportIn!=null">
+			 <if test="reportIn.shopId != null  and reportIn.shopId !=''">
+				<![CDATA[ AND shop_id = #{reportIn.shopId} ]]>
+			</if>
+			<if test="reportIn.startDate != null  and reportIn.startDate !=''">
+				<![CDATA[ AND order_time>=#{reportIn.startDate} ]]>
+			</if>
+			<if test="reportIn.endDate != null  and reportIn.endDate !=''">
+				<![CDATA[ AND DATE_FORMAT(order_time,'%Y%m%d')<=#{reportIn.endDate} ]]>
+			</if>
+		</if>
+	</sql>
+	
+	<sql id="pay_condition">
+		<if test="reportIn!=null">
+			<if test="reportIn.shopId != null  and reportIn.shopId !=''">
+				<![CDATA[ AND shop_id = #{reportIn.shopId} ]]>
+			</if>
+			<if test="reportIn.startDate != null  and reportIn.startDate !=''">
+				<![CDATA[ AND payment_time>=#{reportIn.startDate} ]]>
+			</if>
+			<if test="reportIn.endDate != null  and reportIn.endDate !=''">
+				<![CDATA[ AND DATE_FORMAT(payment_time,'%Y%m%d') <=#{reportIn.endDate} ]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+</mapper>

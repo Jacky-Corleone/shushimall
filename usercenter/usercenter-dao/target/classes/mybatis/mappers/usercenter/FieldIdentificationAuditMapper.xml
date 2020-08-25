@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.usercenter.dao.FieldIdentificationAuditMybatisDAO">
+
+    <!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+    <resultMap id="fieldIdentificationAuditDTOMap" type="fieldIdentificationAuditDTO">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="extendId" column="extend_id"/>
+        <result property="companyName" column="company_name"/>
+        <result property="auditStatus" column="audit_status"/>
+        <result property="auditorId" column="auditor_id"/>
+        <result property="auditRemark" column="audit_remark"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateDate" column="update_date"/>
+        <result property="deleteFlag" column="delete_flag"/>
+    </resultMap>
+
+    <!-- =========================================================== -->
+    <!-- 公共变量                                                                                                                        -->
+    <!-- =========================================================== -->
+    <sql id="selectAllColumns">
+		<![CDATA[
+		select
+			audit.id,
+ 			audit.user_id,
+ 			audit.extend_id,
+ 			audit.company_name,
+ 			audit.audit_status,
+ 			audit.auditor_id,
+ 			audit.audit_remark,
+ 			audit.create_date,
+ 			audit.update_date,
+ 			audit.delete_flag
+		from field_identification_audit audit
+        ]]>
+	</sql>
+
+    <sql id="where_fragement">
+        where 1=1
+        <if test="entity!=null">
+        	<if test="entity.id != null">
+                <![CDATA[ and audit.id  =#{entity.id} ]]>
+            </if>
+            <if test="entity.userId != null">
+                <![CDATA[ and audit.user_id  =#{entity.userId} ]]>
+            </if>
+            <if test="entity.extendId != null">
+                <![CDATA[ and audit.extend_id  =#{entity.extendId} ]]>
+            </if>
+            <if test="entity.companyName != null and entity.companyName !=''">
+                <![CDATA[ and audit.company_name  LIKE CONCAT('%',#{entity.companyName},'%') ]]>
+            </if>
+            <if test="entity.auditStatus != null and entity.auditStatus != 4">
+                <![CDATA[ and audit.audit_status  =#{entity.auditStatus} ]]>
+            </if>
+            <if test="entity.auditStatus == 4">
+                <![CDATA[ and (audit.audit_status = 1 || audit.audit_status = 2 ||audit.audit_status = 3 ) ]]>
+            </if>
+            <if test="entity.auditorId != null">
+                <![CDATA[ and audit.auditor_id  =#{entity.auditorId} ]]>
+            </if>
+            <if test="entity.auditRemark != null">
+                <![CDATA[ and audit.audit_remark =#{entity.auditRemark} ]]>
+            </if>
+            <if test="entity.createDateBegin != null and entity.createDateBegin !=''">
+                <![CDATA[ and audit.create_date >DATE_FORMAT(#{entity.createDateBegin},'%Y-%m-%d') ]]>
+            </if>
+            <if test="entity.createDateEnd != null and entity.createDateEnd !=''">
+                <![CDATA[ and audit.create_date <DATE_FORMAT(#{entity.createDateEnd},'%Y-%m-%d') ]]>
+            </if>
+            <if test="entity.updateDate != null">
+                <![CDATA[ and audit.update_date =#{entity.updateDate} ]]>
+            </if>
+            <if test="entity.deleteFlag != null">
+                <![CDATA[ and audit.delete_flag  =#{entity.deleteFlag} ]]>
+            </if>
+        </if>
+        order by audit.create_date desc
+    </sql>
+
+    <!-- 数据库分页 -->
+    <sql id="pagination_tail">
+		limit #{pager.pageOffset} , #{pager.rows}
+	</sql>
+
+    <!-- 数据库总数 -->
+    <sql id="count_Tail">
+		select count(1) from
+	</sql>
+
+    <!-- =========================================================== -->
+    <!-- DAO增删改查                                                                                                                                                           -->
+    <!-- =========================================================== -->
+
+    <!-- 分页 -->
+    <select id="selectList" resultMap="fieldIdentificationAuditDTOMap">
+        <include refid="selectAllColumns"/>
+        <include refid="where_fragement"/>
+        <if test="pager!=null">
+            <include refid="pagination_tail"/>
+        </if>
+    </select>
+
+    <!-- 查询 -->
+    <select id="selectCount" resultType="java.lang.Long">
+        <include refid="count_Tail"/>
+        field_identification_audit audit
+        <include refid="where_fragement"/>
+    </select>
+
+    <!-- 根据用户ID查找审核DTO  -->
+    <select id="queryAuditByUserId" resultType="fieldIdentificationAuditDTO" parameterType="Object">
+		select
+			audit.id,
+ 			audit.user_id userId,
+ 			audit.extend_id extendId,
+ 			audit.company_name companyName,
+ 			audit.audit_status auditStatus,
+ 			audit.auditor_id auditorId,
+ 			audit.audit_remark auditRemark,
+ 			audit.create_date createDate,
+ 			audit.update_date updateDate,
+ 			audit.delete_flag deleteFlag
+		from field_identification_audit audit
+		WHERE audit.user_id = #{userId}
+	</select>
+
+    <!-- 插入记录 -->
+    <insert id="addAudit" parameterType="Object" useGeneratedKeys="true" keyProperty="userId">
+		<![CDATA[
+		insert into field_identification_audit(
+	        user_id,
+	  		extend_id,
+			company_name,
+			audit_status,
+			auditor_id,
+			audit_remark,
+			create_date,
+			update_date,
+			delete_flag
+		)values(
+	        #{userId},
+	  		#{extendId},
+	  		#{companyName},
+			#{auditStatus},
+			#{auditorId},
+			#{auditRemark},
+			now(),
+			now(),
+			0
+		)
+        ]]>
+	</insert>
+
+    <!-- 根据id修改用户状态  -->
+    <update id="modifyAuditStatus" parameterType="Object">
+        update field_identification_audit
+        set
+        auditor_id = #{auditorId},
+        audit_remark = #{auditRemark},
+        audit_status = #{auditStatus},
+        update_date = now()
+        where id = #{id}
+    </update>
+
+</mapper>

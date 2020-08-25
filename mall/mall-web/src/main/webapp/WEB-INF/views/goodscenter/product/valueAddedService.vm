@@ -1,0 +1,56 @@
+#set($layout = "/none_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+#if($valueAddedItems && $!valueAddedItems.size() > 0)
+	#foreach($valueAddedItem in $valueAddedItems)
+		#set( $isSelected = false )
+		#foreach($itemShopCartDTO in $valueAddedItem.itemShopCartDTOs)
+			#if($velocityCount == 1)
+				#foreach($selectedSkuId in $selectedSkuIds)
+					#if($selectedSkuId == $itemShopCartDTO.skuId)
+						#set( $isSelected = true )
+						#break
+					#end
+				#end
+				#break
+			#end
+		#end
+		<div class="fl serve_div #if($isSelected)active_serve#end" onmouseover="toggleService(this);" onmouseout="toggleService(this);">
+			#foreach($itemShopCartDTO in $valueAddedItem.itemShopCartDTOs)
+				#if($velocityCount == 1)
+					#set( $skuName = "$valueAddedItem.itemName" )
+					#foreach($attrSale in $itemShopCartDTO.attrSales)
+						#foreach($value in $attrSale.values)
+							#set( $skuName = "$skuName|$value.name" )
+						#end
+					#end
+					#set( $skuName = "$skuName|￥$!itemShopCartDTO.skuPrice" )
+					<i class="fl">增</i><input type="text" data="$!{valueAddedItem.itemId}-$!{itemShopCartDTO.skuId}" value="$!skuName" title="$!skuName" class="fl" readonly onclick="toggleActiveService(this);" />
+					<b style="z-index:0"></b>
+					#break
+				#end
+			#end
+			#if($valueAddedItem.itemShopCartDTOs.size() > 1)
+				<div class="serve_t_div">
+					#foreach($itemShopCartDTO in $valueAddedItem.itemShopCartDTOs)
+						#if($velocityCount > 1)
+							#set( $skuName = "$valueAddedItem.itemName" )
+							#foreach($attrSale in $itemShopCartDTO.attrSales)
+								#foreach($value in $attrSale.values)
+									#set( $skuName = "$skuName|$value.name" )
+								#end
+							#end
+							#set( $skuName = "$skuName|￥$!itemShopCartDTO.skuPrice" )
+							<div>
+								<i class="fl">增</i><span data="$!{valueAddedItem.itemId}-$!{itemShopCartDTO.skuId}" title="$!skuName" class="fl" onclick="selectService(this);" >$!skuName</span>
+							</div>
+						#end
+					#end
+				</div>
+			#end
+		</div>
+	#end
+#else
+	<div class="fl list_div">
+		<span style=" background: none repeat scroll 0 0 #a3b4cc;color: #fff;padding: 0 5px;">无</span>
+	</div>
+#end

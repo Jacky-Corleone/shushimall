@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/basecenter-common" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/basecenter-dao" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/basecenter-domain" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/basecenter-export" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/basecenter-parent" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/basecenter-rpc" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/basecenter-service" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/basecenter-web" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../camelot-common" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../camelot-common/common-core" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../goodscenter" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../goodscenter/goodscenter-common" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../goodscenter/goodscenter-dao" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../goodscenter/goodscenter-domain" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../goodscenter/goodscenter-export" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../goodscenter/goodscenter-parent" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../goodscenter/goodscenter-rpc" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../goodscenter/goodscenter-service" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../goodscenter/goodscenter-web" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../mallwx" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../mallwx/mallwx-common" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../mallwx/mallwx-dao" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../mallwx/mallwx-domain" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../mallwx/mallwx-export" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../mallwx/mallwx-parent" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../mallwx/mallwx-rpc" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../mallwx/mallwx-service" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../mallwx/mallwx-web" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../tradecenter" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../tradecenter/tradecenter-common" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../tradecenter/tradecenter-dao" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../tradecenter/tradecenter-domain" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../tradecenter/tradecenter-export" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../tradecenter/tradecenter-parent" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../tradecenter/tradecenter-rpc" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../tradecenter/tradecenter-service" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../tradecenter/tradecenter-web" charset="UTF-8" />
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
+</project>

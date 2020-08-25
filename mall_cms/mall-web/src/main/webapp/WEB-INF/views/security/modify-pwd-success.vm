@@ -1,0 +1,46 @@
+#set($staticPath="$request.contextPath/assets")
+#if($!userType == "seller")
+#set($layout = "/seller_layout.vm")
+#else
+#set($layout = "/buyer_layout.vm")
+#end
+<link href="$staticPath/css/register.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/passwordStrength.js"></script>
+<script type="text/javascript">
+	$(function(){
+		if("$!userType" == "seller"){
+			$("#leftSeller").load("$request.contextPath/leftSeller");
+		} else {
+			$("#leftBuyer").load("$request.contextPath/leftBuyer");
+		}
+	});
+</script>
+<div id="main">
+<!--中间部分开始-->
+
+<!-- left start -->
+#if($!userType == "seller")
+<div id="leftSeller" class="border-4"></div>
+#else
+<div id="leftBuyer"></div>
+#end
+<!-- left end -->
+
+<!--右边部分开始-->
+<div id="right">
+   <h3>安全信息设置>
+   		#if($!msg == '1')
+   			找回支付密码成功
+   		#elseif($!msg == '2')
+   			修改支付密码成功
+   		#end</h3>
+   <div class="Info border-4 register_content">
+   		<div class="register_box_mid" style="margin-top:40px">
+            <p class="font_20"><i class="fa-check-circle mar_r10 font_7a"></i><b>恭喜您，操作成功！</b></p>
+            <div class="register_state font_14b" style="margin:40px auto"><span style="margin-left: 95px;">您已完成密码修改，可直接点击
+             <a href="$request.getContextPath()" class="font_fe"> 首页 </a> 浏览！</span></div>
+        </div><!--register_box-->
+    </div><!--register_content-->
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->

@@ -1,0 +1,283 @@
+#set($layout = "common/order.vm")
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>查看退换货进度</title>
+#parse("common/scriptAndCss.vm")
+<script type="text/javascript">
+$(document).ready(function(){
+// 	var param = {};
+//     param.callback = function () {
+//     	console.debug("--------");
+//     	window.location.href="$request.getContextPath()/orderWx/refundOrcservice?back=0";
+//     };
+//     registerGoBack(param);
+});
+$(document).ready(function(){
+	changeIconToRed(2);
+});
+$(document).ready(function(){
+	if('$!tradeReturnDto.state' == 6){//退款完成
+		
+		$("#refundHand").parent().attr("class","normal");
+		$("#refundHand").attr("class","s-num num-bg-1");
+		$("#refundHand").html("2");
+		
+		$("#refundSuccess").parent().attr("class","normal doing");
+		$("#refundSuccess").attr("class","s-num num-bg-2");
+		$("#refundSuccess").html("<i class='fa-check'></i>");
+		$("#divInfo").prepend('<p class="font_1_0 lin_24">卖家已同意您的退款申请，请及时确认是否已经收到货款</p>');
+	}else{
+		//退款中
+		$("#refundSuccess").attr("class","s-num num-bg-1");
+		$("#refundSuccess").html("3");
+	}
+});
+//发货
+function deliverGoods(id){
+	$("#returnId").val(id);
+	$("#showDiv").show();
+}
+//取消
+function cancle(){
+	$("#showDiv").hide();
+}
+//提交
+function submit(){
+	var expressNo = $("#expressNo").val();//退货快递单号
+	if(expressNo!=null && expressNo.trim()==""){
+		alert("请填写快递单号");
+		return;
+	}
+	var expressName = $("#expressName").val();//快递公司
+	var returnId = $("#returnId").val();
+	console.debug(returnId+"--------");
+	$.ajax({
+		type: "POST",
+		dataType: "text",
+		url: "$request.getContextPath()/orderWx/deliverGoods",
+		data: {
+			returnId: returnId,
+			expressNo: expressNo,
+			expressName:expressName
+		},
+		success: function(data){
+			data = eval("("+data+")");
+			if(data.success){
+				window.location.href = "$request.contextPath/orderWx/toOrderSubmit?orderSource=buyers";
+			}else{
+// 				alert("申请退款失败："+data.errorMessages);
+				$("#errorMsg").html(data.errorMessages);
+			}
+		}
+	});
+}
+
+//确认收货款
+function receivables(returnId, orderId, state){
+	if(parseInt(state) == 7){
+		$.ajax({
+			type: "POST",
+			dataType: "text",
+			url: "$request.getContextPath()/orderWx/updateTradeReturn",
+			data: {
+				returnId: returnId,
+				orderId: orderId,
+				type:4
+			},
+			success: function(data){
+				data = eval("("+data+")");
+				window.location.href=window.location.href;
+			}
+		});
+	}
+}
+
+var interval = 1000; 
+function ShowCountDown(yyyy,mth,dd,hh,mm,ss,divname){
+	var now = new Date(); 
+	//var endDate = new Date(year, month-1, day); 
+	var endDate = new Date(yyyy,mth-1,dd,hh,mm,ss); 
+	var leftTime=endDate.getTime()-now.getTime(); 
+	var leftsecond = parseInt(leftTime/1000); 
+	//var day1=parseInt(leftsecond/(24*60*60*6)); 
+	var day1=Math.floor(leftsecond/(60*60*24)); 
+	var hour=Math.floor((leftsecond-day1*24*60*60)/3600); 
+	var minute=Math.floor((leftsecond-day1*24*60*60-hour*3600)/60); 
+	var second=Math.floor(leftsecond-day1*24*60*60-hour*3600-minute*60); 
+	var cc = document.getElementById(divname); 
+	//cc.innerHTML = "脚本之家提示距离"+year+"年"+month+"月"+day+"日还有："+day1+"天"+hour+"小时"+minute+"分"+second+"秒"; 
+	cc.innerHTML = "卖家必须在<span class=\"font_e3\">"+day1+"</span>天<span class=\"font_e3\">"+hour+"</span>小时<span class=\"font_e3\">"+minute+"</span>分<span class=\"font_e3\">"+second+"</span>秒内处理，逾期系统自动同意退款";
+}
+window.setInterval(function(){
+	var yyyy = $!date.format('yyyy',$!tradeReturnDto.lastUpdDt );
+	var mth = $!date.format('MM',$!tradeReturnDto.lastUpdDt );//js里月份从 0 开始
+	var dd = $!date.format('dd',$!tradeReturnDto.lastUpdDt );
+	var hh = $!date.format('HH',$!tradeReturnDto.lastUpdDt );
+	var mm = $!date.format('mm',$!tradeReturnDto.lastUpdDt );
+	var ss = $!date.format('ss',$!tradeReturnDto.lastUpdDt );
+	#if($!tradeReturnDto.state == 1)
+	ShowCountDown(yyyy,mth,dd+7,hh,mm,ss,'divdown1');
+	#end
+}, interval);
+
+//申请仲裁信息
+function gocomplainadd(id,status){
+	window.location.href="$request.getContextPath()/orderWx/gocomplainadd?tradeReturnid="+id+"&status="+status;
+}
+//查看仲裁结果
+function gocomplaindetail(id){
+	window.location.href="$request.contextPath/orderWx/gocomplaindetail?complainid="+id;
+}
+//申请仲裁
+function applyComplainadd(id){
+	window.location.href="$request.getContextPath()/orderWx/gocomplainadd?tradeReturnid="+id;
+}
+
+function toModifyReturnInfo(orderId,skuId,returnId){
+	window.location.href="$request.getContextPath()/orderWx/refundAgreementWx?orderId="+orderId + "&skuId=" + skuId+ "&returnGoodId=" + returnId;
+}
+</script>
+</head>
+<body>
+<!--包住整个页面的DIV id="content" start -->
+<div id="main">
+    <!--中间内容开始 -->
+    <div class="content" id="wrapper">
+        <div class="stepflex">
+            <dl class="normal">
+                <dt class="s-num num-bg-1">1</dt>
+                <dd class="s-text">退款原因、金额<s></s><b></b></dd>
+            </dl>
+            <dl class="normal doing">
+                <dt class="s-num num-bg-2" id="refundHand"><i class="fa-check"></i></dt>
+                <dd class="s-text">退款处理<s></s><b></b></dd>
+            </dl>
+            <dl class="last">
+                <dt class="s-num num-bg-1" id="refundSuccess">3</dt>
+                <dd class="s-text">退款完成<s></s><b></b></dd>
+            </dl>
+            <div class="clear"></div>
+        </div>
+        <p class="mar_l5 lin_24">
+       		 当前退款状态：
+			<span class="font_1_2 font_e3 mar_2">
+				#if($!tradeReturnDto.state == 1)<!-- 退款申请等待卖家确认中 -->
+				<span class="font_18 hei_45 font_e3">等待卖家处理</span>
+				#elseif($!tradeReturnDto.state == 2)<!-- 卖家不同意协议,等待买家修改 -->
+				<span class="font_18 hei_45 font_e3">卖家拒绝 <p class="font_14 hei_30 wid_820 mar_cen over_ell f1 cursor" title="$!tradeReturnDto.auditRemark" style="text-align: left;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;拒绝原因：$!tradeReturnDto.auditRemark</p></span>
+				#elseif($!tradeReturnDto.state == 3)<!-- 退款申请达成,等待买家发货 -->
+				<span class="font_18 hei_45 font_e3">卖家同意</span>
+				#elseif($!tradeReturnDto.state == 4)<!-- 买家已退货,等待卖家确认收货 -->
+				<span class="font_18 hei_45 font_e3">等待卖家收货</span>
+				#elseif($!tradeReturnDto.state == 5)<!-- 退款关闭 -->
+				<span class="font_18 hei_45 font_e3">退款关闭</span>
+				#elseif($!tradeReturnDto.state == 6)<!-- 退款成功 -->
+				<span class="font_18 hei_45 font_e3">退款成功</span>
+				#elseif($!tradeReturnDto.state == 7)<!-- 卖家同意，正在退款中 -->
+				#if($!tradeReturnDto.orderPayBank==1||$!tradeReturnDto.orderPayBank==101)<!--网银在线 -->
+				<span class="font_18 hei_45 font_e3">卖家同意，正在退款中，退款金额将在3-15个工作日内到达您的支付账户内</span>
+				#else
+				<span class="font_18 hei_45 font_e3">卖家同意，正在退款中</span>
+				#end
+				#elseif($!tradeReturnDto.state == 8)<!--待平台处理退款-->
+				<span class="font_18 hei_45 font_e3">待平台处理退款</span>
+				#elseif($!tradeReturnDto.state == 9)<!--平台处理中-->
+				<span class="font_18 hei_45 font_e3">平台处理中</span>
+				#elseif($!tradeReturnDto.state == 10)<!--退款失败-->
+				<span class="font_18 hei_45 font_e3">退款失败，等待平台再次同意退款</span>
+				#elseif($!tradeReturnDto.state == 11)<!--退款申请成功,等待同意退款-->
+				<span class="font_18 hei_45 font_e3">退款申请成功，支付宝处理中</span>
+				#end
+			</span>
+			<span id="divdown1"></span></p>
+        <div class="pad_lr5">
+          <div class="pad_3 min-hei border_1 mar_cen " id="divInfo">
+            <p class="hei_32 font_e3">注意事项：</p>
+            <p class="lin_24">1.如果卖家拒绝退款协议，请与卖家沟通具体原因，再根据双方的协商结果，重新修改退款协议并提交。</p>
+            <p class="lin_24">2.退款成功后，最终退款金额将退回您绑定的银行卡账户中，请及时查询余额。</p>
+          </div>
+          <div class="hei_45 font_16 mar_l30">
+<!--             	您可以： -->
+          </div>
+          <div class="font_left">
+          #if($!tradeReturnDto.state != 6 || $!complainStatus == 1)  
+			#if($!tradeReturnDto.state == 2)
+				<!-- 被拒绝可以修改退款申请或申请仲裁 但是只能选择一个 -->
+				#if(($!buyerStatus==2 && $!sellerStatus==2) || $!buyerStatus==1 || $!sellerStatus==1)
+					<button class="button_1 hei_34 pad_lr5" onclick="toModifyReturnInfo('$!tradeReturnDto.orderId','$!skuId','$!returnId')">修改退款申请</button>
+					#if($!buyerStatus==2 && $!sellerStatus==2)
+						<a href="$request.getContextPath()/orderWx/gocomplainadd?tradeReturnid=$!tradeReturnDto.id&flag=1&passKey=$!passKey">
+							<button class="button_1 hei_34 pad_lr5" >申请仲裁</button>
+						</a>
+					#end
+				#elseif($!buyerStatus==2 && $!sellerStatus==0)	
+					<a href="$request.getContextPath()/orderWx/gocomplainadd?tradeReturnid=$!tradeReturnDto.id&flag=1&passKey=$!passKey">
+						<button class="button_1 hei_34 pad_lr5" >申请辩解</button>
+					</a>
+					<a href="$request.getContextPath()/orderWx/gocomplainselleradd?tradeReturnid=$!tradeReturnDto.id&status=$!sellerStatus&flag=2&passKey=$!passKey">
+						<button class="button_1 hei_34 pad_lr5" >查看卖家仲裁</button>
+					</a>
+				#end	
+			#elseif($!tradeReturnDto.state == 3)<!-- 退款申请达成,等待买家发货 -->
+				<button class="button_1 hei_34 pad_lr5" onclick="deliverGoods($!tradeReturnDto.id);">发货</button>
+				<div class="block po_ab" style="display: none" id="showDiv">
+				    <div class="block_bg"></div>
+					<div class="block_box po_ab">
+						<input type="hidden" name="returnId" id="returnId"/>
+				        <div class="clear"></div>
+			        	<p class="mar_t10">快递单号：
+			        		<input type="text" name="expressNo" id="expressNo" value="" maxlength="100" class="hei_32 wid_87" onkeyup="this.value=this.value.replace(/[^A-Za-z0-9]/g,'')">
+			        	</p>
+			        	<p class="mar_t10">快递公司：
+			        		<input name="expressName" id="expressName" type="text" class="hei_32 wid_87" maxlength="100" />
+			        	</p>
+			        	<ul><li class="msg font_14" id="errorMsg" style="color: red;"></li></ul>
+				        <p class="font_cen mar_cen">
+				        	<button class="button_2 wid_30 hei_34" onclick="submit()">提交</button>
+				        	<button class="button_2 wid_30 hei_34 mar_l2" onclick="cancle()">取消</button>
+				        </p>
+				    </div>
+			    </div>
+			#elseif($!tradeReturnDto.state == 7)
+				<button class="button_2 pad_lr5 hei_32" onclick="receivables($!tradeReturnDto.id, $!tradeReturnDto.orderId, $!tradeReturnDto.state);">确认收到货款</button>
+			#end
+			<!-- 状态 0.待仲裁 1.已仲裁,2.已撤销 -->
+			#if($!tradeReturnDto.state != 5 && $!tradeReturnDto.state != 6)<!-- 退款关闭、退款成功 后不显示仲裁 -->
+				#if($!buyerStatus==0)	
+					<a href="$request.getContextPath()/orderWx/gocomplainadd?tradeReturnid=$!tradeReturnDto.id&status=$!buyerStatus&flag=1&passKey=$!passKey">
+						<button class="button_1 hei_34 pad_lr5" >查看我的仲裁</button>
+					</a>
+					#if($!sellerStatus==0)
+						<a href="$request.getContextPath()/orderWx/gocomplainselleradd?tradeReturnid=$!tradeReturnDto.id&status=$!sellerStatus&flag=2&passKey=$!passKey">
+							<button class="button_1 hei_34 pad_lr5" >查看卖家仲裁</button>
+						</a>
+					#end
+				#end
+			#end
+			#if($!buyerStatus==1)
+				<a href="$request.getContextPath()/orderWx/gocomplainadd?tradeReturnid=$!tradeReturnDto.id&status=$!buyerStatus&flag=1&passKey=$!passKey">
+					<button class="button_1 hei_34 pad_lr5" >查看我的仲裁</button>
+				</a>
+			#end
+			#if($!sellerStatus==1)
+				<a href="$request.getContextPath()/orderWx/gocomplainselleradd?tradeReturnid=$!tradeReturnDto.id&status=$!sellerStatus&flag=2&passKey=$!passKey">
+					<button class="button_1 hei_34 pad_lr5" >查看卖家仲裁</button>
+				</a>
+			#end
+		#end
+          </div>
+        </div>
+    </div> <!--中间内容 end -->
+</div>
+<!-- 底部 -->
+#parse("common/footer.vm")
+<!-- 底部 -->
+<!--包住整个页面的DIV id="content" end -->
+</body>
+</html>

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.maketcenter.dao.CentralPurchasingEnterpriseDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="centralPurchasingEnterprise" type="com.camelot.centralPurchasing.domain.CentralPurchasingEnterprise">
+		<result property="enterpriseId" column="enterprise_id"/>
+		<result property="enterpriseName" column="enterprise_name"/>
+		<result property="enterpriseLinkman" column="enterprise_linkman"/>
+		<result property="phoneNo" column="phone_no"/>
+		<result property="email" column="email"/>
+		<result property="address" column="address"/>
+		<result property="qqWx" column="qq_wx"/>
+		<result property="businessType" column="business_type"/>
+		<result property="insertTime" column="insert_time"/>
+		<result property="insertBy" column="insert_by"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateBy" column="update_by"/>
+
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			enterprise_id,
+			enterprise_name,
+			enterprise_linkman,
+			phone_no,
+			email,
+			address,
+			qq_wx,
+			business_type,
+			insert_time,
+			insert_by,
+			update_time,
+			update_by
+
+		FROM 
+		CENTRAL_PURCHASING_ENTERPRISE enterprise_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.enterpriseId != null">
+				<![CDATA[ and enterprise_.enterprise_id = #{entity.enterpriseId} ]]>
+			</if>
+			<if test="entity.enterpriseName != null and entity.enterpriseName !=''">
+				<![CDATA[ and enterprise_.enterprise_name = #{entity.enterpriseName} ]]>
+			</if>
+			<if test="entity.enterpriseLinkman != null and entity.enterpriseLinkman !=''">
+				<![CDATA[ and enterprise_.enterprise_linkman = #{entity.enterpriseLinkman} ]]>
+			</if>
+			<if test="entity.phoneNo != null and entity.phoneNo !=''">
+				<![CDATA[ and enterprise_.phone_no = #{entity.phoneNo} ]]>
+			</if>
+			<if test="entity.email != null and entity.email !=''">
+				<![CDATA[ and enterprise_.email = #{entity.email} ]]>
+			</if>
+			<if test="entity.address != null and entity.address !=''">
+				<![CDATA[ and enterprise_.address = #{entity.address} ]]>
+			</if>
+			<if test="entity.qqWx != null and entity.qqWx !=''">
+				<![CDATA[ and enterprise_.qq_wx = #{entity.qqWx} ]]>
+			</if>
+			<if test="entity.businessType != null and entity.businessType !=''">
+				<![CDATA[ and enterprise_.business_type = #{entity.businessType} ]]>
+			</if>
+			<if test="entity.insertTime != null">
+				<![CDATA[ and enterprise_.insert_time = #{entity.insertTime} ]]>
+			</if>
+			<if test="entity.insertBy != null">
+				<![CDATA[ and enterprise_.insert_by = #{entity.insertBy} ]]>
+			</if>
+			<if test="entity.updateTime != null">
+				<![CDATA[ and enterprise_.update_time = #{entity.updateTime} ]]>
+			</if>
+			<if test="entity.updateBy != null">
+				<![CDATA[ and enterprise_.update_by = #{entity.updateBy} ]]>
+			</if>
+
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="centralPurchasingEnterprise" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where enterprise_.enterprise_id = #{id} 
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="centralPurchasingEnterprise" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		CENTRAL_PURCHASING_ENTERPRISE enterprise_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="add" useGeneratedKeys="true" keyProperty="enterpriseId" parameterType="com.camelot.centralPurchasing.domain.CentralPurchasingEnterprise">
+		<![CDATA[
+		insert into CENTRAL_PURCHASING_ENTERPRISE (
+				enterprise_name,
+				enterprise_linkman,
+				phone_no,
+				email,
+				address,
+				qq_wx,
+				business_type,
+				insert_time,
+				insert_by,
+				update_time,
+				update_by
+		   )values(
+				#{enterpriseName},
+				#{enterpriseLinkman},
+				#{phoneNo},
+				#{email},
+				#{address},
+				#{qqWx},
+				#{businessType},
+				now(),
+				#{insertBy},
+				now(),
+				#{updateBy}
+
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.centralPurchasing.domain.CentralPurchasingEnterprise">
+		<![CDATA[
+		update CENTRAL_PURCHASING_ENTERPRISE set
+   			
+			enterprise_name = #{enterpriseName},
+			enterprise_linkman = #{enterpriseLinkman},
+			phone_no = #{phoneNo},
+			email = #{email},
+			address = #{address},
+			qq_wx = #{qqWx},
+			business_type = #{businessType},
+			insert_time = #{insertTime},
+			insert_by = #{insertBy},
+			update_time = #{updateTime},
+			update_by = #{updateBy}
+
+		 where enterprise_id = #{enterpriseId}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from CENTRAL_PURCHASING_ENTERPRISE where enterprise_id = #{id}
+		]]>
+	</delete>
+</mapper>

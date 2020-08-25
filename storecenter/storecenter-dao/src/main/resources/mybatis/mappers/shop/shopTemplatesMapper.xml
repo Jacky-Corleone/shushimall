@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.storecenter.dao.ShopTemplatesDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="shopTemplatesMap" type="com.camelot.storecenter.dto.ShopTemplatesDTO">
+				<result property="id" column="id"/>
+				<result property="shopId" column="shop_id"/>
+				<result property="templatesName" column="templates_name"/>
+				<result property="status" column="status"/>
+				<result property="templatesInfo" column="templates_info"/>
+				<result property="created" column="created"/>
+				<result property="modified" column="modified"/>
+				<result property="color" column="color"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,shop_id
+ 			,templates_name
+ 			,status
+ 			,templates_info
+ 			,created
+ 			,modified
+ 			,color
+		FROM 
+		shop_templates shop_templates_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1 
+		<if test="entity!=null">
+			<if test="entity.id != null  and entity.id !=''">
+				<![CDATA[ and shop_templates_.id  = #{entity.id} ]]>
+			</if>
+			<if test="entity.shopId != null  and entity.shopId !=''">
+				<![CDATA[ and shop_templates_.shop_id  = #{entity.shopId} ]]>
+			</if>
+			<if test="entity.templatesName != null  and entity.templatesName !=''">
+				<![CDATA[ and shop_templates_.templates_name  = #{entity.templatesName} ]]>
+			</if>
+			<if test="entity.status != null  and entity.status !=''">
+				<![CDATA[ and shop_templates_.status  = #{entity.status} ]]>
+			</if>
+			<if test="entity.templatesInfo != null  and entity.templatesInfo !=''">
+				<![CDATA[ and shop_templates_.templates_info  = #{entity.templatesInfo} ]]>
+			</if>
+			<if test="entity.created != null  and entity.created !=''">
+				<![CDATA[ and shop_templates_.created  = #{entity.created} ]]>
+			</if>
+			<if test="entity.modified != null  and entity.modified !=''">
+				<![CDATA[ and shop_templates_.modified  = #{entity.modified} ]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="selectById" resultMap="shopTemplatesMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where shop_templates_.id = #{id}
+		]]>
+	</select>
+	<select id="selectByShopId" resultMap="shopTemplatesMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where  shop_templates_.shop_id = #{shopId} and status=1
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="selectListByCondition" resultMap="shopTemplatesMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectCountByCondition" resultType="long">
+		<include refid="count_Tail" />
+		shop_templates shop_templates_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="com.camelot.storecenter.dto.ShopTemplatesDTO">
+		<![CDATA[
+		insert into shop_templates (
+		    	 shop_id
+		    	 ,templates_name
+		    	 ,color
+		    	 ,status
+		    	 ,templates_info
+		    	 ,created
+		    	 ,modified
+		   )values(
+		    	#{shopId}
+		    	,#{templatesName}
+		    	,#{color}
+		    	,2
+		    	,#{templatesInfo}
+		    	,now()
+		    	,now()
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.storecenter.dto.ShopTemplatesDTO">
+		<![CDATA[
+		update shop_templates set
+   			id = #{id}
+   			,shop_id = #{shopId}
+   			,templates_name = #{templatesName}
+   			,status = #{status}
+   			,templates_info = #{templatesInfo}
+   			,created = #{created}
+   			,modified = #{modified}
+		 where id = #{id}
+		]]>
+	</update>
+
+	<update id="updateColor" parameterType="long">
+		<![CDATA[
+			update shop_templates set
+   			color = #{color}
+   			,modified =now()
+		 where id = #{id}
+		]]>
+	</update>
+	<update id="updateStatus" parameterType="long">
+		<![CDATA[
+			update shop_templates set
+   			status = #{status}
+   			,modified =now()
+		 where id = #{id}
+		]]>
+	</update>
+</mapper>

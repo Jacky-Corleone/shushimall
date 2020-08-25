@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.basecenter.dao.BaseTDKConfigDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="baseTDKConfigMap" type="baseTDKConfigDTO">
+		<result property="id" column="id"/>
+		<result property="title" column="title"/>
+		<result property="description" column="description"/>
+		<result property="keywords" column="keywords"/>
+		<result property="pageType" column="page_type"/>
+		<result property="createTime" column="create_time"/>
+		<result property="modifyTime" column="modify_time"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<sql id="selectAllColumns">
+		SELECT
+		  t.id,
+		  t.description,
+		  t.keywords,
+		  t.page_type,
+		  t.create_time,
+		  t.modify_time
+	</sql>
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法 -->
+    <!-- =========================================================== -->
+	<!-- 保存 -->
+	<insert id="add" keyProperty="id" useGeneratedKeys="true" parameterType="Object">
+		insert into base_tdk_config(
+				id,
+				title,
+				description,
+				keywords,
+				page_type,
+				create_time,
+				modify_time
+		)values(
+				#{id},
+				#{title},
+				#{description},
+				#{keywords},
+				#{pageType},
+				now(),
+				now()
+		)
+	</insert>
+	
+	<!-- 编辑 -->
+	<update id="update">
+		update base_tdk_config 
+		<set>
+			modify_time = now(),
+			<if test="title != null">
+				title = #{title},
+			</if>
+			<if test="description != null">
+				description = #{description},
+			</if>
+			<if test="keywords != null">
+				keywords = #{keywords},
+			</if>
+			<if test="pageType != null">
+				page_type = #{pageType},
+			</if>
+		</set>	
+		where id = #{id}
+	</update>
+	
+	
+	<!-- 查询 -->
+	<select id="queryBaseTDKConfigList" resultMap="baseTDKConfigMap">
+		select 
+			id,
+			title,
+			description,
+			keywords,
+			page_type,
+			create_time,
+			modify_time
+		from base_tdk_config 
+	</select>
+	
+</mapper>

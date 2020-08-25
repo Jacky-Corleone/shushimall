@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.storecenter.dao.QqCustomerDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="QqCustomerMap" type="com.camelot.storecenter.dto.QqCustomerDTO">
+				<result property="id" column="id"/>
+				<result property="customerType" column="customer_type"/>
+				<result property="userId" column="user_id"/>
+				<result property="shopId" column="shop_id"/>
+				<result property="shopName" column="shop_name"/>
+				<result property="customerQqNumber" column="customer_QQ_number"/>
+				<result property="isDefault" column="is_default"/>
+				<result property="customerSortNumber" column="customer_sort_number"/>
+				<result property="lastOperatorId" column="last_operator_id"/>
+				<result property="createDate" column="create_date"/> 
+				<result property="lastUpdateDate" column="last_update_date"/>
+				<result property="deletedFlag" column="deleted_flag"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			 qq_customer_.id
+ 			,qq_customer_.customer_type
+ 			,qq_customer_.user_id
+ 			,qq_customer_.shop_id
+ 			,qq_customer_.shop_name
+ 			,qq_customer_.customer_QQ_number
+ 			,qq_customer_.is_default
+ 			,qq_customer_.customer_sort_number
+ 			,qq_customer_.last_operator_id
+ 			,qq_customer_.create_date
+ 			,qq_customer_.last_update_date
+ 			,qq_customer_.deleted_flag
+		FROM 
+		qq_customer qq_customer_
+		]]>
+	</sql>
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.id != null  and entity.id !=''">
+				<![CDATA[ and qq_customer_.id  = #{entity.id} ]]>
+			</if>
+			<if test="entity.customerType != null">
+				<![CDATA[ and qq_customer_.customer_type  = #{entity.customerType} ]]>
+			</if>
+			<if test="entity.userId != null  and entity.userId !=''">
+				<![CDATA[ and qq_customer_.user_id  = #{entity.userId} ]]>
+			</if>
+			<if test="entity.shopId != null  and entity.shopId !=''">
+				<![CDATA[ and qq_customer_.shop_id  = #{entity.shopId} ]]>
+			</if>
+			<if test="entity.shopName != null  and entity.shopName !=''">
+				<![CDATA[ and qq_customer_.shop_name  = #{entity.shopName} ]]>
+			</if>
+			<if test="entity.customerQqNumber != null  and entity.customerQqNumber !=''">
+				<![CDATA[ and qq_customer_.customer_QQ_number  = #{entity.customerQqNumber} ]]>
+			</if>
+			<if test="entity.isDefault != null">
+				<![CDATA[ and qq_customer_.is_default  = #{entity.isDefault} ]]>
+			</if>
+			<if test="entity.customerSortNumber != null">
+				<![CDATA[ and qq_customer_.customer_sort_number  = #{entity.customerSortNumber} ]]>
+			</if>
+			<if test="entity.lastOperatorId != null  and entity.lastOperatorId !=''">
+				<![CDATA[ and qq_customer_.last_operator_id  = #{entity.lastOperatorId} ]]>
+			</if>
+			<if test="entity.createDate != null  and entity.createDate !=''">
+				<![CDATA[ and qq_customer_.create_date  = #{entity.createDate} ]]>
+			</if>
+			<if test="entity.lastUpdateDate != null  and entity.lastUpdateDate !=''">
+				<![CDATA[ and qq_customer_.last_update_date  = #{entity.lastUpdateDate} ]]>
+			</if>
+			<if test="entity.deletedFlag != null">
+				<![CDATA[ and qq_customer_.deleted_flag  = #{entity.deletedFlag} ]]>
+			</if>
+			
+			<if test="entity.shopIds != null ">
+				<![CDATA[ and qq_customer_.shop_id in ]]>
+				<foreach collection="entity.shopIds" item="item" index="index"  open="(" separator="," close=")">
+				<![CDATA[ #{item} ]]>
+				</foreach>
+			</if>
+			<if test="entity.userIds != null ">
+				<![CDATA[ and qq_customer_.user_id in ]]>
+				<foreach collection="entity.userIds" item="item" index="index"  open="(" separator="," close=")">
+				<![CDATA[ #{item} ]]>
+				</foreach>
+			</if>
+		</if>
+		<![CDATA[ ORDER BY qq_customer_.id desc ]]>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   
+	<!-- 分页查询所有 -->
+	<select id="selectListByCondition" resultMap="QqCustomerMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectCountByCondition" resultType="long">
+		<include refid="count_Tail" />
+		  qq_customer qq_customer_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="com.camelot.storecenter.dto.QqCustomerDTO">
+		<![CDATA[
+		insert into qq_customer (
+		    	  customer_type 
+		    	 ,user_id 
+		    	 ,shop_id 
+		    	 ,shop_name 
+		    	 ,customer_QQ_number 
+		    	 ,is_default 
+		    	 ,customer_sort_number  
+		    	 ,last_operator_id  
+		    	 ,create_date  
+		    	 ,last_update_date  
+		    	 ,deleted_flag  
+		   )values(
+		         #{customerType}
+		    	,#{userId}
+		    	,#{shopId}
+		    	,#{shopName}
+		    	,#{customerQqNumber}
+		    	,#{isDefault}
+		    	,#{customerSortNumber}
+		    	,#{lastOperatorId}
+		    	,now()
+		    	,#{lastUpdateDate}
+		    	,#{deletedFlag}
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.storecenter.dto.QqCustomerDTO">
+		<![CDATA[
+		update qq_customer set
+   			 customer_type = #{customerType}
+   			,user_id = #{userId}
+   			,shop_id = #{shopId}
+   			,shop_name = #{shopName}
+   			,customer_QQ_number = #{customerQqNumber}
+   			,is_default = #{isDefault}
+   			,customer_sort_number = #{customerSortNumber}
+   			,last_operator_id = #{lastOperatorId}
+   			,last_update_date = now()
+   			,deleted_flag = #{deletedFlag}
+		 where id = #{id}
+		]]>
+	</update>
+	
+	<!-- 修改默认客服 -->
+	<update id="updateMRCustomer" parameterType="com.camelot.storecenter.dto.QqCustomerDTO">
+		<![CDATA[
+		update qq_customer set
+   			is_default = 0
+		 where customer_type = #{customerType}
+		]]>
+		<if test="shopId!=null">
+			and shop_id = #{shopId} 
+		</if>
+		<if test="userId!=null">
+			and user_id = #{shopId} 
+		</if>
+	</update>
+	
+	<!-- 删除QQ客服 -->
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from qq_customer where id = #{id}
+		]]>
+	</delete>
+
+</mapper>

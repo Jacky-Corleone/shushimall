@@ -1,0 +1,44 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.camelot.openplatform.marketcenter</groupId>
+	<artifactId>marketcenter</artifactId>
+	<packaging>pom</packaging>
+	<version>shushi100-1.0.3.daily-SNAPSHOT</version>
+	<name>camelot-marketcenter</name>
+	<url>http://maven.apache.org</url>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- <sonar.jdbc.url>jdbc:mysql://10.135.7.56:3306/sonar?useUnicode=true&amp;characterEncoding=utf8&amp;autoReconnect=true</sonar.jdbc.url>
+		<sonar.jdbc.driver>com.mysql.jdbc.Driver</sonar.jdbc.driver>
+		<sonar.jdbc.username>sonar</sonar.jdbc.username>
+		<sonar.jdbc.password>sonar</sonar.jdbc.password>
+		<sonar.host.url>http://10.135.6.66:9000</sonar.host.url>
+		<sonar.scm.enabled>true</sonar.scm.enabled>
+		<sonar.core.codeCoveragePlugin>cobertura</sonar.core.codeCoveragePlugin>
+		<sonar.cobertura.maxmen>2048M</sonar.cobertura.maxmen>
+		<sonar.doxygen.generateDocumentation>true</sonar.doxygen.generateDocumentation> -->
+		<file.encoding>UTF-8</file.encoding>
+	</properties>
+	<modules>
+		<module>marketcenter-parent</module>
+		<module>marketcenter-export</module>
+		<module>marketcenter-rpc</module>
+		<module>marketcenter-common</module>
+		<module>marketcenter-domain</module>
+		<module>marketcenter-dao</module>
+		<module>marketcenter-service</module>
+		<module>marketcenter-web</module>
+	</modules>
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <name>Team nexus Release Repository</name>
+            <url>http://121.42.168.19:8081/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>Team nexus Snapshot Repository</name>
+            <url>http://121.42.168.19:8081/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+</project>

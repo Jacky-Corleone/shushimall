@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.tradecenter.dao.TradeOrderPriceHistoryDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="priceHisMap"
+	type="com.camelot.tradecenter.domain.TradeOrderPriceHistory">
+		<result property="id" column="id" />
+		<result property="orderId" column="order_id" />
+		<result property="sellerId" column="seller_id" />
+		<result property="buyerId" column="buyer_id" />
+		<result property="shopId" column="shop_id" />
+		<result property="beforeTotalPrice" column="before_total_price" />
+		<result property="beforeFreight" column="before_freight" />
+		<result property="beforeTotalDiscount" column="before_total_discount" />
+		<result property="beforePaymentPrice" column="before_payment_price" />
+		<result property="afterTotalPrice" column="after_total_price" />
+		<result property="afterTotalDiscount" column="after_total_discount" />
+		<result property="afterPaymentPrice" column="after_payment_price" />
+		<result property="operationUser" column="operation_user" />
+		<result property="createTime" column="create_time" />
+
+	</resultMap>
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+	<!-- 插入 -->
+	<insert id="add">
+		<![CDATA[
+		INSERT INTO trade_order_price_history (
+		  order_id,
+		  seller_id,
+		  buyer_id,
+		  shop_id,
+		  before_total_price,
+		  before_freight,
+		  before_total_discount,
+		  before_payment_price,
+		  after_total_price,
+		  after_freight,
+		  after_total_discount,
+		  after_payment_price,
+		  operation_user,
+		  create_time
+		) 
+		VALUES
+		  (
+		    #{orderId},
+		    #{sellerId},
+		    #{buyerId},
+		    #{shopId},
+		    #{beforeTotalPrice},
+		    #{beforeFreight},
+		    #{beforeTotalDiscount},
+		    #{beforePaymentPrice},
+		    #{afterTotalPrice},
+		    #{afterFreight},
+		    #{afterTotalDiscount},
+		    #{afterPaymentPrice},
+		    #{operationUser},
+		    now()
+		  ) 
+		]]>
+	</insert>	
+		
+</mapper>

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.usercenter.dao.UserModifyInfoMybatisDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="userModifyInfoMap" type="userModifyInfoDTO">
+				<result property="id" column="id"/>
+				<result property="userType" column="user_type"/>
+				<result property="applicantUserid" column="applicant_userid"/>
+				<result property="applyStatus" column="apply_status"/>
+				<result property="createTime" column="create_time"/>
+				<result property="modifyTable" column="modify_table"/>
+				<result property="modifyTime" column="modify_time"/>
+				<result property="applicantName" column="applicant_name"/>
+				<result property="remark" column="remark"/>
+				<result property="modifyType" column="modify_type"/>
+				<result property="deletedFlag" column="deleted_flag"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{pager.pageOffset} , #{pager.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,user_type
+ 			,applicant_userid
+ 			,apply_status
+ 			,create_time
+ 			,modify_table
+ 			,modify_time
+ 			,applicant_name
+ 			,remark
+ 			,modify_type
+ 			,deleted_flag
+		FROM 
+		user_modify_info user_modify_info_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1   and deleted_flag='0'
+		<if test="entity!=null">
+			
+			<if test="entity.userType != null  and entity.userType !=''">
+				<![CDATA[ and user_modify_info_.user_type = #{entity.userType} ]]>
+			</if>
+			<if test="entity.applicantUserid != null  and entity.applicantUserid !=''">
+				<![CDATA[ and user_modify_info_.applicant_userid LIKE CONCAT('%',#{entity.applicantUserid},'%') ]]>
+			</if>
+			<if test="entity.applyStatus != null  ">
+				<![CDATA[ and user_modify_info_.apply_status  = #{entity.applyStatus} ]]>
+			</if>
+
+			<if test="entity.applicantName != null  and entity.applicantName !=''">
+				<![CDATA[ and user_modify_info_.applicant_name  LIKE CONCAT('%',#{entity.applicantName},'%') ]]>
+			</if>
+		</if>
+		order by user_modify_info_.apply_status,user_modify_info_.modify_time desc
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="selectById" resultMap="userModifyInfoMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where user_modify_info_.id = #{id} and deleted_flag='0'
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="selectList" resultMap="userModifyInfoMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="pager!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectCount" resultType="long">
+		<include refid="count_Tail" />
+		user_modify_info user_modify_info_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="userModifyInfoDTO" useGeneratedKeys="true" keyProperty="id">
+		
+		<![CDATA[
+		insert into user_modify_info (
+		    	 
+		    	 user_type
+		    	 ,applicant_userid
+		    	 ,apply_status
+		    	 ,create_time
+		    	 ,modify_table
+		    	 ,modify_time
+		    	 ,applicant_name
+		    	 ,remark
+		    	 ,modify_type
+		    	 ,deleted_flag
+		   )values(
+		    	#{userType}
+		    	,#{applicantUserid}
+		    	,#{applyStatus}
+		    	,now()
+		    	,#{modifyTable}
+		    	,#{modifyTime}
+		    	,#{applicantName}
+		    	,#{remark}
+		    	,#{modifyType}
+		    	,'1'
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="userModifyInfoDTO">
+		
+		update user_modify_info 
+			set id = #{id}
+   			<if test="applyStatus != null  ">
+				, apply_status = #{applyStatus}
+			</if>
+   			<if test="modifyTime != null  ">
+				, modify_time = #{modifyTime}
+			</if>
+			<if test="remark != null  ">
+				, remark = #{remark}
+			</if>
+			<if test="modifyType != null  ">
+				, modify_type = #{modifyType}
+			</if>
+			<if test="deletedFlag != null  ">
+				, deleted_flag = #{deletedFlag}
+			</if>
+			
+		 where id = #{id}
+		
+	</update>
+	
+	<update id="updateTableColumnValue" parameterType="userModifyInfoDTO">
+		
+		update #{userModifyInfoDTO.tableName} set
+   			#{userModifyInfoDTO.columnName}=#{userModifyInfoDTO.afterChangeValue}
+   			where  id=#{userModifyInfoDTO.}}
+   			
+		
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from user_modify_info where id = #{id}
+		]]>
+	</delete>
+</mapper>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+#set($staticPath="$request.contextPath/assets")
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta property="qc:admins" content="345156531462026247654751445752" />
+    <meta name="renderer" content="webkit" />
+    <link type="text/css" href="$staticPath/css/index.css" rel="stylesheet"/>
+    <link type="text/css" href="$staticPath/css/basic.css" rel="stylesheet"/>
+    <script type="text/javascript" src="$staticPath/js/respond.min.js"></script>
+    #parse("/common/tdk.vm")
+</head>
+<body class="bg_06">
+#parse("/common/header.vm")
+<div class="clear"></div>
+<section class="w">
+    $screen_content
+</section>
+<div class="clear"></div>
+#parse("/common/footer.vm")
+</body>
+</html>

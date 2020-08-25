@@ -1,0 +1,119 @@
+#set($layout = "common/order.vm")
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>订单详情</title>
+#parse("common/scriptAndCss.vm")
+<script type="text/javascript">
+$(document).ready(function(){
+	if("buyers"=='$!{orderSource}'){
+		changeIconToRed(2);
+	}else{
+		changeIconToRed(3);
+	}
+});
+</script>
+</head>
+<body>
+	<div id="main" class="po_re">
+    ##parse("common/headerWx.vm")
+	    <form action="$request.contextPath/orderWx/orderSubmit" id="form" method="post">
+			    <!-- 中间内容 -->
+			    <div class="content" id="wrapper">
+			        <!-- 送货地址 -->
+			        <dl class="address lin_24 bg_02 pad_5">
+			            <dt class="fl">收货人信息：</dt>
+				        	<dd class="fl" id="address">
+				                <p>收&nbsp;&nbsp;货&nbsp;&nbsp;人：$!tradeOrder.name</p>
+				                <p>地&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;址：$!tradeOrder.fullAddress</p>
+				                <p>手机号码：$!tradeOrder.mobile</p>
+				                <p>固定号码：$!tradeOrder.phone</p>
+				            </dd>
+			            <div class="clear"></div>
+			        </dl><!-- 送货地址 -->
+			        <!-- 订单 -->
+			        
+			        <div class=" font_1_2 mar_t10">
+			            <p class="pad_lr5 favour lin_24">商品列表</p>
+				         <!--每一笔订单可以循环一下内容 开始-->
+			
+				        	 #foreach($deliveryType in $!tradeOrder.groupItems.keySet())
+					        <!-- 商品信息 -->
+							<div class="border_2 shop_order pad_5">
+								#foreach( $item in $!tradeOrder.groupItems.get($deliveryType))
+								<p class="fl shop_order_img">
+									<a href="$request.contextPath/product/toDetail?id=$!item.itemId&skuId=$!item.skuId">
+										<img src="$!imageServerAddr#foreach( $array in $!jsonArray)#if($!array.skuId == $!item.skuId)$!array.skuPicUrl#break#end#end" width="75px" height="75px"/>
+									</a>
+								</p>
+								<p class="wid_48 fl shop_order_p">
+									#foreach( $array in $!jsonArray)
+										#if($!array.skuId == $!item.skuId)
+											<a href="$request.getContextPath()/product/toDetail?id=$!item.itemId&skuId=$!item.skuId" target="_blank">
+												$!array.itemName
+											</a>
+											$!array.skuName
+										#end
+									#end 
+								</p>
+								<div class="fl lin_24">
+									<p class="font_e3">￥$!{item.payPrice}</p>
+									<p >x$!{item.num}</p>
+								</div>
+								<div class="clear"></div>
+								<div style="text-align:right">
+								
+						           <p >
+						                                 运送方式：#if($deliveryType==1)快递#elseif($deliveryType==2)EMS#elseif($deliveryType==3)平邮#else 无#end
+						           </p>
+    		                    </div>
+								#end
+							</div>
+							<!-- 商品信息 -->
+						#end
+					</div>
+			        
+			        <ul class="individual bg_03 detail mar_t10">
+			       
+			            
+			            <li class="border_3">
+			            	<span class="fl">支付信息</span>
+			            	<p class="fr">
+			            		#if($!tradeOrder.shipmentType == 1)
+			            			立即支付
+			            		#end 
+			            		#if($!tradeOrder.shipmentType == 2)
+			            			延期付款($!tradeOrder.payPeriod天)
+			            		#end
+			            	</p>
+			            </li>
+			            <li class="border_3">
+			            	<span class="fl">支付方式</span>
+			            	<p class="fr">
+			            		#if($!tradeOrder.paymentMethod == 1)
+			            			个人支付
+			            		#end 
+			            		#if($!tradeOrder.paymentMethod == 2)
+			            			企业支付
+			            		#end
+			            	</p>
+			            </li>
+			        </ul><!-- 明细 end-->
+			        
+					##set( $paymentPrice = $!tradeOrder.paymentPrice - $!tradeOrder.freight )
+					##set( $total = $!tradeOrder.freight + $!paymentPrice )
+			        <ul class="pad_lr5">
+			        	<li class="hei_32"><p class="fl">商品总金额：</p><p class="fr">￥$!tradeOrder.totalPrice</p></li>
+						<li class="hei_32"><p class="fl">运&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;费：</p><p class="fr">￥$!tradeOrder.freight</p></li>
+						<li class="hei_32"><p class="fl">优惠金额：</p><p class="fr">￥$!tradeOrder.totalDiscount</p></li>
+						<li class="hei_32"><p class="fl">总计：</p><p class="fr">￥$!tradeOrder.paymentPrice</p></li>
+					</ul>
+			    </div><!-- 订单 end-->
+			    <!-- 底部 -->
+		</form>
+
+	</div>
+		#parse("common/footer.vm")
+</body>
+</html>

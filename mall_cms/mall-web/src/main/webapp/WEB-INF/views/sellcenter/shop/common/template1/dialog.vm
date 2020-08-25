@@ -1,0 +1,452 @@
+<!-- 头部banner、背景图弹框start -->
+<div class="po_fai small_ban" style="display:none" id="bannerDialog">
+    <div class="po_fai_bg"></div>
+    <div class="po_main pad_t10" >
+    	<div class=" hei_32 bg_05 pad_l10 "><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor"></i><div id="bannerDialog_dialogTitle"></div></div>
+	    <div class="clear"></div>   
+	    <div class="register_content" style="width:650px; margin-top:10px">
+	        <ul>
+	        	<li class="hei_40">
+	        		<div class="wid_110 fl"><p class="hei_30 font_right">上传banner图片</p></div>
+	        		<div class="wid_410 fl mar_l10 po_re">
+		        		<input type="text" readonly="readonly" class="input_Style2 kf" id="bannerDialog_pictureUrlText" value="" />
+		        		<input type="hidden" id="bannerDialog_id" value="" />
+		        		<input type="hidden" id="bannerDialog_pictureUrlName" value="" />
+		        		<input type="hidden" id="bannerDialog_position" value="" />
+		        		<input type="hidden" id="bannerDialog_modultType" value="" />
+		        		<input type="hidden" id="bannerDialog_width" value="" />
+		        		<input type="hidden" id="bannerDialog_height" value="" />
+		        		<input type="hidden" id="bannerDialog_eleId" value="" />
+		        		<span class="z-upload">
+							<button type="button" class="button_3 kf hei_30 mar_l10" style='padding:0px 15px;'>选择文件</button>
+				            <input type="file" id="bannerDialog_fileInput" class="file-img" name="file" onchange="bannerFileTextChange('bannerDialog')">
+				        </span>	        		
+		        	 <p class="fl hei_30 mar_l10 font_e3 po_ab pa_06">( 建议尺寸：<label id="bannerDialog_supportSize"></label> )</p>
+		        	</div>
+	        	</li>
+	        	<li class="hei_40">
+	        		<div class="wid_110 fl"><p class="hei_30 font_right">图片链接地址</p></div>
+	        		<div class="wid_500 fl mar_l10">
+	        			<input type="text" class="input_Style2 kf" id="bannerDialog_chainUrl" value="" />
+	        		</div>
+	        	</li>
+	        </ul>
+	        <div class="wid_410 mar">
+	        	<div class="min-hei wid_300 border-4"><img src="" id="bannerDialog_previewImage" width="302" height="102" /></div>
+	        </div>
+	        <li class="hei_40" style="margin-top:10px;">
+	        		<div class="wid_110 fl"><p class="hei_30 font_right">上传背景图片</p></div>
+	        		<div class="wid_410 fl mar_l10">
+		        		<input type="text" readonly="readonly" class="input_Style2 kf" id="bannerBgDialog_pictureUrlText" value="" />
+		        		<input type="hidden" id="bannerBgDialog_id" value="" />
+		        		<input type="hidden" id="bannerBgDialog_pictureUrlName" value="" />
+		        		<input type="hidden" id="bannerBgDialog_position" value="b" />
+		        		<input type="hidden" id="bannerBgDialog_modultType" value="1" />
+		        		<input type="hidden" id="bannerBgDialog_width" value="" />
+		        		<input type="hidden" id="bannerBgDialog_height" value="" />
+		        		<input type="hidden" id="bannerBgDialog_eleId" value="" />
+		        		<span class="z-upload">
+							<button type="button" class="button_3 kf hei_30 mar_l10" style='padding:0px 15px;'>选择文件</button>
+				            <input type="file" id="bannerBgDialog_fileInput" class="file-img" name="file" onchange="bannerFileTextChange('bannerBgDialog')">
+				        </span>
+		        		
+		        	</div>
+	        	</li>
+	        </ul>
+	        <div class="wid_410 mar">
+	        	<div class="min-hei wid_300 border-4"><img src="" id="bannerBgDialog_previewImage" width="302" height="102" /></div>
+	        </div>
+	        <div class="wid_410 mar">
+		    	<div class="wid_200 mar_t10 pad_t50">
+		    		<button class="button_1 hei_30" id="bannerDialog_shopLogoSave">确定</button>
+		    		<button class="button_5 hei_30 mar_l10 demo-icons">
+		    			<a href="#">取消</a>
+		    		</button>
+		    	</div>
+	        </div>
+	    </div>
+    </div>
+</div>
+<!-- 头部banner、背景图弹框end -->
+
+<!-- 单张图片上传的弹框start -->
+<div class="po_fai small_ban" style="display:none" id="commonDialog">
+    <div class="po_fai_bg"></div>
+    <div class="po_main pad_t10" >
+    	<div class=" hei_32 bg_05 pad_l10 "><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor"></i><div id="commonDialog_dialogTitle"></div></div>
+	    <div class="clear"></div>   
+	    <div class="register_content" style="width:650px; margin-top:10px">
+	        <ul>
+	        	<li class="hei_40">
+	        		<div class="wid_110 fl"><p class="hei_30 font_right">上传图片</p></div>
+	        		<div class="wid_410 fl mar_l10 po_re">
+		        		<input type="text" readonly="readonly" class="input_Style2 kf" id="commonDialog_pictureUrlText" value="" />
+		        		<input type="hidden" id="commonDialog_id" value="" />
+		        		<input type="hidden" id="commonDialog_pictureUrlName" value="" />
+		        		<input type="hidden" id="commonDialog_position" value="" />
+		        		<input type="hidden" id="commonDialog_modultType" value="" />
+		        		<input type="hidden" id="commonDialog_width" value="" />
+		        		<input type="hidden" id="commonDialog_height" value="" />
+		        		<span class="z-upload">
+							<button type="button" class="button_3 kf hei_30 mar_l10" style='padding:0px 15px;'>选择文件</button>
+				            <input type="file" id="commonDialog_fileInput" class="file-img" name="file" onchange="commonFileTextChange()">
+				        </span>
+		        		<p class="fl hei_30 mar_l10 font_e3 po_ab pa_06">( 建议尺寸：<label id="commonDialog_supportSize"></label> )</p>
+		        	</div>
+	        	</li>
+	        	<li class="hei_40">
+	        		<div class="wid_110 fl"><p class="hei_30 font_right">图片链接地址</p></div>
+	        		<div class="wid_500 fl mar_l10">
+	        			<input type="text" class="input_Style2 kf" id="commonDialog_chainUrl" value="" />
+	        		</div>
+	        	</li>
+	        </ul>
+	        <div class="wid_410 mar">
+	        	<div class="min-hei wid_300 border-4"><img src="" id="commonDialog_previewImage" width="302" height="102" /></div>
+		    	<div class="wid_200 mar_t10 pad_t50">
+		    		<button class="button_1 hei_30" id="commonDialog_shopLogoSave">确定</button>
+		    		<button class="button_5 hei_30 mar_l10 demo-icons">
+		    			<a href="#">取消</a>
+		    		</button>
+		    	</div>
+	        </div>
+	    </div>
+    </div>
+</div>
+<!-- 单张图片上传的弹框end -->
+
+<!-- 轮播图弹框start -->
+<div class="po_fai big_ban" style="display:none;" id="adDialog">
+    <div class="po_fai_bg"></div>
+    <div class="po_main pad_t10" style="width:650px;">
+	    <div class="hei_32 bg_05 pad_l10 "><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor"></i>广告位编辑</div>
+	    <div class="clear"></div>   
+	    <div class="register_content" style="width:650px; margin: 10 0 10 0; height:440px; overflow:auto;">
+        <ul style="margin-top:10px;">
+			<li class="hei_40">
+				<div class="wid_110 fl"><p class="hei_30 font_right">上传第一张图片</p></div>
+				<div class="wid_410 fl mar_l10 po_re">
+					<input type="text" readonly="readonly" class="input_Style2 kf" id="ad1ShowFileName" value="$!shopRenovationMap.get('2a').pictureUrl" />
+					<input type="hidden" id="ad1Id" value="$!shopRenovationMap.get('2a').id" />
+					<span class="z-upload">
+						<button type="button" class="button_3 kf hei_30 mar_l10" style='padding:0px 15px;'>选择文件</button>
+			            <input type="file" id="ad1FileInput" class="file-img" name="file" onchange="ad1FileTextChange()">
+			        </span>
+					
+					<p class="fl hei_30 mar_l10 font_e3 po_ab pa_06">( 建议尺寸：980*315px )</p>
+				</div>
+			</li>
+			<li class="hei_40">
+        		<div class="wid_110 fl"><p class="hei_30 font_right">图片链接地址</p></div>
+        		<div class="wid_500 fl mar_l10">
+        			<input type="text" class="input_Style2 kf" id="ad1ChainUrl" value="$!shopRenovationMap.get('2a').chainUrl" />
+        		</div>
+        	</li>
+		</ul>
+		<div class="wid_410 mar">
+			<div class="min-hei wid_300 border-4"><img src="$!imageServerAddr$!shopRenovationMap.get('2a').pictureUrl" id="ad1PreviewImage" width="302" height="102" /></div>
+		</div>
+		<ul style="margin-top:10px;">
+			<li class="hei_40">
+				<div class="wid_110 fl"><p class="hei_30 font_right">上传第二张图片</p></div>
+				<div class="wid_410 fl mar_l10 po_re">
+					<input type="text" readonly="readonly" class="input_Style2 kf" id="ad2ShowFileName" value="$!shopRenovationMap.get('2b').pictureUrl" />
+					<input type="hidden" id="ad2Id" value="$!shopRenovationMap.get('2b').id" />
+					<span class="z-upload">
+						<button type="button" class="button_3 kf hei_30 mar_l10" style='padding:0px 15px;'>选择文件</button>
+			            <input type="file" id="ad2FileInput" class="file-img" name="file" onchange="ad2FileTextChange()">
+			        </span>
+					
+					<p class="fl hei_30 mar_l10 font_e3 po_ab pa_06">( 建议尺寸：980*315px )</p>
+				</div>
+			</li>
+			<li class="hei_40">
+        		<div class="wid_110 fl"><p class="hei_30 font_right">图片链接地址</p></div>
+        		<div class="wid_500 fl mar_l10">
+        			<input type="text" class="input_Style2 kf" id="ad2ChainUrl" value="$!shopRenovationMap.get('2b').chainUrl" />
+        		</div>
+        	</li>
+		</ul>
+		<div class="wid_410 mar">
+			<div class="min-hei wid_300 border-4"><img src="$!imageServerAddr$!shopRenovationMap.get('2b').pictureUrl" id="ad2PreviewImage" width="302" height="102" /></div>
+		</div>
+        <ul style="margin-top:10px;">
+        	<li class="hei_40">
+        		<div class="wid_110 fl"><p class="hei_30 font_right">上传第三张图片</p></div>
+        		<div class="wid_410 fl mar_l10 po_re">
+	        		<input type="text" readonly="readonly" class="input_Style2 kf" id="ad3ShowFileName" value="$!shopRenovationMap.get('2c').pictureUrl" />
+		        	<input type="hidden" id="ad3Id" value="$!shopRenovationMap.get('2c').id" />
+	        		<span class="z-upload">
+						<button type="button" class="button_3 kf hei_30 mar_l10" style='padding:0px 15px;'>选择文件</button>
+			            <input type="file" id="ad3FileInput" class="file-img" name="file" onchange="ad3FileTextChange()">
+			        </span>
+	        		<p class="fl hei_30 mar_l10 font_e3 po_ab pa_06">( 建议尺寸：980*315px )</p>
+	        	</div>
+        	</li>
+        	<li class="hei_40">
+        		<div class="wid_110 fl"><p class="hei_30 font_right">图片链接地址</p></div>
+        		<div class="wid_500 fl mar_l10">
+        			<input type="text" class="input_Style2 kf" id="ad3ChainUrl" value="$!shopRenovationMap.get('2c').chainUrl" />
+        		</div>
+        	</li>
+        </ul>
+        <div class="wid_410 mar">
+        	<div class="min-hei wid_300 border-4"><img src="$!imageServerAddr$!shopRenovationMap.get('2c').pictureUrl" id="ad3PreviewImage" width="302" height="102" /></div>
+	    	<div class="wid_200 mar_t10 pad_t50">
+	    		<button class="button_1 hei_30" type="button" id="shopAdSave">确定</button><button class="button_5 hei_30 mar_l10 demo-icons"><a href="#">取消</a></button>
+	    	</div>
+        </div>
+    </div>
+    </div>
+</div>
+<!-- 轮播图弹框end -->
+
+<!-- 推荐位弹框start -->
+<div class="po_fai shop_edit_show" style="display:none;" id="productDialog">
+    <div class="po_fai_bg"></div>
+    <div class="po_main pad_t10" style="width:670px; height:430px; 	overflow: auto;" >
+    <div class=" hei_32 bg_05 pad_l10 "><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor"></i>推荐位编辑</div>
+    <div class="clear"></div>   
+    <div class="register_content" style="width:650px; margin: 0  ">
+        <ul>
+        	<li class="mar_t10 hei_40">
+        		<div class="wid_80 fl mar_l10"><p class="hei_30 font_left">商品筛选</p></div>
+        		<form id="proSearchForm">
+	        		<div class="wid_500 fl mar_l10">
+		        		<input type="text" class="input_Style2 kf mar_r10" id="_itemName" name="itemName" placeHolder="输入商品名称" />
+		        		<input type="text" class="input_Style2 kf mar_10" id="_itemId" name="itemId" placeHolder="输入商品编号" />
+		        		<button class="button_3 kf hei_30 mar_l10" style='padding:0px 15px;' type="button" id="proSearchBtn" onclick="ShopDecorate.loadShopProduct()">查 询</button>
+		        	</div>
+	        	</form>
+        	</li>
+        	<li id="prolist">
+        		
+        	</li>
+        	<li class="hei_40">
+        		<div class="wid_110 fl mar_l10"><p class="hei_30 font_left">上传商品推荐图片</p></div>
+        		<div class="wid_440 fl mar_l10 po_re">
+	        		<input type="text" class="input_Style2 kf" readonly="readonly" id="productDialog_pictureUrlText" />
+	        		<input type="hidden" id="productDialog_id" value="" />
+	        		<input type="hidden" id="productDialog_pictureUrlName" value="" />
+	        		<input type="hidden" id="productDialog_position" value="" />
+	        		<input type="hidden" id="productDialog_modultType" value="" />
+	        		<input type="hidden" id="productDialog_width" value="" />
+	        		<input type="hidden" id="productDialog_height" value="" />
+	        		<input type="hidden" id="productDialog_skuId" value="" />
+	        		<input type="hidden" id="productDialog_eleId" value="" />
+	        		<input type="hidden" id="productDialog_chainUrl" value="" />
+	        		<input type="hidden" id="productDialog_marketPrice" value="" />
+	        		<input type="hidden" id="productDialog_itemName" value="" />
+                    <input type="hidden" id="productDialog_hasPrice" value="" />
+	        		<span class="z-upload">
+						<button type="button" class="button_3 kf hei_30 mar_l10" style='padding:0px 15px;'>选择文件</button>
+			            <input type="file" id="productDialog_fileInput" class="file-img" name="file" onchange="productTextChange()">
+			        </span>
+	        		
+	        		<p class="fl hei_30 mar_l10 font_e3 po_ab pa_06">( 建议尺寸：238*250px图片 )</p>
+				</div>
+        	</li>
+        	<li>
+        		<div class="wid_110 fl mar_l10"><p class="hei_40 font_left">预览</p></div>
+        		<div class="wid_300 fl mar_l10 min-hei mar_t10 border-1">
+        			<img src="" id="productDialog_previewImage" width="302" height="252" />
+	        	</div>
+        	</li>
+        </ul>
+        <div class="clear"></div>
+        <div class="wid_400 mar_cen">
+	    	<div class="wid_200 mar_t10 pad_t50 mar_lr5">
+	    		<button class="button_1 hei_30" id="productDialog_productSave" >确定</button>
+	    		<button class="button_5 hei_30 mar_l10 demo-icons"><a href="#">取消</a></button>
+	    	</div>
+        </div>
+    </div>
+    </div>
+</div>
+<!-- 推荐位弹框 end -->
+<script type="text/javascript">
+	$(function(){
+		$("i.demo-icons,button.demo-icons").bind("click", function(){
+			closeDialog();
+		});
+		
+		//通用弹框中保存按钮的点击事件
+		$("#bannerDialog_shopLogoSave").bind("click",function(){
+			//保存banner的背景图
+			//保存banner图片
+            var option = {};
+            option.dialogId = "bannerDialog";
+            option.data = {
+                "shopRenovationList[0].id":$("#bannerDialog_id").val(),
+                "shopRenovationList[0].pictureUrl":$("#bannerDialog_pictureUrlText").val(),
+                "shopRenovationList[0].modultType":$("#bannerDialog_modultType").val(),
+                "shopRenovationList[0].position":$("#bannerDialog_position").val(),
+                "shopRenovationList[0].chainUrl":$("#bannerDialog_chainUrl").val(),
+
+                "shopRenovationList[1].id":$("#bannerBgDialog_id").val(),
+                "shopRenovationList[1].pictureUrl":$("#bannerBgDialog_pictureUrlText").val(),
+                "shopRenovationList[1].modultType":$("#bannerBgDialog_modultType").val(),
+                "shopRenovationList[1].position":$("#bannerBgDialog_position").val(),
+                "shopRenovationList[1].chainUrl":$("#bannerBgDialog_chainUrl").val(),
+                "templatesId":$("#templatesId").val()
+            };
+            ShopDecorate.saveData(option);
+            //背景图片上传成功后，需要设置店铺装修页面页头的背景图为已上传的图片、设置背景图隐藏域中的值
+            var fullsrc = "$!imageServerAddr"+$("#bannerBgDialog_pictureUrlText").val();
+            $("#"+$("#bannerBgDialog_pictureUrlName").val()).css("background-image","url('"+fullsrc+"')");
+            $("#shopLogoEdit_pictureUrlName").attr("src", "$!imageServerAddr" + $("#bannerDialog_pictureUrlText").val());
+
+            $("#shopLogoEdit_picUrl").val($("#bannerDialog_pictureUrlText").val());
+            $("#shopLogoEdit_chainUrl").val($("#bannerDialog_chainUrl").val());
+            $("#shopLogoEdit_bgPicUrl").val($("#bannerBgDialog_pictureUrlText").val());
+		});
+		
+		//通用弹框中保存按钮的点击事件
+		$("#commonDialog_shopLogoSave").bind("click",function(){
+            var option = {};
+            option.dialogId = "commonDialog";
+            option.data = {
+                "shopRenovationList[0].id":$("#commonDialog_id").val(),
+                "shopRenovationList[0].pictureUrl":$("#commonDialog_pictureUrlText").val(),
+                "shopRenovationList[0].modultType":$("#commonDialog_modultType").val(),
+                "shopRenovationList[0].position":$("#commonDialog_position").val(),
+                "shopRenovationList[0].chainUrl":$("#commonDialog_chainUrl").val(),
+                "templatesId":$("#templatesId").val()
+            };
+            ShopDecorate.saveData(option);
+		});
+		
+		//推荐位弹框中保存按钮事件
+		$("#productDialog_productSave").bind("click",function(){
+			var skuId = $("#productDialog_skuId").val();
+			if(skuId==null || skuId==""){
+				alert("请先选择商品");
+				return;
+			}
+			var option = {};
+			option.dialogId = "productDialog";
+			option.price = $("#productDialog_marketPrice").val();
+			option.moduleName = $("#productDialog_itemName").val();
+            option.hasPrice = $("#productDialog_hasPrice").val();
+			var eleId = $("#productDialog_eleId").val();
+			//修改产品价格
+            var proPrice = "欢迎询价";
+            if(option.hasPrice=="1"){
+                proPrice = "￥" + $("#productDialog_marketPrice").val();
+            }
+            //修改产品价格
+			$("#"+eleId+"_price").html(proPrice);
+			//修改产品名称
+			$("#"+eleId+"_price").parent().siblings(".n_font").html($("#productDialog_itemName").val());
+
+            option.pictureUrlName = $("#productDialog_pictureUrlName").val();
+            option.pictureUrl = $("#productDialog_pictureUrlText").val();
+            option.data = {
+                "shopRenovationList[0].id":$("#productDialog_id").val(),
+                "shopRenovationList[0].pictureUrl":$("#productDialog_pictureUrlText").val(),
+                "shopRenovationList[0].modultType":$("#productDialog_modultType").val(),
+                "shopRenovationList[0].position":$("#productDialog_position").val(),
+                "shopRenovationList[0].chainUrl":$("#productDialog_chainUrl").val(),
+                "shopRenovationList[0].hasPrice":$("#productDialog_hasPrice").val(),
+                "shopRenovationList[0].skuId":$("#productDialog_skuId").val(),
+                "shopRenovationList[0].price":$("#productDialog_marketPrice").val(),
+                "shopRenovationList[0].moduleName":$("#productDialog_itemName").val(),
+                "templatesId":$("#templatesId").val()
+            };
+            $("#productDialog_skuId").val("");
+            $("#_itemName").focus();	//焦点移到对话框上边
+            ShopDecorate.saveData(option);
+		});
+		
+		//轮播图弹框中，点击保存按钮的事件
+		$("#shopAdSave").bind("click",function(){
+			var option = {};
+			option.dialogId = "adDialog";
+
+            option.data = {
+                "shopRenovationList[0].id":$("#ad1Id").val(),
+                "shopRenovationList[0].pictureUrl":$("#ad1ShowFileName").val(),
+                "shopRenovationList[0].position":"a",
+                "shopRenovationList[0].chainUrl":$("#ad1ChainUrl").val(),
+                "shopRenovationList[0].modultType":"2",
+
+                "shopRenovationList[1].id":$("#ad2Id").val(),
+                "shopRenovationList[1].pictureUrl":$("#ad2ShowFileName").val(),
+                "shopRenovationList[1].position":"b",
+                "shopRenovationList[1].chainUrl":$("#ad2ChainUrl").val(),
+                "shopRenovationList[1].modultType":"2",
+
+                "shopRenovationList[2].id":$("#ad3Id").val(),
+                "shopRenovationList[2].pictureUrl":$("#ad3ShowFileName").val(),
+                "shopRenovationList[2].position":"c",
+                "shopRenovationList[2].chainUrl":$("#ad3ChainUrl").val(),
+                "shopRenovationList[2].modultType":"2",
+                "templatesId":$("#templatesId").val()
+            }
+
+			ShopDecorate.saveData(option);
+		});
+	});
+
+	/**通用弹框中，文件路径文本框的改变事件*/
+	function commonFileTextChange(){
+		var wdt = $("#commonDialog_width").val();
+		var hgt = $("#commonDialog_height").val();
+		ShopDecorate.uploadImg({
+			previewImage:"commonDialog_previewImage",
+			showFileDir:"commonDialog_pictureUrlText",
+			fileInput:"commonDialog_fileInput",
+            pictureUrlName:$("#commonDialog_pictureUrlName").val(),
+			width:wdt,
+			height:hgt,
+			size:this.UPLOAD_SIZE
+		});
+	};
+	/**banner弹框中，文件路径文本框的改变事件*/
+	function bannerFileTextChange(dialogId){
+		var wdt = $("#"+dialogId+"_width").val();
+		var hgt = $("#"+dialogId+"_height").val();
+		ShopDecorate.uploadImg({
+			previewImage:dialogId+"_previewImage",
+			showFileDir:dialogId+"_pictureUrlText",
+			fileInput:dialogId+"_fileInput",
+			width:wdt,
+			height:hgt,
+			size:this.UPLOAD_SIZE
+		});
+	};
+	
+	/**第一张轮播图文本框的改变事件*/
+	function ad1FileTextChange(){
+		ShopDecorate.uploadImg({pictureUrlName:"ad1Url",previewImage:"ad1PreviewImage",showFileDir:"ad1ShowFileName",fileInput:"ad1FileInput",width:"315",height:"980",size:this.UPLOAD_SIZE});
+	};
+	/**第二张轮播图文本框的改变事件*/
+	function ad2FileTextChange(){
+		ShopDecorate.uploadImg({pictureUrlName:"ad2Url",previewImage:"ad2PreviewImage",showFileDir:"ad2ShowFileName",fileInput:"ad2FileInput",width:"315",height:"980",size:this.UPLOAD_SIZE});
+	};
+	/**第三张轮播图文本框的改变事件*/
+	function ad3FileTextChange(){
+		ShopDecorate.uploadImg({pictureUrlName:"ad3Url",previewImage:"ad3PreviewImage",showFileDir:"ad3ShowFileName",fileInput:"ad3FileInput",width:"315",height:"980",size:this.UPLOAD_SIZE});
+	};
+
+	//推荐位选择产品时，图片文件路径文本框的改变事件
+	function productTextChange(){
+		var wdt = $("#productDialog_width").val();
+		var hgt = $("#productDialog_height").val();
+		ShopDecorate.uploadImg({
+			previewImage:"productDialog_previewImage",
+			showFileDir:"productDialog_pictureUrlText",
+			fileInput:"productDialog_fileInput",
+            pictureUrlName:$("#productDialog_pictureUrlName").val(),
+			width:wdt,
+			height:hgt,
+			size:ShopDecorate.UPLOAD_SIZE
+		});
+	};
+	
+	//关闭弹框
+	function closeDialog(){
+		$("#_itemName").focus();	//焦点移到对话框上边
+		$(".po_fai").hide();
+	};
+</script>

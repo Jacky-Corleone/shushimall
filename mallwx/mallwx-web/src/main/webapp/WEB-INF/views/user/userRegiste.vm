@@ -1,0 +1,58 @@
+#set($layout = "common/blanklayout.vm")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<base href="${request.getContextPath()}/"></base>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>个人中心 - 注册</title>
+<link href="assets/css/detail.css" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" src="assets/css/detail.js" />
+<link rel="stylesheet" type="text/css" src="assets/css/style.js" />
+<script type="text/javascript" src="assets/js/iscroll.js"></script>
+<script type="text/javascript" src="assets/js/zepto.js"></script>
+</head>
+<body>
+<div id="main" class="po_re">
+    <!-- 头部 -->
+    #*<header class="po_re">
+        <div class="top_l fl">
+            <i class="fa fa-angle-left"></i>返回
+        </div>
+        <div class="top_c fl">
+            设置密码
+        </div>
+         <div class="top_r fr">
+            <img src="assets/images/more.png" />
+        </div>
+        <div class="clear"></div>
+    </header>*# <!-- 头部 end-->
+    <!-- 中间内容 -->
+    <div class="content" id="wrapper">
+        <h3 class="hei_50 font_cen bg_02 font_1_2">我的信息</h3>
+        <div class="news bg_01">
+            <p class="lin_24 font_66">请设置密码。您可以用其他方式绑定账号，密码登录，比如手机密码登录，快速登录！</p>
+            <div class="clear"></div>
+            <h4 class="hei_50 border_2 mar_t20" >采购小管家账号</h4>
+            <ul class="pass">
+                <li><p class="wid_25 fl font_right pad_r5"><span class="font_e5">*</span>电子邮箱</p><input type="email" class="wid_50 input_3"/></li>
+                <li><p class="wid_25 fl font_right pad_r5"><span class="font_e5">*</span>登录名</p><input type="text" class="wid_50 input_3"/></li>
+                <li><p class="wid_25 fl font_right pad_r5"><span class="font_e5">*</span>密码</p><input type="password" class="wid_50 input_3"/></li>
+                <li><p class="wid_25 fl font_right pad_r5"><span class="font_e5">*</span>确认密码</p><input type="password" class="wid_50 input_3"/></li>
+                <li><p class="wid_25 fl font_right pad_r5"><span class="font_e5">*</span>公司名称</p><input type="password" class="wid_50 input_3"/></li>
+                <li><p class="wid_25 fl font_right pad_r5"><span class="font_e5">*</span>联系人</p><input type="password" class="wid_25 input_3 fl"/><div class="fl mar_t20"><input type="radio" /><span>先生</span><input type="radio" /><span>女士</span></div></li>
+                <li><p class="wid_25 fl font_right pad_r5"><span class="font_e5">*</span>联系电话</p><select class="mar_t20 hei_32 wid_65 input_3 fl"><option>中国大陆（+86）</option></select></li>
+                <li class="font_right pad_r5"><input type="text" class="input_3 wid_11 mar_r2" /><input type="text" class="wid_11  input_3 mar_r2" /><input type="text" class="input_3 wid_15 wid_11" /></li>
+                <li><p class="wid_25 fl font_right pad_r5">验证码</p><input type="password" class="wid_25 input_3 fl mar_r2"/><img src="" class="fl mar_r2 mar_t10" width="50" height="30"/><p class="mar_t10  fl">换一张</p></li>
+            </ul>
+            <div class='font_cen'>
+                <button class="button_1 pad_lr10 hei_34">提交</button>
+            </div>
+        </div>
+    </div><!-- 中间内容 end-->
+    #parse("common/footer.vm")
+</div>
+</body>
+</html>

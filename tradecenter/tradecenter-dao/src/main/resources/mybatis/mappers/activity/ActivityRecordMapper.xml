@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.activity.dao.ActivityRecordDao">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="activityRecordDTO" type="com.camelot.activity.dto.ActivityRecordDTO">
+		<result property="id" column="id"/>
+		<result property="orderId" column="order_id"/>
+		<result property="shopId" column="shop_id"/>
+		<result property="type" column="type"/>
+		<result property="discountAmount" column="discount_amount"/>
+	    <result property="promotionId" column="promotion_id"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id,
+ 			order_id,
+ 			shop_id,
+ 			type,
+ 			discount_amount,
+ 			promotion_id
+		FROM 
+		activity_record activityRecord
+		]]>
+	</sql>
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="activityRecordDTO" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		activity_record  activityRecord
+		<include refid="where_fragement" />
+	</select>
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.orderId != null and entity.orderId != ''">
+				<![CDATA[ and activityRecord.order_Id = #{entity.orderId} ]]>
+			</if>
+			<if test="entity.shopId != null">
+				<![CDATA[ and activityRecord.shop_id = #{entity.shopId} ]]>
+			</if>
+			<if test="entity.discountAmount != null">
+				<![CDATA[ and activityRecord.discount_amount = #{entity.discountAmount} ]]>
+			</if>
+			<if test="entity.type != null">
+				<![CDATA[ and activityRecord.type = #{entity.type} ]]>
+			</if>
+			<if test="entity.promotionId != null">
+				<![CDATA[ and activityRecord.promotion_id = #{entity.promotionId} ]]>
+			</if>
+			<if test="entity.promotionTypes != null">
+				 and activityRecord.type  in
+				<foreach collection="entity.promotionTypes" item="type" index="index" open="(" separator="," close=")">
+	                #{type}
+	  	        </foreach>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="com.camelot.activity.dto.ActivityRecordDTO">
+		<![CDATA[
+		insert into activity_record (
+	 			order_id,
+	 			shop_id,
+	 			discount_amount,
+	 			type,
+	 			promotion_id
+		   )values(
+				#{orderId},
+				#{shopId},
+				#{discountAmount},
+				#{type},
+				#{promotionId}
+		   )
+	    ]]>	
+	</insert>
+</mapper>

@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+
+	<dubbo:reference id="userExtendsService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.usercenter.service.UserExtendsService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="addressBaseService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.basecenter.service.AddressBaseService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	
+	<dubbo:reference id="iptableService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.basecenter.service.IptableService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="addressInfoService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.basecenter.service.AddressInfoService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="promotionService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.maketcenter.service.PromotionService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="promotionFrExportService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.maketcenter.service.PromotionFrExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="promotionInfoExportService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.maketcenter.service.PromotionInfoExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="promotionMdExportService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.maketcenter.service.PromotionMdExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="searchExportService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.searchcenter.service.SearchExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+
+	<dubbo:reference id="userCompanyService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.usercenter.service.UserCompanyService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="shopCategorySellerExportService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.storecenter.service.ShopCategorySellerExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="shopBrandExportService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.storecenter.service.ShopBrandExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="shopCategoryExportService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.storecenter.service.ShopCategoryExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="itemBrandExportService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.goodscenter.service.ItemBrandExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+	<dubbo:reference id="itemSkuPackageService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.goodscenter.service.ItemSkuPackageService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="itemSkuInquiryPriceExportService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.goodscenter.service.ItemSkuInquiryPriceExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="tradeOrderExportService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.tradecenter.service.TradeOrderExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="shopFavouriteService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.storecenter.service.ShopFavouriteExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="itemFavouriteService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.goodscenter.service.ItemFavouriteExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="shopModifyInfoExportService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.storecenter.service.ShopModifyInfoExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="userContractService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.usercenter.service.UserContractService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="shopDomainExportService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.storecenter.service.ShopDomainExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="shopFareExportService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.storecenter.service.ShopFareExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="itemCategoryService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.goodscenter.service.ItemCategoryService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="userStorePermissionExportService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.usercenter.service.UserStorePermissionExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="webMsgService" registry="qingdaoRegistry"
+		owner="basecenter" interface="com.camelot.basecenter.service.BaseWebSiteMessageService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="tradeReturnExportService" registry="qingdaoRegistry"
+		owner="storecenter" interface="com.camelot.aftersale.service.TradeReturnExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+	<dubbo:reference id="tradeReturnGoodsDetailService" registry="qingdaoRegistry"
+		owner="storecenter" interface="com.camelot.aftersale.service.TradeReturnGoodsDetailService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="shopTemplatesExportService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.storecenter.service.ShopTemplatesExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="shopRenovationExportService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.storecenter.service.ShopRenovationExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="shopEvaluationService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.storecenter.service.ShopEvaluationService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="userCreditExportService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.usercenter.service.UserCreditExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<dubbo:reference id="userCreditLogExportService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.usercenter.service.UserCreditLogExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+    <dubbo:reference id="complainExportService" registry="qingdaoRegistry"
+        owner="storecenter" interface="com.camelot.aftersale.service.ComplainExportService"
+        version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+    <dubbo:reference id="searchItemExportService" registry="qingdaoRegistry"
+        owner="storecenter" interface="com.camelot.goodscenter.service.SearchItemExportService"
+        version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+    <dubbo:reference id="itemOldExportService" registry="qingdaoRegistry"
+        owner="camelot" interface="com.camelot.goodscenter.service.ItemOldExportService"
+        version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+
+     <!--第三方IM即时通讯集成开始-->
+    <dubbo:reference id="shopCustomerServiceService" registry="qingdaoRegistry"
+        owner="storecenter" interface="com.camelot.storecenter.service.ShopCustomerServiceService"
+        version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    <dubbo:reference id="shopAndCustomerService" registry="qingdaoRegistry"
+    	owner="storecenter" interface="com.camelot.storecenter.service.ShopAndCustomerService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<!--第三方IM即时通讯集成结束-->
+
+	<dubbo:reference id="userCenterOperaService" registry="qingdaoRegistry"
+    	owner="zhangfan" interface="com.camelot.usercenter.service.UserCenterOperaService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+    <dubbo:reference id="baseTDKConfigService" registry="qingdaoRegistry"
+        owner="camelot" interface="com.camelot.basecenter.service.BaseTDKConfigService"
+        version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+    <dubbo:reference id="itemAttributeExportService" registry="qingdaoRegistry"
+        owner="camelot" interface="com.camelot.goodscenter.service.ItemAttributeExportService"
+        version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+    <dubbo:reference id="itemAttrValueItemExportService" registry="qingdaoRegistry"
+        owner="camelot" interface="com.camelot.goodscenter.service.ItemAttrValueItemExportService"
+        version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+    <dubbo:reference id="mallAdExportService" registry="qingdaoRegistry"
+        owner="camelot" interface="com.camelot.sellercenter.malladvertise.service.MallAdExportService"
+        version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+   	<dubbo:reference id="fieldIdentificationAuditService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.usercenter.service.FieldIdentificationAuditService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+   	<dubbo:reference id="fieldIdentificationPictureService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.usercenter.service.FieldIdentificationPictureService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+    <dubbo:reference id="userWxExportService" registry="qingdaoRegistry"
+         owner="zhangfan" interface="com.camelot.usercenter.service.UserWxExportService"
+         version="1.0" protocol="dubbo" timeout="100000" init="true"/>
+
+    <dubbo:reference id="protocolExportService" registry="qingdaoRegistry"
+         owner="zhangfan" interface="com.camelot.goodscenter.service.ProtocolExportService"
+         version="1.0" protocol="dubbo" timeout="100000" init="true"/>
+                     
+	<dubbo:reference id="inquiryExportService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.goodscenter.service.InquiryExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+					 
+	<dubbo:reference id="translationExportService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.goodscenter.service.TranslationExportService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<dubbo:reference id="tradeApprovedOrdersExportService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.tradecenter.service.TradeApprovedOrdersExportService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<dubbo:reference id="invoiceExportService" registry="qingdaoRegistry"
+		owner="camelot" interface="com.camelot.tradecenter.service.InvoiceExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<!--运费模板调用者-->
+	<dubbo:reference id="shopFreightTemplateService" registry="qingdaoRegistry"
+		 owner="storecenter" interface="com.camelot.storecenter.service.ShopFreightTemplateService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<dubbo:reference id="shopPreferentialWayService" registry="qingdaoRegistry"
+		 owner="storecenter" interface="com.camelot.storecenter.service.ShopPreferentialWayService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<dubbo:reference id="shopDeliveryTypeService" registry="qingdaoRegistry"
+		 owner="storecenter" interface="com.camelot.storecenter.service.ShopDeliveryTypeService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<!--vip卡号消费者-->
+	<dubbo:reference id="vipCardService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.maketcenter.service.VipCardService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<!--价格中心-促销活动消费者-->
+	<dubbo:reference id="shopCartPromotionService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.pricecenter.service.ShopCartPromotionService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<!--价格中心-满减活动消费者-->
+	<dubbo:reference id="shopCartFullReductionService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.pricecenter.service.ShopCartFullReductionService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<!--价格中心-VIP卡消费者-->
+	<dubbo:reference id="shopCartVIPCardService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.pricecenter.service.ShopCartVIPCardService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />				 
+	<!--价格中心-运费消费者-->
+	<dubbo:reference id="shopCartFreightService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.pricecenter.service.ShopCartFreightService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<!--价格中心-优惠券消费者-->
+	<dubbo:reference id="shopCartCouponService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.pricecenter.service.ShopCartCouponService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<!--价格中心-积分消费者-->
+	<dubbo:reference id="shopCartIntegralService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.pricecenter.service.ShopCartIntegralService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<!--集采-->
+	<dubbo:reference id="centralPurchasingExportServiceImpl" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.maketcenter.service.CentralPurchasingExportService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		 
+	<!--集采订单-->
+	<dubbo:reference id="centralPurchasingRefOrderExportService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.maketcenter.service.CentralPurchasingRefOrderExportService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<!-- sku价格消费者 -->
+	<dubbo:reference id="itemPriceExportService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.goodscenter.service.ItemPriceExportService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />				 
+
+	<!-- 优惠券 -->
+	<dubbo:reference id="couponsExportService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.maketcenter.service.CouponsExportService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />	
+	<!-- 对tableTest表操作的接口调用 -->	
+	<!-- <dubbo:reference id="tableTestService" registry="qingdaoRegistry"
+			 owner="camelot" interface="com.camelot.basecenter.service.TableTestService"
+			 version="1.0" protocol="dubbo" timeout="100000" init="true" />		 -->
+     <!--成长值配置 -->
+	<dubbo:reference id="growthService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.basecenter.service.GrowthService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	 <!--成长值记录 -->
+	<dubbo:reference id="userGrowthService" registry="qingdaoRegistry"
+		 owner="zhangfan" interface="com.camelot.usercenter.service.UserGrowthService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+	<!-- 用户积分信息 -->
+	<dubbo:reference id="userIntegralTrajectoryService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.usercenter.service.UserIntegralTrajectoryExportService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />		
+		 
+	<!-- 积分商城 -->
+	<dubbo:reference id="integralConfigService"
+		registry="qingdaoRegistry" owner="zhangfan"
+		interface="com.camelot.maketcenter.service.IntegralConfigExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+	<!-- 优惠活动结算单配置 -->
+	<dubbo:reference id="activityStatementSerice" registry="qingdaoRegistry"
+			owner="camlot" interface="com.camelot.activity.service.ActivityStatementSerice"
+			version="1.0" protocol="dubbo" timeout="100000" init="true" />	
+			
+	 <!--退款退货 -->
+	<dubbo:reference id="tradeReturnGoodsService" registry="qingdaoRegistry"
+		 owner="zhangfan" interface="com.camelot.aftersale.service.TradeReturnGoodsService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />	
+	 <!--活动明细 -->
+	<dubbo:reference id="tradeOrderItemsDiscountExportService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.tradecenter.service.TradeOrderItemsDiscountExportService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+	<!--QQ客服 -->
+	<dubbo:reference id="qqCustomerService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.storecenter.service.QqCustomerService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />	 	
+		 
+	<!--订单附件 -->
+	<dubbo:reference id="tradeOrdersEnclosureService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.tradecenter.service.TradeOrdersEnclosureService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />	 
+	<!-- 评价标签 -->
+	<dubbo:reference id="evalTagService" registry="qingdaoRegistry"
+		owner="zhangfan" interface="com.camelot.goodscenter.service.EvalTagService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+		
+	<!-- 套装商品订单记录 -->
+	<dubbo:reference id="tradeOrderItemsPackageExportService" registry="qingdaoRegistry"
+		 owner="camelot" interface="com.camelot.tradecenter.service.TradeOrderItemsPackageExportService"
+		 version="1.0" protocol="dubbo" timeout="100000" init="true" />
+</beans>

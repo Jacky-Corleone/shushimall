@@ -1,0 +1,457 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+
+<style >
+.qd_btn {
+  width: auto;
+  padding: 0px 25px;
+  background: #E50011;
+  text-align: center;
+  border: none;
+  font-family: Microsoft Yahei;
+  color: #fff;
+  border-radius: 2px;
+  cursor: pointer;
+  height: 35px;
+  line-height: 35px;
+  margin: 30px auto 0px;
+  margin-left: 20px;
+  margin-top: 20px;
+}
+.po_fai .po_main{background-color:#FFF; padding:10px; border:5px solid #e3e3e3;z-index:101;position:fixed; top:50%; left:50%; zoom:1;min-height:120px;}
+.po_fai .po_main{width:555px; min-height:105px;margin-left:-310px; margin-top:-300px;}
+.po_fai .po_main ul li{width:100%; text-align:center; line-height:50px;}
+</style>
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<script type="text/javascript">
+	$(function(){
+		//加载左侧菜单
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+	});
+	//显示隐藏层
+    function showSetDiv(hide){
+		if(hide){
+		document.all.city_id.value = "";
+		document.all.fare_name.value = "";
+		document.all.city_addrId.value = "";
+		document.all.city_addrName.value = "";
+		document.all.city_price.value = "";
+		dealAddr('add');
+		}
+		document.all.freightSetDiv.style.display = 'block';
+    };
+    function hideSetDiv(){
+		document.all.freightSetDiv.style.display = 'none';
+    };
+	//显示隐藏城市列表
+    function showCity(){
+		var cityCheckArr=$("#city_addrId").val().split(",");
+		$.each(cityCheckArr,function(i,item){
+			$("input:checkbox[value='"+item+"']").prop("checked","true");
+		});
+		document.all.cityList.style.display = 'block';
+    };
+    function hideCity(){
+		document.all.cityList.style.display = 'none';
+		$("input[name='cityItem']").each(function(){this.checked=false;}); 
+    };
+
+	// 选中城市后赋值
+    function selectCity() {
+		if(checkSelectedCityItem())
+		{
+	    	var checks = document.getElementsByName("cityItem");
+	    	var str = "";
+	    	for (var i = 0; i < checks.length; i++) {
+	    		if (checks[i].checked) {
+	    			str = str + checks[i].value+",";
+	    		}
+	    	}
+	    	str = str.substring(0, str.length - 1);
+			
+			document.all.city_addrName.value = transIdName(str);
+			document.all.city_addrId.value = str;
+	    	hideCity();
+		}
+    };
+	
+    //检查选中的省份，如果选中全国，提示不让选省份
+    function checkSelectedCityItem()
+    {
+    	//选中全国
+    	var contItem = $('#cityList dl dd span input:checkbox:checked[value="0"]');
+    	//选中省份
+    	var cityItem = $('#cityList dl dd span input:checkbox:checked[value!="0"]');
+    	if(contItem.length == 0 && cityItem.length == 0)
+   		{
+    		alert('请至少选择一个省份，或全国！');
+    		return false;
+   		}
+    	//选中全国不能选中省份
+    	if ((!!contItem.length) == (!!cityItem.length))
+    	{
+    		alert('选中了全国，不能选中省份！');
+    		return false;
+    	}
+    	return true;
+    }
+    
+    
+	//操作传值
+    function actionSet(){
+        $("#submitActionButton").loadingMsg();
+		id = document.all.city_id.value;
+		name = document.all.fare_name.value;
+		addrId = document.all.city_addrId.value;
+		addrName = document.all.city_addrName.value;
+		price = document.all.city_price.value;
+		
+		if(price.length <1){
+			alert("请填写价格");
+		}else if(addrId.length < 1){
+			alert("请选择地址");
+		}else if(id.length > 1){
+		    data = id +"&"+name +"&"+addrId +"&"+addrName +"&"+price+"&" ;
+            hideSetDiv();
+            submitAjax(data,"save");
+		}else{
+        	$.get("$request.contextPath/freightSet/freightCheck", {
+    			"city_id" : document.all.city_id.value,
+        		"checkbox" : document.all.city_addrId.value
+        	}, function(response) {
+                $("#submitActionButton").hideMsg();
+        		if (response.result == 'failure') {
+        			alert("有重复的城市，请重新选择："+transIdName(response.result));
+    				document.all.city_addrName.value = "";
+    				document.all.city_addrId.value = "";
+        		} else {
+    				data = id +"&"+name +"&"+addrId +"&"+addrName +"&"+price+"&" ;
+                	hideSetDiv();
+                	submitAjax(data,"save");
+        		}
+        	}, "json");
+		}
+    };
+	
+	//delete操作
+    function actionById(id,action){
+		submitAjax(id,action);
+    };
+	
+	//异步提交
+    function submitAjax(setData,action) {
+		$.get("$request.contextPath/freightSet/freightAction", {
+        		"setData" : setData,
+    			"action" : action
+        	}, function(response) {
+        		if (response.result != 'failure') {
+					alert('操作成功');
+        		} else {
+					alert('操作失败');
+        		}
+				window.location.reload();
+        	}, "json");
+    };
+
+	//修改功能
+	function updateCity(id,name,addrId,price){
+		document.all.city_id.value = id;
+		document.all.fare_name.value = name;
+		document.all.city_addrId.value = addrId;
+		document.all.city_addrName.value = transIdName(addrId);
+		document.all.city_price.value = price;
+		dealAddr('add');
+		dealAddr('update', addrId);
+		showSetDiv(false);
+	};
+	
+    // 城市id与name转换
+    function transIdName(value){
+    	var _CityId = new Array("0","21","22","23","37","32","34","33","35","31","42","43","41","36","11","12","13","14","15",
+		"51","53","52","54","50","44","45","46","64","65","63","61","62","81","82","71");
+    	var _CityName = new Array("全国","辽宁","吉林","黑龙江","山东","江苏","安徽","浙江","福建","上海","湖北","湖南","河南","江西","北京","天津",
+		"河北","山西","内蒙古","四川","云南","贵州","西藏","重庆","广东","广西","海南","宁夏","新疆","青海","陕西","甘肃","香港","澳门","台湾");
+    	var _values = value.split(",");
+    	
+    	var resultStr = "";
+    	for(var j = 0 ; j< _values.length;j++){
+    		for(var i = 0 ; i< _CityId.length;i++){
+    			if(_values[j]==_CityId[i]){
+    				resultStr = resultStr + _CityName[i]+",";
+    			}
+    		}
+    	}
+		resultStr = resultStr.substring(0, resultStr.length - 1);
+		return resultStr;
+    };
+	
+	//到指定的分页页面
+	function topage(page){
+		$("input[name='page']").val(page);
+		$("#queryForm").submit();
+	};
+	
+    function amount(th){
+        var regStrs = [
+            ['^0(\\d+)$', '$1'], //禁止录入整数部分两位以上，但首位为0
+            ['[^\\d\\.]+$', ''], //禁止录入任何非数字和点
+            ['\\.(\\d?)\\.+', '.$1'], //禁止录入两个以上的点
+            ['^(\\d+\\.\\d{2}).+', '$1'] //禁止录入小数点后两位以上
+        ];
+        for(i=0; i<regStrs.length; i++){
+            var reg = new RegExp(regStrs[i][0]);
+            th.value = th.value.replace(reg, regStrs[i][1]);
+        }
+    };
+    function overFormat(th){
+        var v = th.value;
+        if(v === ''){
+            v = '0.00';
+        }else if(v === '0'){
+            v = '0.00';
+        }else if(v === '0.'){
+            v = '0.00';
+        }else if(/^0+\d+\.?\d*.*$/.test(v)){
+            v = v.replace(/^0+(\d+\.?\d*).*$/, '$1');
+            v = inp.getRightPriceFormat(v).val;
+        }else if(/^0\.\d$/.test(v)){
+            v = v + '0';
+        }else if(!/^\d+\.\d{2}$/.test(v)){
+            if(/^\d+\.\d{2}.+/.test(v)){
+                v = v.replace(/^(\d+\.\d{2}).*$/, '$1');
+            }else if(/^\d+$/.test(v)){
+                v = v + '.00';
+            }else if(/^\d+\.$/.test(v)){
+                v = v + '00';
+            }else if(/^\d+\.\d$/.test(v)){
+                v = v + '0';
+            }else if(/^[^\d]+\d+\.?\d*$/.test(v)){
+                v = v.replace(/^[^\d]+(\d+\.?\d*)$/, '$1');
+            }else if(/\d+/.test(v)){
+                v = v.replace(/^[^\d]*(\d+\.?\d*).*$/, '$1');
+                ty = false;
+            }else if(/^0+\d+\.?\d*$/.test(v)){
+                v = v.replace(/^0+(\d+\.?\d*)$/, '$1');
+                ty = false;
+            }else{
+                v = '0.00';
+            }
+        }
+        th.value = v; 
+    };
+	
+    //地址checkbox处理
+    function dealAddr(action) {
+		value = document.all.city_addrId.value;
+    	var cbs = document.getElementsByName("cityItem");
+    	if (action == 'add') {
+    		for (var i = 0; i < cbs.length; i++) {
+    				cbs[i].checked = false;
+    		}
+    	} else if (action == 'update') {
+    		var _values = value.split(",");
+    		for (var i = 0; i < cbs.length; i++) {
+    			for (var j = 0; j < _values.length; j++) {
+    				if(_values[j] == cbs[i].value){
+    					cbs[i].checked = true;
+    				}
+    			}
+    		}
+    	}
+    };
+
+	//城市重复校验
+    function cityCheck() {
+    	$.get("$request.contextPath/freightSet/freightCheck", {
+			"city_id" : document.all.city_id.value,
+    		"checkbox" : document.all.city_addrId.value
+    	}, function(response) {
+    		if (response.result == 'failure') {
+    			alert("有重复的城市，请重新选择："+transIdName(response.result));
+				document.all.city_addrName.value = "";
+				document.all.city_addrId.value = "";
+    		} else {
+    		}
+    	}, "json");
+    };
+
+</script>
+
+<form action="$request.getContextPath()/freightSet/freightList" method="post" id="queryForm">
+		<input type="hidden" name="page" value="$!pager.page" />
+</form>
+
+<div id="main">
+<!--中间部分开始-->
+
+<!--left start -->
+<div id="leftSeller" class="border-4">
+                        
+</div>
+<!--left end -->
+
+<!--右边部分开始-->
+	<div class=" bg_06 fl hei_600 mar_l10 box-shadow1 wid_980 ">
+				<!-- 运费模板 -->
+				<div class="but_moban hei_60 " style="padding-left:20px">
+					 <button   type="button" class="button_1 hei_35 add_moban "  onclick="showSetDiv(true)">新添加运费模板</button>
+				</div>
+				
+				<!--循环列表begin-->
+        		#foreach($entity in $pager.records)
+				<!--每一笔订单可以循环一下内容 开始-->
+				<div class="wid_940 mar" >
+                      <!-- 订单号 -->
+                      <div class="border-4 mar_t10 curso ">
+                      	<p class="hei_40 bg_08 wid_940 border-6">
+							<i class="fl mar_l10">$!userName<b class="font_fe mar_lr20 "> 使用中</b></i>
+							<i class="fr mar_r10 font_c7 cursor">
+								<span style="color:#666" onclick="updateCity('','$!entity.fareName','$!entity.fareRegion','$!entity.firstWeightPrice')" class="mar_l10" >复制模板</span><b class="mar_lr10">|</b>
+								<span style="color:#666" onclick="updateCity('$!entity.id','$!entity.fareName','$!entity.fareRegion','$!entity.firstWeightPrice')" >修改</span><b class="mar_lr10">|</b>
+								<span style="color:#666" onclick=" if(confirm('确定删除此记录吗？')) actionById($!entity.id,'delete')" >删除</span>
+							</i>
+						</p>
+                      <!-- 每一个商品信息 -->
+					  <table width = "100%">
+                     <tr class="list_top hei_35 font_14b bg_05">
+                          <td class="wid_300 font_cen">模板名称</td>
+                          <td class="wid_330 font_cen">地址</td>
+                          <td class="wid_300 font_cen">运费</td>
+                     </tr>
+                     <tr class="list_top hei_35 font_14b">
+							#if (!$!entity.fareName || $!entity.fareName == '')  <td class="wid_300 font_cen">&nbsp;</td>
+								#else <td class="wid_300 font_cen"> $!entity.fareName</td>
+							#end
+							#if (! $!entity.fareRegion || $!entity.fareRegion == '')  <td class="wid_330 font_cen">&nbsp;</td>
+								#else <td class="wid_330 font_cen"><script type="text/javascript">document.write(transIdName("$!entity.fareRegion")) ;</script></td>
+							#end
+							#if (! $!entity.firstWeightPrice || $!entity.firstWeightPrice == '')  <td class="wid_300 font_cen">&nbsp;</td>
+								#else <td class="wid_300 font_cen"> $!entity.firstWeightPrice</td>
+							#end
+                     </tr>
+					 </table>
+					 
+                      </div>
+                   
+				 #end
+				 #pageVelocity($pager)
+            
+            
+				<!--循环列表end-->
+ 
+                </div>
+			</div><!-- 商品列表-右 -->
+			<!--右边部分结束-->
+	<div class="po_fai moban" style="display:none" id = "freightSetDiv" >
+	    <div class="po_fai_bg"></div>
+	    <div class="po_main">
+			<dl class="wid_500 hei_40 mar_t20 po_re" >
+				<dt class="fl hei_30 wid_90 font_right">模板名称：</dt>
+				<dd class="fl"><input type="text" id='fare_name' class="input_Style2 hei_30 mar_l10"  maxlength="40"/></dd>
+			</dl>
+			<dl class="wid_500 hei_40 mar_t20 po_re" >
+				<dt class="fl hei_30 wid_90 font_right">运费：</dt>
+				<dd class="fl"><input type="text" id="city_price" class="input_Style2 hei_30 mar_l10" maxlength="12"
+					onKeyUp="amount(this)" onBlur="overFormat(this)" /><i class="demo-icons">元</i></dd>
+			</dl>
+			<dl  class="wid_500 hei_100 mar_t20  po_re">
+				<dt class="fl wid_90 add_sell font_7a font_right cursor" onclick="showCity()">请点击此处增加地址：</dt>
+				<dd class="fl"><textarea  class="input_Style2 wid_350 hei_60 mar_l10" style="resize: none;"  id="city_addrName" readonly="readonly"/></textarea></dd>				
+				<input type="text"  id="city_addrId" style="display:none"  />
+				<input type="text"  id="city_id" style="display:none"  />
+			</dl>
+			<div class=" mar_tb10 mar_r20 font_cen">
+				<button id="submitActionButton" type="button" class="qd_btn" loadMsg="正在保存..." onclick="actionSet()">确定</button>
+				<button type="button" class="qd_btn" onclick="hideSetDiv()">取消</button>
+			</div>
+				
+			<div class="right_botton list wid_400 bg_06 border-4 box-shadow1 po_ab hide" style="top:165px;left:30px" id = "cityList">
+	            <div class="tit mar_lr10 bg_05 pad_l10 mar_tb10">请选择您的收货地区:</div>
+				<dl class="wid_400 fl mar_20 hei_35">
+					<dt class="fl font_b">全国&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</dt>
+					<dd class="fl mar_l10">
+						<span><input type="checkbox" name="cityItem" value="0" />全国</span>
+					</dd>
+	            </dl>
+	            <dl class="wid_400 fl mar_20 hei_35">
+					<dt class="fl font_b">东北地区</dt>
+					<dd class="fl mar_l10">
+						<span><input type="checkbox" name="cityItem" value="21" />辽宁</span>
+						<span><input type="checkbox" name="cityItem" value="22" />吉林</span>
+						<span><input type="checkbox" name="cityItem" value="23" />黑龙江</span>
+					</dd>
+	            </dl>
+	            <dl class="wid_400 fl mar_20 hei_35">
+					<dt class="fl font_b">华东地区</dt>
+					<dd class="fl mar_l10">
+						<span><input type="checkbox" name="cityItem" value="37" />山东</span>
+						<span><input type="checkbox" name="cityItem" value="32" />江苏</span>
+						<span><input type="checkbox" name="cityItem" value="34" />安徽</span>
+						<span><input type="checkbox" name="cityItem" value="33" />浙江</span>
+						<span><input type="checkbox" name="cityItem" value="35" />福建</span>
+						<span><input type="checkbox" name="cityItem" value="31" />上海</span>
+					</dd>
+				</dl>
+	            <dl class="wid_400 fl mar_20 hei_35">
+					<dt class="fl font_b">华中地区</dt>
+					<dd class="fl mar_l10">
+						<span><input type="checkbox" name="cityItem" value="42" />湖北</span>
+						<span><input type="checkbox" name="cityItem" value="43" />湖南</span>
+						<span><input type="checkbox" name="cityItem" value="41" />河南</span>
+						<span><input type="checkbox" name="cityItem" value="36" />江西</span>
+					</dd>
+				</dl>
+				<dl class="wid_400 fl mar_20 hei_35">
+					<dt class="fl font_b">华北地区</dt>
+					<dd class="fl mar_l10">
+						<span><input type="checkbox" name="cityItem" value="11" />北京</span>
+						<span><input type="checkbox" name="cityItem" value="12" />天津</span>
+						<span><input type="checkbox" name="cityItem" value="13" />河北</span>
+						<span><input type="checkbox" name="cityItem" value="14" />山西</span>
+						<span><input type="checkbox" name="cityItem" value="15" />内蒙古</span>
+					</dd>
+				</dl>
+				<dl class="wid_400 fl mar_20 hei_35">
+					<dt class="fl font_b">西南地区</dt>
+					<dd class="fl mar_l10">
+						<span><input type="checkbox" name="cityItem" value="51" />四川</span>
+						<span><input type="checkbox" name="cityItem" value="53" />云南</span>
+						<span><input type="checkbox" name="cityItem" value="52" />贵州</span>
+						<span><input type="checkbox" name="cityItem" value="54" />西藏</span>
+						<span><input type="checkbox" name="cityItem" value="50" />重庆</span>
+					</dd>
+				</dl>
+				<dl class="wid_400 fl mar_20 hei_35">
+					<dt class="fl font_b">华南地区</dt>
+					<dd class="fl mar_l10">
+						<span><input type="checkbox" name="cityItem" value="44" />广东</span>
+						<span><input type="checkbox" name="cityItem" value="45" />广西</span>
+						<span><input type="checkbox" name="cityItem" value="46" />海南</span>
+					</dd>
+				</dl>
+				<dl class="wid_400 fl mar_20 hei_35">
+					<dt class="fl font_b">西北地区</dt>
+					<dd class="fl mar_l10">
+						<span><input type="checkbox" name="cityItem" value="64" />宁夏</span>
+						<span><input type="checkbox" name="cityItem" value="65" />新疆</span>
+						<span><input type="checkbox" name="cityItem" value="63" />青海</span>
+						<span><input type="checkbox" name="cityItem" value="61" />陕西</span>
+						<span><input type="checkbox" name="cityItem" value="62" />甘肃</span>
+					</dd>
+				</dl>
+				<dl class="wid_400 fl mar_20 hei_35">
+					<dt class="fl font_b">港澳台&nbsp;&nbsp;&nbsp;</dt>
+					<dd class="fl mar_l10">
+						<span><input type="checkbox" name="cityItem" value="81" />香港</span>
+						<span><input type="checkbox" name="cityItem" value="82" />澳门</span>
+						<span><input type="checkbox" name="cityItem" value="71" />台湾</span>
+					</dd>
+				</dl>
+					<p class="fr mar_r20 mar_b10 city_ok" >
+						<button type="button" class="button_1 hei_35 mar_t10" onclick="selectCity()">确定</button>
+						<button type="button" class="qd_btn" onclick="hideCity()">取消</button>
+					</p>
+          	</div>
+		</div>
+	</div>
+</div><!--#main end -->

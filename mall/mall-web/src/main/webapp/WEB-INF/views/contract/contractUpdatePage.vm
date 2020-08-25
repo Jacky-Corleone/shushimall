@@ -1,0 +1,561 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/${sourcePage}_layout.vm")
+<script language="javascript" type="text/javascript" src="$staticPath/js/js.js"></script>
+<script type="text/javascript" src="$staticPath/js/common.js"></script>
+<script language="javascript" type="text/javascript" src="$staticPath/js/tab.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="$request.contextPath/assets/js/ajaxfileupload.js"></script>
+<script language="javascript" type="text/javascript" src="$staticPath/js/contract/contract.js"></script>
+<link href="$staticPath/assets/css/manage_style.css">
+<input id="contextPath" type="hidden" value="$request.contextPath">
+<input id="sourcePage" type="hidden" value="$sourcePage">
+<input id="gix" type="hidden" value="$gix">
+<script type="text/javascript">
+    $(document).ready(function () {
+        //加载左侧菜单
+        if ("${sourcePage}" == "buyer") {
+            $("#leftBuyer").load("$request.contextPath/leftBuyer");
+        }
+        if ("${sourcePage}" == "seller") {
+            $("#leftSeller").load("$request.contextPath/leftSeller");
+        }
+        if ($("#paymentTypeID").val() == 0) {
+            $("#choseDay").val($("#days").val());
+        } else {
+            $("#choseMonth").val($("#days").val());
+        }
+        if ($("#approveStatus").val() == 7) {
+            //console.log($("#approveInfo").val());
+            $("#approveList").val($("#approveInfo").val());
+        }
+        $("#remark").val($("#remarkDetail").val());
+        updateContractInfo.nowMats = new Array();
+        #foreach (${contractMat} in ${contractMatPager.records})
+            {
+                var temp = {"id": "${contractMat.id}", "contractNo": "${contractMat.contractNo}"};
+                updateContractInfo.nowMats.push(temp);
+            }
+            //console.log(updateContractInfo.nowMats[0].id);
+        #end
+    });
+
+    // 分页
+    function topage(page) {
+        toCompanyPage(page);
+    }
+</script>
+<!--导航菜单end-->
+<div id="main">
+    #if(${sourcePage}=="buyer")
+        <!-- left start -->
+        <div id="leftBuyer" style="width: 198px; float: left;">&nbsp;</div>
+        <!-- left end -->
+    #end
+    #if($sourcePage=="seller")
+        <!-- left start -->
+        <div id="leftSeller" style="width: 198px; float: left;">&nbsp;</div>
+        <!-- left end -->
+    #end
+    <!--右边部分开始-->
+    <div id="right" class="bg_06 border-4">
+        <li class="mar_lr10 pad_tb20">
+            <form id="contractInfoForm" method="post">
+                <p class="font_16 hei_32 pad_l10 bg_05">协议状态
+                    <span>
+                        <input type="hidden" value="$!contractInfo.status">
+                        &nbsp;&nbsp;$statusMap.get($contractInfo.status)
+                    </span>
+                </p>
+                <ul class="list mar_t10 mar_l10 ">
+                    <li class="wid_460 mar_tb10 ">
+                        <span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>协议序号 : </span>
+                        <input type="text" class="wid_260 input_Style2 hei_30"
+                               name="contractOrderNo" value="$!contractInfo.contractOrderNo" id="contractOrderNo"/>
+                        <input type="hidden" name="contractNo" value="$contractInfo.contractNo">
+                    </li>
+                    <li class="wid_460 mar_tb10">
+                        <span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>协议名称 : </span>
+                        <input type="text" class="wid_260 input_Style2 hei_30" id="contractName" name="contractName"
+                               value="$!contractInfo.contractName"/>
+                    </li>
+                </ul>
+                <div class="clear"></div>
+                <!-- 联系方式 开始 -->
+                <p class="font_16 hei_32 pad_l10 bg_05">联系方式</p>
+                <input id="userType" type="hidden" value="$!register.userType">
+                <!-- 印刷厂信息start -->
+                <div class="wid_460 fl">
+                    <ul class="list mar_t10 mar_l10 ">
+                        <li class="wid_460 mar_tb10 ">
+                            <span class="font_wid mar_r10">
+                        #if("seller"==$sourcePage)
+                            <i class="font_fs mar_l2">*</i>
+                        #end
+                                买方 : </span>
+                            <input type="text" class="wid_260 input_Style2 hei_30" id="contractPrinterId"
+                                #if("seller"==$sourcePage)
+                                   onclick="getCompany(0)"
+                                #end
+                                   value="$!user.companyName" readonly="true"/>
+                            <input name="printerId" type="hidden" value="$!user.uid">
+                        </li>
+                        <li class="wid_460 mar_tb10">
+                            <span class="font_wid mar_r10">
+                            #if("seller"==$sourcePage)
+                                <i class="font_fs mar_l2">*</i>
+                            #end
+                                联系人 : </span>
+                            <input type="text" class="wid_260 input_Style2 hei_30" id="contractSupplierId"
+                                   value="$!user.uname" readonly="true"/>
+                            <input type="hidden" name="createBy" value="$!user.uid">
+                        </li>
+                        <li class="wid_460 mar_tb10 ">
+                        <span class="font_wid mar_r10">
+                            #if("seller"==$sourcePage)
+                                <i class="font_fs mar_l2">*</i>
+                            #end
+                        联系电话 : </span>
+                            <input type="text" class="wid_95 input_Style2 hei_30" id="contractMobilePhone"
+                                   value="$!user.umobile" placeholder="手机号" readonly="true"/>
+                        </li>
+                        <li class="wid_460 mar_tb10 ">
+                            <span class="font_wid mar_r10">传真 : </span>
+                            <input type="text" class="wid_40 input_Style2 hei_30" readonly="true"/>
+                            <i class="mar_lr10">-</i>
+                            <input type="text" class="wid_95 input_Style2 hei_30" readonly="true"/>
+                        </li>
+                        <li class="wid_460 mar_20 mar_tb10">
+                                <span class="font_wid mar_r10">
+                                电子邮箱 : </span>
+                            <input type="text" id="contractEmail" class="wid_260  input_Style2 hei_30"
+                                   value="$!user.userEmail" readonly="true"/>
+                        </li>
+                    </ul>
+                </div>
+                <!-- 印刷厂信息end -->
+                <!-- 供货商信息start -->
+                <div style="float:right;width:480px">
+                    <ul class="list mar_t10 mar_l10 ">
+                        <li class="wid_460 mar_tb10">
+                                <span class="font_wid mar_r10">
+                                #if("buyer"==$sourcePage)
+                                    <i class="font_fs mar_l2">*</i>
+                                #end
+                                    卖方 : </span>
+                            <input type="text" class="wid_260 input_Style2 hei_30" value="$!seller.companyName"
+                                #if("buyer"==$sourcePage)
+                                   onclick="getCompany(0)"
+                                #end
+                                   readonly="true" id="companyName"/>
+                            <input type="hidden" name="supplierId" id="conSupplierId" value="$seller.uid">
+                            <input id="sellerSupplierId" type="hidden" value="$seller.shopId">
+                            <input type="hidden" id="supplierShopId" value="$seller.shopId">
+                            <input type="hidden" name="parentId" id="supplierParentId">
+                        </li>
+                        <li class="wid_460 mar_20 mar_tb10">
+                        <span class="font_wid mar_r10">
+                        #if("buyer"==$sourcePage)
+                            <i class="font_fs mar_l2">*</i>
+                        #end
+                            联系人 : </span>
+                            <input type="text" class="wid_260 input_Style2 hei_30" value="$!seller.uname"
+                                   id="supplierConector"/>
+                        </li>
+                        <li class="wid_460 mar_tb10 ">
+                            <span class="font_wid mar_r10">
+                            #if("buyer"==$sourcePage)
+                                <i class="font_fs mar_l2">*</i>
+                            #end
+                                联系电话 : </span>
+                            <input type="text" class="wid_95 input_Style2 hei_30" value="$!seller.umobile"
+                                   id="mobilePhone" placeholder="手机号"
+                                   readonly="true"/>
+                        </li>
+                        <li class="wid_460 mar_tb10 ">
+                            <span class="font_wid mar_r10">传真 : </span>
+                            <input type="text" class="wid_40 input_Style2 hei_30" readonly="true"/>
+                            <i class="mar_lr10">-</i>
+                            <input type="text" class="wid_95 input_Style2 hei_30" readonly="true"/>
+                        </li>
+                        <li class="wid_460 mar_20 mar_tb10">
+                            <span class="font_wid mar_r10">
+                            电子邮箱 : </span>
+                            <input type="text" class="wid_260  input_Style2 hei_30" id="Email"
+                                   value="$!seller.userEmail" readonly="true"/>
+                        </li>
+                    </ul>
+                </div>
+
+                <!--  供货商信息end -->
+                <!-- 联系方式 end -->
+                <div class="clear"></div>
+                <!-- 协议条件 开始 -->
+                <p class="font_16 hei_32 pad_l10 bg_05 mar_t20">协议条件</p>
+                <ul class="list mar_t10 mar_l10 ">
+                       <!--协议类型 开始-->
+                 <li class="wid_920 mar_20 mar_tb10">
+                        <span class="font_wid mar_r10"><i class="font_fs mar_l2">*</i>协议类型: </span>
+<!--                         <select class="wid_100  input_Style2 hei_30" id="protocolTypeId" name="protocolType" onclick="empty();display();" > -->
+<!--                              <option value="1">单价</option> -->
+<!--                               <option value="2">数量</option> -->
+<!--                               <option value="3">总价值</option> -->
+<!--                         </select> -->
+    						 #if("1"==$contractInfo.protocolType) 
+    							&nbsp;&nbsp;单价
+    						 #end 
+    						 #if("2"==$contractInfo.protocolType) 
+    						   &nbsp;&nbsp; 数量
+    						 #end 
+    						 #if("3"==$contractInfo.protocolType) 
+    						   &nbsp;&nbsp;总价值
+    						 #end 
+					
+                 </li>
+
+	
+                
+                
+                    <!--协议有效期 开始-->
+                    <li class="wid_920 mar_tb10">
+                            <span class="font_wid mar_r10">
+                            <i class="font_fs mar_l2">*</i>
+                            协议有效期 : </span>
+                        <input class="jcDate wid_170 hei_30 input_Style2" name="beginDate" id="beginDate"
+                               value="$!date.format('yyyy-MM-dd',$!contractInfo.beginDate)"
+                               onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+                        <i class=" mar_lr10">至</i>
+                        <input class="jcDate wid_170 hei_30 input_Style2" name="endDate" id="endDate"
+                               value="$!date.format('yyyy-MM-dd',$!contractInfo.endDate)"
+                               onclick="WdatePicker({minDate:'%y-%M-%d',isShowClear:false});"/>
+                    </li>
+                    <!--协议有效期 end-->
+                    <li class="wid_920 mar_tb10">
+                        <span class="font_wid mar_r10">
+                        <i class="font_fs mar_l2">*</i>
+                        协议账期 : </span>
+                        <input type="hidden" value="$paymentTermDTO.paymentType" id="paymentTypeID">
+                        <input type="hidden" value="$paymentTermDTO.paymentDays" id="days">
+                        #if($paymentTermDTO.paymentType==0)
+                            <input type="radio" value="0" name="paymentType"
+                                   onclick="radioChange()" checked="true"/>
+                            <select id="choseDay" class="wid_100 input_Style2 hei_30"
+                                    name="paymentDays" text="$!paymentTermDTO.paymentDays">
+                                <option value="">请选择</option>
+                                <option value="7">7</option>
+                                <option value="30">30</option>
+                                <option value="60">60</option>
+                                <option value="90">90</option>
+                                <option value="120">120</option>
+                                <option value="180">180</option>
+                            </select>
+                            <i class="mar_lr10">天</i>
+                            <input type="radio" onclick="radioChange()" value="1"
+                                   name="paymentType"/>
+                            <select name="paymentMonth" id="choseMonth" disabled="true" style="padding-left:0%"
+                                    class="wid_100 input_Style2 hei_30">
+                                <option value="">请选择</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                            </select>
+                            <i class="mar_lr10">自然月</i>
+                        #else
+                            <input type="radio" name="paymentType" id="dayRadio" value="0"
+                                   onclick="radioChange()"/>
+                            <select id="choseDay" disabled="true" class="wid_100 input_Style2 hei_30"
+                                    name="paymentDays">
+                                <option value="">请选择</option>
+                                <option value="7">7</option>
+                                <option value="30">30</option>
+                                <option value="60">60</option>
+                                <option value="90">90</option>
+                                <option value="120">120</option>
+                                <option value="180">180</option>
+                            </select>
+                            <i class="mar_lr10">天</i>
+                            <input type="radio" value="1" onclick="radioChange()"
+                                   name="paymentType" id="monthRadio" checked="true"/>
+                            <select name="paymentMonth" id="choseMonth" style="padding-left:0%"
+                                    class="wid_100 input_Style2 hei_30">
+                                <option value="">请选择</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                            </select>
+                             <i class="mar_lr10">自然月</i>
+                        #end
+                        #if($contractInfo.status==0||$contractInfo.status==2||$contractInfo.status==7||$contractInfo.status==6)
+                            <i class="mar_lr10">需要审批</i><!--创建完毕:0;协议需要审批:1;审批完毕:2;确认完毕:4;-->
+
+                            <input type="checkbox" id="needApprove" value="1" onchange="showApproveList(this)"
+                                #if($contractInfo.status==7)
+                                   checked="true"
+                                #end />
+
+                            <div id="approveBy"
+                                 style="display:#if($contractInfo.status==7||$contractInfo.status==2)block; #else none;#end ">
+                                <span class="font_wid mar_r10">选择审批人:</span>
+                                <input type="hidden" value="$contractInfo.status" id="approveStatus">
+                                <input type="hidden" value="$contractInfo.approveBy" id="approveInfo">
+                                <select id="approveList" class="wid_150 input_Style2 hei_30" name="approveBy">
+                                    #foreach($approve in $approveList)
+                                        <option value="$approve.userId">$!approve.username</option>
+                                    #end
+                                </select>
+                            </div>
+                        #end
+                    </li>
+                    <input type="hidden" id="annex" name="annex" value="$contractInfo.annex"/>
+                    <li id="uploadLi" class="wid_920 mar_20 mar_tb10">
+                        <span class="font_wid mar_r10">附件 : </span>
+
+                        #if(""==$contractInfo.annex)
+                            <input type="file" class="wid_260  input_Style2 hei_30" id="fileInput" name="file"
+                                   onchange="startUpload();"/>
+                        #else
+                            <span class="wid_30 over_ell"><a href="$gix$contractInfo.annex" target="view_window">$!fileName</a></span>
+                            <a style="line-height:30px;margin-left:5%" href="javascript:cancleimg()">删除</a>
+                        #end
+                    </li>
+                    <li class="wid_920 mar_20 mar_tb10">
+                    <span class="font_wid mar_r10">
+                    <i class="font_fs mar_l2">*</i>
+                    备注 : </span>
+                        <input type="hidden" id="remarkDetail" value="$!contractInfo.remark">
+                        <textarea cols="" rows="" name="remark" id="remark"
+                                  class="wid_500 input_Style2 hei_100"></textarea>
+                    </li>
+                </ul>
+                  <input id="protocolTypeId" type="hidden" value="$!contractInfo.protocolType" name="protocolType"/>
+                
+            </form>
+            <!-- 协议条件 end -->
+            <div class="clear"></div>
+            <!-- 协议物品 开始 -->
+            <p class="font_16 hei_32 pad_l10 bg_05 mar_t20">协议物品</p>
+
+            <div class="right_xinxi mar_t20 mar_cen">
+                <p class="hei_40">
+                    <span class="fr"><button type="button" class="button_2 hei_24 " onclick="showItemSearchDIV()">+增加
+                    </button></span>
+                </p>
+                <!-- 协议物品 开头 -->
+                 #if("1"==$contractInfo.protocolType)  
+                <ul class="list_top bg_08 font_cen font_14b">
+                    <li class="wid_150">产品编号</li>
+                    <li class="wid_150">所属类目</li>
+                    <li class="wid_230">物品名称</li>
+                    <li class="wid_110">销售属性</li>
+                    <li class="wid_200">单价</li>
+                    <li class="wid_80">操作</li>
+                </ul>
+                #end 
+                 #if("2"==$contractInfo.protocolType)  
+                <ul class="list_top bg_08 font_cen font_14b">
+                    <li class="wid_120">产品编号</li>
+                    <li class="wid_160">所属类目</li>
+                    <li class="wid_160">物品名称</li>
+                    <li class="wid_150">销售属性</li>
+                    <li class="wid_140">单价</li>
+                    <li class="wid_140">总数量</li>
+                    <li class="wid_80">操作</li>
+                </ul>
+                #end 
+                 #if("3"==$contractInfo.protocolType)  
+                <ul class="list_top bg_08 font_cen font_14b">
+                    <li class="wid_120">产品编号</li>
+                    <li class="wid_160">所属类目</li>
+                    <li class="wid_150">物品名称</li>
+                    <li class="wid_150">销售属性</li>
+                    <li class="wid_140">单价</li>
+                    <li class="wid_140">总价值</li>
+                    <li class="wid_80">操作</li>
+                </ul>
+                #end 
+                <div id="itemList">
+                    #foreach($contractMat in $contractMatPager.records)
+                         #if("1"==$!contractMat.contractType)  
+                        <ul class="list_top hei_40" id="ul">
+                            <li class="wid_150 font_cen over_ell" title="$!contractMat.get('matCd')">
+                                <input id="matCd$velocityCount" type="hidden" value="$!contractMat.get('matCd')" name="matCd"/>
+                                <input id="id$velocityCount" type="hidden" value="$!contractMat.get('id')" name="id"/>
+                                $!contractMat.get('matCd')&nbsp;</li>
+                            <li class="wid_150 font_cen over_ell" title="$!contractMat.get('cName')">$!contractMat.get('cName')&nbsp;</li>
+                            <li class="wid_230 font_cen over_ell" title="$!contractMat.get('itemName')">$!contractMat.get('itemName')&nbsp;</li>
+                            <li class="wid_110 font_cen over_ell" title="$!contractMat.get('salerAttr')">$!contractMat.get('salerAttr')&nbsp;</li>
+                            <li class="wid_200 font_cen over_ell">
+                                <input id="matPrice$velocityCount" type="text" onkeyup="priceTrim(this)" maxlength="8"
+                                       class="wid_50 input_Style2 hei_24" value="$!contractMat.get('matPrice')"
+                                       name="matPrice"/>
+                                <i class="mar_lr10">元</i></li>
+                            <li class="wid_80 font_cen font_7a" onclick="removeItem(this)">删除</li>
+                        </ul>
+                       #end 
+                     #if("2"==$!contractMat.contractType)  
+                        <ul class="list_top hei_40" id="ul">
+                            <li class="wid_120 font_cen over_ell" title="$!contractMat.get('matCd')">
+                                <input id="matCd$velocityCount" type="hidden" value="$!contractMat.get('matCd')" name="matCd"/>
+                                <input id="id$velocityCount" type="hidden" value="$!contractMat.get('id')" name="id"/>
+                                $!contractMat.get('matCd')&nbsp;</li>
+                            <li class="wid_160 font_cen over_ell" title="$!contractMat.get('cName')">$!contractMat.get('cName')&nbsp;</li>
+                            <li class="wid_150 font_cen over_ell" title="$!contractMat.get('itemName')">$!contractMat.get('itemName')&nbsp;</li>
+                            <li class="wid_150 font_cen over_ell" title="$!contractMat.get('salerAttr')">$!contractMat.get('salerAttr')&nbsp;</li>
+                            <li class="wid_140 font_cen over_ell">
+                                <input id="matPrice$velocityCount" type="text" onkeyup="priceTrim(this)" maxlength="8"
+                                       class="wid_50 input_Style2 hei_24" value="$!contractMat.get('matPrice')"
+                                       name="matPrice"/>
+                                <i class="mar_lr10">元</i></li>
+                                 <li class="wid_140 font_cen over_ell">
+                                <input id="number$velocityCount" type="text" onkeyup="onkeyup_product(this)" maxlength="8"
+                                       class="wid_50 input_Style2 hei_24" value="$!contractMat.get('number')"
+                                       name="number"/>
+                                <i class="mar_lr10">个</i></li>
+                            <li class="wid_80 font_cen font_7a" onclick="removeItem(this)">删除</li>
+                        </ul>
+                       #end 
+                       #if("3"==$!contractMat.contractType)  
+                        <ul class="list_top hei_40" id="ul">
+                            <li class="wid_120 font_cen over_ell" title="$!contractMat.get('matCd')">
+                                <input id="matCd$velocityCount" type="hidden" value="$!contractMat.get('matCd')" name="matCd"/>
+                                <input id="id$velocityCount" type="hidden" value="$!contractMat.get('id')" name="id"/>
+                                $!contractMat.get('matCd')&nbsp;</li>
+                            <li class="wid_160 font_cen over_ell" title="$!contractMat.get('cName')">$!contractMat.get('cName')&nbsp;</li>
+                            <li class="wid_150 font_cen over_ell" title="$!contractMat.get('itemName')">$!contractMat.get('itemName')&nbsp;</li>
+                            <li class="wid_150 font_cen over_ell" title="$!contractMat.get('salerAttr')">$!contractMat.get('salerAttr')&nbsp;</li>
+                            <li class="wid_140 font_cen over_ell">
+                                <input id="matPrice$velocityCount" type="text" onkeyup="priceTrim(this)" maxlength="8"
+                                       class="wid_50 input_Style2 hei_24" value="$!contractMat.get('matPrice')"
+                                       name="matPrice"/>
+                                <i class="mar_lr10">元</i></li>
+                                   <li class="wid_140 font_cen over_ell">
+                                <input id="cost$velocityCount" type="text" onkeyup="priceTrim(this)" maxlength="8"
+                                       class="wid_50 input_Style2 hei_24" value="$!contractMat.get('cost')"
+                                       name="cost"/>
+                                <i class="mar_lr10">元</i></li>
+                           
+                                
+                                
+                            <li class="wid_80 font_cen font_7a" onclick="removeItem(this)">删除</li>
+                        </ul>
+                       #end 
+                    #end
+                </div>
+            </div>
+            <!--right_xinxi end-->
+            <div class="clear"></div>
+            <div class="wid_260 mar_cen">
+                <button type="button" class="button_2 hei_35" onclick="updateContractInfo()">保 存</button>
+                <button type="button" class="button_3 hei_35 mar_l14" onclick="goBack()">取 消</button>
+            </div>
+            <!-- 类型选择 -->
+    </div>
+    <!--mar_lr10 end -->
+</div>
+<!--id="right" end-->
+<!--右边部分结束-->
+</div>
+<!--#main end -->
+<style>
+    .city_shi ol li {
+        float: left;
+        width: 60px;
+        height: 30px;
+        line-height: 30px;
+        text-align: center;
+    }
+
+    .city_shi ol li:hover {
+        background: #f00;
+    }
+</style>
+<script type="text/javascript">
+    $("#quanguo").click(function () {
+        $(".all_chain").show();
+    })
+    $(".xx").click(function () {
+        $(".all_chain").hide();
+    })
+</script>
+
+<!--消息弹窗开始-->
+<div id="resultMess" style="display:none;position:absolute;z-index:20001;border:solid;background:#dedede">
+    <div id="mess_head" style="width:400px; height:200px; border:1px solid red ; z-index: 20001; position: absolute;">
+        <div style="float:center;width:400px;height:30px">
+            <input type="button" value="关闭" onclick="closeMess();" style="float:right"/>
+        </div>
+        <div id="messDetail" style="background:black;width:400px;height:170px">
+        </div>
+    </div>
+</div>
+<!--消息弹窗结束-->
+<!-- 联系人 -->
+<div id="Idiv" class="po_fai" style=" display:none">
+    <div class="po_main_Mess pad_t10" style="width:560px">
+        <div class="hei_32 bg_05 pad_l10 font_14b"><i class="demo-icons fa-times-circle font_16 fr mar_r10 no"
+                                                      onclick="closeDiv(this)"></i>公司名称
+            <input name="company" placeholder="请输入要查询的公司名称" class="wid_11 input_3">
+            <button class="button_1 hei_24" onclick="searchCompany()">查询</button>
+        </div>
+        <!--标题 end -->
+        <input type="hidden" id="IdivOperate">
+
+        <div id="partBDetail">
+        </div>
+        <!--内容div end -->
+    </div>
+    <!--po_main_Mess end-->
+</div>
+<!-- 背景蒙板 -->
+<div class="po_fai" id="loadMask" style="display: none">
+    <div class="po_fai_bg"></div>
+</div>
+
+<!--联系人列表-->
+<div id="Odiv" style="display: none; position: absolute; z-index: 20000; border:solid;background:#dedede">
+    <div id="conector_head"
+         style="width:800px; height:500px; border:1px solid red ; z-index: 20001; position: absolute;">
+        <div style="float:center;width:800px;height:30px">
+            <input type="button" value="关闭" onclick="closeOdiv();" style="float:right"/>
+        </div>
+        <div class="clear"></div>
+        <form id="conectorPage" method="post">
+            <input name="page" type="hidden">
+        </form>
+        <div id="conectorDetail" style="background:white;width:800px;height:470px">
+
+        </div>
+    </div>
+</div>
+
+
+<!-- 查询物品信息 -->
+<div id="itemSearchDIV" class="po_fai" style="display:none;">
+    <!--弹出蒙版背景-->
+    <div class="po_main_Mess pad_t10" style="width:560px;overflow-y: auto;height:60%;">
+        <div class="hei_32 bg_05 pad_l10 font_14b"><i class="demo-icons fa-times-circle font_16 fr mar_r10 no"
+                                                      onclick="closeDiv(this)"></i>卖方物品列表
+        </div>
+        <!--标题 end -->
+        <div id="itemSearchResult">
+        </div>
+        <!--内容div end -->
+
+        <div class="clear"></div>
+        <div class="wid_260 mar_cen" style="position: absolute;bottom: 0;left:0;right:0;">
+            <button class="button_2 hei_35 mar_r10" onclick="createItemLi()">
+                确定
+            </button>
+            <button class="button_3  hei_35" onclick="closeDiv(this)">
+                取消
+            </button>
+        </div>
+        <!-- 确认 取消 结束 -->
+    </div>
+    <!--po_main_Mess end-->
+</div>

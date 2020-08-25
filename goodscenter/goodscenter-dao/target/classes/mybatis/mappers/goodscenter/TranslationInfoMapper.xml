@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.goodscenter.dao.TranslationInfoDAO">
+	<resultMap id="translationInfoMapper" type="com.camelot.goodscenter.dto.TranslationInfoDTO">
+			<result property="id" column="id" />
+			<result property="translationNo" column="translation_no" />
+			<result property="translationName" column="translation_name" />
+			<result property="printerId" column="printer_id" />
+			<result property="supplierId" column="supplier_id" />
+			<result property="beginDate" column="begin_date" />
+			<result property="endDate" column="end_date" />
+			<result property="matCd" column="mat_cd"/>
+			<result property="matAttribute" column="mat_attribute"/>
+		    <result property="quantity" column="quantity"/>
+			<result property="status" column="status" />
+			<result property="deliveryDate" column="delivery_date" />
+			<result property="annex" column="annex" />
+			<result property="remarks" column="remarks" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="activeFlag" column="active_flag" />
+			<result property="itemName" column="item_name" />
+			<result property="categoryId" column="category_id" />
+			<result property="refuseReason" column="refusal_reason" />
+			<result property="platformId" column="platform_id" />
+	</resultMap>
+	
+	<sql id="where">
+		<where>
+			<if test="translationInfo.id != null and translationInfo.id != '' ">
+				and  translationInfo.id = #{translationInfo.id}
+			</if>
+			<if test="translationInfo.translationNo != null and translationInfo.translationNo != '' ">
+				and  translationInfo.translation_no LIKE CONCAT('%',#{translationInfo.translationNo},'%')
+			</if>
+	        <if test="translationInfo.translationName != null and translationInfo.translationName != '' ">
+			      
+<!-- 			     <![CDATA[ and translationInfo.translation_name like CONCAT('%',TRIM(#{translationInfo.translationName}),'%')]]> -->
+		            and translationInfo.translation_name LIKE '%${translationInfo.translationName}%'
+
+            </if>
+		    <if test="translationInfo.itemName != null and translationInfo.itemName != '' ">
+<!--                  <![CDATA[ and translationInfo.item_name like CONCAT('%',TRIM(#{translationInfo.itemName}),'%')]]> -->
+                    and translationInfo.item_name LIKE '%${translationInfo.itemName}%'
+		    </if>
+			<if test="translationInfo.printerId != null and translationInfo.printerId != '' ">
+				and  translationInfo.printer_id = #{translationInfo.printerId}
+			</if>
+			<if test="translationInfo.supplierId != null and translationInfo.supplierId != '' ">
+				and  translationInfo.supplier_id = #{translationInfo.supplierId}
+			</if>
+			<if test="translationInfo.beginDate != null and translationInfo.beginDate != '' ">
+				and  translationInfo.begin_date = #{translationInfo.beginDate}
+			</if>
+			<if test="translationInfo.createdstr != null and translationInfo.createdstr != '' ">
+			<![CDATA[ and  translationInfo.begin_date >= #{translationInfo.createdstr}]]>
+			</if>
+			<if test="translationInfo.createdend != null and translationInfo.createdend != '' ">
+			<![CDATA[ and  translationInfo.begin_date <= #{translationInfo.createdend}]]>
+			</if>
+			<if test="translationInfo.endDate != null and translationInfo.endDate != '' ">
+				and  translationInfo.end_date = #{translationInfo.endDate}
+			</if>
+			<if test="translationInfo.matCd != null and translationInfo.matCd != '' ">
+				and  translationInfo.mat_cd = #{translationInfo.matCd}
+			</if>
+			<if test="translationInfo.matAttribute != null and translationInfo.matAttribute != '' ">
+				and  translationInfo.mat_attribute = #{translationInfo.matAttribute}
+			</if>
+			<if test="translationInfo.status != null and translationInfo.status != '' ">
+				and  translationInfo.status = #{translationInfo.status}
+			</if>
+			<if test="translationInfo.deliveryDate != null and translationInfo.deliveryDate != '' ">
+				and  translationInfo.delivery_date = #{translationInfo.deliveryDate}
+			</if>
+			<if test="translationInfo.annex != null and translationInfo.annex != '' ">
+				and  translationInfo.annex = #{translationInfo.annex}
+			</if>
+			<if test="translationInfo.remarks != null and translationInfo.remarks != '' ">
+				and  translationInfo.remarks = #{translationInfo.remarks}
+			</if>
+			<if test="translationInfo.createBy != null and translationInfo.createBy != '' ">
+				and  translationInfo.create_by = #{translationInfo.createBy}
+			</if>
+			<if test="translationInfo.createDate != null and translationInfo.createDate != '' ">
+				and  translationInfo.create_date = #{translationInfo.createDate}
+			</if>
+			<if test="translationInfo.updateBy != null and translationInfo.updateBy != '' ">
+				and  translationInfo.update_by = #{translationInfo.updateBy}
+			</if>
+			<if test="translationInfo.updateDate != null and translationInfo.updateDate != '' ">
+				and  translationInfo.update_date = #{translationInfo.updateDate}
+			</if>
+			<if test="translationInfo.activeFlag != null and translationInfo.activeFlag != '' ">
+				and  translationInfo.active_flag = #{translationInfo.activeFlag}
+			</if>
+			<if test="translationInfo.platformId != null">
+				and  translationInfo.platform_id = #{translationInfo.platformId}
+			</if>
+	
+			<if test="translationInfo.quantity != null and translationInfo.quantity != '' ">
+				and  item.quantity=#{translationInfo.quantity}
+			</if>
+			<if test=" translationInfo.statusList != null and translationInfo.statusList.size() > 0 ">
+				AND translationInfo.status in
+				<foreach collection="translationInfo.statusList" open="(" separator="," close=")" item="status">
+					#{status}
+				</foreach>
+			</if>
+			<if test=" translationInfo.createBys != null and translationInfo.createBys.size() > 0 ">
+				AND translationInfo.create_by in
+				<foreach collection="translationInfo.createBys" open="(" separator="," close=")" item="createBy">
+					#{createBy}
+				</foreach>
+			</if>
+			<if test=" translationInfo.supplierIdList != null and translationInfo.supplierIdList.size() > 0 ">
+				AND translationInfo.translation_no in ( select translation_no from translation_mat where shop_id in 
+				<foreach collection="translationInfo.supplierIdList" open="(" separator="," close=")" item="supplierId">
+					#{supplierId}
+				</foreach>
+				)
+			</if>
+		</where>
+	</sql>
+	
+	<select id="queryPage" resultMap="translationInfoMapper">
+		SELECT
+		translation_no,
+		translation_name,
+		printer_id,
+		supplier_id,
+		begin_date,
+		end_date,
+		translationInfo.status STATUS,
+		delivery_date,
+		annex,
+		remarks,
+		create_by,
+		MAX(create_date) create_date,
+		refusal_reason
+		FROM
+		translation_info translationInfo
+		<include refid="where"/>
+		group by translation_no,
+		translation_name,
+		printer_id,
+		supplier_id,
+		begin_date,
+		end_date,
+		STATUS,
+		delivery_date,
+		annex,
+		remarks,
+		create_by,
+		refusal_reason
+		ORDER BY MAX(create_date) DESC
+		limit #{pager.pageOffset},#{pager.rows}
+	</select>
+	
+	<select id="queryPageCount" resultType="long">
+		SELECT COUNT(*) FROM (SELECT
+		translation_no,
+		translation_name,
+		printer_id,
+		supplier_id,
+		begin_date,
+		end_date,
+		translationInfo.status STATUS,
+		delivery_date,
+		annex,
+		remarks,
+		create_by,
+		MAX(create_date),
+		refusal_reason
+		FROM
+		translation_info translationInfo
+		<include refid="where"/>
+		group by translation_no,
+		translation_name,
+		printer_id,
+		supplier_id,
+		begin_date,
+		end_date,
+		STATUS,
+		delivery_date,
+		annex,
+		remarks,
+		refusal_reason,
+		create_by) a
+
+	</select>
+	
+	<select id="findById" resultMap="translationInfoMapper" >
+		select * from translation_info translationInfo
+		where id = #{id}
+	</select>
+
+	<select id="findByTranslationInfoDTO" resultMap="translationInfoMapper">
+		select * from translation_info translationInfo
+		LEFT JOIN item_category itemCategory
+		ON translationInfo.category_id = itemCategory.cid
+		<include refid="where"/>
+		limit 0,1
+	</select>
+
+
+	<select id="queryTranslationInfoPagerCount" resultType="long">
+		SELECT count(*)
+		FROM   translation_info translationInfo
+		LEFT JOIN item_category itemCategory
+		ON translationInfo.category_id = itemCategory.cid
+		WHERE  1=1
+		<if test="translationInfo.translationNo != null and translationInfo.translationNo != '' ">
+			<![CDATA[ and translationInfo.translation_no like CONCAT('%',TRIM(#{translationInfo.translationNo}),'%')]]>
+		</if>
+		<if test="translationInfo.printerId != null and translationInfo.printerId != '' ">
+			and  translationInfo.printer_id = #{translationInfo.printerId}
+		</if>
+		<if test="translationInfo.supplierId != null and translationInfo.supplierId != '' ">
+			and  translationInfo.supplier_id = #{translationInfo.supplierId}
+		</if>
+		<if test="translationInfo.matAttribute != null and translationInfo.matAttribute != '' ">
+			<![CDATA[ and translationInfo.mat_attribute like CONCAT('%',TRIM(#{translationInfo.matAttribute}),'%')]]>
+		</if>
+		<if test=" translationInfo.supplierIdList != null and translationInfo.supplierIdList.size() > 0 ">
+			AND translationInfo.supplier_id in
+			<foreach collection="translationInfo.supplierIdList" open="(" separator="," close=")" item="supplierId">
+				#{supplierId}
+			</foreach>
+		</if>
+		<if test=" translationInfo.statusList != null and translationInfo.statusList.size() > 0 ">
+			AND translationInfo.status in
+			<foreach collection="translationInfo.statusList" open="(" separator="," close=")" item="status">
+				#{status}
+			</foreach>
+		</if>
+		<if test="translationInfo.activeFlag != null and translationInfo.activeFlag != '' ">
+			and  translationInfo.active_flag = #{translationInfo.activeFlag}
+		</if>
+		<if test="translationInfo.translationName != null and translationInfo.translationName != '' ">
+<!-- 			<![CDATA[ and translationInfo.translation_name like CONCAT('%',TRIM(#{translationInfo.translationName}),'%')]]> -->
+		        and translationInfo.translation_name LIKE '%${translationInfo.translationName}%'
+		
+		</if>
+		<if test="translationInfo.itemName != null and translationInfo.itemName != '' ">
+              and translationInfo.item_name LIKE '%${translationInfo.itemName}%'
+<!--                <![CDATA[ and translationInfo.item_name like CONCAT('%',TRIM(#{translationInfo.itemName}),'%')]]> -->
+		</if>
+	</select>
+
+	<select id="queryTranslationInfoPager" resultType="map">
+		SELECT
+		*
+		FROM
+		translation_info translationInfo
+		LEFT JOIN item_category itemCategory
+		ON translationInfo.category_id = itemCategory.cid
+		WHERE 1=1
+		<if test="translationInfo.translationNo != null and translationInfo.translationNo != '' ">
+			<![CDATA[ and translationInfo.translation_no like CONCAT('%',TRIM(#{translationInfo.translationNo}),'%')]]>
+		</if>
+		<if test="translationInfo.printerId != null and translationInfo.printerId != '' ">
+			and  translationInfo.printer_id = #{translationInfo.printerId}
+		</if>
+		<if test="translationInfo.matAttribute != null and translationInfo.matAttribute != '' ">
+			<![CDATA[ and translationInfo.mat_attribute like CONCAT('%',TRIM(#{translationInfo.matAttribute}),'%')]]>
+		</if>
+	
+	
+		<if test=" translationInfo.supplierIdList != null and translationInfo.supplierIdList.size() > 0 ">
+			AND translationInfo.supplier_id in
+			<foreach collection="translationInfo.supplierIdList" open="(" separator="," close=")" item="supplierId">
+				#{supplierId}
+			</foreach>
+		</if>
+		<if test=" translationInfo.statusList != null and translationInfo.statusList.size() > 0 ">
+			AND translationInfo.status in
+			<foreach collection="translationInfo.statusList" open="(" separator="," close=")" item="status">
+				#{status}
+			</foreach>
+		</if>
+		<if test="translationInfo.translationName != null and translationInfo.translationName != '' ">
+			 and translationInfo.translation_name LIKE '%${translationInfo.translationName}%'
+<!-- 			<![CDATA[ and translationInfo.translation_name like CONCAT('%',TRIM(#{translationInfo.translation_name}),'%')]]> -->
+		</if>
+		<if test="translationInfo.itemName != null and translationInfo.itemName != '' ">
+		 and translationInfo.item_name LIKE '%${translationInfo.itemName}%'
+<!--                <![CDATA[ and translationInfo.item_name like CONCAT('%',TRIM(#{translationInfo.item_name}),'%')]]> -->
+		</if>
+		<if test="translationInfo.activeFlag != null and translationInfo.activeFlag != '' ">
+			and  translationInfo.active_flag = #{translationInfo.activeFlag}
+		</if>
+		limit #{pager.pageOffset},#{pager.rows}
+	</select>
+
+	<update id="updateByTranslationNo">
+		update translation_info set
+				supplier_id = #{supplierId},
+				update_by = #{updateBy},
+				update_date = #{updateDate}
+		where translation_no = #{translationNo}
+	</update>
+	<insert id="insert" parameterType="com.camelot.goodscenter.dto.TranslationInfoDTO" useGeneratedKeys="true" keyProperty="id">
+		insert into translation_info(
+				translation_no,
+				translation_name,
+				item_name,
+				printer_id,
+				supplier_id,
+				begin_date,
+				end_date,
+				mat_cd,
+				mat_attribute,
+				quantity,
+				status,
+				delivery_date,
+				annex,
+				remarks,
+				create_by,
+				create_date,
+				update_by,
+				update_date,
+				active_flag,
+				category_id,
+				platform_id
+		)values(
+				#{translationNo},
+				#{translationName},
+				#{itemName},
+				#{printerId},
+				#{supplierId},
+				#{beginDate},
+				#{endDate},
+				#{matCd},
+				#{matAttribute},
+				#{quantity},
+				#{status},
+				#{deliveryDate},
+				#{annex},
+				#{remarks},
+				#{createBy},
+				SYSDATE() ,
+				#{updateBy},
+				#{updateDate},
+				#{activeFlag},
+				#{categoryId},
+				#{platformId}
+		)
+	</insert>
+	
+	<update id="update">
+		update translation_info set
+				id = #{id},
+				category_id = #{categoryId},
+				translation_no = #{translationNo},
+				translation_name = #{translationName},
+				item_name = #{itemName},
+				printer_id = #{printerId},
+				supplier_id = #{supplierId},
+				begin_date = #{beginDate},
+				end_date = #{endDate},
+				mat_cd=#{matCd},
+				mat_attribute=#{matAttribute},
+				quantity=#{quantity},
+				status = #{status},
+				delivery_date = #{deliveryDate},
+				annex = #{annex},
+				remarks=#{remarks},
+				create_by = #{createBy},
+				create_date = #{createDate},
+				update_by = #{updateBy},
+				update_date = #{updateDate},
+				active_flag = #{activeFlag},
+				refusal_reason=#{refuseReason}
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from translation_info
+		<if test=" codes != null and codes.size() > 0 ">
+			where id in
+			<foreach collection="codes" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test=" codes == null or codes.size() == 0 ">
+			where 1 = 3
+		</if>
+	</delete>
+	
+	<select id="findAll" resultMap="translationInfoMapper">
+		select * from translation_info translationInfo
+		LEFT JOIN item_category itemCategory
+		ON translationInfo.category_id = itemCategory.cid
+		WHERE 1=1
+		<if test="translationInfo.id != null and translationInfo.id != '' ">
+			and  translationInfo.id = #{translationInfo.id}
+		</if>
+		<if test="translationInfo.translationNo != null and translationInfo.translationNo != '' ">
+			and  translationInfo.translation_no = #{translationInfo.translationNo}
+		</if>
+		<if test="translationInfo.matCd != null and translationInfo.matCd != '' ">
+			and  translationInfo.mat_cd = #{translationInfo.matCd}
+		</if>
+	</select>
+</mapper>

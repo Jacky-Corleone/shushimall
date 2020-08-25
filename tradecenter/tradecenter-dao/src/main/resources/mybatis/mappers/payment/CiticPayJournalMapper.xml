@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.payment.dao.CiticPayJournalDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="citicPayJournalMap" type="citicPayJournal">
+		<result property="id" column="id"/>
+		<result property="outTradeNo" column="out_trade_no"/>
+		<result property="orderParentTradeNo" column="order_parent_trade_no"/>
+		<result property="payAccNo" column="pay_acc_no"/>
+		<result property="tranType" column="tran_type"/>
+		<result property="recvAccNo" column="recv_acc_no"/>
+		<result property="recvAccNm" column="recv_acc_nm"/>
+		<result property="tranAmt" column="tran_amt"/>
+		<result property="memo" column="memo"/>
+		<result property="status" column="status"/>
+		<result property="statusText" column="status_text"/>
+		<result property="payType" column="pay_type"/>
+		<result property="enableFlag" column="ENABLE_FLAG"/>
+		<result property="dealFlag" column="deal_flag"/>
+		<result property="dealText" column="deal_text"/>
+		<result property="created" column="created"/>
+		<result property="modified" column="modified"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,out_trade_no
+ 			,order_parent_trade_no
+ 			,pay_acc_no
+ 			,tran_type
+ 			,recv_acc_no
+ 			,recv_acc_nm
+ 			,tran_amt
+ 			,memo
+ 			,status
+ 			,status_text
+ 			,pay_type
+ 			,ENABLE_FLAG
+ 			,deal_flag
+ 			,deal_text
+ 			,created
+ 			,modified
+		FROM 
+		citic_pay_journal citic_pay_journal_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where citic_pay_journal_.ENABLE_FLAG =1
+		<if test="entity!=null">
+			<if test="entity.outTradeNo != null  and entity.outTradeNo !=''">
+				<![CDATA[ and citic_pay_journal_.out_trade_no  = #{entity.outTradeNo} ]]>
+			</if>
+			<if test="entity.orderParentTradeNo != null  and entity.orderParentTradeNo !=''">
+				<![CDATA[ and citic_pay_journal_.order_parent_trade_no  = #{entity.orderParentTradeNo} ]]>
+			</if>
+			<if test="entity.payAccNo != null  and entity.payAccNo !=''">
+				<![CDATA[ and citic_pay_journal_.pay_acc_no  = #{entity.payAccNo} ]]>
+			</if>
+			<if test="entity.tranType != null  and entity.tranType !=''">
+				<![CDATA[ and citic_pay_journal_.tran_type  = #{entity.tranType} ]]>
+			</if>
+			<if test="entity.recvAccNo != null  and entity.recvAccNo !=''">
+				<![CDATA[ and citic_pay_journal_.recv_acc_no  = #{entity.recvAccNo} ]]>
+			</if>
+			<if test="entity.status != null  and entity.status !=''">
+				<![CDATA[ and citic_pay_journal_.status = #{entity.status} ]]>
+			</if>
+			<if test="entity.payType != null  and entity.payType !=''">
+				<![CDATA[ and citic_pay_journal_.pay_type = #{entity.payType} ]]>
+			</if>
+			<if test="entity.dealFlag != null">
+				<![CDATA[ and citic_pay_journal_.deal_flag = #{entity.dealFlag} ]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+	
+	<select id="queryList" resultMap="citicPayJournalMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+	</select>
+	
+	<select id="selectByTradeNo" resultMap="citicPayJournalMap" >
+		<include refid="selectAllColumns"/>
+		where citic_pay_journal_.ENABLE_FLAG =1 
+		 and (citic_pay_journal_.out_trade_no  = #{tradeNo} or citic_pay_journal_.order_parent_trade_no  = #{tradeNo})
+		 and citic_pay_journal_.status = 2  FOR UPDATE
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="citicPayJournal" useGeneratedKeys="true" keyProperty="id">
+		insert into citic_pay_journal (
+		    	out_trade_no
+		    	 ,order_parent_trade_no
+		    	 ,pay_acc_no
+		    	 ,recv_acc_no
+		    	 ,recv_acc_nm
+		    	 ,tran_amt
+		    	 ,memo
+		    	 ,status
+		    	 ,status_text
+		    	 ,pay_type
+		    	 <if test="dealFlag != null">
+		    	 ,deal_flag
+		    	 ,deal_text
+		    	 </if>
+		    	 ,created
+		   )values(
+		    	#{outTradeNo}
+		    	,#{orderParentTradeNo}
+		    	,#{payAccNo}
+		    	,#{recvAccNo}
+		    	,#{recvAccNm}
+		    	,#{tranAmt}
+		    	,#{memo}
+		    	,#{status}
+		    	,#{statusText}
+		    	,#{payType}
+		    	<if test="dealFlag != null">
+		    	,#{dealFlag}
+		    	,#{dealText}
+		    	 </if>
+		    	,now()
+		   )
+	    
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="citicPayJournal">
+		update citic_pay_journal set modified =  now()
+   			<if test="memo != null  and memo !=''">
+   				,memo = #{memo}
+   			</if>
+   			<if test="status != null">
+   			,status = #{status}
+   			</if>
+   			<if test="enableFlag != null ">
+   			,ENABLE_FLAG = #{enableFlag}
+   			</if>
+   			<if test="dealFlag != null ">
+   			,deal_flag = #{dealFlag}
+   			</if>
+   			<if test="dealText != null  and dealText !=''">
+   			,deal_text = #{dealText}
+   			</if>
+		 where id = #{id}
+	</update>
+	
+		<update id="updateByOutTradeNo" parameterType="citicPayJournal">
+		update citic_pay_journal set modified =  now()
+   			<if test="enableFlag != null ">
+   			,ENABLE_FLAG = #{enableFlag}
+   			</if>
+		 where out_trade_no = #{outTradeNo}
+	</update>
+</mapper>

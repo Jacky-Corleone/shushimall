@@ -1,0 +1,100 @@
+#set($layout = "/mini_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<link rel="stylesheet" type="text/css" href="$staticPath/css/basic.css">
+<link rel="stylesheet" type="text/css" href="$staticPath/css/jingdong_s.css">
+<script type="text/javascript" src="$staticPath/js/jquery.qrcode.min.js"></script>
+<script type="text/javascript">
+$(function(){
+	$("#qrcode").qrcode({
+		render: "table",
+		text: "$!er.resultMessage"
+	});
+	var size = $("label").text().length;
+	if(size > 30){
+		$("label").text($("label").text().substring(0,30)+"...");
+	}
+	queryResult();
+})
+function queryResult(){
+	window.setTimeout(function(){
+		var key = "payResult$!orderInfo.result.outTradeNo";
+		$.ajax({
+			url: "$request.contextPath/shopCart/queryResult",
+			data: {key:key},
+			type: "post",
+			dataType: "json",
+			success: function(data){
+				if(data.success){
+			        $(".wxzf2").empty();
+			        $(".wxzf3").empty();
+			        $("#payResult").html("订单支付成功！");
+					window.location = '$request.contextPath/shopCart/payCallBack_wx';
+				}else{
+					queryResult();
+				}
+			}
+		});
+	},1000);
+}
+	
+	function jump(count) { 
+        window.setTimeout(function(){ 
+            count--; 
+            if(count > 0) { 
+		        $("#closeWindow").html(count+" 秒后页面将关闭！");
+			 	jump(count); 
+            } else {
+            	window.close();
+            } 
+        }, 1000); 
+    } 
+    
+
+</script>
+<div class="header_sy">
+	<div class="center">
+		<img src="$staticPath/images/weixin_pay.jpg">
+	</div>
+</div>
+<div class="center_sy">
+	<div class="top">
+		<ul>
+			<li class="left">
+				<dl>
+					<dt style="color: #666793;">请您及时付款，以便订单尽快处理,<label title="$!orderInfo.result.subject">$!orderInfo.result.subject<label></dt>
+					<dd>请您在提交订单后<span>2小时</span>内完成支付，否则订单会自动取消。</dd>
+				</dl>
+			</li>
+			<li class="right">
+				<dl>
+					<dt>应付金额 <span>$!orderInfo.result.orderAmount</span> 元</dt>
+					<!-- <dd><a href="" class="xq">订单详情 <i class="fa-caret-down"></i></a></dd> -->
+				</dl>
+			</li>
+		</ul>
+	</div>
+	<div class="center">
+		<ul>
+			<li class="wxzf">微信支付</li>
+			<li class="wxzf2">
+				<span id="qrcode"></span>
+				<img src="$staticPath/images/iphone_weixin.jpg">
+			</li>
+			<li class="wxzf3">
+				<img src="$staticPath/images/phone-bg.png">
+			</li>
+			<li style=" clear: left;">
+				<div style=" padding-left: 300px; color: red;">
+					<ul>
+						<li id="payResult" style=" font-size: 14px; font-weight: bold; ">
+						</li>
+						<li id="closeWindow" style=" font-size: 14px; font-weight: bold; ">
+						</li>
+					<ul>
+				</div>
+			</li>
+		</ul>
+		
+	</div>
+</div>
+

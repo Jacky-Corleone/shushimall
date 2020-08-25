@@ -1,0 +1,70 @@
+#set($layout = "/none_layout.vm")
+<script type="text/javascript">
+	//图片查看
+	$("img[showImg='findImg']").fancyzoom({
+		Speed:400,
+		showoverlay:false,
+		imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+	})
+	
+	// 删除品牌
+	function pseudoDeleteBrand(brandId){
+		if(confirm("确定要删除该品牌吗？")){
+			$.ajax({
+                url: "$request.getContextPath()/shopManageBrandController/deleteBrand",
+                dataType:"json",
+                data:{brandId:brandId},
+                success: function(data){
+                    if(data.result=='success'){
+                        alert("删除成功");
+						nTabs(2);
+                    }else{
+                    	alert(data.msg);
+                    }
+                },error:function(data){
+                    alert("系统繁忙，请稍后再试");
+                }
+            }); 
+		}
+	}
+</script>
+<!-- 店铺最新加的经营品牌的品牌id -->
+<input type="hidden" id="addBrandIds" name="addBrandIds" value="" />
+<div id="main">
+<!--中间部分开始-->
+<!--右边部分开始-->
+<div id="right" class="border-4 bg_06 box-shadow1">
+    <!--文字段落开始-->
+    <div class="Notice pad_tb20">
+    		<dl><dd><h3>我经营的品牌</h3></dd></dl>
+            <dl>
+               <dd> 
+                   <p>
+                   		#foreach($entity in $!busShopBrandList)
+                   			<img src="$!imageServerAddr$entity.brandLogoUrl" width="90" height="40" name="" style="cursor:pointer;" showImg="findImg" title="$entity.brandName" alt="$entity.brandName">
+							&nbsp;<i class="my_icon-del" title="删除" onclick="pseudoDeleteBrand($entity.brandId)">&nbsp;&nbsp;&nbsp;&nbsp;</i>
+                   		#end
+                   </p>
+               </dd>
+            </dl>
+            <dl><dd><h3>正在审核的品牌</h3></dd></dl>
+    		<dl>
+    			<li>
+	    			<div class="font_content">
+	    				#foreach($entity in $!auditShopBrandList)
+		    				<span  class="press_pic border-4 mar_r10">
+		    					<img src="$!imageServerAddr$entity.brandLogoUrl" width="90" height="40" name="" style="cursor:pointer;" showImg="findImg" alt="$entity.brandName" title="$entity.brandName" />
+                    			<b class="pa_04 po_ab"></b>
+                    		</span>
+                   		#end
+	    			</div>
+    			</li>
+    		</dl>
+            <div class="wid_460" style="margin:20px auto">
+                <input class="button_2 hei_35 font_14b" type="button" value="返 回" onclick="forwardToShopIndex()" />
+            </div>
+         </div><!--Notice end-->
+    <!--文字段落结束-->         
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->

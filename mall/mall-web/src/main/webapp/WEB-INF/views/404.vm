@@ -1,0 +1,11 @@
+#set($staticPath="$request.contextPath/assets")
+<div id="content" style="height:300px">
+    <div class="error_404">
+        <img src="$staticPath/images/404.png" alt="" class="fl"/> 
+        <span class="fl"><i class="font_36">sorry!</i>页面不存在，工程师把页面弄丢了！！<br/>
+        	<button type="button" class="button_1 hei_30 mar_tb10" onclick="location.href='$request.contextPath/'">
+        		返回首页  
+        	</button>
+        </span>
+   </div>
+</div>

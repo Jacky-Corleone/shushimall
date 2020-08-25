@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.goodscenter.dao.ItemOldDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="itemOldMap" type="com.camelot.goodscenter.dto.ItemOldDTO">
+				<result property="id" column="id"/>
+				<result property="itemId" column="item_id"/>
+				<result property="cid" column="cid"/>
+				<result property="cName" column="c_name"/>
+				<result property="sellerId" column="seller_id"/>
+				<result property="itemName" column="item_name"/>
+				<result property="recency" column="recency"/>
+				<result property="priceOld" column="price_old"/>
+				<result property="price" column="price"/>
+				<result property="freight" column="freight"/>
+				<result property="sellerTel" column="seller_tel"/>
+				<result property="sellerName" column="seller_name"/>
+				<result property="provinceCode" column="province_code"/>
+				<result property="provinceName" column="province_name"/>
+				<result property="cityCode" column="city_code"/>
+				<result property="cityName" column="city_name"/>
+				<result property="districtCode" column="district_code"/>
+				<result property="districtName" column="district_name"/>
+				<result property="describeUr" column="describe_ur"/>
+				<result property="describeDetail" column="describe_detail"/>
+				<result property="created" column="created"/>
+				<result property="modified" column="modified"/>
+				<result property="comment" column="comment"/>
+				<result property="platformUserId" column="platform_user_id"/>
+				<result property="status" column="status"/>
+				<result property="timeDifference" column="timeDifference"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			item_old_.id
+ 			,item_old_.item_id
+ 			,item_old_.seller_Id
+ 			,item_old_.cid
+ 			,item_category_.c_name
+ 			,item_old_.item_name
+ 			,item_old_.recency
+ 			,item_old_.price_old
+ 			,item_old_.price
+ 			,item_old_.freight
+ 			,item_old_.seller_tel
+ 			,item_old_.seller_name
+ 			,item_old_.province_code
+ 			,item_old_.province_name
+ 			,item_old_.city_code
+ 			,item_old_.city_name
+ 			,item_old_.district_code
+ 			,item_old_.district_name
+ 			,item_old_.describe_ur
+ 			,item_old_.created
+ 			,item_old_.modified
+ 			,item_old_.comment
+ 			,item_old_.platform_user_id
+ 			,item_old_.status
+ 			,item_old_.describe_detail
+ 			,TIMESTAMPDIFF(DAY ,item_old_.created,NOW()) as timeDifference
+		FROM 
+		item_old item_old_  LEFT JOIN item_category item_category_ on item_old_.cid=item_category_.cid
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			
+			<if test="entity.statuss != null  and entity.statuss !=''">
+					<![CDATA[ and item_old_.status  in ]]>
+				<foreach collection="entity.statuss" item="item" index="index" open="(" separator="," close=")">
+					<![CDATA[ #{item} ]]>
+				</foreach>
+			</if>
+			<if test="entity.sellerIds != null  and entity.sellerIds !=''">
+					<![CDATA[ and item_old_.seller_Id  in ]]>
+				<foreach collection="entity.sellerIds" item="item" index="index" open="(" separator="," close=")">
+					<![CDATA[ #{item} ]]>
+				</foreach>
+			</if>
+			<if test="entity.sellerId != null  and entity.sellerId !=''">
+				<![CDATA[ and item_old_.seller_Id  = #{entity.sellerId} ]]>
+			</if>
+		 	<if test="entity.cid != null  and entity.cid !=''">
+				<![CDATA[ and FIND_IN_SET(item_old_.cid,(SELECT queryChildCategory(#{entity.cid}))) ]]>
+			</if>
+			<if test="entity.id != null  and entity.id !=''">
+				<![CDATA[ and item_old_.id  = #{entity.id} ]]>
+			</if>
+			<if test="entity.itemId != null  and entity.itemId !=''">
+				<![CDATA[ and item_old_.item_id  = #{entity.itemId} ]]>
+			</if>
+			<if test="entity.itemName != null  and entity.itemName !=''">
+				<![CDATA[ and item_old_.item_name like CONCAT('%',#{entity.itemName},'%') ]]>
+			</if>
+			<if test="entity.recency != null  and entity.recency !=''">
+				<![CDATA[ and item_old_.recency  = #{entity.recency} ]]>
+			</if>
+			<if test="entity.priceOld != null  and entity.priceOld !=''">
+				<![CDATA[ and item_old_.price_old  = #{entity.priceOld} ]]>
+			</if>
+			<if test="entity.price != null  and entity.price !=''">
+				<![CDATA[ and item_old_.price  = #{entity.price} ]]>
+			</if>
+			<if test="entity.freight != null  and entity.freight !=''">
+				<![CDATA[ and item_old_.freight  = #{entity.freight} ]]>
+			</if>
+			<if test="entity.sellerTel != null  and entity.sellerTel !=''">
+				<![CDATA[ and item_old_.seller_tel  = #{entity.sellerTel} ]]>
+			</if>
+			<if test="entity.sellerName != null  and entity.sellerName !=''">
+				<![CDATA[ and item_old_.seller_name  = #{entity.sellerName} ]]>
+			</if>
+			<if test="entity.provinceCode != null  and entity.provinceCode !=''">
+				<![CDATA[ and item_old_.province_code  = #{entity.provinceCode} ]]>
+			</if>
+			<if test="entity.provinceName != null  and entity.provinceName !=''">
+				<![CDATA[ and item_old_.province_name  = #{entity.provinceName} ]]>
+			</if>
+			<if test="entity.cityCode != null  and entity.cityCode !=''">
+				<![CDATA[ and item_old_.city_code  = #{entity.cityCode} ]]>
+			</if>
+			<if test="entity.cityName != null  and entity.cityName !=''">
+				<![CDATA[ and item_old_.city_name  = #{entity.cityName} ]]>
+			</if>
+			<if test="entity.districtCode != null  and entity.districtCode !=''">
+				<![CDATA[ and item_old_.district_code  = #{entity.districtCode} ]]>
+			</if>
+			<if test="entity.districtName != null  and entity.districtName !=''">
+				<![CDATA[ and item_old_.district_name  = #{entity.districtName} ]]>
+			</if>
+			<if test="entity.describeUr != null  and entity.describeUr !=''">
+				<![CDATA[ and item_old_.describe_ur  = #{entity.describeUr} ]]>
+			</if>
+			<if test="entity.describeDetail != null  and entity.describeDetail !=''">
+				<![CDATA[ and item_old_.describe_detail  = #{entity.describeDetail} ]]>
+			</if>
+			<if test="entity.createdstr != null  and entity.createdstr !=''">
+				<![CDATA[ and item_old_.created  > #{entity.createdstr} ]]>
+			</if>
+			<if test="entity.createdend != null  and entity.createdend !=''">
+				<![CDATA[ and item_old_.created  < #{entity.createdend} ]]>
+			</if>
+			<if test="entity.modified != null  and entity.modified !=''">
+				<![CDATA[ and item_old_.modified  = #{entity.modified} ]]>
+			</if>
+			<if test="entity.comment != null  and entity.comment !=''">
+				<![CDATA[ and item_old_.comment  = #{entity.comment} ]]>
+			</if>
+			<if test="entity.platformUserId != null  and entity.platformUserId !=''">
+				<![CDATA[ and item_old_.platform_user_id  = #{entity.platformUserId} ]]>
+			</if>
+
+		</if>
+		<![CDATA[ order by created desc ]]>
+	</sql>
+	
+	
+	<sql id="where_forSeach">
+		where item_old_.status=4
+		<if test="entity!=null">
+			<if test="entity.cids.size()>0">
+					<![CDATA[ and item_old_.cid  in ]]>
+				<foreach collection="entity.cids" item="item" index="index" open="(" separator="," close=")">
+					<![CDATA[ #{item} ]]>
+				</foreach>
+			</if>
+			<if test="entity.key != null  and entity.key !=''">
+				<![CDATA[ and item_old_.item_name  like CONCAT('%',#{entity.key},'%') ]]>
+			</if>
+			<if test="entity.recency != null  and entity.recency !=''">
+				<![CDATA[ and item_old_.recency  = #{entity.recency} ]]>
+			</if>
+			<if test="entity.price != null  and entity.price !=''">
+				<![CDATA[ and item_old_.price  = #{entity.price} ]]>
+			</if>
+			<if test="entity.pricemin != null  and entity.pricemin !=''">
+				<![CDATA[ and item_old_.price  > #{entity.pricemin} ]]>
+			</if>
+			<if test="entity.pricemax != null  and entity.pricemax !=''">
+				<![CDATA[ and item_old_.price  < #{entity.pricemax} ]]>
+			</if>
+			<if test="entity.provinceCode != null  and entity.provinceCode !=''">
+				<![CDATA[ and item_old_.province_code  = #{entity.provinceCode} ]]>
+			</if>
+			<if test="entity.cityCode != null  and entity.cityCode !=''">
+				<![CDATA[ and item_old_.city_code  = #{entity.cityCode} ]]>
+			</if>
+			<if test="entity.districtCode != null  and entity.districtCode !=''">
+				<![CDATA[ and item_old_.district_code  = #{entity.districtCode} ]]>
+			</if>
+			<if test="entity.orderType!=null">
+				<if test="entity.orderType==1">
+					<![CDATA[ order by item_old_.price  ]]>
+				</if>
+				<if test="entity.orderType==2">
+					<![CDATA[ order by item_old_.price desc ]]>
+				</if>
+				<if test="entity.orderType==3">
+					<![CDATA[ order by item_old_.created  ]]>
+				</if>
+				<if test="entity.orderType==4">
+					<![CDATA[ order by item_old_.created desc ]]>
+				</if>
+			</if>
+		</if>
+	</sql>
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="queryById" resultMap="itemOldMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where item_old_.item_id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="itemOldMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		item_old item_old_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 搜索二手商品 -->
+	<select id="querySeachItemOldList"  resultMap="itemOldMap">
+		<include refid="selectAllColumns"/>
+		<include refid="where_forSeach" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="com.camelot.goodscenter.dto.ItemOldDTO">
+		<![CDATA[
+		insert into item_old (
+		    	 item_id
+		    	 ,cid
+		    	 ,seller_Id
+		    	 ,item_name
+		    	 ,recency
+		    	 ,price_old
+		    	 ,price
+		    	 ,freight
+		    	 ,seller_tel
+		    	 ,seller_name
+		    	 ,province_code
+		    	 ,province_name
+		    	 ,city_code
+		    	 ,city_name
+		    	 ,district_code
+		    	 ,district_name
+		    	 ,describe_ur
+		    	 ,describe_detail
+		    	 ,created
+		    	 ,modified
+		    	 ,status
+		   )values(
+		    	#{itemId}
+		    	,#{cid}
+		    	,#{sellerId}
+		    	,#{itemName}
+		    	,#{recency}
+		    	,#{priceOld}
+		    	,#{price}
+		    	,#{freight}
+		    	,#{sellerTel}
+		    	,#{sellerName}
+		    	,#{provinceCode}
+		    	,#{provinceName}
+		    	,#{cityCode}
+		    	,#{cityName}
+		    	,#{districtCode}
+		    	,#{districtName}
+		    	,#{describeUr}
+		    	,#{describeDetail}
+		    	,now()
+		    	,now()
+		    	,'2'
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.goodscenter.dto.ItemOldDTO">
+		<![CDATA[
+		update item_old set
+			 cid= #{cid}
+			,seller_Id=#{sellerId}
+   			,item_name = #{itemName}
+   			,recency = #{recency}
+   			,price_old = #{priceOld}
+   			,price = #{price}
+   			,freight = #{freight}
+   			,seller_tel = #{sellerTel}
+   			,seller_name = #{sellerName}
+   			,province_code = #{provinceCode}
+   			,province_name = #{provinceName}
+   			,city_code = #{cityCode}
+   			,city_name = #{cityName}
+   			,district_code = #{districtCode}
+   			,district_name = #{districtName}
+   			,describe_ur = #{describeUr}
+   			,describe_detail = #{describeDetail}
+   			,modified = now()
+		 where  item_id = #{itemId}
+		]]>
+	</update>
+	<!-- 根据id，修改记录 -->
+	<update id="updateStatus" parameterType="long">
+		<![CDATA[
+		update item_old set
+			 status=#{status}
+			,comment=#{comment}
+			,platform_User_Id=#{platformUserId}
+   			,modified = now()
+		 where  item_id = #{itemId}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from item_old where id = #{id}
+		]]>
+	</delete>
+</mapper>

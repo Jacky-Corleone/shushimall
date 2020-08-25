@@ -1,0 +1,372 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+<link href="$staticPath/css/manage_style.css" rel="stylesheet" type="text/css" />
+<link href="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.css" type="text/css" rel="stylesheet" />
+<!-- 自定义样式 -->
+<style type="text/css">
+	.userPersonalInfo_class_hide{
+		display:none;
+	}
+</style>
+<script language="javascript" type="text/javascript" src="$staticPath/js/js.js"></script>
+<!-- 日期控件 -->
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<!-- 验证控件 -->
+<script type="text/javascript" src="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.js"></script>
+<!-- 验证国际化控件 -->
+<script type="text/javascript" src="$staticPath/plugin/jquery-validation/1.11.1/messages_zh.js"></script>
+<!-- 防止重复提交AJAX控件 -->
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<script type="text/javascript">
+$(function(){
+	//左侧菜单
+	$("#leftBuyer").load("$request.contextPath/leftBuyer");
+	//初始化页面
+	initPage();
+	//保存按钮
+	$("#userPersonalInfoBtn").click(function(){
+		//保存性别
+		$("#sex").val($("input[name='sexSelect']:checked").val());
+		//保存籍贯
+		$("#origin").val($("#province").val()+","+$("#city").val()/* +","+$("#area").val() */);
+		//Form验证
+		var isValid = $("#userPersonalInfoForm").valid();
+		if( !isValid ){
+			return;
+		}
+		//防止重复提交AJAX请求
+		$("#userPersonalInfoBtn").loadingMsg();
+		//发送AJAX请求
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			url:"$request.contextPath/userPersonalInfo/updateUserPersonalInfo",
+			data:$("#userPersonalInfoForm").serializeArray(),
+			success: function(data){
+				$("#userPersonalInfoBtn").hideMsg();
+					alert(data.messages);
+					location.reload();
+				},
+				error:function(data){
+					$("#userPersonalInfoBtn").hideMsg();
+				}
+			});
+		});
+		//籍贯下拉框关联
+		$("#province").change(function(){
+			/* $("#area").empty();
+			$("#area").append($("<option>").text("请选择").val("")); */
+			optionItems("$request.contextPath/shopBaseInfoController/queryAddress",$("#province").val(),"city","");
+		});
+		//籍贯下拉框关联
+		/* $("#city").change(function(){
+			optionItems("$request.contextPath/shopBaseInfoController/queryAddress",$("#city").val(),"area","");
+		}); */
+})
+
+//初始化页面事件
+function initPage(){
+	//Form验证
+	initValidPlugin();
+	//转换样式
+	changeShow('userPersonalInfo_class_show','userPersonalInfo_class_hide');
+	//展示资料完整度进度条
+	$("#infoPerfectDegree").width("$userPersonalInfoPerfectDegree");
+	//展示性别
+	$(":radio[name=sexSelect][value='$!userPersonalInfoDTO.sex']").attr("checked","true");
+	$("#sex_view").html($("input[name='sexSelect']:checked").next("span").text());
+	//展示生日
+	$("#birthday_view").html("$!userPersonalInfoDTO.birthday");
+	//展示血型
+	if("$!userPersonalInfoDTO.blood" != null && "$!userPersonalInfoDTO.blood" != ""){
+		$("#blood").val("$!userPersonalInfoDTO.blood");
+		if($("#blood option:selected").val() == '0'){
+		 	$("#blood_view").html();
+		}else{
+			$("#blood_view").html($("#blood option:selected").text());
+		}
+	}
+	//展示籍贯
+	if("$!userPersonalInfoDTO.origin" != null && "$!userPersonalInfoDTO.origin" != "" ){
+		var origin = "$!userPersonalInfoDTO.origin";
+		var strs = origin.split(",");
+		for(var i=0;i<strs.length;i++){
+			if(i==0){
+				optionItems("$request.contextPath/shopBaseInfoController/queryAddress",'0',"province",strs[i]);
+			}else if(i==1){
+				optionItems("$request.contextPath/shopBaseInfoController/queryAddress",strs[i-1],"city",strs[i]);
+			}/* else if(i==2){
+				optionItems("$request.contextPath/shopBaseInfoController/queryAddress",strs[i-1],"area",strs[i]);
+			} */
+		}
+
+	}
+}
+
+//Form验证事件
+function initValidPlugin(){
+	$("#userPersonalInfoForm").validate({
+		rules: {
+ 			"nikeName":{
+                nickName: true
+			},
+// 			"homePage":{
+// 				required: true
+// 			},
+// 			"blood":{
+// 				required: true,
+// 				number: true
+// 			},
+// 			"area":{
+// 				required: true,
+// 				number: true
+// 			},
+			"income":{
+				number: true
+			}
+// 			"hobby":{
+// 				required: true
+// 			},
+// 			"evaluate":{
+// 				required: true
+// 			}
+		}
+	});
+	jQuery.validator.addMethod("specialCharValidate", function(value, element) {
+		var pattern = new RegExp("[`~!@%#$^&*()=|{}':;',　\\[\\]<>/? \\.；：%……+￥（）【】‘”“'。，、？]");
+		return this.optional(element)||!pattern.test(value) ;
+	}, "不能有特殊字符");
+	jQuery.validator.addMethod("chrchinese", function(value, element) {
+		var chinese = /^[a-zA-Z\u4e00-\u9fa5]+$/;
+		return this.optional(element) || (chinese.test(value));
+	}, "只能输入字母和中文");
+	jQuery.validator.addMethod("chrnum", function(value, element) {
+		var chrnum = /^([a-zA-Z0-9]+)$/;
+		return this.optional(element) || (chrnum.test(value));
+	}, "只能输入数字和字母");
+    jQuery.validator.addMethod("nickName", function(value, element) {
+        var chrnum = /^[\u4e00-\u9fa5a-zA-Z0-9]{0,20}$/;
+        return this.optional(element) || (chrnum.test(value));
+    }, "输入0-20个字符，可由中文和英文组成!");
+}
+
+//转换样式事件
+function changeShow(showClass,hideClass){
+	$("."+showClass).show();
+	$("."+hideClass).hide();
+}
+
+//籍贯下拉框关联事件
+function optionItems(url, parentCode, optionId, selectVal){
+	$.ajax({
+		url:url,
+		type:"post",
+		data:{
+			parentCode:parentCode
+		},
+		dataType: "json",
+		success:function(data){
+			var optionItem = $("#"+optionId);
+			optionItem.empty();
+			optionItem.append($("<option>").text("请选择").val(""));
+			$.each(data, function (n, address) {
+				var option = $("<option>").text(address.name).val(address.code);
+				if(address.code == selectVal){
+					option.attr("selected",true);
+				}
+				optionItem.append(option);
+
+			});
+		}
+	});
+}
+</script>
+
+<div id="main">
+<!--left start -->
+<div id="leftBuyer" class="border-4"></div>
+<!--left end -->
+
+<form id="userPersonalInfoForm" method="post">
+
+<div id="right" class="border-4 bg_06">
+	<div class="tit">个人信息</div>
+	<!-- 个人信息ID -->
+	<input name="id" type="hidden" value="$!userPersonalInfoDTO.id"/>
+	<!-- 用户ID -->
+	<input name="userId" type="hidden" value="$!userPersonalInfoDTO.userId"/>
+	<div class="Notice pad_tb20">
+		<dl>
+			<dt class="font_7a">资料完成程度</dt>
+			<dd>
+				<span class="speed po_re">
+					<span id="infoPerfectDegree" class="po_ab Info-speed" ></span>
+				</span>
+                <i>资料完成进度为$userPersonalInfoPerfectDegree
+                	#if($userPersonalInfoPerfectDegree != "100.0%")
+		                <a href="#" onclick="changeShow('userPersonalInfo_class_hide','userPersonalInfo_class_show');" class="font_fe mar_l10">
+							马上完善>>
+						</a>
+					#end
+				</i>
+			</dd>
+		</dl>
+		<dl>
+			<dt>
+<!-- 			<i class="demo-icons font_fe">*</i> -->
+			昵称：</dt>
+			<dd>
+				<!-- 展示昵称 -->
+				<span class="userPersonalInfo_class_show">$!userPersonalInfoDTO.nikeName</span>
+				<span class="userPersonalInfo_class_hide">
+					<!-- 保存昵称 -->
+               		<input name="nikeName" type="text" class="input_Style2 wid_260 hei_30" placeholder="输入昵称..." value="$!userPersonalInfoDTO.nikeName" />
+                </span>
+			</dd>
+		</dl>
+		<dl>
+			<dt>
+<!-- 			<i class="demo-icons font_fe">*</i> -->
+			性别：</dt>
+			<!-- 保存性别 -->
+			<input id="sex" name="sex" type="hidden"/>
+			<dd>
+				<div class="userPersonalInfo_class_show">
+					<!-- 展示性别 -->
+               		<span id="sex_view"></span>
+				</div>
+                <div class="userPersonalInfo_class_hide">
+	                <input name="sexSelect" type="radio" value="1" class="mar_lr5"/><span>男</span>
+	                <input name="sexSelect" type="radio" value="2" class="mar_lr5" /><span>女</span>
+	                <input name="sexSelect" type="radio" value="3" class="mar_lr5" /><span>保密</span>
+                </div>
+			</dd>
+		</dl>
+		<dl>
+			<dt>
+<!-- 			<i class="demo-icons font_fe">*</i> -->
+			个人主页：</dt>
+			<dd>
+                <!-- 展示个人主页 -->
+				<span class="userPersonalInfo_class_show">$!userPersonalInfoDTO.homePage</span>
+				<span class="userPersonalInfo_class_hide">
+					<!-- 保存个人主页 -->
+					<input name="homePage" type="text" class="input_Style2 wid_330 hei_30" placeholder="输入个人主页域名..." value="$!userPersonalInfoDTO.homePage"/>
+                </span>
+			</dd>
+		</dl>
+		<dl>
+			<dt>
+<!-- 			<i class="demo-icons font_fe">*</i> -->
+			生日：</dt>
+			<dd>
+				<div class="userPersonalInfo_class_show">
+					<!-- 展示生日 -->
+					<span id="birthday_view"></span>
+				</div>
+				<div class="userPersonalInfo_class_hide">
+					<!-- 保存生日 -->
+					<input name="birthday" class="input_Style2 wid_110 hei_30" type="text" value="$!userPersonalInfoDTO.birthday" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+				</div>
+			</dd>
+		</dl>
+		<dl>
+			<dt>
+<!-- 			<i class="demo-icons font_fe">*</i> -->
+			血型：</dt>
+			<dd>
+				<div class="userPersonalInfo_class_show">
+					<!-- 展示血型 -->
+					<span id="blood_view"></span>
+				</div>
+				<div class="userPersonalInfo_class_hide">
+					<!-- 保存血型 -->
+					<select name="blood" id="blood" class="input_Style2 wid_120 mar_r10 hei_30">
+	                    <option value="0" selected="selected"> 请选择 </option>
+	                    <option value="1"> A型 </option>
+	                    <option value="2"> B型 </option>
+	                    <option value="3"> AB型 </option>
+	                    <option value="4"> O型 </option>
+                    </select>
+				</div>
+			</dd>
+		</dl>
+		<dl>
+			<dt>
+<!-- 			<i class="demo-icons font_fe">*</i> -->
+			籍贯：</dt>
+			<!--保存籍贯 -->
+			<input id="origin" name="origin" type="hidden"/>
+			<dd>
+				<!--　展示籍贯及地址详细信息 -->
+				<span class="userPersonalInfo_class_show">$!finalOrigin</span>
+			</dd>
+			<div class="userPersonalInfo_class_hide">
+				<dd>
+					<select name="province" id="province" class="input_Style2 wid_120 mar_r10 hei_30">
+						<option value="0" selected="selected"> 请选择 </option>
+	                    #foreach($origin in $originList)
+							<option value="$!origin.code"> $!origin.name </option>
+						#end
+                   	</select>
+                    <select name="city" id="city" class="input_Style2 wid_120 mar_r10 hei_30">
+						<option value="0" selected="selected"> 请选择 </option>
+                    </select>
+                    <!-- <select name="area" id="area" class="input_Style2 wid_120 mar_r10 hei_30">
+                    	<option value="0" selected="selected"> 请选择 </option>
+                    </select> -->
+				</dd>
+				<!--保存地址详细信息 -->
+				<dd style="margin-left:110px;"><input name="address" type="text" class="input_Style2 wid_330 hei_30 " placeholder="输入详细地址..." value="$!userPersonalInfoDTO.address"/></dd>
+			</div>
+		</dl>
+		<dl>
+			<dt>
+<!-- 			<i class="demo-icons font_fe">*</i> -->
+			月收入水平：</dt>
+			<dd>
+				<!--　展示收入水平 -->
+				<span class="userPersonalInfo_class_show">$!userPersonalInfoDTO.income<i class="demo-icons">元</i></span>
+				<span class="userPersonalInfo_class_hide">
+					<!--　保存收入水平 -->
+               		<input id="income" name="income" type="text" class="input_Style2 wid_150 hei_30" placeholder="输入金额..." value="$!userPersonalInfoDTO.income" maxlength="10"/><i class="demo-icons">元</i>
+				</span>
+			</dd>
+		</dl>
+		<dl class="mar_t">
+			<dt>
+<!-- 			<i class="demo-icons font_fe">*</i> -->
+			兴趣爱好：</dt>
+			<dd>
+				<!--展示兴趣爱好 -->
+				<span class="userPersonalInfo_class_show">$!userPersonalInfoDTO.hobby</span>
+				<span class="userPersonalInfo_class_hide">
+					<!--保存兴趣爱好 -->
+	                <textarea id="hobby" name="hobby" maxlength="200" cols="" rows="" class="input_Style2 hei_150 wid_460">$!userPersonalInfoDTO.hobby</textarea>
+	                <p class="font_12 font_c7">不同关键字用英文逗号“,”分开,只能输入200个字</p>
+               	</span>
+			</dd>
+		</dl>
+		<dl>
+			<dt>
+<!-- 			<i class="demo-icons font_fe">*</i> -->
+			自我评价：</dt>
+			<dd>
+				<!--展示自我评价 -->
+				<span class="userPersonalInfo_class_show">$!userPersonalInfoDTO.evaluate</span>
+				<span class="userPersonalInfo_class_hide">
+					<!--保存自我评价 -->
+	                <textarea id="evaluate" name="evaluate" maxlength="100" cols="" rows="" class="input_Style2 hei_100 wid_460">$!userPersonalInfoDTO.evaluate</textarea>
+	                <p class="font_12 font_c7">只能输入100个字</p>
+				</span>
+			</dd>
+		</dl>
+		<div class="wid_460" style="margin:20px auto">
+<!-- 			<button class="button_2 hei_35 font_14b userPersonalInfo_class_show" type="button" onclick="changeShow('userPersonalInfo_class_hide','userPersonalInfo_class_show');" >修 改</button> -->
+			<button class="button_2 hei_35 font_14b userPersonalInfo_class_hide" type="button" id="userPersonalInfoBtn" loadMsg="正在保存...">保 存</button>
+			<button class="button_3 hei_35 font_14b userPersonalInfo_class_hide mar_r30" type="button" onclick="changeShow('userPersonalInfo_class_show','userPersonalInfo_class_hide')">取 消</button>
+		</div>
+	</div>
+</div>
+</form>
+</div><!--#main end -->

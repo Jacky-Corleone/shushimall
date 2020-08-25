@@ -1,0 +1,241 @@
+<script type="text/javascript">
+	//屏蔽回车键
+	document.onkeydown = function(event) {  
+    var target, code, tag;  
+    if (!event) {  
+        event = window.event; //针对ie浏览器  
+        target = target;  
+        code = event.keyCode;  
+        if (code == 13) {  
+            tag = target.tagName;  
+            if (tag == "TEXTAREA") {
+				if(target.id =="pic_captcha_id"){
+					checkCaptcha();
+				}
+				if(target.id =="enterprise_pic_captcha_id"){
+					checkCaptcha();
+				}
+				
+				return true; 
+			}  
+            else {
+				if(target.id =="pic_captcha_id"){
+					checkCaptcha();
+				}
+				if(target.id =="enterprise_pic_captcha_id"){
+					checkCaptcha();
+				}
+				return false; 
+			}  
+        }  
+    }  
+    else {  
+        target = event.target; //针对遵循w3c标准的浏览器，如Firefox  
+        code = event.keyCode;  
+        if (code == 13) {  
+            tag = target.tagName;
+            if (tag == "INPUT") {
+				if(target.id =="pic_captcha_id"){
+					checkCaptcha();
+				}
+				if(target.id =="enterprise_pic_captcha_id"){
+					checkCaptcha();
+				}
+				return false; 
+			}  
+            else {
+				if(target.id =="pic_captcha_id"){
+					checkCaptcha();
+				}
+				if(target.id =="enterprise_pic_captcha_id"){
+					checkCaptcha();
+				}
+				return true; 
+			}  
+        }  
+    }  
+};  
+	
+
+	//查看交易信息列表
+	function showCiticTrade(orderDate,userType){
+		queryCiticTrade(1,orderDate,userType);
+		$("#citic_trade_div").show();
+	}
+	//关闭按钮
+	function closeCaptcha(){
+		$('#captchaDiv').hide();
+	}
+	function queryCiticTrade(startRecord,orderDate,userType){
+		$("#loadMask").show();
+		//查询
+		$.ajax({
+             type : "POST",
+             dataType : "text",
+             cache : false,
+             data : {
+             	startRecord : startRecord,
+             	orderDate : orderDate,
+             	userType : userType
+             },
+             url : "$request.getContextPath()/citic/queryCiticTradeList",
+             success : function(message){
+             	 $("#loadMask").hide();
+              	 $("#informationLayer").empty();
+              	 $("#pageDiv").empty();
+	             var result = JSON.parse(message);
+	             if(result.success){
+	             	var citicTradeInfoList = result.result.list;
+	             	if(citicTradeInfoList == null){
+		             	$("#informationLayer").append("没有查询到交易记录！"+result.result.statusText);
+		             	return ;
+		             }
+		             var count = result.result.list.length;
+		             
+		             var str = '';
+		             for(var i = 0 ; i < count ; i++){
+		             	var citicTradeInfo = citicTradeInfoList[i];
+		             	str = str +'<ul class="list_top bg_05 font_7b">';
+		             	str = str + '<li style="height : 35px" class="wid_40 font_cen">' + (i+1) +'</li>';
+		             	str = str + '<li style="height : 35px" class="wid_250 font_cen over_ell" title='+citicTradeInfo.accountNm+'>' + citicTradeInfo.accountNm +'</li>';
+		             	str = str + '<li style="height : 35px" class="wid_200 font_cen">' + citicTradeInfo.accountNo +'</li>';
+		             	str = str + '<li style="height : 35px" class="wid_100 font_cen">' + citicTradeInfo.tranDate.substring(0,4)+'-'+citicTradeInfo.tranDate.substring(4,6)+'-'+citicTradeInfo.tranDate.substring(6,8) +'</li>';
+		             	str = str + '<li style="height : 35px" class="wid_100 font_cen">' + citicTradeInfo.tranTime.substring(0,2)+':'+citicTradeInfo.tranTime.substring(2,4)+':'+citicTradeInfo.tranTime.substring(4,6) +'</li>';
+		             	str = str + '<li style="height : 35px" class="wid_50 font_cen">' + citicTradeInfo.tranAmt +'</li>';
+		             	str = str + '<li style="height : 35px" class="wid_100 font_cen">' + result.result.statusText +'</li>';
+		             	if(citicTradeInfo.tranType==23 && citicTradeInfo.loanFlag=="D" && userType=="settlement"){
+		             	str = str + '<li style="height : 35px" class="wid_50 font_cen">提现</li>';
+		             	}else if(citicTradeInfo.tranType==15 && citicTradeInfo.loanFlag=="C" && userType=="settlement"){
+		             	str = str + '<li style="height : 35px" class="wid_50 font_cen">结算</li>';
+		             	}else if(citicTradeInfo.tranType==15 && citicTradeInfo.loanFlag=="D" && userType=="buyer"){
+		             	str = str + '<li style="height : 35px" class="wid_50 font_cen">支出</li>';
+		             	}else if(citicTradeInfo.tranType==15 && citicTradeInfo.loanFlag=="C" && userType=="buyer"){
+		             	str = str + '<li style="height : 35px" class="wid_50 font_cen">充值</li>';
+		             	}else if(citicTradeInfo.tranType==15 && citicTradeInfo.loanFlag=="D" && userType=="seller"){
+		             	str = str + '<li style="height : 35px" class="wid_50 font_cen">结算</li>';
+		             	}else if(citicTradeInfo.tranType==15 && citicTradeInfo.loanFlag=="C" && userType=="seller"){
+		             	str = str + '<li style="height : 35px" class="wid_50 font_cen">收入</li>';
+		             	}else{
+						str = str + '<li style="height : 35px" class="wid_50 font_cen">&nbsp;</li>';
+						}
+		             	str = str + '<li style="height : 35px" class="wid_50 font_cen"><a href="javascript:showCaptcha(\''+citicTradeInfo.subAccNo+'\',\''+citicTradeInfo.verifyCode+'\')" ><font color="green">点击打印</font></a></li>';
+		             	str = str +'</ul>'; 
+		             }
+		             $("#informationLayer").append(str);
+		             var pageStr = ''
+		             debugger
+		             if(count<10 && startRecord >10 ){
+		             	pageStr = '<a href="javascript:queryCiticTrade('+(startRecord-10)+','+orderDate+',\''+userType+'\')">[上一页]</a>';
+		             }else if(count>=10 && startRecord >10 ){
+		             	pageStr = '<a href="javascript:queryCiticTrade('+(startRecord-10)+','+orderDate+',\''+userType+'\')">[上一页]</a><a href="javascript:queryCiticTrade('+(startRecord+10)+','+orderDate+',\''+userType+'\')">[下一页]</a>';
+		             }else if(count>=10 && startRecord <=10 ){
+		             	pageStr = '<a href="javascript:queryCiticTrade('+(startRecord+10)+','+orderDate+',\''+userType+'\')">[下一页]</a>';
+		             }
+		             $("#pageDiv").append(pageStr);
+	             }else{
+	             	$("#information").append("查询交易信息发生异常,请联系平台工作人员！");
+	             }
+	             
+             	
+    		}
+         });
+	
+	}
+	function hideDiv(){
+		$("#citic_trade_div").hide();
+	}
+	//弹出验证码框
+	function showCaptcha(accountNo,verifyCode){
+		p_chage();
+		$("#pic_captcha_id").val('');
+		$("#subAccNo").val(accountNo);
+		$("#printVerifyCode").val(verifyCode);
+		$("#captchaDiv").show();
+	}
+	//校验验证码
+	function checkCaptcha(){
+		var code = $("#pic_captcha_id").val();
+		$.ajax({
+			url:"$request.contextPath/captcha/checkCaptcha",
+			type:"post",
+			timeout:180000,
+			data:{
+				code:code
+			},
+			success:function(data){
+				if(data.isOK==0){
+					$("#captchaForm").submit();
+					$("#captchaDiv").hide();
+				}else{
+					alert('图片验证码错误');
+				}	
+			}
+		})
+	}
+	//重新生成验证码
+	function p_chage(){
+		var img = document.getElementById("p_vc");
+		img.src="$request.contextPath/user/acquire?a=" + new Date().getTime();
+	}
+	
+</script>
+<!-- 弹出层  交易信息列表DIV -->
+<div class="po_fai" style="display:none;color:#747474;" id="citic_trade_div">
+	
+    <div class="po_fai_bg"></div>
+    <div class="po_main2 pad_t10" style="height:450px;padding:0px" >
+    <div class="abc" >
+        <div class="tit pad_l10 hei_35 bg_08" style="position:fixed;width:970px">
+        	交易记录
+		 <i id="citic_trade_close" onclick="javascript:hideDiv()" class="fa-times-circle fr font_14 mar_r10 cursor"></i>
+		</div>
+		<ul class="list_top bg_05 font_14b mar_tb30" style="position:fixed;width:980px">
+			<li class="wid_30 font_cen hei_40">序号</li>
+			<li class="wid_250 font_cen hei_40">账户名称</li>
+			<li class="wid_200 font_cen hei_40">帐号</li>
+			<li class="wid_100 font_cen hei_40">交易日期</li>
+			<li class="wid_100 font_cen hei_40">交易时间</li>
+			<li class="wid_50 font_cen hei_40">交易金额</li>
+			<li class="wid_100 font_cen hei_40">交易状态</li>
+			<li class="wid_50 font_cen hei_40">类型</li>
+			<li class="wid_50 font_cen hei_40">打印</li>
+		</ul>
+		</div>
+    	<div class="mar_b10">
+    
+    		<div class="information" id="informationLayer">
+    		</div>
+        </div>
+        <div id="pageDiv" style="float:right">
+		</div>
+	</div>
+<!-- 验证码弹出层 -->
+<div id="captchaDiv" style="display:none;" >
+	
+	<form id="captchaForm"  method="post" target="_blank" action="$request.contextPath/citic/getCiticTradeInto">
+		<input name="subAccNo" id="subAccNo" size ="10" TYPE="hidden"/>
+		<input name="printVerifyCode" id="printVerifyCode" size ="10" TYPE="hidden"/>
+		<input name="verifyCode" id="verifyCode" size ="10" TYPE="hidden" />
+		<div class="po_main" style="width:300px; margin-left:-250px;">
+			<div class="tit pad_l10 hei_35 bg_05" >
+				<i id="captchaDivClose" onclick="javascript:closeCaptcha()" class="fa fa-times-circle fr font_14 mar_r10 cursor"></i>
+			</div>
+			<font color='red' size='3px'>为了您的帐号安全，请输入验证码：</font>
+			<ul class="mar_tb20">
+				<li style="text-align:left">
+					<input name="captcha" type="text" id="pic_captcha_id" class="input_Style1 wid_120" placeholder="验证码" maxlength="6" />
+					<span class="wid_120">
+						<img id="p_vc" style="" src="$request.contextPath/user/acquire" />
+						<a href="javascript:p_chage();">换一张</a>
+					</span>
+					<span id="pic_captcha_span" style="margin-top: 3px; margin-left: 7px;"></span>
+				</li>
+				<li class="clear"></li>
+				<li>
+					<button id="captchaNextStep" onclick="javascript:checkCaptcha()" type="button" class="button_1 hei_35" loadMsg="正在提交...">确定</button>
+				</li>
+			</ul>
+		</div>
+	</form>
+</div>
+

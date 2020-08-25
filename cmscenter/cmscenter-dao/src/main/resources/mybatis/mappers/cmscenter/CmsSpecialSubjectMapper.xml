@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.cmscenter.dao.CmsSpecialSubjectDAO">
+	<resultMap id="CmsSpecialSubjectMapper" type="com.camelot.cmscenter.dto.CmsSpecialSubjectDTO">
+			<result property="id" column="id" />
+			<result property="specialSubjectName" column="special_subject_name" />
+			<result property="productCategory" column="product_category" />
+			<result property="specialSubjectCategory" column="special_subject_category" />
+			<result property="specialSubjectTitle" column="special_subject_title" />
+			<result property="specialSubjectModel" column="special_subject_model" />
+			<result property="categoryProfile" column="category_profile" />
+			<result property="keywords" column="keywords" />
+			<result property="specialSubjectPic" column="special_subject_pic" />
+			<result property="sort" column="sort" />
+			<result property="link" column="link" />
+			<result property="address" column="address" />
+			<result property="foregroundFlag" column="foreground_flag" />
+			<result property="displayFlag" column="display_flag" />
+			<result property="delFlag" column="del_flag" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			<result property="createDateStart" column="create_date_start" />
+			<result property="createDateEnd" column="create_date_end" />
+			<result property="updateDateStart" column="update_date_start" />
+			<result property="updateDateEnd" column="update_date_end" />
+			
+	</resultMap>
+
+	<select id="queryById" resultMap="CmsSpecialSubjectMapper" >
+		select * from cms_special_subject where id = #{id}
+	</select>
+	
+	<insert id="insertCss" parameterType="com.camelot.cmscenter.dto.CmsSpecialSubjectDTO" useGeneratedKeys="false" keyProperty="id">
+		INSERT INTO cms_special_subject (id,special_subject_name,product_category,special_subject_category,special_subject_title,special_subject_model,category_profile,keywords,special_subject_pic,
+		sort,address,foreground_flag,display_flag,create_by,create_date,remarks,del_flag)
+		VALUES(#{id},#{specialSubjectName},#{productCategory},#{specialSubjectCategory},#{specialSubjectTitle},#{specialSubjectModel},#{categoryProfile},#{keywords},#{specialSubjectPic},
+		#{sort},#{address},#{foregroundFlag},#{displayFlag},#{createBy},NOW(),#{remarks},#{delFlag})
+	</insert>
+	
+	<update id="updateCss" parameterType="com.camelot.cmscenter.dto.CmsSpecialSubjectDTO">
+		UPDATE cms_special_subject SET special_subject_name=#{specialSubjectName},product_category=#{productCategory},special_subject_category=#{specialSubjectCategory},
+		special_subject_title=#{specialSubjectTitle},special_subject_model=#{specialSubjectModel},category_profile=#{categoryProfile},keywords=#{keywords},special_subject_pic=#{specialSubjectPic},
+		sort=#{sort},address=#{address},foreground_flag=#{foregroundFlag},display_flag=#{displayFlag},update_by=#{updateBy},update_date=NOW() where id=#{id}
+	</update>
+
+	<select id="getCount" parameterType="com.camelot.cmscenter.dto.CmsSpecialSubjectDTO" resultType="long">
+		select count(*) from cms_special_subject 
+		<include refid="where_fragement" />
+	</select>
+
+	<!-- 查询 -->
+	<select id="queryDTOList" resultMap="CmsSpecialSubjectMapper">
+		select *
+		from cms_special_subject
+		<include refid="where_fragement" />
+		ORDER BY create_date ASC
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<update id="deleteCss" parameterType="com.camelot.cmscenter.dto.CmsSpecialSubjectDTO">
+		update cms_special_subject set del_flag=1,update_by=#{updateBy},update_date=NOW() where id = #{id}
+	</update>
+	
+	<update id="releaseCss" parameterType="com.camelot.cmscenter.dto.CmsSpecialSubjectDTO">
+		update cms_special_subject set link=#{link},update_by=#{updateBy},update_date=NOW() where id = #{id}
+	</update>
+
+	<sql id="where_fragement">
+		where 1 = 1 and del_flag NOT IN (1)
+		<if test="cmsSpecialSubjectDTO.id!=null and cmsSpecialSubjectDTO.id!=''">
+			and id = #{cmsSpecialSubjectDTO.id}
+		</if>
+		<if test="cmsSpecialSubjectDTO.specialSubjectCategory!=null and cmsSpecialSubjectDTO.specialSubjectCategory!=''">
+			and special_subject_category = #{cmsSpecialSubjectDTO.specialSubjectCategory}
+		</if>
+		<if test="cmsSpecialSubjectDTO.specialSubjectName!=null and cmsSpecialSubjectDTO.specialSubjectName!=''">
+			and special_subject_name = #{cmsSpecialSubjectDTO.specialSubjectName}
+		</if>
+		<if test="cmsSpecialSubjectDTO.productCategory!=null and cmsSpecialSubjectDTO.productCategory!=''">
+			and product_subject_category = #{cmsSpecialSubjectDTO.productCategory}
+		</if>
+		<if test="cmsSpecialSubjectDTO.specialSubjectTitle!=null and cmsSpecialSubjectDTO.specialSubjectTitle!=''">
+			and special_subject_title = #{cmsSpecialSubjectDTO.specialSubjectTitle}
+		</if>
+		<if test="cmsSpecialSubjectDTO.displayFlag!=null and cmsSpecialSubjectDTO.displayFlag!=''">
+			and display_flag = #{cmsSpecialSubjectDTO.displayFlag}
+		</if>
+		<if test="cmsSpecialSubjectDTO.specialSubjectModel!=null and cmsSpecialSubjectDTO.specialSubjectModel!=''">
+			and special_subject_model = #{cmsSpecialSubjectDTO.specialSubjectModel}
+		</if>
+		<if test="cmsSpecialSubjectDTO.categoryProfile!=null and cmsSpecialSubjectDTO.categoryProfile!=''">
+			and category_profile = #{cmsSpecialSubjectDTO.categoryProfile}
+		</if>
+		<if test="cmsSpecialSubjectDTO.keywords!=null and cmsSpecialSubjectDTO.keywords!=''">
+			and keywords = #{cmsSpecialSubjectDTO.keywords}
+		</if>
+	</sql>
+
+	<sql id="pagination_tail">
+		limit #{page.pageOffset} , #{page.rows}
+	</sql>
+</mapper>

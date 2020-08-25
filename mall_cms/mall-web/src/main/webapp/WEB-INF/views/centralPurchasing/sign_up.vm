@@ -1,0 +1,55 @@
+#set($layout = "/none_layout.vm")
+<div class="po_fai moban js_central_purchasing" style="display:none;width:200px">
+    <div class="po_fai_bg"></div>
+    <div class="po_main" style="z-index:100">
+    	<div class="hei_32 bg_05 pad_l10 "><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor js_central_purchasing_cancle"></i>报名信息</div>
+		<form id="signUpForm" name="signUpForm" action="$request.contextPath/centralPurchasing/signUp" method="post">
+			<input type="hidden" id="activitesDetailsId" name="signUpRefPurchasingDetail[0].activitesDetailsId" value="">
+    		<div id="centralPurchasingSignUp" style="height:350px;overflow-y: auto;">
+        		<div class="wid_440 fl mar_t10" style="min-height:30px;">
+                    <div class="hei_45 wid_500 fl mar_t10">
+                        <p class="wid_120 hei_35 font_right fl"><i class="font_fs mar_l2">*</i>采购单位：</p>
+                        <input type="text" name="enterpriseName" id="enterpriseName" value="" maxlength="30" class="wid_200 input_Style2 hei_30" /><i class="mar_l10"></i>
+                    </div>
+                    <div class="hei_45 wid_500 fl mar_t10">
+                        <p class="wid_120 hei_35 font_right fl"><i class="font_fs mar_l2">*</i>联系人：</p>
+                        <input type="text" name="enterpriseLinkman" id="enterpriseLinkman" value="" maxlength="12" class="wid_200 input_Style2 hei_30" /><i class="mar_l10"></i>
+                    </div>
+                    <div class="hei_45 wid_500 fl mar_t10">
+                        <p class="wid_120 hei_35 font_right fl"><i class="font_fs mar_l2">*</i>手机号码：</p>
+                        <input type="text" name="phoneNo" id="phoneNo" value="" maxlength="11" onkeyup="numInput(this)" class="wid_200 input_Style2 hei_30" /><i class="mar_l10"></i>
+                    </div>
+                    <div class="hei_45 wid_500 fl mar_t10">
+                        <p class="wid_120 hei_35 font_right fl"><i class="font_fs mar_l2">*</i>邮箱：</p>
+                        <input type="text" name="email" id="email" value="" maxlength="30" class="wid_200 input_Style2 hei_30" /><i class="mar_l10"></i>
+                    </div>
+                    <div class="hei_45 wid_500 fl mar_t10">
+                        <p class="wid_120 hei_35 font_right fl"><i class="font_fs mar_l2">*</i>联系地址：</p>
+                        <input type="text" name="address" id="address" value="" maxlength="30" class="wid_200 input_Style2 hei_30" /><i class="mar_l10"></i>
+                    </div>
+                    <div class="hei_45 wid_500 fl mar_t10">
+                        <p class="wid_120 hei_35 font_right fl"><i class="font_fs mar_l2">*</i>QQ/微信：</p>
+                        <input type="text" name="qqWx" id="qqWx" value="" maxlength="20" class="wid_200 input_Style2 hei_30" /><i class="mar_l10"></i>
+                    </div>
+                    <div class="hei_45 wid_500 fl mar_t10">
+                        <p class="wid_120 hei_35 font_right fl"><i class="font_fs mar_l2">*</i>业务类型：</p>
+                        <input type="text" name="businessType" id="businessType" value="" maxlength="30" class="wid_200 input_Style2 hei_30" /><i class="mar_l10"></i>
+                    </div>
+                    <div class="hei_45 wid_500 fl mar_t10">
+                        <p class="wid_120 hei_35 font_right fl"><i class="font_fs mar_l2">*</i>采购数量：</p>
+                        <input type="text" name="signUpRefPurchasingDetail[0].enterpriseEstimateNum" id="enterpriseEstimateNum" value="" maxlength="12" onkeyup="numInput(this,0)" class="wid_200 input_Style2 hei_30" /><i class="mar_l10"></i>
+                    </div>
+                    <div class="hei_45 wid_500 fl mar_t10">
+                        <p class="wid_120 hei_35 font_right fl"><i class="font_fs mar_l2">*</i>期望价格（单价）：</p>
+                        <input type="text" name="signUpRefPurchasingDetail[0].enterpriseEstimatePrice" id="enterpriseEstimatePrice" value="" maxlength="12" onkeyup="numInput(this,2)" class="wid_200 input_Style2 hei_30" /><i class="mar_l10"></i>
+                    </div>
+					
+    				<div class="mar_tb10 mar_r20 font_cen">
+            			<input type="button" class="button_2 hei_35 font_14b" loadMsg="正在提交..." id="btnSubmit" onclick="signUp('btnSubmit')" value="提交"/>
+            			<input type="button" class="button_2 hei_35 font_14b js_central_purchasing_cancle" value="取消"/>
+            		</div>
+                </div>
+            </div>
+		</form>
+    </div>
+</div>

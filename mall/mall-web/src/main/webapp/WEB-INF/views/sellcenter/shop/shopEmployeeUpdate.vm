@@ -1,0 +1,154 @@
+#set($layout = "/none_layout.vm")
+<link href="$request.getContextPath()/assets/css/register.css" rel="stylesheet" type="text/css"/>
+<style >
+.update_div_1{ display:block; width:100%; height:100%;}
+.update_div_2{background:#000; opacity:0.5;filter: Alpha(Opacity=50); width:100%; height:100%; position:fixed; left:0; top:0;z-index:100; overflow:hidden;}
+.update_div_3{background-color:#FFF; padding:10px; border:5px solid #e3e3e3;z-index:101;position:fixed; top:50%; left:50%; zoom:1;min-height:120px;}
+.update_div_3{width:555px; min-height:105px;margin-left:-310px; margin-top:-200px;}
+.update_div_3 ul li{width:100%; text-align:center; line-height:50px;}
+</style>
+<script type="text/javascript">
+	$(function(){
+		$("div>div>i.demo-icons,#cancelEmployeeAdd").bind("click",function(){
+			$("#update_div").hide();
+		});
+		//重置密码
+		$("#reset").click(function(){
+			if(confirm('您确认要重置密码吗？'))
+			{
+				$.get("$request.contextPath/shopAuthorityManageController/resetPwt",{userId:$("#userId").val()},function(response){
+					if(response.result=='success'){
+						alert("重置密码成功！");
+					}else{
+						alert("重置密码失败，请重新操作！");
+					}	
+				},
+				"json");
+			}
+		});//--
+	});
+	
+    function toCheckbox(checkId) {
+    	var cb = document.getElementsByName("resourceId");
+		var _values = checkId.split("|");
+
+    	for(var j = 0 ; j< _values.length;j++){
+    		for(var i = 0 ; i< cb.length;i++){
+				if(cb[i].value == _values[j]){
+					cb[i].checked=true;
+				}
+    		}
+    	}
+    };
+	
+	function checkProtocol() {
+    	var cb = document.getElementsByName("resourceId");
+    	for (var i = 0; i < cb.length; i++) {
+    		if (cb[i].checked) {
+    			return true;
+    		}
+    	}
+		alert('权限设置需要至少选择一项。');
+    	return false;
+    };
+	$("#btn_submit_update").click(function(){
+		if(checkProtocol() ){
+			addEmployee() ;
+		}
+	});
+	// 新增员工操作
+    function addEmployee() {
+    	var cb = document.getElementsByName("resourceId");
+    	var str = "";
+    	for (var i = 0; i < cb.length; i++) {
+    		if (cb[i].checked) {
+				if((","+str+",").indexOf(","+cb[i].value+",") < 0){
+    			str = str + cb[i].value + ",";
+				}
+    		}
+    	}
+    
+    	$.get("$request.contextPath/shopAuthorityManageController/updateEmploy", {
+            "nickname": $("#nickname").val(),
+    		"username" : $("#username").val(),
+    		"userId" : $("#userId").val(),
+    		"checkbox" : str,
+    		"moduleType": "$!moduleType"
+    	}, function(response) {
+    		if (response.result == 'success') {
+    			alert("操作成功");
+    			window.location.reload();
+    		} else {
+        		alert("操作失败");
+        		window.location.reload();
+    		}
+    	}, "json");
+    	$("#update_div").hide();
+    };
+</script>
+
+	<div  class="update_div_1">
+		 <div class="update_div_2"></div>
+            <div class="update_div_3 pad_t10" >
+               <div class="hei_32 bg_05 pad_l10"><i class="demo-icons fa-times-circle font_16 fr mar_r10"></i><b>详情信息</b></div>
+               <div class="clear"></div>   
+               <div class="register_content" style="width:500px; height:450px; margin: 0; overflow:hidden  ">
+				
+				<div class="register_box_mid"   >
+                   <dl>
+                       <dt>员工账号名：</dt>
+                       <dd style="border:none"><input name="username" id="username" type="text" class="input_Style2 wid_180" readonly = "true" value="$!username"/>
+						<input name="userId" type="hidden" id="userId" value="$!userId"/>
+                       </dd>
+                   </dl>
+                   <dl>
+                       <dt>员工姓名：</dt>
+                       <dd style="border:none"><input name="nickname" id="nickname" type="text" class="input_Style2 wid_180" value="$!nickname"/>
+                       </dd>
+                   </dl>
+			   <dl>
+				
+                   <dd style="border:none ; margin-left:75px; " name="resourceIds" >
+					 <span>权限设置：</span>
+					 #foreach($entity in $resources)
+						
+						  #if($!action == "view")
+								 #if($entity.resourceName=="店铺管理")<input type="checkbox" name="resourceId" value="$entity.id" disabled = "true" />$entity.resourceName 
+        							<span class="font_ec">(最高权限)</span> <br>
+        							#else
+        							<input type="checkbox" name="resourceId" value="$entity.id"disabled = "true" />$entity.resourceName
+        						 #end
+							#else
+        						 #if($entity.resourceName=="店铺管理")<input type="checkbox" name="resourceId" value="$entity.id" />$entity.resourceName 
+        							<span class="font_ec">(最高权限)</span> <br>
+        							#else
+        							<input type="checkbox" name="resourceId" value="$entity.id" />$entity.resourceName
+        						 #end
+						 #end
+						
+
+						 #if( $!{velocityCount}%4==0 ) <br>#end
+					 #end
+                   </dd>
+				   
+               </dl>
+               #if($!action != "view" )
+				   <dl style="margin-left:120px;">
+	    				<span style="color:red">忘记密码？</span>点击重置密码为123456
+	    			   <button type="button" class="button_4 but_cx3"  id="reset">
+	                      <a class="font_1c hei_24">点击重置</a>
+	                    </button>
+				   </dl>
+			   #end
+                   <div class="font_cen">
+					<script type="text/javascript">toCheckbox('$!checkId');</script>
+					#if($!action != "view" )<button class="button_2 hei_40 font_16" id="btn_submit_update">确定</button>#end
+                     <button class="button_3 hei_40 font_16" id="cancelEmployeeAdd">取消</button>
+                   </div>
+               	</div>
+					
+               </div>
+            </div>
+		
+	</div>
+	</div>

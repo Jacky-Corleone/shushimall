@@ -1,0 +1,18 @@
+<div>
+
+资讯中心
+<hr>
+	<div>
+		<@cmsCategoryListTag name="资讯中心" delFlag="0">
+			<#list categoryList as category>
+				<div>
+					<@cmsArticleListTag cityid="${category.id}" delFlag="0">
+						<#list articleList as article>
+							<span><a href="$!result.prefix$!article.link">${article.title}</a></span></br>	
+						</#list>
+					</@cmsArticleListTag>
+				</div>
+			</#list>
+		</@cmsCategoryListTag>
+	</div>
+</div>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.payment.dao.FinanceWithdrawRecordDAO">
+	<resultMap id="financeWithdrawRecordMapper" type="financeWithdrawRecord">
+			<result property="id" column="id" />
+			<result property="tradeNo" column="trade_no" />
+			<result property="userId" column="user_id" />
+			<result property="userName" column="username" />
+			<result property="amount" column="amount" />
+			<result property="type" column="type" />
+			<result property="status" column="status" />
+			<result property="createdTime" column="created_time" />
+			<result property="modifiedTime" column="modified_time" />
+			<result property="failReason" column="fail_reason" />
+			<result property="userName" column="username" />
+	</resultMap>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		SELECT record.id,record.trade_no,record.user_id,username,record.amount,record.TYPE,record.STATUS,record.created_time,record.modified_time,record.fail_reason 
+		FROM finance_withdraw_record record
+		LEFT JOIN usercenter.user user on record.user_id = user.id
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.tradeNo != null and entity.tradeNo !=''">
+				<![CDATA[ and record.trade_no  = #{entity.tradeNo} ]]>
+			</if>
+			<if test="entity.userId != null and entity.userId !=''">
+				<![CDATA[ and record.user_id  = #{entity.userId} ]]>
+			</if>
+			<if test="entity.type != null and entity.type !=''">
+				<![CDATA[ and record.type  = #{entity.type} ]]>
+			</if>
+			<if test="entity.status != null and entity.status !=''">
+				<![CDATA[ and record.status  = #{entity.status} ]]>
+			</if>
+			<if test="entity.userName != null and entity.userName !=''">
+				<![CDATA[ and user.username  LIKE CONCAT('%',#{entity.userName},'%') ]]>
+			</if>
+			<if test="entity.createdBegin != null  and entity.createdBegin !=''">
+			<![CDATA[ and record.created_time >DATE_FORMAT(#{entity.createdBegin},'%Y-%m-%d') ]]>
+			</if>
+			<if test="entity.createdEnd != null  and entity.createdEnd !=''">
+				<![CDATA[ and record.created_time <DATE_FORMAT(#{entity.createdEnd},'%Y-%m-%d')]]>
+			</if>
+			<if test="null != entity.userIds and entity.userIds.size() > 0">
+				<![CDATA[ and user_id in]]>
+				<foreach collection="entity.userIds" item="userId" open="(" separator="," close=")">
+					<![CDATA[   #{userId } ]]>
+				</foreach>
+			</if>
+			<if test="entity.failReason != null and entity.failReason !=''">
+				<![CDATA[ and record.fail_reason  = #{entity.failReason} ]]>
+			</if>
+			<if test="entity.recordStatus!=null">
+					<![CDATA[ and record.status    in ]]>
+				<foreach collection="entity.recordStatus" item="record"  index="index" open="("  separator="," close=")">
+					<![CDATA[ #{record} ]]>
+				</foreach>
+			</if>
+		</if>
+		order by record.created_time desc
+	</sql>
+	
+	
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	
+	<!-- 统计总条数 -->
+	<sql id="count_Tail">
+		select count(1) from finance_withdraw_record record
+		LEFT JOIN usercenter.user user on record.user_id = user.id
+	</sql>
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="com.camelot.payment.dto.FinanceWithdrawRecordDTO">
+		insert into finance_withdraw_record(
+				trade_no,
+				user_id,
+				amount,
+				type,
+				status,
+				created_time,
+				fail_reason
+		)values(
+				#{tradeNo},
+				#{userId},
+				#{amount},
+				#{type},
+				#{status},
+				now(),
+				#{failReason}
+		)
+	</insert>
+	<update id="update">
+		update finance_withdraw_record record set record.modified_time = now()
+			<if test = "status != null">
+				,record.status = #{status}
+			</if>
+			<if test = "failReason != null">
+				,record.fail_reason = #{failReason}
+			</if>
+			
+		where 1=2 
+		<if test = "id != null">
+			 or id = #{id}
+		</if>
+		
+		<if test = "tradeNo != null">
+				 or trade_no = #{tradeNo}
+			</if>
+	</update>
+	
+	<update id="updateForTradeNo">
+		update finance_withdraw_record record set record.modified_time = now()
+			<if test = "status != null">
+				,record.status = #{status}
+			</if>
+			<if test = "failReason != null">
+				,record.fail_reason = #{failReason}
+			</if>
+		where trade_no = #{tradeNo}
+	</update>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail"></include>
+		<include refid="where_fragement"></include>
+	</select>
+	
+	<select id="queryList" resultMap="financeWithdrawRecordMapper" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	
+</mapper>

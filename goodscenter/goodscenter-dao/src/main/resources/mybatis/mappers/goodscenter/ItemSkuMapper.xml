@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.goodscenter.dao.ItemSkuDAO">
+	<resultMap id="itemSkuMapper" type="com.camelot.goodscenter.domain.ItemSku">
+			<result property="skuId" column="sku_id" />
+			<result property="itemId" column="item_id" />
+			<result property="sellerId" column="seller_id" />
+			<result property="skuStatus" column="sku_status" />
+			<result property="skuType" column="sku_type" />
+			<result property="ad" column="ad" />
+			<result property="attributes" column="attributes" />
+			<result property="created" column="created" />
+			<result property="modified" column="modified" />
+			<result property="shopId" column="shop_id" />
+			<result property="productId" column="product_id" />
+	</resultMap>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+		  *
+		from 
+			item_sku
+		]]>
+	</sql>
+	<!-- mysql 分页尾 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	
+	<select id="queryById" resultMap="itemSkuMapper">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+			where sku_id = #{id}
+		]]>
+	</select>
+	
+	
+	<insert id="add">
+		<![CDATA[
+		INSERT INTO item_sku (
+		  sku_id,
+		  item_id,
+		  seller_id,
+		  sku_status,
+		  sku_type,
+		  ad,
+		  attributes,
+		  created,
+		  modified,
+		  shop_id,
+		  product_id
+		) 
+		VALUES
+		  (
+		    #{skuId},
+		    #{itemId},
+		    #{sellerId},
+		    1,
+		    1,
+		    #{ad},
+		    #{attributes},
+		    now(),
+		    now(),
+		    #{shopId},
+		    #{productId}
+  		)
+		]]>
+	</insert>
+	
+	<insert id="insertSkuPicture">
+		<![CDATA[
+			INSERT INTO item_sku_picture (
+			  picture_id,
+			  sku_id,
+			  picture_url,
+			  sort_number,
+			  picture_status,
+			  seller_id,
+			  created,
+			  modified,
+			  shop_id
+			) 
+			VALUES
+			  (
+			    #{pictureId},
+			    #{skuId},
+			    #{pictureUrl},
+			    #{sortNumber},
+			    1,
+			    #{sellerId},
+			    now(),
+			    now(),
+			    #{shopId}
+			  ) 
+		]]>
+	</insert>
+	
+	<insert id="insertSkuPrice">
+		<![CDATA[
+			INSERT INTO trade_sku_price (
+			  item_id,
+			  sku_id,
+			  seller_id,
+			  shop_id,
+			  market_price,
+			  sell_price,
+			  cost_price,
+			  area_name,
+			  area_id,
+			  area_number,
+			  min_num,
+			  max_num,
+			  create_user,
+			  update_user,
+			  create_time,
+			  update_time
+			) 
+			VALUES
+			  (
+			    #{itemId},
+			    #{skuId},
+			    #{sellerId},
+			    #{shopId},
+			    #{marketPrice},
+			    #{sellPrice},
+			    #{costPrice},
+			    #{areaName},
+			    #{areaId},
+			    #{areaNumber},
+			    #{minNum},
+			    #{maxNum},
+			    #{createUser},
+			    #{updateUser},
+			    now(),
+			    now()
+			  )
+
+			
+		]]>
+	</insert>
+	
+	<insert id="insertSkuPriceLog">
+		<![CDATA[
+			INSERT INTO trade_sku_price_log (
+			  sku_id,
+			  seller_id,
+			  market_price,
+			  cost_price,
+			  sell_price,
+			  sell_stepped,
+			  area_name,
+			  area_id,
+			  create_user,
+			  create_time
+			) 
+			VALUES
+			  (
+			    #{skuId},
+			    #{sellerId},
+			    #{marketPrice},
+			    #{costPrice},
+			    #{sellPrice},
+			    CONCAT(#{minNum},'-',#{maxNum}),
+			    #{areaName},
+			    #{areaId},
+			    #{createUser},
+			    now()
+			  ) 
+
+			
+		]]>
+	</insert>
+	
+	<insert id="insertItemSkuInventory">
+		<![CDATA[
+		INSERT INTO trade_inventory (
+		  shop_id,
+		  sku_id,
+		  seller_id,
+		  total_inventory,
+		  occupied_inventory,
+		  created,
+		  modified,
+		  state,
+		  yn,
+		  create_user,
+		  update_user
+		) 
+		VALUES
+		  (
+		    #{shopId},
+		    #{skuId},
+		    #{sellerId},
+		    #{totalInventory},
+		    #{occupiedInventory},
+		    now(),
+		    now(),
+		    1,
+		    2,
+		    #{sellerId},
+		    #{sellerId}
+		  )
+		]]>
+		
+	</insert>
+	
+	<select id="getSkuId" resultType="long">
+		SELECT get_item_sku_id()
+	</select>
+	
+	<update id="update">
+		<![CDATA[
+			UPDATE 
+			  item_sku 
+			SET
+			  item_id = #{itemId},
+			  seller_id = #{sellerId},
+			  sku_status = #{skuStatus},
+			  sku_type = #{skuType},
+			  ad = #{ad},
+			  attributes = #{attributes},
+			  modified = now(),
+			  shop_id = #{shopId},
+			  product_id = #{productId}
+			WHERE sku_id = #{skuId} 
+  
+		]]>
+	</update>
+	
+	<delete id="deleteSkuPictures">
+		<![CDATA[
+			DELETE FROM item_sku_picture WHERE item_sku_picture.sku_id=#{skuId}
+		]]>
+	</delete>
+	
+	<delete id="deleteSkuSellPrices">
+		<![CDATA[
+			DELETE FROM trade_sku_price WHERE trade_sku_price.sku_id=#{skuId}
+		]]>
+	</delete>
+	
+	<update id="deleteSkuById">
+		<![CDATA[
+		UPDATE 
+		  item_sku 
+		SET
+		  sku_status = 2
+		WHERE sku_id = #{skuId}
+		]]>
+	</update>
+	
+	<select id="queryProductIdExist" resultType="long">
+		SELECT get_item_sku_id() from item_sku where product_id=#{productId}
+	</select>
+	
+	
+</mapper>

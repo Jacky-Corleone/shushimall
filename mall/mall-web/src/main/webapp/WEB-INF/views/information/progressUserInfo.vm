@@ -1,0 +1,303 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+
+<link href="$staticPath/css/register.css" rel="stylesheet" type="text/css" />
+<link href="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.css" type="text/css" rel="stylesheet" />
+
+<script type="text/javascript" src="$staticPath/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/jquery-validation/1.11.1/messages_zh.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/js/jquery-migrate-1.1.0.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.shadow.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.ifixpng.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/fancyzoom/jquery.fancyzoom.js"></script>
+
+<style>
+	.userInfo_class_hide{
+		display:none;
+	}
+	.approve_buyer ul{margin:0px; }
+	.approve_buyer ul li{width:500px; }
+</style>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	//加载左侧菜单
+	if("$!shopDTO.status" == '5'){
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+	}
+	//页面状态
+	if("$!pageState" == "edit"){
+		$(".userInfo_class_hide").show();
+		$(".userInfo_class_show").hide();
+	}
+	//初始化验证
+	initValidPlugin();
+	
+	//卖家认证提交
+	$("#userInfoBtn").click(function(){
+		//收集数据：营业执照信息
+		collectDataBusiness();
+		//开户行支行所在地
+		$("#bankBranchIsLocated").val($("#account_provinces").val()+","+$("#account_city").val()+","+$("#account_area").val());
+		//同类电商网店经验
+		$("#isHaveEBusiness").val($("input[name='isHaveEBusiness']:checked").val());
+		
+		//数据校验-框架校验
+		var businessIsValid = $("#businessForm").valid();
+		var organizationIsValid = $("#organizationForm").valid();
+		var taxIsValid = $("#taxForm").valid();
+		var accountIsValid = $("#accountForm").valid();
+		var manageIsValid = $("#manageForm").valid();
+		if(!businessIsValid || !organizationIsValid || !taxIsValid || !accountIsValid || !manageIsValid ){
+			return false;
+		}
+		/* 
+		//数据校验-JS校验 
+		var required_bl = true;
+		var required_val = "";
+		var businessLicenceIndate = $("#businessLicenceIndate").val();
+		var companyPhone = $("#companyPhone").val();
+		var businessLicencePicSrc = $("#businessLicencePicSrc").val();
+		var artificialPersonPicSrc = $("#artificialPersonPicSrc").val();
+		var artificialPersonPicBackSrc = $("#artificialPersonPicBackSrc").val();
+		var organizationPicSrc = $("#organizationPicSrc").val();
+		var taxRegistrationCertificatePicSrc = $("#taxRegistrationCertificatePicSrc").val();
+		var taxpayerCertificatePicSrc = $("#taxpayerCertificatePicSrc").val();
+		var bankAccountPermitsPicSrc = $("#bankAccountPermitsPicSrc").val();
+		if(!$('#timeState').is(':checked') && (businessLicenceIndate==null || businessLicenceIndate=="" || businessLicenceIndate==undefined)){
+			required_bl = false;
+			required_val = "营业执照有效期";
+		}else if(companyPhone==null || companyPhone=="" || companyPhone==undefined){
+			required_bl = false;
+			required_val = "联系电话";
+		}else if(businessLicencePicSrc==null || businessLicencePicSrc=="" || businessLicencePicSrc==undefined){
+			required_bl = false;
+			required_val = "营业执照副本电子版";
+		}else if(artificialPersonPicSrc==null || artificialPersonPicSrc=="" || artificialPersonPicSrc==undefined){
+			required_bl = false;
+			required_val = "法人身份证（正面）";
+		}else if(artificialPersonPicBackSrc==null || artificialPersonPicBackSrc=="" || artificialPersonPicBackSrc==undefined){
+			required_bl = false;
+			required_val = "法人身份证（反面）";
+		}else if(organizationPicSrc==null || organizationPicSrc=="" || organizationPicSrc==undefined){
+			required_bl = false;
+			required_val = "组织机构代码电子版";
+		}else if(taxRegistrationCertificatePicSrc==null || taxRegistrationCertificatePicSrc=="" || taxRegistrationCertificatePicSrc==undefined){
+			required_bl = false;
+			required_val = "税务登记证电子版";
+		}else if(taxpayerCertificatePicSrc==null || taxpayerCertificatePicSrc=="" || taxpayerCertificatePicSrc==undefined){
+			required_bl = false;
+			required_val = "纳税人资格证电子版";
+		}else if(bankAccountPermitsPicSrc==null || bankAccountPermitsPicSrc=="" || bankAccountPermitsPicSrc==undefined){
+			required_bl = false;
+			required_val = "银行开户许可证电子版";
+		}
+		if( !required_bl ){
+			alert(required_val+",不能为空值!");
+			return;
+		}
+		 */
+        //营业执照信息 营业执照有效期至
+        if($("#businessLicenceIndate").val() == '长期有效'){
+            $("#businessLicenceIndate").val('');
+        }
+		//提交
+		$("#userInfoBtn").loadingMsg();
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			url:"$request.contextPath/information/progressSeller/submintUserInfo",
+			data:$("#userInfoDiv").find("input,select,radio,checkbox").serializeArray(),
+			success: function(result){
+				$("#userInfoBtn").hideMsg();
+				alert(result.message);
+				window.location.href="$request.contextPath/information/progressSeller/initProgress";
+			},
+			error:function(result){
+				$("#userInfoBtn").hideMsg();
+			}
+		});
+	});
+	//取消
+	$("#cancelBtn").click(function(){
+		window.location.href="$request.contextPath/information/progressSeller/initProgress";
+	});
+	//图片查看
+	$('.po_re_img').fancyzoom({
+		Speed:400,
+		showoverlay:false,
+		imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+	});
+});
+
+/*工具方法：上传图片*/
+function startUpload(fileElementId, showImg,urlInput){
+	//判断图片格式
+	var fileInput = $("#"+fileElementId).val();
+	var extStart = fileInput.lastIndexOf(".");
+	var ext = fileInput.substring(extStart,fileInput.length).toUpperCase();
+	if(ext!=".JPG" && ext!=".jpg" && ext!=".JPEG" && ext!=".jpeg" && ext!=".PNG" && ext!=".png" && ext!=".BMP" && ext!=".bmp"){
+		alert("图片限于jpg,jpeg,png,bmp格式");
+		return false;
+	}
+	$.ajaxFileUpload({
+		url: '$request.getContextPath()/fileUpload/fixedUpload?size=307200&date='+new Date(), //用于文件上传的服务器端请求地址
+		secureuri: false, //是否需要安全协议，一般设置为false
+		fileElementId: fileElementId, //文件上传域的ID
+		dataType: 'json', //返回值类型 一般设置为json
+		type:"post",
+		success: function (data, status){  //服务器成功响应处理函数
+			if(!data.success){
+				alert(data.msg);
+				return false;
+			}
+			$("#"+showImg).attr("src","$!imageServerAddr"+data.url);
+			$("#"+urlInput).val(data.url);
+			$("#"+fileElementId).val("");
+			
+			//图片查看
+			$('.po_re_img').fancyzoom({
+				Speed:400,
+				showoverlay:false,
+				imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+			});
+		},
+		error: function (data, status, e){//服务器响应失败处理函数
+		}
+	});
+};
+
+/**
+ * 省市区数据填充
+ * parentCode 父级编码
+ * opitonId 需要填充数据的下拉列表框的id
+ * selectVal 默认选中的值
+ * name 服务器返回的数据中，作为下拉框option的text的字段名，默认为"name"
+ * code 服务器返回的数据中，作为下拉框option的value的字段名，默认为"code"
+ */
+function optionItems(url, parentCode, optionId,selectVal, name, code){
+	$.ajax({
+		url:url,
+		type:"post",
+		data:{
+			parentCode:parentCode
+		},
+		dataType: "json",
+		success:function(data){
+			var optionItem = $("#"+optionId);
+			optionItem.empty();
+			optionItem.append($("<option>").text("请选择").val(""));
+			$.each(data, function (n, address) {
+				if(!name){
+					name = "name"; 
+				}
+				if(!code){
+					code = "code";
+				}
+				var option = $("<option>").text(address[name]).val(address[code]);
+				if(address.code == selectVal){
+					option.attr("selected",true);
+				}
+				optionItem.append(option);
+			});
+		}
+	});
+}
+/**
+ * 省市区数据-初始化
+ * address 地址编码：32,3201,320103
+ * provinces 下拉框ID：省份
+ * city 下拉框ID：市
+ * area 份下拉框ID：区
+ */
+function initAddress(address,provinces,city,area){
+	var strs = address.split(",");
+	for(var i=0;i<strs.length;i++){
+		if(i==0){
+			$("#"+provinces).val(strs[i]);
+			//optionItems("$request.contextPath/information/register/queryAddress",'0',"company_provinces",strs[i]);
+		}else if(i==1){
+			optionItems("$request.contextPath/information/register/queryAddress",strs[i-1],city,strs[i]);
+		}else if(i==2){
+			optionItems("$request.contextPath/information/register/queryAddress",strs[i-1],area,strs[i]);
+		}
+	}
+}
+
+/*初始化校验控件*/
+function initValidPlugin(){
+	//验证：特殊字符
+	jQuery.validator.addMethod("specialCharValidate", function(value, element) { 
+			var pattern = new RegExp("[`~!@%#$^&*()=|{}':;',　\\[\\]<>/? \\.；：%……+￥（）【】‘”“'。，、？]"); 
+			return this.optional(element)||!pattern.test(value) ; 
+	}, "不能有特殊字符");
+	//验证：只能为字母和中文
+	jQuery.validator.addMethod("chrchinese", function(value, element) {
+		var chinese = /[a-zA-Z\u4e00-\u9fa5]+$/;
+		return this.optional(element) || (chinese.test(value));
+	}, "只能输入字母和中文");
+	//验证：数字和字母
+	jQuery.validator.addMethod("chrnum", function(value, element) {
+		var chrnum = /^([a-zA-Z0-9]+)$/;
+		return this.optional(element) || (chrnum.test(value));
+	}, "只能输入数字和字母");
+}
+</script>
+
+<div id="main">
+<!--left start-->
+#if("$!shopDTO.status"=="5")
+<div id="leftSeller" class="border-4"></div>
+#else
+<div id="leftSeller" class="border-4">
+	<dl>
+		<dt><i class="demo-icons fa-unlock-alt font_16 mar_r10"></i>卖家中心</dt>
+		<dd>信息设置<i class="fa-sort-desc fr mar_r10"></i></dd>
+		<ul>
+			<li><a href="$request.contextPath/information/progressSeller/initProgress" >审核进度查看</a></li>
+		</ul>
+	</dl>
+</div>
+#end
+<!--left end-->
+
+<!--right start-->
+<div id="right"><div id="userInfoDiv">
+	<!-- 用户ID/店铺ID -->
+	<input type="hidden" id="userId" name="userId" value="$!userId">
+	<input type="hidden" id="extendId" name="extendId" value="$!extendId">
+	
+	<!--营业执照信息 start -->
+	#parse("/information/sellerBusiness.vm")
+	<!--营业执照信息end-->
+	
+	<!--组织机构代码信息 start -->
+	#parse("/information/sellerOrganization.vm")
+	<!--组织机构代码信息end-->
+	
+	<!--税务登记证信息 start -->
+	#parse("/information/sellerTax.vm")
+	<!--税务登记证信息end-->
+	
+	<!--出金账户信息 start -->
+	#parse("/information/sellerAccount.vm")
+	<!--出金账户信息end-->
+	
+	<!--经营信息 start -->
+	#parse("/information/sellerManage.vm")
+	<!--经营信息end-->
+	
+	<div class="mar_cen wid_500 font_cen">
+	#if("$!pageState"=="edit")
+		<button type="button" id="userInfoBtn" class="button_2 hei_40 font_14b" loadMsg="正在保存...">提 交</button>
+		<button type="button" id="cancelBtn" class="button_3 hei_40 font_14b">取 消</button>
+	#elseif("$!pageState"=="view")
+		<button type="button" id="cancelBtn" class="button_2 hei_35 font_14b">返 回</button>
+	#end
+	</div>
+</div></div>
+<!--right end-->
+</div>

@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.sellercenter.dao.MallThemeDAO">
+	<resultMap id="mallThemeMapper" type="com.camelot.sellercenter.domain.MallTheme">
+		<result property="id" column="id"/>
+		<result property="themeName" column="theme_name"/>
+		<result property="primaryCid" column="primary_cid"/>
+		<result property="cId" column="cId"/>
+		<result property="clev" column="clev"/>
+		<result property="addressId" column="addressId"/>
+		<result property="provinceCode" column="provinceCode"/>
+		<result property="cityCode" column="cityCode"/>
+		<result property="villageCode" column="villageCode"/>
+		<result property="type" column="type"/>
+		<result property="color" column="color"/>
+		<result property="status" column="status"/>
+		<result property="userId" column="userId"/>
+		<result property="sortNum" column="sort_num"/>
+		<result property="created" column="created"/>
+		<result property="modified" column="modified"/>
+		<result property="colorb" column="color_b"/>
+	</resultMap>
+	<resultMap id="mallThemeDTO" type="com.camelot.sellercenter.malltheme.dto.MallThemeDTO">
+		<result property="id" column="id"/>
+		<result property="themeName" column="theme_name"/>
+		<result property="primaryCid" column="primary_cid"/>
+		<result property="cId" column="cId"/>
+		<result property="clev" column="clev"/>
+		<result property="addressId" column="addressId"/>
+		<result property="provinceCode" column="provinceCode"/>
+		<result property="cityCode" column="cityCode"/>
+		<result property="villageCode" column="villageCode"/>
+		<result property="type" column="type"/>
+		<result property="color" column="color"/>
+		<result property="status" column="status"/>
+		<result property="userId" column="userId"/>
+		<result property="sortNum" column="sort_num"/>
+		<result property="created" column="created"/>
+		<result property="modified" column="modified"/>
+		<result property="colorb" column="color_b"/>
+	</resultMap>
+	<select id="queryById" resultMap="mallThemeDTO">
+		select * from mall_theme
+		where id = #{id}
+	</select>
+	<update id="updateStatusById">
+		update mall_theme set
+		status = #{publishFlag}
+		where id = #{id}
+	</update>
+	
+	<insert id="add">
+		insert into mall_theme(
+			theme_name,
+			primary_cid,
+			cId,
+			clev,
+			addressId,
+			provinceCode,
+			cityCode,
+			villageCode,
+			type,
+			color,
+			color_b,
+			status,
+			userId,
+			sort_num,
+			created,
+			modified
+			)values(
+			#{themeName},
+			#{primaryCid},
+			#{cId},
+			#{clev},
+			#{addressId},
+			#{provinceCode},
+			#{cityCode},
+			#{villageCode},
+			#{type},
+			#{color},
+			#{colorb},
+			#{status},
+			#{userId},
+			#{sortNum},
+			NOW(),
+			NULL
+			)
+			<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+				select @@IDENTITY
+			</selectKey>
+	</insert>
+	<select id="delete">
+		delete from mall_theme
+		where id = #{id}
+	</select>
+	
+	<update id="update" parameterType="Object">
+		update mall_theme set
+		modified = NOW()
+		<if test="themeName != null" >
+		,theme_name = #{themeName}
+		</if>
+		<if test="cId != null" >
+		,cId = #{cId}
+		</if>
+		<if test="primaryCid != null" >
+		,primary_cid = #{primaryCid}
+		</if>
+		<if test="clev != null" >
+		,clev = #{clev}
+		</if>
+		<if test="addressId != null" >
+		,addressId = #{addressId}
+		</if>
+		<if test="provinceCode != null" >
+		,provinceCode = #{provinceCode}
+		</if>
+		<if test="cityCode != null" >
+		,cityCode = #{cityCode}
+		</if>
+		<if test="villageCode != null" >
+		,villageCode = #{villageCode}
+		</if>
+		<if test="themeName != null" >
+		,type = #{type}
+		</if>
+		<if test="themeName != null" >
+		,color = #{color}
+		</if>
+		<if test="themeName != null" >
+		,color_b = #{colorb}
+		</if>
+		<if test="themeName != null" >
+		,status = #{status}
+		</if>
+		<if test="themeName != null" >
+		,userId = #{userId}
+		</if>
+		<if test="themeName != null" >
+		,sort_num = #{sortNum}
+		</if>
+		where id = #{id}
+	</update>
+	
+	
+	<select id="queryCountDTO" resultType="long">
+		select count(0) from mall_theme where 1=1
+		<if test="publishFlag!= null ">
+			and status = #{publishFlag}
+		</if>
+	</select>
+	<select id="queryDTO" resultMap="mallThemeDTO" >
+		select * from mall_theme where 1=1
+		<if test="publishFlag!=null">
+			and status = #{publishFlag}
+		</if>
+	</select>
+	
+	<select id="queryListCountDTO" resultType="long">
+		select count(0) from mall_theme
+		
+		<include refid="queryList_where" />
+	</select>
+	<select id="queryListDTO" resultMap="mallThemeDTO">
+		SELECT 
+			id,theme_name,primary_cid,cId,clev,addressId,provinceCode,cityCode,villageCode,type,color,status,userId,sort_num,created,modified,color_b
+			from mall_theme 
+		<include refid="queryList_where" />
+		order by sort_num asc, modified desc
+		<if test="page != null ">
+		limit #{page.pageOffset} , #{page.rows}
+		</if>
+	</select>
+	
+	<select id="queryGroupCityCode" resultMap="mallThemeDTO">
+		SELECT * from mall_theme where cityCode is not NULL and mall_theme.status =1 GROUP BY cityCode 
+	</select>
+	
+	<sql id="queryList_where">
+		where 1=1
+		<if test="publishFlag!= null ">
+			and status = #{publishFlag}
+		</if>
+		<if test="entity!=null">
+			<if test=" entity.id != null and entity.id != '' ">
+				and id = #{entity.id}
+			</if>
+			<if test=" entity.themeName != null ">
+				and theme_name like concat('%',#{entity.themeName},'%')
+			</if>
+			<if test=" entity.cId != null ">
+				and cId = #{entity.cId}
+			</if>
+			<if test=" entity.primaryCid != null ">
+				and primary_cid = #{entity.primaryCid}
+			</if>
+			<if test=" entity.clev != null ">
+				and clev = #{entity.clev}
+			</if>
+			<if test=" entity.addressId != null ">
+				and addressId = #{entity.addressId}
+			</if>
+			<if test=" entity.provinceCode != null ">
+				and provinceCode = #{entity.provinceCode}
+			</if>
+			<if test=" entity.cityCode != null ">
+				and cityCode = #{entity.cityCode}
+			</if>
+			<if test=" entity.villageCode != null ">
+				and villageCode = #{entity.villageCode}
+			</if>
+			<if test=" entity.type != null and entity.type != 0">
+				and type = #{entity.type}
+			</if>
+			<if test=" entity.color != null ">
+				and color = #{entity.color}
+			</if>
+			<if test=" entity.userId != null ">
+				and userId = #{entity.userId}
+			</if>
+			<if test=" entity.status != null ">
+				and status = #{entity.status}
+			</if>
+			<if test="entity.statusGroup != null">
+				and status in
+				<foreach collection="entity.statusGroup" item="status" open="(" close=")" separator=",">
+					#{status}
+				</foreach>
+			</if>
+			<if test=" entity.themeNameNoLike != null and entity.themeNameNoLike != ''">
+				<![CDATA[ and theme_name = #{entity.themeNameNoLike} ]]>
+			</if>
+			
+		</if>
+
+	</sql>
+	
+</mapper>

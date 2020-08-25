@@ -1,0 +1,59 @@
+#set($layout = "common/blanklayout.vm")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <base href="${request.getContextPath()}/"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>订单充值</title>
+    <link href="assets/css/detail.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" src="assets/css/detail.js" />
+    <link rel="stylesheet" type="text/css" src="assets/css/style.js" />
+    <script type="text/javascript" src="assets/js/iscroll.js"></script>
+    <script type="text/javascript" src="assets/js/tab.js"></script>
+    <script type="text/javascript" src="assets\js\jquery-1.11.2.min.js"></script>
+</head>
+<script type="text/javascript" >
+    //其他方式支付
+    function pay(){
+        window.location.href="$request.contextPath/person/pay?orderNo="+$!orderNo;
+    }
+    function toBankList(){
+        window.location="$request.contextPath/user/toBankList";
+    }
+</script>
+
+<body >
+<div id="main" class="po_re">
+    <!-- 中间内容 -->
+    <form id="" action="person/payOrder" method="post">
+        <input type="hidden" name="orderNo" value="$!orderNo"/>
+        <input type="hidden" name="totalPrice" value="$!totalPrice"/>
+    <div class="content" id="wrapper">
+        <div class="hei_70 wid_100">
+            <img src="assets/images/logo_zf.png"  width="80%"/>
+        </div>
+        <div class="pad_lr10">
+            <div class="hei_50 wid_100 font_1_5 font_3" style="overflow: visible;line-height:25px;">余额不足,请充值或选择其他方式。</div>
+            <div class="lin_32 font_1_2">订单号:<span class="font_2">$!orderNo</span></div>
+            <div class="lin_32 font_1_2">应付金额（元）:￥<span class="font_2">$!totalPrice</span></div>
+            <div class="lin_32 font_1_2">账户名称:<span class="font_2">$!bankAccountName</span></div>
+            <div class="lin_32 font_1_2">账户账号:<span class="font_2">$!buyerPaysAccount</span></div>
+            <div class="lin_32 font_1_2">开户行:<span class="font_2">中信银行北京和平里支行</span></div>
+            <div class="lin_32 font_1_2">开户行号:<span class="font_2">302100011753</span></div>
+            <div class="lin_32 font_1_2">账户余额:<span class="font_2">$!balance</span></div>
+            <div class="font_cen">
+                <button class="button_1 pad_lr5 hei_32" onclick="toBankList();return false;"  type="button" >充值</button>
+                <button class="button_1 pad_lr5 hei_32" onclick="pay(); return false;"  type="button" >其他方式支付</button>
+            </div>
+        </div>
+    </form>
+
+    </div><!-- 中间内容 end-->
+</div>
+
+</body>
+</html>

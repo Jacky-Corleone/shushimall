@@ -1,0 +1,190 @@
+<script type="text/javascript">
+$(function(){
+	//初始化验证
+	initValidPluginAccount();
+	//初始化页面
+	initAccount();
+
+	/*暂存：出金账户信息*/
+	$("#accountBtn").click(function(){
+		//开户行支行所在地
+		$("#bankBranchIsLocated").val($("#account_provinces").val()+","+$("#account_city").val()/* +","+$("#account_area").val() */);
+		//暂存操作
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			url:"$request.contextPath/information/registerSeller/stagingInformation",
+			data:$("#accountForm").serializeArray(),
+			success: function(data){
+				alert(data.result);
+			}
+		});
+	});
+	//下拉菜单:开户行支行所在地
+	$("#account_provinces").change(function(){
+		/* $("#account_area").empty().append($("<option>").text("请选择").val("")); */
+		optionItems("$request.contextPath/information/register/queryAddress",$("#account_provinces").val(),"account_city","");
+	});
+	/* $("#account_city").change(function(){
+		optionItems("$request.contextPath/information/register/queryAddress",$("#account_city").val(),"account_area","");
+	}); */
+});
+
+/*初始化页面*/
+function initAccount(){
+	//开户行支行所在地
+	if("$!userAccountDTO.bankBranchIsLocated"!=null && "$!userAccountDTO.bankBranchIsLocated"!="" ){
+		initAddress("$!userAccountDTO.bankBranchIsLocated","account_provinces","account_city","account_area");
+	}
+	//是否中信本银行
+	if("$!userAccountDTO.isCiticBank"!=null && "$!userAccountDTO.isCiticBank"!="" ){
+		$("#isCiticBank").val("$!userAccountDTO.isCiticBank");
+	}
+}
+
+/*初始化校验控件*/
+function initValidPluginAccount() {
+    $("#accountForm").validate({
+        rules: {
+            "userAccountDTO.bankAccountName": {
+                required: true,
+//                specialCharValidate: true,
+              //  bankAccountName: true
+            },
+            "userAccountDTO.bankAccount": {
+                required: true,
+                number: true
+
+            },
+            "userAccountDTO.bankName": {
+                required: true
+            },
+            "userAccountDTO.bankBranchJointLine": {
+                required: true
+            },
+            "account_provinces": {
+                required: true
+            },
+            "account_city": {
+                required: true
+            },
+            /* "account_area": {
+                required: true
+            }, */
+            "userAccountDTO.isCiticBank": {
+                required: true
+            }
+        }
+    });
+
+//        jQuery.validator.addMethod("bankAccountName", function (value, element) {
+//                var chrnum = /^[\u4e00-\u9fa5a-zA-Z]{2,20}$/;
+//                return this.optional(element) || (chrnum.test(value));
+//         }, "输入2-20个字符，可由中文和英文组成");
+}
+</script>
+
+<!--出金账户信息 start -->
+<form id="accountForm" method="post">
+<div class="bg_07 border-6">
+<div class="approve_buyer" id="approve_buyer">
+	<h1 class="font_18 mar_20">出金账户信息：</h1>
+	<input name="stagingType" type="hidden" value="4"/>
+	<ul>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>银行开户名：</span>
+			<span class="userInfo_class_show">$!userAccountDTO.bankAccountName</span>
+			<div class="userInfo_class_hide">
+			<input id="bankAccountName" name="userAccountDTO.bankAccountName" value="$!userAccountDTO.bankAccountName" type="text"
+				class="input_Style1 wid_250" placeholder="输入开户名..." maxlength="100"/>
+			</div>
+		</li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>公司银行账号：</span>
+			<span class="userInfo_class_show">$!userAccountDTO.bankAccount</span>
+			<div class="userInfo_class_hide">
+			<input id="bankAccount" name="userAccountDTO.bankAccount" value="$!userAccountDTO.bankAccount" type="text"
+				class="input_Style1 wid_250" placeholder="输入银行账号" maxlength="25"/>
+			</div>
+		</li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>开户行支行名称：</span>
+			<span class="userInfo_class_show">$!userAccountDTO.bankName</span>
+			<div class="userInfo_class_hide">
+			<input id="bankName" name="userAccountDTO.bankName" value="$!userAccountDTO.bankName" type="text"
+				class="input_Style1 wid_250" placeholder="输入开户行支行名称，如：上海浦东发展银行北京宣武支行" maxlength="50"/>
+			</div>
+		</li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>开户行支行联行号：</span>
+			<span class="userInfo_class_show">$!userAccountDTO.bankBranchJointLine</span>
+			<div class="userInfo_class_hide">
+			<input id="bankBranchJointLine" name="userAccountDTO.bankBranchJointLine" value="$!userAccountDTO.bankBranchJointLine"
+				type="text" class="input_Style1 wid_250" maxlength="20" placeholder="输入开户行支行联行号，如：310100000036" />
+			</div>
+		</li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>开户行支行所在地：</span>
+			<span class="userInfo_class_show">$!finalBankBranchIsLocated</span>
+			<div class="userInfo_class_hide">
+				<select id="account_provinces" name="account_provinces" class="input_Style1 wid_80">
+					<option value="" selected="selected"> 请选择 </option>
+					#foreach($address in $addressList)
+					    <option value="$!address.code"> $!address.name </option>
+					#end
+				</select>
+				<i>-</i>
+				<select id="account_city" name="account_city" class="input_Style1 wid_80">
+					<option value="" selected="selected"> 请选择 </option>
+				</select>
+				<!-- <i>-</i>
+				<select id="account_area" name="account_area" class="input_Style1 wid_80">
+					<option value="" selected="selected"> 请选择 </option>
+				</select> -->
+			</div>
+			<input id="bankBranchIsLocated" name="userAccountDTO.bankBranchIsLocated" type="hidden"/>
+		</li>
+		<li>
+			<span class="font_span"><i class="demo-icons font_fs">*</i>是否中信本银行：</span>
+			<span class="userInfo_class_show">
+                #if($!userAccountDTO.isCiticBank==1)
+                    是
+                #else
+                    否
+                #end
+			</span>
+			<div class="userInfo_class_hide">
+			<select id="isCiticBank" name="userAccountDTO.isCiticBank" class="input_Style2 wid_180 hei_35">
+				<option value="" selected="selected"> 请选择 </option>
+				<option value="1" > 是  </option>
+				<option value="0" > 否  </option>
+			</select>
+			</div>
+		</li>
+		<div class="clear"></div>
+		<span style="color: red">&nbsp;&nbsp;提示:&nbsp;上传图片仅支持JPG、JPEG、PNG、BMP格式，上传图片大小不得超过1M</span>
+		<div class="clear"></div>
+		<li>
+			<p class="font_span"><i class="demo-icons font_fs">*</i>银行开户许可证电子版：</p>
+			<img src="$!imageServerAddr$!userAccountDTO.bankAccountPermitsPicSrc" id="bankAccountPermitsPicSrcImg"
+				alt="" width="55" height="55" class="mar_lr10 fl po_re_img" title="点击查看大图">
+			<div class="userInfo_class_hide">
+			<p class="hei_40 fl registere_class_hide z-upload">
+				<button type="button" class="button_4 font_12 border-1 button_small">上传图片</button>
+				<input type="file" id="bankAccountPermitsPicSrcFile" class="file-img" name="file" onchange="startUpload('bankAccountPermitsPicSrcFile','bankAccountPermitsPicSrcImg','bankAccountPermitsPicSrc')">
+			</p>
+			</div>
+			<input id="bankAccountPermitsPicSrc" name="userAccountDTO.bankAccountPermitsPicSrc" type="hidden" value="$!userAccountDTO.bankAccountPermitsPicSrc"/>
+		</li>
+		#if("$!pageState"!="view")
+		<div class="fl mar_l170">
+			<p><img src="$request.contextPath/assets/images/bankAccountPermitsPic.jpg" width="150" height="80" title="点击查看大图" class="po_re_img"/></p>
+		</div>
+		#end
+	</ul>
+	#if("$!pageState"=="register")
+	<div class="button_2 hei_40 font_14b" style="margin:20px auto" id="accountBtn">暂 存</div>
+	#end
+</div></div>
+</form>
+<!--出金账户信息end-->

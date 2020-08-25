@@ -1,0 +1,207 @@
+#set($layout=("common/order.vm"))
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>订单审核管理</title>
+#parse("common/scriptAndCss.vm")
+<script type="text/javascript">
+
+$(document).ready(function(){
+	//pageSize,url,totalItem, appendId,selectElement,data, ,callback
+	var Num = 0;
+	var url = "$request.contextPath/orderWx/queryApprove?approve=loadApprove";
+	var totalItem = '$!{totalItem}';
+	$.dropDownFresh('3',url, totalItem , "myTab0_Content" + Num,"wrapper");
+});
+
+function changeOrderStatus(thisObj, Num){
+	var tabObj = thisObj.parentNode.id;
+	var tabList = document.getElementById(tabObj).getElementsByTagName("li");
+	for (i = 0; i < tabList.length; i++) {
+		if (i == Num) {//选中
+			$.ajax({
+			   type: "POST",
+			   url: "$request.contextPath/orderWx/queryApprove?approve=loadApprove&approveStatus="+Num,
+			   dataType: "html",
+			   success: function(data){
+				   $("#"+tabObj + "_Content" + Num).empty().append(data);
+				   var url = "$request.contextPath/orderWx/queryApprove?approve=loadApprove&approveStatus="+Num;
+				   var totalItem = $("#totalItem").val();
+				   $.dropDownFresh('3',url, totalItem , "myTab0_Content" + Num,"wrapper");
+			   }
+			});
+			tabList[i].className = "active";
+			document.getElementById(tabObj + "_Content" + i).style.display = "block";
+			$("#myTab0_Content"+i).attr("style","display:block");
+		} else {//未选中
+			tabList[i].className = "normal";
+// 			document.getElementById(tabObj + "_Content" + i).style.display = "none";
+			$("#myTab0_Content"+i).attr("style","display:none");
+			$("#"+tabObj + "_Content" + Num).empty();
+		}
+	}
+}
+
+//审核通过
+function approveSubmit(orderId,status,parentId){
+	if(window.confirm("您确定要审核通过吗？")){
+		$.ajax({
+			url:"$request.contextPath/orderWx/approveSubmit",
+			type:"post",
+			dataType:"text",
+			data:{
+				orderId:orderId,
+				status:status,
+				parentId:parentId
+			},
+			success:function(data){
+				data = eval("("+data+")");
+				alert(data.msg);
+				$("input[name='approveStatus']").val(0);
+				$("#queryForm").submit();
+			},
+			error:function(data){
+				alert(data.msg);
+				$("input[name='approveStatus']").val(0);
+				$("#queryForm").submit();
+			}
+		});
+	};
+}
+
+//审核驳回
+function approveReject(orderId,status){
+	console.debug($("#rejectDiv"));
+	$("#rejectDiv").show();
+	$("#orderId").val(orderId);
+	$("#status").val(status);
+}
+
+function actionSet(){
+	var orderId=$("#orderId").val();
+	var status=$("#status").val();
+	var reason=$("#reasonId").val();
+	if($.trim(reason)==""){
+		alert("请填写驳回原因！");
+	}else{
+		$.ajax({
+			url:"$request.contextPath/orderWx/approveReject",
+			type:"post",
+			data:{
+				orderId:orderId,
+				status:status,
+				reason:reason
+			},
+			dataType: "text",
+			success:function(data){
+				data = eval("("+data+")");
+				$("#rejectDiv").hide();
+				alert(data.msg);
+// 				$("input[name='approveStatus']").val(0);
+				$("#queryForm").submit();
+			},
+			error:function(data){
+// 				$("#rejectDiv").hide();
+// 				alert(data.msg);
+				data = eval("("+data+")");
+				$("#errorMsg").html(data.msg);
+// 				$("input[name='approveStatus']").val(0);
+				$("#queryForm").submit();
+			}
+		});
+	}
+}
+
+function hideSetDiv(){
+	$("#rejectDiv").hide();
+}
+
+function showDiv(id,content){
+    $("#contentId").html(content);
+	$("#"+id).show();
+}
+
+function hideDiv(){
+	$("#rejectReasonId").hide();
+}
+
+function orderDetailApprove(orderId){
+	window.location.href="$request.getContextPath()/orderWx/queryOrderInfoBuyer?orderId="+orderId+"&approve=true";
+}
+
+
+</script>
+<script type="text/javascript" src="$request.contextPath/assets/js/dropDownFresh/dropDownFresh.js"></script>
+</head>
+<body>
+<form id="queryForm" action="$request.getContextPath()/orderWx/queryApprove?approve=loadApprove" method="post">
+	<input type="hidden" name="page" value="$!pager.page">
+	<input type="hidden" name="shipmentType" id="shipmentType" value="$!shipmentType">
+</form>
+
+<div class="block po_ab" style="display: none" id="rejectDiv">
+    <div class="block_bg"></div>
+	<div class="block_box po_ab">
+        <div class="clear"></div>
+       	<p class="mar_t10">驳回原因：
+       		<textarea class="input_3 wid_95 hh_100" style="resize: none;" maxlength="150" id="reasonId"/></textarea>
+       	</p>
+       	<input type="hidden"  id="orderId" />
+		<input type="hidden"  id="status" />
+       	<ul><li class="msg font_14" id="errorMsg" style="color: red;"></li></ul>
+        <p class="font_cen mar_cen">
+        	<button class="button_2 wid_30 hei_34" onclick="actionSet()">确定</button>
+        	<button class="button_2 wid_30 hei_34 mar_l2" onclick="hideSetDiv()">取消</button>
+        </p>
+    </div>
+</div>
+
+<div class="block po_ab" style="display: none" id="rejectReasonId">
+    <div class="block_bg"></div>
+	<div class="block_box po_ab">
+        <div class="clear"></div>
+       	<p class="mar_t10">驳回原因：
+       		<textarea class="input_3 wid_95 hh_100" style="resize: none;" maxlength="150" id="contentId"/></textarea>
+       	</p>
+       	<input type="hidden"  id="orderId" />
+		<input type="hidden"  id="status" />
+       	<ul><li class="msg font_14" id="errorMsg" style="color: red;"></li></ul>
+        <p class="font_cen mar_cen">
+        	<button class="button_2 wid_30 hei_34 mar_l2" onclick="hideDiv()">取消</button>
+        </p>
+    </div>
+</div>
+
+<div id="main" class="bg_02 po_re">
+	<div class="content" id="wrapper" style="overflow-x:hidden;">
+	        <div class="nTab">
+	            <!-- 标题开始 -->
+	            <div class="TabTitle bg_01">
+	              <ul id="myTab0" class="myTab2 ">
+	                <li class="active" onclick="changeOrderStatus(this,0);" style="width: 50%">由我提交的订单</li>
+	                <li class="normal" onclick="changeOrderStatus(this,1);" style="width: 50%">由我审核的订单</li>
+	              </ul>
+	            </div><!-- 标题开始 end-->
+	            <!-- 内容开始 -->
+	            <div class="TabContent mar_t10">
+	                <!-- 切换内容    0   -->     
+	                <div id="myTab0_Content0">
+	                    #if(""=="$!{status}" || "0"==$!{status})
+		                    #parse("order/order_approve_buyer_detail.vm")
+	                    #end
+	                </div><!-- 切换内容    0   -->  
+	                <!-- 切换内容    1   -->     
+	                <div id="myTab0_Content1" class="none">
+	                    #if("1"=="$!{status}")
+		                    #parse("order/order_approve_buyer_detail.vm")
+	                    #end
+	                </div>
+	                <!-- 切换内容    1   -->  
+	            </div>
+	        </div>
+    </div>
+</div>
+   #parse("common/footer.vm")
+</body>
+</html>

@@ -1,0 +1,74 @@
+#set($layout = "common/order.vm")
+#if(${pager.records})
+	 #foreach($entity in $pager.records)
+		#if(${entity})
+			<div class="pad_lr5 bg_01 mar_b10">
+				<!-- 订单号 -->
+				<div class="hei_32 border_2">
+					<p class="fl wid_57">
+						<span>退货编号:$!{entity.codeNo}</span>
+					</p>
+					<p class="fl wid_57">
+						<span>订单号:$!{entity.orderId}</span>
+					</p>
+					<p class="fr wid_35 font_right">
+						<a class="font_e5 mar_l5" id="$!order.orderId">
+							#if($entity.orderStatus == '1' )  待付款
+								#elseif ($entity.orderStatus == '2' )待配送
+								#elseif ($entity.orderStatus == '3' )待收货
+								#elseif ($entity.orderStatus == '4' )待评价
+								#elseif ($entity.orderStatus == '5' )已完成
+								#elseif ($entity.orderStatus == '6' )已取消
+								#else &nbsp;
+							#end
+						</a>
+					</p>
+					<input type="hidden" id="total" value="$!pager.totalCount">
+					<!-- <input type="hidden" id="back" value="$!{back}"> -->
+				</div>
+				
+				<div class="border_2 shop_order pad_tb5">
+					<div class="wid_100 fl shop_refundOrc_p">
+						<div class="wid_29 fl" style="text-align:right">申请退款金额：</div>
+						<div class="wid_70 fl">
+							￥$!entity.refundGoods
+						</div>
+					</div>
+					<div class="wid_100 fl shop_refundOrc_p">
+						<div class="wid_25 fl" style="text-align:right">退款状态：</div>
+						<div class="wid_70 fl">
+								#if($!entity.state == 1)卖家待确认		<!-- 退款申请，等待卖家确认中 -->
+									#elseif ($entity.state == 2 )卖家拒绝		<!-- 卖家不同意协议，等待买家修改 -->
+									#elseif ($entity.state == 3 )待发货			<!-- 退款申请达成，等待买家发货 -->
+									#elseif ($entity.state == 4 )卖家待收货	<!-- 买家已退货，等待卖家确认收货 -->
+									#elseif ($entity.state == 5 )已关闭			<!-- 退款关闭 -->
+									#elseif ($entity.state == 6 )退款成功		<!-- 退款成功 -->
+									#elseif ($entity.state == 7 )待收款		<!-- 退款中	 -->
+									#elseif ($entity.state == 8 )待平台处理退款		<!-- 待平台处理退款	 -->
+									#elseif ($entity.state == 9 )平台处理退款中		<!-- 平台处理退款中	 -->
+									#elseif ($entity.state == 10 )退款失败，等待平台再次同意退款		<!-- 退款失败，等待平台再次同意退款		 -->
+									#elseif ($entity.state == 11 )退款申请成功<br/>支付宝处理中		<!-- 退款申请成功,等待同意退款		 -->
+									#end
+						</div>
+					</div>
+					<div class="wid_100 fl shop_refundOrc_p">
+						<div class="wid_25 fl" style="text-align:right">申请时间：</div>
+						<div class="wid_70 fl">
+							$!date.format('yyyy-MM-dd HH:mm:ss ', $!entity.applyDt)
+						</div>
+					</div>
+					<div class="wid_100 fl">
+						<button class="button_3 pad_mlr5" style="width: 130px" id="refundSubmitSucc" onclick="toSeeRetrunInfo('$!entity.id','$!entity.add1')">查看退款/退货进度</button>
+						<button class="button_3 pad_mlr5" style="width: 130px" id="refundSubmitSucc" onclick="toSeeReturnPro('$!entity.orderId','$!entity.id','$!entity.add1')">查看退款申请</button>
+					</div>
+					<div class="clear"></div>
+				</div>
+				<!-- 订单号 -->
+			</div>
+		#else
+			没有订单
+		#end
+	#end
+#else
+	没有数据
+#end

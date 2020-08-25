@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+    <dubbo:application name="searchcenter" owner="zhangfan" organization="camelot"/>
+    <!-- <dubbo:protocol name="dubbo" port="20880" /> -->
+    <!-- <dubbo:protocol name="rmi" port="1099" /> -->
+    <!-- <dubbo:protocol name="hessian" port="8089" /> -->
+    <!-- <dubbo:protocol name="webservice" port="9999" server="jetty"/> -->
+    
+    <!-- 多注册中心配置 -->
+    <dubbo:registry id="qingdaoRegistry" protocol="zookeeper" address="172.21.102.53:2181" />
+    
+    <dubbo:provider delay="-1" protocol="dubbo" timeout="10000" retries="3"></dubbo:provider>
+</beans>

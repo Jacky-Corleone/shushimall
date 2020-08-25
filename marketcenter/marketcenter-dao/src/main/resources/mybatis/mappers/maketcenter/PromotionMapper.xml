@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.maketcenter.dao.PromotionDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="promotionMap" type="promotion">
+				<result property="promotionMarkdown.skuId" column="sku_id"/>
+				<result property="promotionMarkdown.itemId" column="item_id"/>
+				<result property="promotionMarkdown.areaId" column="area_id"/>
+				<result property="promotionMarkdown.minNum" column="min_num"/>
+				<result property="promotionMarkdown.maxNum" column="max_num"/>
+				<result property="promotionMarkdown.sellPrice" column="sell_price"/>
+				<result property="promotionMarkdown.promotionPrice" column="promotion_price"/>
+		        <result property="promotionMarkdown.discountPercent" column="discount_percent"/>
+		        <result property="promotionMarkdown.markdownType" column="markdown_type"/>
+				<!-- <result property="promotionMarkdown.createTime" column="create_time"/>
+				<result property="promotionMarkdown.updateTime" column="update_time"/> -->
+				
+				<result property="promotionInfo.id" column="id"/>
+				<result property="promotionInfo.sellerId" column="seller_id"/>
+				<result property="promotionInfo.shopId" column="shop_id"/>
+				<result property="promotionInfo.activityName" column="activity_name"/>
+				<result property="promotionInfo.type" column="type"/>
+				<result property="promotionInfo.startTime" column="start_time"/>
+				<result property="promotionInfo.endTime" column="end_time"/>
+				<result property="promotionInfo.onlineState" column="online_state"/>
+				<result property="promotionInfo.words" column="words"/>
+				<result property="promotionInfo.createUser" column="create_user"/>
+				<result property="promotionInfo.reviewer" column="reviewer"/>
+				<result property="promotionInfo.isAllItem" column="is_all_item"/>
+				<result property="promotionInfo.createTime" column="create_time"/>
+				<result property="promotionInfo.updateTime" column="update_time"/>
+				<result property="promotionInfo.platformId" column="platform_id"/>
+				
+			    <result property="promotionFullReduction.itemId" column="pitemId"/>
+				<result property="promotionFullReduction.skuId" column="pskuId"/> 
+				<result property="promotionFullReduction.meetPrice" column="meet_price"/>
+				<result property="promotionFullReduction.discountPrice" column="discount_price"/>
+				<!-- <result property="promotionFullReduction.createTime" column="create_time"/>
+				<result property="promotionFullReduction.updateTime" column="update_time"/> -->
+	</resultMap>
+	
+	<select id="getPromotion" resultMap="promotionMap">
+		<![CDATA[
+		select 
+				pm.sku_id,
+				pm.item_id,
+				pm.area_id,
+				pm.min_num,
+				pm.max_num,
+				pm.sell_price,
+				pm.promotion_price,
+				pm.discount_percent,
+				pm.markdown_type,
+				p.id,
+				p.seller_id,
+				p.shop_id,
+				p.activity_name,
+				p.type ,
+				p.start_time,
+				p.end_time,
+				p.online_state,
+				p.is_all_item,
+				p.words,
+				p.create_user,
+				p.reviewer,
+				p.create_time,
+				p.update_time,
+				p.platform_id,
+				pf.meet_price,
+				pf.discount_price,
+				pf.sku_id pskuId,
+				pf.item_id pitemId
+			from promotion_info p LEFT JOIN promotion_full_reduction pf on  pf.promotion_info_id=p.id 
+ 			 LEFT JOIN promotion_markdown  pm on  pm.promotion_info_id=p.id
+			 where  deleted = 0
+		
+		]]>	
+		<if test="entity.isEffective != null and entity.isEffective != '' ">
+			<if test="entity.isEffective ==1 ">
+			    <![CDATA[	and p.start_time > now() and p.online_state=1 ]]>	
+			</if>
+			<if test="entity.isEffective ==2 ">
+				<![CDATA[	and p.start_time <= now() and p.end_time >= now() and p.online_state=1 ]]>	
+			</if>
+			<if test="entity.isEffective ==3 ">
+				<![CDATA[	and p.end_time < now() and p.online_state=1 ]]>	
+			</if>
+			<if test="entity.isEffective ==4 ">
+				<![CDATA[	and p.start_time <= now() and p.end_time >= now() and p.online_state=3 ]]>	
+			</if>
+		</if>
+		<if test="entity.sellerId != null and entity.sellerId != '' ">
+			<![CDATA[	and p.seller_id=#{entity.sellerId}]]>	
+		</if>
+		
+		<if test="entity.num != null ">
+			<![CDATA[	and (pm.max_num >=#{entity.num} and pm.min_num<=#{entity.num} ) or (pm.max_num is null and pm.min_num is null) ]]>	
+		</if>
+		
+		<if test="entity.shopId != null ">
+			<![CDATA[	and (p.shop_id=#{entity.shopId} or p.shop_id=0)]]>	
+		</if>
+		<if test="entity.itemId != null ">
+			<![CDATA[	and  ((pf.item_id=#{entity.itemId} or pf.item_id=0) or (pm.item_id=#{entity.itemId} or pm.item_id=0)) ]]>	
+		</if>
+		<if test="entity.skuId != null and entity.skuId != '' ">
+			<![CDATA[	and (pf.sku_id=#{entity.skuId} or pm.sku_id=#{entity.skuId}) ]]>	
+		</if>
+		<if test="entity.areaId != null and entity.areaId !='' ">
+			<![CDATA[	and ( pm.area_id=#{entity.areaId} or pm.area_id is null) ]]>	
+		</if>
+		<if test="entity.activityName != null and entity.activityName != '' ">
+			<![CDATA[	and p.activity_Name like  CONCAT('%',#{entity.activityName},'%') ]]>	
+		</if>
+		<if test="entity.onlineState != null and entity.onlineState != '' ">
+			<![CDATA[	and p.online_state=#{entity.onlineState} ]]>	
+		</if>
+        <if test="entity.isAllItem != null and entity.isAllItem != '' ">
+			<![CDATA[	and p.is_all_item=#{entity.isAllItem} ]]>	
+		</if>
+		<if test="entity.type != null and entity.type != '' ">
+			<![CDATA[	and p.type = #{entity.type} ]]>	
+		</if>
+		<if test="entity.promotionInfoId != null and entity.promotionInfoId != '' ">
+			<![CDATA[	and p.id = #{entity.promotionInfoId} ]]>	
+		</if>
+		<if test="entity.platformId != null">
+			<![CDATA[	and p.platform_id = #{entity.platformId} ]]>	
+		</if>
+		<choose>
+			<when test="entity.userType != null">
+				<![CDATA[ and (p.user_type = #{entity.userType} or p.user_type=0) ]]>
+			</when>
+			<otherwise>
+				<![CDATA[and p.user_type=0]]>
+			</otherwise>
+		</choose>
+		<if test="entity.membershipLevel != null  and  entity.membershipLevel != ''">
+			<![CDATA[	and p.membership_level like  CONCAT('%',#{entity.membershipLevel},'%') ]]>	
+		</if>
+		<if test="entity.createTimestr != null and entity.createTimestr != '' ">
+			<![CDATA[	and p.create_time > #{entity.createTimestr} ]]>	
+		</if>
+		<if test="entity.createTimeend != null and entity.createTimeend != '' ">
+			<![CDATA[	and p.create_time < #{entity.createTimeend} ]]>	
+		</if>
+		<![CDATA[  ORDER BY  p.shop_id ]]>
+		<if test="page!=null">
+			<![CDATA[ limit #{page.pageOffset} , #{page.rows} ]]>
+		</if>
+	</select>
+	
+	
+	<select id="getPromotionCount" resultType="long">
+		<![CDATA[
+		select count(1)
+			from promotion_info p LEFT JOIN promotion_full_reduction pf on  pf.promotion_info_id=p.id 
+ 			 LEFT JOIN promotion_markdown  pm on  pm.promotion_info_id=p.id
+			 where 1=1
+		]]>	
+		<if test="entity.isEffective != null and entity.isEffective != '' ">
+			<if test="entity.isEffective ==1 ">
+			    <![CDATA[	and p.start_time > now() and p.online_state=1 ]]>	
+			</if>
+			<if test="entity.isEffective ==2 ">
+				<![CDATA[	and p.start_time <= now() and p.end_time >= now() and p.online_state=1 ]]>	
+			</if>
+			<if test="entity.isEffective ==3 ">
+				<![CDATA[	and p.end_time < now() and p.online_state=1 ]]>	
+			</if>
+			<if test="entity.isEffective ==4 ">
+				<![CDATA[	and p.start_time <= now() and p.end_time >= now() and p.online_state=3 ]]>	
+			</if>
+		</if>
+		<if test="entity.num != null ">
+			<![CDATA[	and (pm.max_num >=#{entity.num} and pm.min_num<=#{entity.num} ) or (pm.max_num is null and pm.min_num is null) ]]>	
+		</if>
+		<if test="entity.sellerId != null and entity.sellerId != '' ">
+			<![CDATA[	and p.seller_id=#{entity.sellerId}]]>	
+		</if>
+		<if test="entity.shopId != null ">
+			<![CDATA[	and (p.shop_id=#{entity.shopId} or p.shop_id=0)]]>	
+		</if>
+		<if test="entity.itemId != null ">
+			<![CDATA[	and  ((pf.item_id=#{entity.itemId} or pf.item_id=0) or (pm.item_id=#{entity.itemId} or pm.item_id=0)) ]]>	
+		</if>
+		<if test="entity.skuId != null and entity.skuId != '' ">
+			<![CDATA[	and (pf.sku_id=#{entity.skuId} or pm.sku_id=#{entity.skuId}) ]]>	
+		</if>
+		<if test="entity.areaId != null and entity.areaId !='' ">
+			<![CDATA[	and ( pm.area_id=#{entity.areaId} or pm.area_id is null) ]]>
+		</if>
+		<if test="entity.activityName != null and entity.activityName != '' ">
+			<![CDATA[	and p.activity_Name like  CONCAT('%',#{entity.activityName},'%') ]]>	
+		</if>
+		<if test="entity.onlineState != null and entity.onlineState != '' ">
+			<![CDATA[	and p.online_state=#{entity.onlineState} ]]>	
+		</if>
+        <if test="entity.isAllItem != null and entity.isAllItem != '' ">
+			<![CDATA[	and p.is_all_item=#{entity.isAllItem} ]]>	
+		</if>
+		<if test="entity.type != null and entity.type != '' ">
+			<![CDATA[	and p.type = #{entity.type} ]]>	
+		</if>
+		<if test="entity.platformId != null">
+			<![CDATA[	and p.platform_id = #{entity.platformId} ]]>	
+		</if>
+		<choose>
+			<when test="entity.userType != null">
+				<![CDATA[ and (p.user_type = #{entity.userType} or p.user_type=0) ]]>
+			</when>
+			<otherwise>
+				<![CDATA[and p.user_type=0]]>
+			</otherwise>
+		</choose>
+		<if test="entity.membershipLevel != null  and  entity.membershipLevel != ''">
+			<![CDATA[	and p.membership_level like  CONCAT('%',#{entity.membershipLevel},'%') ]]>	
+		</if>
+		<if test="entity.promotionInfoId != null and entity.promotionInfoId != '' ">
+			<![CDATA[	and p.id = #{entity.promotionInfoId} ]]>	
+		</if>
+		<if test="entity.createTimestr != null and entity.createTimestr != '' ">
+			<![CDATA[	and p.create_time > #{entity.createTimestr} ]]>	
+		</if>
+		<if test="entity.createTimeend != null and entity.createTimeend != '' ">
+			<![CDATA[	and p.create_time < #{entity.createTimeend} ]]>	
+		</if>
+	</select>
+	<update id="modifyPromotionOnlineState" parameterType="com.camelot.maketcenter.dto.PromotionInfo">
+				update promotion_info set 
+				online_state=#{entity.onlineState},
+				update_time=now()
+				where id=#{entity.id}
+	</update>
+	
+	
+</mapper>

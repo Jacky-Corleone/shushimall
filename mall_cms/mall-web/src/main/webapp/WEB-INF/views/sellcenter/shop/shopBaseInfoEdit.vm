@@ -1,0 +1,563 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/none_layout.vm")
+<script type="text/javascript">
+	$(function(){
+		//图片查看
+		$("img[showImg='findImg']").fancyzoom({
+			Speed:400,
+			showoverlay:false,
+			imgDir:'$request.getContextPath()/assets/plugin/fancyzoom/ressources/'
+		});
+		//省市区下拉菜单改变事件绑定
+		$("#business_provinces").change(function(){
+			optionItems("$request.contextPath/shopBaseInfoController/queryAddress",$("#business_provinces").val(),"business_city");
+			//清空区信息
+			/* $("#business_area").empty().append($("<option>").text("请选择").val("")); */
+		});
+		/* $("#business_city").change(function(){
+			optionItems("$request.contextPath/shopBaseInfoController/queryAddress",$("#business_city").val(),"business_area");
+		}); */
+		//填充省市县下拉框
+		optionItems("$request.contextPath/shopBaseInfoController/queryAddress",0,"business_provinces","$shopInfo.provinceCode");//加载省份数据
+		optionItems("$request.contextPath/shopBaseInfoController/queryAddress","$shopInfo.provinceCode","business_city","$shopInfo.cityCode");//加载市数据
+		//optionItems("$request.contextPath/shopBaseInfoController/queryAddress","$shopInfo.cityCode","business_area","$shopInfo.districtCode");//加载县(区)数据
+		//触发上传事件
+		$("#uploadBtn").bind("click", function(){
+			var ie=navigator.appName=="Microsoft Internet Explorer" ? true : false; 
+			if(ie){ 
+				document.getElementById("fileInput").click(); 
+				//document.getElementById("filename").value=document.getElementById("fileInput").value;
+			}else{
+				$("#fileInput").click();
+			} 
+		});
+		//初始化验证
+		initValidPlugin();
+		//保存方法
+		$("#saveBtn").bind("click",function(){
+			var isValid = $("#shopInfoForm").valid();
+			if(!isValid){
+				return;
+			}
+			//给省、市、地区的名称赋值
+			$("#provinceName").val($("#business_provinces option:selected").text());
+			$("#cityName").val($("#business_city option:selected").text());
+			/* $("#districtName").val($("#business_area option:selected").text()); */
+			//更新
+			$("#saveBtn").loadingMsg();
+			$.post("$request.getContextPath()/shopBaseInfoController/modifyShopInfo",$("#shopInfoForm").serializeArray(),function(response){
+				if(response.result=="success"){
+					alert("申请成功");
+					window.location.href = "$request.contextPath/shopBaseInfoController/toView";
+				}else{
+					alert("申请失败");
+				}
+				$("#saveBtn").hideMsg();
+			},"json");
+		});
+		$("img").each(function(index){
+			if($(this).attr("src")=="$!imageServerAddr"){
+				$(this).attr("src","");
+			}
+		});
+
+        //初始化店铺类型、品牌类型、经营类型
+        $("select[name='shopType']").val("$!shopInfo.shopType");
+        $("select[name='brandType']").val("$!shopInfo.brandType");
+        $("select[name='businessType']").val("$!shopInfo.businessType");
+	});
+
+    /**
+     * 图片上传
+     * @param fileInput 图片上传的file组件的id
+     * @param imgAddr 图片上传后的地址元素的id
+     * @param imgSrc 显示图片的img标签元素的id
+     */
+	function uploadImg(fileInput, imgAddr, imgSrc){
+		var logofile = $("#"+fileInput).val();
+		var ext = logofile.substring(logofile.length-3).toLowerCase();
+		if (ext!="jpg" && ext!="jpeg" && ext!="bmp" && ext!="png"){
+			//销售授权书扫描件支持图片和压缩文件
+    		if(fileInput == "fileInputMa"){
+    			if(ext!="rar" && ext!="zip" && ext!="7z"){
+    				alert("图片限于jpg,jpeg,png,bmp格式，附件限于rar,zip,7z格式");
+        			return false;
+    			}else{
+    				//上传文件
+    				startFileUpload();
+    				return false;
+    			}
+    		}else{
+        		alert("图片限于jpg,jpeg,png,bmp格式");
+        		return false;
+    		}
+		}
+        var url = '$request.getContextPath()/fileUpload/fixedUpload?size=512000&date='+new Date();
+		upload(url, fileInput, imgAddr, function(imgUrl){
+			if(imgSrc){
+				if(fileInput == "fileInputMa"){
+    				$("#marketingAuthFileShowContainer").html('<img id="marketingAuth" src="" width="100" height="100" style="cursor:pointer;" showImg="findImg" title="点击查看原图" alt="销售授权书扫描件" />');
+    			}
+            	$("#"+imgSrc).attr("src","$!imageServerAddr"+imgUrl);
+        	}
+		});
+	}
+
+    function upload(ajaxUrl, fileInput, imgAddr, callback){
+        $.ajaxFileUpload({
+            url: ajaxUrl, //用于文件上传的服务器端请求地址
+            fileElementId: fileInput, //文件上传域的ID
+            dataType: 'text/html', //返回值类型 一般设置为json
+            type:"post",
+            success: function (data, status){  //服务器成功响应处理函数
+                var data = $.parseJSON(data);
+                if(data.success){
+                    callback(data.url);
+                    $("#"+imgAddr).val(data.url);
+                }else{
+                    alert(data.msg);
+                }
+            },
+            error: function (data, status, e){//服务器响应失败处理函数
+                alert(data.msg);
+            }
+        });
+    }
+	
+	
+    //文件上传
+    function startFileUpload(){
+        var fileName = $("#fileInputMa")[0].files[0].name;
+        var maxSize = 3145728;// 3M
+        if ($("#fileInputMa")[0].files[0].size > maxSize) {
+            alert("上传文件过大！");
+            return false;
+        }
+        $.ajaxFileUpload({
+            url: '$request.getContextPath()/fileUpload/uploadzise?size='+maxSize, //用于文件上传的服务器端请求地址
+            secureuri: false, //是否需要安全协议，一般设置为false
+            fileElementId: "fileInputMa", //文件上传域的ID
+            dataType: 'json', //返回值类型 一般设置为json
+            type:"post",
+            success: function (data, status){  //服务器成功响应处理函数
+                if(data.success){
+    				var imageUrl = '$!imageServerAddr'+data.url;
+    				$("#marketingAuthFileShowContainer").html("<a href='" + imageUrl + "' title=" + fileName + "><img src='$staticPath/images/zip.png' style='width:32px;height:32px'></a>");
+            		$("#maImgAddr").val(data.url);
+                }else{
+                    alert(data.msg);
+                }
+            },
+            error: function (data, status, e){//服务器响应失败处理函数
+                alert("亲系统繁忙，请稍后再试");
+            }
+        });
+    }
+
+	//初始化校验控件
+	function initValidPlugin(){
+		$("#shopInfoForm").validate({
+            rules: {
+                shopName:{
+                    required: true,
+                    maxlength: 200
+                },
+                logoUrl:{
+                    maxlength: 100
+                },
+                keyword:{
+                    maxlength: 500
+                },
+                introduce:{
+                    maxlength: 500
+                },
+                mainSell:{
+                    maxlength: 16
+                },
+                districtCode:{
+                	required: true
+                },
+                streetName:{
+                	required: true,
+                    maxlength: 500
+                },
+                shopType:{
+                    required: true
+                },
+                brandType:{
+                    required: true
+                },
+                businessType:{
+                    required: true
+                },
+				initialMount:{
+                    required: true
+                },
+				initialPrice:{
+                    required: true
+                },
+                disclaimer:{
+                    imageRequired: true,
+                },
+                marketingAuth:{
+                    imageRequired: function(){return $("#shopType").val()=="2"}
+                }
+            },excludeValidator:["marketingAuth","disclaimer"]
+        });
+	}
+
+    //控制销售授权书扫描件是否显示
+    function marketingAuthDisplay(obj){
+        if(obj.value==2){
+            $("#dlMarketingAuth").show();
+        }else{
+            $("#dlMarketingAuth").hide();
+        }
+    }
+</script>
+<form method="post" id="shopInfoForm">
+	<input type="hidden" name="shopId" value="$!shopInfo.shopId" />
+	<!--文字段落开始-->
+    <div class="Notice pad_tb20">
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt><i class="demo-icons font_fs">*</i>店铺名称：</dt>
+               <dd><input name="shopName" type="text" value="$!shopInfo.shopName" class="input_Style2 wid_260 hei_30" placeholder="输入店铺名称..." maxlength="25"/></dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>店铺LOGO：</dt>
+               <dd>
+               		<img id="imgLogoUrl" src="$!imageServerAddr$!shopInfo.logoUrl" width="200" height="90" style="cursor:pointer;" showImg="findImg" title="点击查看原图" alt="店铺logo" />
+               		<input type="hidden" name="logoUrl" id="logoUrlAddr" value="$!shopInfo.logoUrl" />
+                    <p class="font_c7 font_12">
+	                    <!-- 上传按钮通用功能start -->
+	                    <span class="z-upload">
+							<button type="button" class="button_4 font_12 border-1 button_small">上传LOGO</button>
+				            <input type="file" id="fileInputLogo" class="file-img" name="file" onchange="uploadImg('fileInputLogo','logoUrlAddr','imgLogoUrl')">
+				        </span>文件格式JPEG、JPG、BMP、PNG文件大小500K以内，建议尺寸200PX*90PX
+				        <!-- 上传按钮通用功能end -->
+                    </p>
+               </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+    <!--每一行基本信息开始-->
+
+            <dl class="mar_t">
+               <dt>关键字：</dt>
+               <dd>
+                <textarea name="keyword" cols="" rows="" class="input_Style2 hei_150 wid_460">$!shopInfo.keyword</textarea>
+                <p class="font_12 font_c7">不同关键字用英文逗号“,”分开，最多可以输入500个字符</p>
+               </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>店铺简介：</dt>
+               <dd>
+                <textarea name="introduce" cols="" rows="" class="input_Style2 hei_100 wid_460">$!shopInfo.introduce</textarea>
+                <p class="font_12 font_c7">最多可以输入500个字符</p>               
+			   </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>店铺主营：</dt>
+               <dd><input name="mainSell" value="$!shopInfo.mainSell" maxlength="16" type="text" class="input_Style2 wid_180 hei_30" placeholder="输入店铺主营..."/>
+                <p class="font_12 font_c7">最多可以输入16个字符</p>
+               </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+
+    <!--每一行基本信息开始-->
+    <dl>
+        <dt><i class="demo-icons font_fs">*</i>店铺类型：</dt>
+        <dd>
+            <select name="shopType" id="shopType" class="input_Style2 wid_150 mar_r10 hei_30" onchange="marketingAuthDisplay(this)">
+                <option value=""> -请选择- </option>
+                <option value="1"> 品牌商 </option>
+                <option value="2"> 经销商 </option>
+            </select>
+        </dd>
+    </dl>
+    <!--每一行基本信息 结束-->
+
+    <!--每一行基本信息开始-->
+    <dl>
+        <dt><i class="demo-icons font_fs">*</i>品牌类型：</dt>
+        <dd>
+            <select name="brandType" id="brandType" class="input_Style2 wid_150 mar_r10 hei_30">
+                <option value=""> -请选择- </option>
+                <option value="1"> 国内品牌 </option>
+                <option value="2"> 国际品牌 </option>
+            </select>
+        </dd>
+    </dl>
+    <!--每一行基本信息 结束-->
+
+    <!--每一行基本信息开始-->
+    <dl>
+        <dt><i class="demo-icons font_fs">*</i>经营类型：</dt>
+        <dd>
+            <select name="businessType" id="businessType" class="input_Style2 wid_150 mar_r10 hei_30">
+                <option value=""> -请选择- </option>
+                <option value="1"> 自有品牌 </option>
+                <option value="2"> 代理品牌 </option>
+            </select>
+        </dd>
+    </dl>
+    <!--每一行基本信息 结束-->
+
+    <!--每一行基本信息开始-->
+    <dl>
+        <dt><i class="demo-icons font_fs">*</i>免责声明：</dt>
+        <dd>
+            <img id="disclaimer" src="$!imageServerAddr$!shopInfo.disclaimer" width="100" height="100" style="cursor:pointer;" showImg="findImg" title="点击查看原图" alt="免责声明" />
+            <input type="text" name="disclaimer" id="disclaimerImgAddr" value="$!shopInfo.disclaimer" class="messageInput" />
+            <p class="font_c7 font_12">
+                <!-- 上传按钮通用功能start -->
+                <span class="z-upload">
+                    <button type="button" class="button_4 font_12 border-1 button_small">上传扫描件</button>
+                    <input type="file" id="fileInputDisclaimer" class="file-img" name="file" onchange="uploadImg('fileInputDisclaimer','disclaimerImgAddr','disclaimer')">
+                </span>文件格式JPEG、JPG、BMP、PNG文件大小500K以内
+                <!-- 上传按钮通用功能end -->
+            </p>
+        </dd>
+    </dl>
+    <!--每一行基本信息 结束-->
+
+    <!--每一行基本信息开始-->
+    <dl>
+        <dt>商品注册申请书扫描件：</dt>
+        <dd>
+            <img id="trademarkRegistCert" src="$!imageServerAddr$!shopInfo.trademarkRegistCert" width="100" height="100" style="cursor:pointer;" showImg="findImg" title="点击查看原图" alt="商品注册申请书扫描件" />
+            <input type="text" name="trademarkRegistCert" id="trcImgAddr" value="$!shopInfo.trademarkRegistCert" class="messageInput" />
+            <p class="font_c7 font_12">
+                <!-- 上传按钮通用功能start -->
+                <span class="z-upload">
+                    <button type="button" class="button_4 font_12 border-1 button_small">上传扫描件</button>
+                    <input type="file" id="fileInputTrc" class="file-img" name="file" onchange="uploadImg('fileInputTrc','trcImgAddr','trademarkRegistCert')">
+                </span>文件格式JPEG、JPG、BMP、PNG文件大小500K以内
+                <!-- 上传按钮通用功能end -->
+            </p>
+        </dd>
+    </dl>
+    <!--每一行基本信息 结束-->
+
+    <!--每一行基本信息开始-->
+    <dl>
+        <dt>报关单类扫描件：</dt>
+        <dd>
+            <img id="inspectionReport" src="$!imageServerAddr$!shopInfo.inspectionReport" width="100" height="100" style="cursor:pointer;" showImg="findImg" title="点击查看原图" alt="报关单类扫描件" />
+            <input type="text" name="inspectionReport" id="irImgAddr" value="$!shopInfo.inspectionReport" class="messageInput" />
+            <p class="font_c7 font_12">
+                <!-- 上传按钮通用功能start -->
+                <span class="z-upload">
+                    <button type="button" class="button_4 font_12 border-1 button_small">上传扫描件</button>
+                    <input type="file" id="fileInputIr" class="file-img" name="file" onchange="uploadImg('fileInputIr','irImgAddr','inspectionReport')" />
+                </span>文件格式JPEG、JPG、BMP、PNG文件大小500K以内
+                <!-- 上传按钮通用功能end -->
+            </p>
+        </dd>
+    </dl>
+    <!--每一行基本信息 结束-->
+
+    <!--每一行基本信息开始-->
+    <dl>
+        <dt>卫生/生产许可证扫描件：</dt>
+        <dd>
+            <img id="productionLicense" src="$!imageServerAddr$!shopInfo.productionLicense" width="100" height="100" style="cursor:pointer;" showImg="findImg" title="点击查看原图" alt="卫生/生产许可证扫描件" />
+            <input type="text" name="productionLicense" id="plImgAddr" value="$!shopInfo.productionLicense" class="messageInput" />
+            <p class="font_c7 font_12">
+                <!-- 上传按钮通用功能start -->
+                <span class="z-upload">
+                    <button type="button" class="button_4 font_12 border-1 button_small">上传扫描件</button>
+                    <input type="file" id="fileInputPl" class="file-img" name="file" onchange="uploadImg('fileInputPl','plImgAddr','productionLicense')" />
+                </span>文件格式JPEG、JPG、BMP、PNG文件大小500K以内
+                <!-- 上传按钮通用功能end -->
+            </p>
+        </dd>
+    </dl>
+    <!--每一行基本信息 结束-->
+
+    <!--每一行基本信息开始-->
+    <dl id="dlMarketingAuth" #if($!shopInfo.shopType==1) class="hide" #end >
+        <dt><i class="demo-icons font_fs">*</i>销售授权书扫描件：</dt>
+        <dd>
+			<div id="marketingAuthFileShowContainer">
+			#if($shopInfo.marketingAuth)
+				#if($!shopInfo.marketingAuth.indexOf(".JPG")!=-1 || $!shopInfo.marketingAuth.indexOf(".jpg")!=-1
+						|| $!shopInfo.marketingAuth.indexOf(".JPEG")!=-1 || $!shopInfo.marketingAuth.indexOf(".jpeg")!=-1
+						|| $!shopInfo.marketingAuth.indexOf(".BMP")!=-1 || $!shopInfo.marketingAuth.indexOf(".bmp")!=-1
+						|| $!shopInfo.marketingAuth.indexOf(".PNG")!=-1 || $!shopInfo.marketingAuth.indexOf(".png")!=-1)
+					<img id="marketingAuth" src="$!imageServerAddr$!shopInfo.marketingAuth" width="100" height="100" style="cursor:pointer;" showImg="findImg" title="点击查看原图" alt="销售授权书扫描件" />
+				#elseif($!shopInfo.marketingAuth.indexOf(".RAR")!=-1 || $!shopInfo.marketingAuth.indexOf(".rar")!=-1
+						|| $!shopInfo.marketingAuth.indexOf(".zip")!=-1 || $!shopInfo.marketingAuth.indexOf(".zip")!=-1
+						|| $!shopInfo.marketingAuth.indexOf(".7Z")!=-1 || $!shopInfo.marketingAuth.indexOf(".7z")!=-1)
+					<a href='$!imageServerAddr$!shopInfo.marketingAuth'><img src='$staticPath/images/zip.png' style='width:32px;height:32px'></a>
+				#end
+			#end
+			</div>
+            <input type="text" name="marketingAuth" id="maImgAddr" value="$!shopInfo.marketingAuth" style="display:none"/>
+            <p class="font_c7 font_12">
+                <!-- 上传按钮通用功能start -->
+                <span class="z-upload">
+                    <button type="button" class="button_4 font_12 border-1 button_small">上传附件</button>
+                    <input type="file" id="fileInputMa" class="file-img" name="file" onchange="uploadImg('fileInputMa','maImgAddr','marketingAuth')" />
+                </span>图片格式JPEG、JPG、BMP、PNG文件大小500K以内，压缩文件格式rar、zip、7z大小3M以内
+                <!-- 上传按钮通用功能end -->
+            </p>
+        </dd>
+    </dl>
+    <!--每一行基本信息 结束-->
+
+	#*
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt><i class="demo-icons font_fs">*</i>购买设置：</dt>
+               <dd>
+               	   <p><b>起批设置：</b></p>
+                   <p class="mar_t10">
+                   	数量要求： <input name="initialMount" value="$!shopInfo.initialMount" maxlength="10" type="text" class="input_Style2 wid_120 hei_30" placeholder="输入数量..."/><i class="demo-icons">件</i>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <input type="radio" name="initialCondition" value="1" #if($!shopInfo.initialCondition==1) checked="checked" #end />或
+                    <input type="radio" name="initialCondition" value="2" #if($!shopInfo.initialCondition==2) checked="checked" #end />且         
+                    &nbsp;&nbsp;&nbsp;&nbsp;                              
+                                                            金额要求： <input name="initialPrice" value="$!shopInfo.initialPrice" maxlength="10" type="text" class="input_Style2 wid_120 hei_30" placeholder="输入金额..."/><i class="demo-icons">元</i>
+                   </p>
+               	   <p><b>其他设置：</b></p>
+                   <p><i class="demo-icons"><input name="mutilPrice" type="checkbox" value="1" #if($!shopInfo.mutilPrice==1) checked="checked" #end /></i>混批<span class="border-4 bg_08 space_block"><i class="demo-icons fa-info-circle font_82 font_16"></i>混批指不限商品种类，只要买家总采购数量或金额达到要求，则可进行批发。设置成功后对全店商品生效</span></p>
+                   <p class="mar_t10">
+                                                           数量要求：货品总数大于 <input name="mountMin" value="$!shopInfo.mountMin" maxlength="10" type="text" class="input_Style2 wid_120 hei_30" placeholder="输入数量..."/><i class="demo-icons">件</i>
+                   &nbsp;&nbsp;&nbsp;&nbsp;
+                   <input type="radio" name="mutilCondition" value="1" #if($!shopInfo.mutilCondition==1) checked="checked" #end />或
+                   <input type="radio" name="mutilCondition" value="2" #if($!shopInfo.mutilCondition==2) checked="checked" #end />且
+                   &nbsp;&nbsp;&nbsp;&nbsp;                                               
+                                                           金额要求：订单总价大于 <input name="priceMin" value="$!shopInfo.priceMin" maxlength="10" type="text" class="input_Style2 wid_120 hei_30" placeholder="输入金额..."/><i class="demo-icons">元</i>
+                   </p>
+                </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+	*#
+	<input name="initialMount" type="hidden" value="1" />
+	<input name="initialCondition" type="hidden" value="1" />
+	<input name="initialPrice" type="hidden" value="0" />
+	
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt><i class="demo-icons font_fs">*</i>发货(退货)地址：</dt>
+               <dd> <select name="provinceCode" id="business_provinces" class="input_Style2 wid_150 mar_r10 hei_30">
+						<option value=""> -请选择- </option>
+                    </select>
+                   <input type="hidden" id="provinceName" name="provinceName" value="$shopInfo.provinceName" />
+                   <select name="cityCode" id="business_city" class="input_Style2 wid_150 mar_r10 hei_30">
+                       <option value=""> -请选择- </option>
+                   </select>
+                   <input type="hidden" id="cityName" name="cityName" value="$shopInfo.cityName" />
+                   <!-- <select name="districtCode" id="business_area" class="input_Style2 wid_150 mar_r10 hei_30">
+                       <option value=""> -请选择- </option>
+                   </select> -->
+                   <input type="hidden" id="districtName" name="districtName" value="$shopInfo.districtName" />
+                   <p class="font_12 font_c7">填写后，认证后卖家可通过地区筛选找到您的店铺</p>
+                </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>邮政编码：</dt>
+               <dd>
+                  <input name="zcode" maxlength="10" value="$!shopInfo.zcode" type="text" class="input_Style2 wid_120 hei_30" placeholder="输入邮政编码..."/>
+                </dd> 
+            </dl>
+    <!--每一行基本信息 结束-->
+
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt><i class="demo-icons font_fs">*</i>街道地址：</dt>
+               <dd>
+                   <input name="streetName" value="$!shopInfo.streetName" type="text" class="input_Style2 wid_500 hei_30" placeholder="输入地址..." maxlength="30"/>
+                   <p class="font_12 font_c7">
+                    不需要重新填写省/市/区
+                   </p>
+                </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>手机号码：</dt>
+               <dd>
+                   <p><input name="mobile" maxlength="11" value="$!shopInfo.mobile" type="text" class="input_Style2 wid_120 hei_30" placeholder="输入手机号码..."/>                   </p>
+                </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+    
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>座机号码：</dt>
+               <dd>
+                    <input name="areaCode" value="$!shopInfo.areaCode" type="text" class="input_Style2 wid_60 hei_30" />
+                    <i class="demo-icons">-</i>
+                    <input name="landline" value="$!shopInfo.landline" type="text" class="input_Style2 wid_120 hei_30"/>
+                    <i class="demo-icons">-</i>
+                    <input name="extensionNumber" maxlength="10" value="$!shopInfo.extensionNumber" type="text" class="input_Style2 wid_60 hei_30" />  
+                </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+    
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>销售负责人：</dt>
+               <dd>
+                    <input name="linkMan1" value="$!shopInfo.linkMan1" type="text" class="input_Style2 wid_120 hei_30" />
+                </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+    
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>销售负责人电话：</dt>
+               <dd>
+                    <input name="linkPhoneNum1" value="$!shopInfo.linkPhoneNum1" type="text" class="input_Style2 wid_120 hei_30" />
+                </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+    
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>其他联系人：</dt>
+               <dd>
+                    <input name="linkMan2" value="$!shopInfo.linkMan2" type="text" class="input_Style2 wid_120 hei_30" />
+                </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+    
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>其他联系人电话：</dt>
+               <dd>
+                    <input name="linkPhoneNum2" value="$!shopInfo.linkPhoneNum2" type="text" class="input_Style2 wid_120 hei_30" />
+                </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+    
+    <!--每一行基本信息开始-->
+            <dl>
+               <dt>备注：</dt>
+               <dd>
+                    <textarea name="remark" rows="3" cols="50">$!shopInfo.remark</textarea>
+                </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+            <div class="wid_460" style="margin:20px auto">
+    		#if($!auditStatus!=0)
+                <input class="button_2 hei_35 font_14b" type="button" loadMsg="正在提交..." id="saveBtn" value="确定" />
+            #end
+                <input class="button_2 hei_35 font_14b" type="button" value="返回" onclick="forwardToShopIndex()" />
+            </div>
+    </div><!--Notice end-->
+</form>

@@ -1,0 +1,221 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/${sourcePage}_layout.vm")
+<script language="javascript" type="text/javascript" src="$staticPath/js/js.js"></script>
+<script type="text/javascript" src="$staticPath/js/common.js"></script>
+<script language="javascript" type="text/javascript" src="$staticPath/js/tab.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="$staticPath/js/contract/contract.js"></script>
+<input id="contextPath" type="hidden" value="$request.contextPath">
+<input id="sourcePage" type="hidden" value="$sourcePage">
+<script type="text/javascript">
+    $(document).ready(function () {
+        //加载左侧菜单
+        if ("${sourcePage}" == "buyer") {
+            $("#leftBuyer").load("$request.contextPath/leftBuyer");
+        }
+        if ("${sourcePage}" == "seller") {
+            $("#leftSeller").load("$request.contextPath/leftSeller");
+        }
+    });
+    function topage(page) {
+        searchContractInfo(1,page);
+    }
+</script>
+<!--导航菜单end-->
+<div id="main">
+    #if(${sourcePage}=="buyer")
+        <!-- left start -->
+        <div id="leftBuyer" style="width: 198px; float: left;">&nbsp;</div>
+        <!-- left end -->
+    #end
+    #if($sourcePage=="seller")
+        <!-- left start -->
+        <div id="leftSeller" style="width: 198px; float: left;">&nbsp;</div>
+        <!-- left end -->
+    #end
+
+    <div id="right">
+        <div id="right_top" class="right_top border-4 bg_06">
+            <div class="right_top_l">
+                <ul class="list">
+                    <li class="wid_270">
+                        <span class="font_wid">协议名称：</span><input id="contractName" class="input_Style2 wid_150 hei_30"
+                                                                  type="text"/>
+                    </li>
+                    <li class="wid_270">
+                        <span class="font_wid">
+                            #if($sourcePage=="buyer")
+                                卖方：
+                            #elseif($sourcePage=="seller")
+                                买方：
+                            #end
+                        </span>
+                        <input id="companyName" class="input_Style2 wid_150 hei_30"
+                               type="text"/>
+                    </li>
+                    <li class="wid_270">
+                        <span class="font_wid">物品：</span><input id="itemName" class="input_Style2 wid_150 hei_30"
+                                                                type="text"/>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="right_top_r ">
+                <button type="button" class="button_4 but_cx3" onclick="searchContractInfo(1)">
+                    查 询
+                </button>
+            </div>
+        </div>
+        <!-- 查询 结束 -->
+
+        <div class="right_bot border-4 mar_t10 bg_06">
+            <!-- 商品列表开头 -->
+            <div class="right_xinxi mar_l14">
+                <ul class="list_top bg_08 font_cen font_14b">
+                    <li class="wid_50 font_cen">
+                        <input type="checkbox" class="mar_l10 hei_22" id="all_select" onclick="selectAll()"/></li>
+                    </li>
+                    <li class="wid_150">
+                        #if($sourcePage=="buyer")
+                            卖方名称
+                        #elseif($sourcePage=="seller")
+                            买方名称
+                        #end
+                    </li>
+                    <li class="wid_130">协议名称</li>
+                    <li class="wid_90">状态</li>
+                    <li class="wid_110">录入方</li>
+                    <li class="wid_110">创建日期</li>
+                    <li class="wid_180">合约有效日期</li>
+                    <li class="wid_130">备注</li>
+                </ul>
+                <!-- 类型选择 -->
+                <!-- 类型选择 -->
+                <ul class="right_select">
+                    <li>
+                        <button type="button" class="button_4 mar_l10 hei_24"
+                                onclick="showConfirmDIV('审批','同意')">
+                            同&nbsp;&nbsp;意
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="button_4 mar_l10 hei_24"
+                                onclick="showConfirmDIV('审批','拒绝')">
+                            拒&nbsp;&nbsp;绝
+                        </button>
+                    </li>
+                    <span class="fr mar_tb10"><button type="button" class="button_2 hei_24 "
+                                                      onclick="toContractCreatePage('$sourcePage')">+创建协议
+                    </button></span>
+                </ul>
+                <!-- 内容开始 -->
+
+                <div id="contractList">
+                    #foreach($conInfo in $pager.records)
+                        <ul class="list_top hei_40">
+                            <li class="wid_50 font_cen">
+                                <input type="checkbox" id="subCheck" name="contractId" value="$!conInfo.id"
+                                       onclick="setSelectAll()"/>
+                            </li>
+                            <li class="wid_150 over_ell font_cen"
+                                onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')"
+								#if($sourcePage=="seller")title="$!{cmap.get($conInfo.printerId.toString())}"#elseif($sourcePage=="buyer")title="$!{cmap.get($conInfo.supplierId.toString())}"#end>
+                                #if($sourcePage=="seller")
+                                    $!{cmap.get($conInfo.printerId.toString())}&nbsp;
+                                #elseif($sourcePage=="buyer")
+                                    $!{cmap.get($conInfo.supplierId.toString())}&nbsp;
+                                #end
+                            </li>
+                            <li class="wid_130 over_ell font_cen"
+                                onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')" title="$!conInfo.contractName">
+                                <input type="hidden" value="$conInfo.contractName" name="contractName">
+                                <input type="hidden" value="$!conInfo.contractNo"/>
+                                $!conInfo.contractName
+                                &nbsp;
+                            </li>
+                            <li class="wid_90 over_ell font_cen"
+                                onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')"><input
+                                    type="hidden" name="status"
+                                    value="$conInfo.status">$!statusMap.get($conInfo.status)&nbsp;</li>
+                            <li class="wid_110 over_ell font_cen"
+                                onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')" title="$!{map.get($!conInfo.createBy.toString())}">$!{map.get($!conInfo.createBy.toString())}
+                                &nbsp;</li>
+                            <li class="wid_110 over_ell font_cen"
+                                onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')">$!date.format(
+                                'yyyy-MM-dd',$!conInfo.createDate)&nbsp;</li>
+                            <li class="wid_180 over_ell font_cen"
+                                onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')">
+                                $!date.format('yyyy-MM-dd',$!conInfo.beginDate)至$!date.format(
+                                'yyyy-MM-dd',$!conInfo.endDate)&nbsp;
+                            </li>
+                            <li class="wid_130 over_ell font_cen"
+                                onclick="getContractDetail('$!conInfo.id','$conInfo.contractNo')" title="$!conInfo.remark">$!conInfo.remark&nbsp;</li>
+                        </ul>
+                    #end
+
+                    <!-- 内容结束 -->
+                    <!-- 分页 -->
+                    #pageVelocity($pager)
+                </div>
+            </div>
+            <div class="att1" style="width:950px;margin:auto;">
+                <div class="att_top">
+                    <ul>
+                        <li class="hover" id="opt_1">协议明细</li>
+                    </ul>
+                </div>
+                <!--标题att_top end -->
+                <div id="opt_1_content" style="margin-top: 2%;">
+
+                </div>
+            </div>
+            <!--att1 end -->
+        </div>
+        <!--下面列表结束 -->
+    </div>
+    <!--id="right" end-->
+    <!--右边部分结束-->
+    <div id="Idiv" class="po_fai" style="display:none">
+        <div class="po_main" style="height: auto;width: auto">
+            <div class="tit pad_l10 hei_35 bg_05">
+                <span class="fl font_14b">选择公司联系人</span>
+                <input type="hidden" id="IdivOperate">
+                <i onclick="closeDiv(this)" class="fa fa-times-circle fr font_14 mar_r10 cursor"></i>
+            </div>
+            <div class="clear"></div>
+            <div id="partBDetail" style="overflow: auto">
+            </div>
+        </div>
+    </div>
+</div>
+<!--#main end -->
+<script type="text/javascript">
+    function toContractCreatePage(e) {
+        window.location = $("#contextPath").val() + "/contractCreate?sourcePage=" + e;
+    }
+
+    function optionItems(obj) {
+
+        $.ajax({
+            url: "$request.contextPath/contract/getDetail",
+            type: "post",
+            data: {
+                parentCid: parentCode
+            },
+            dataType: "json",
+            success: function (data) {
+                //获取地域数据
+                var optionItem = $("#" + optionId);
+                optionItem.empty();
+                optionItem.append($("<option>").text("二级分类").val(""));
+                $.each(data.result, function (n, category) {
+                    var option = $("<option>").text(category.cname).val(category.cid);
+                    optionItem.append(option);
+                });
+            }
+        });
+    }
+</script>
+
+
+</div>

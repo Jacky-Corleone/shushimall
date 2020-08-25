@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.camelot.openplatform.sellercenter:sellercenter-export:shushi100-1.0.3.daily-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/camelot/openplatform/sellercenter/sellercenter-export/shushi100-1.0.3.daily-SNAPSHOT/sellercenter-export-shushi100-1.0.3.daily-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/camelot/openplatform/sellercenter/sellercenter-export/shushi100-1.0.3.daily-SNAPSHOT/sellercenter-export-shushi100-1.0.3.daily-SNAPSHOT-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/camelot/openplatform/sellercenter/sellercenter-export/shushi100-1.0.3.daily-SNAPSHOT/sellercenter-export-shushi100-1.0.3.daily-SNAPSHOT-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

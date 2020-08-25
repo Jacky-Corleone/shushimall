@@ -1,0 +1,112 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+<link rel="stylesheet" type="text/css" href="$request.getContextPath()/assets/css/bank/public.css"/>
+<link rel="stylesheet" type="text/css" href="$request.getContextPath()/assets/css/bank/css.css" />
+
+<link href="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.css" type="text/css" rel="stylesheet" />
+
+<script type="text/javascript" src="$staticPath/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/jquery-validation/1.11.1/messages_zh.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<script type="text/javascript" src="$staticPath/js/jquery-migrate-1.1.0.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/fancyzoom/jquery.shadow.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/fancyzoom/jquery.ifixpng.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/fancyzoom/jquery.fancyzoom.js"></script>
+<script type="text/javascript">
+	$(function(){
+		$("#leftBuyer").load("$request.contextPath/leftBuyer");
+	});
+</script>
+<!--点击“立即支付” 弹层-->
+<script>   
+  function inv_b(){   
+   document.all.asaimsg_but.style.display="block"; 
+   } 
+</script>
+
+
+<div class="webwrap">
+
+<!--主体-->
+<div class="main-p">
+	
+          <div class="pay-way">
+			<div style="margin-top:7px ;margin-left: 180px;">
+                <p ><font  style="color: #000000;font-family:Microsoft YaHei ;font-size: 14px;line-height: 25px;" >
+                    <b>注意事项：汇款时需要注意以下信息，请牢记！</b><br>
+                    1.请选择并点击下方银行图标，进入相应银行网银页面登录您的银行账户。<br>
+                    2.选择汇款/转账业务，根据银行提示输入下列汇款信息，请仔细核对汇款信息，以免支付失败。<br>
+                    如有疑问欢迎联系舒适100平台客服，我们将竭诚为您服务！谢谢！
+                </font><p>
+
+					<table border="0" cellpadding="3" cellspacing="1" width="100%">
+                       <tr >
+                        <td align="left"><p style="font-size: 14px;">账户名称：$!{buyerPaysAccountName}</p></td>
+                        <td align="left"><p style="font-size: 14px;">账&nbsp;户&nbsp;账&nbsp;号：$!{buyerPaysAccount}</p></td>
+                       </tr>
+                    
+                    <tr >
+                        <td  align="left"><p style="font-size: 14px;">开&nbsp;户&nbsp;行&nbsp;：中信银行北京和平里支行</p></td>
+                        <td align="left"><p style="font-size: 14px;">开户行行号：302100011753</p></td>
+                       </tr>
+                    </table>
+            </div>
+			
+			
+             <div class="pay-bank" style="margin-left: 180px;">
+                <p style="font-size: 14px;">选择银行：</p>
+                <ul>
+                    <li><a href="http://www.icbc.com.cn/icbc/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank2.png"></a></li>
+                    <li><a href="http://www.cmbchina.com/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank3.png"></a></li>
+                    <li><a href="http://www.cgbchina.com.cn/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank1.png"></a></li>
+                    <li><a href="http://www.ccb.com/cn/home/index.html" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank4.png"></a></li>
+                    <li><a href="http://www.boc.cn/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank5.png"></a></li>
+                    <li><a href="http://www.abchina.com/cn/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank6.png"></a></li>
+                    <li><a href="http://www.bankcomm.com/BankCommSite/default.shtml" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank7.png"></a></li>
+                    <li><a href="http://bank.ecitic.com/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank8.png"></a></li>
+                    <li><a href="http://www.cmbc.com.cn/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank9.png"></a></li>
+                    <li><a href="http://www.bjrcb.com/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank10.png"></a></li>
+                    <li><a href="http://www.cib.com.cn/cn/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank11.png"></a></li>
+                    <li><a href="http://www.spdb.com.cn/chpage/c1/?COLLCC=2681107466&" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank12.png"></a></li>
+                    <li><a href="http://www.bankofshanghai.com/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank13.png"></a></li>
+                    <li><a href="http://www.psbc.com/portal/zh_CN/index.html" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank14.png"></a></li>
+                    <li><a href="http://www.cebbank.com/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank15.png"></a></li>
+					
+					<li><a href="http://www.js96008.com/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank16.png"></a></li>
+					<li><a href="http://www.zj96596.com/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank17.png"></a></li>
+               </ul>
+            </div>
+            <div class="clear"></div>
+            
+          </div>
+          <div class="pay pay2">
+<!--             	<ul> -->
+<!--                 	<li class="pay_button2"> -->
+<!--                     	<a href="javascript:void(0)" onclick = "document.getElementById('asaimsg').style.display='block'; document.getElementById('asaimsgbg').style.display='block';document.getElementById('asaimsg_but').style.display='block';">其他支付方式</a> -->
+                    
+                    <div id="asaimsg" class="AsaiDivShow">
+	                    <!--以下为弹出层-->
+						<div class="po_fai po_fai_02">
+						    <div class="po_fai_bg"></div>
+						    <div class="po_main_z">
+								<ul>
+						        	<li><img src="$request.getContextPath()/assets/images/bank/pay-way_01.png" /></li>
+						            <li><a href="#">选择其他付款方式</a></li>
+						        </ul>
+						        <div class="clear"></div>
+						        <dl><dt>使用电脑支付</dt>
+						        	<dd><img src="$request.getContextPath()/assets/images/bank/pay_z.jpg" /><a href="#" class="po_z_but"></a><!--<input name="" type="button" value="立即支付"/>--></dd></dl>
+						        <dl><dt>使用支付宝钱包扫一扫付款</dt><dd><img src="$request.getContextPath()/assets/images/bank/z_W.jpg" /></dd></dl>
+							</div>
+						</div>
+						<!--以上为弹出层-->
+					</div>
+                    <div id="asaimsg_but"><img src="$request.getContextPath()/assets/images/bank/ajax-loader-small.gif" />拼命跳转支付页面......</div>
+
+ <div class="clear"></div>          
+</div>
+</div>
+
+</div>

@@ -1,0 +1,195 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<!-- ECharts单文件引入 -->
+<script src="$staticPath/plugin/echarts/dist/echarts.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript">
+	var dataArr = new Array();
+	$(function() {
+		//加载左侧菜单
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+		
+		//路径配置
+	require.config({
+	    paths: {
+	        echarts: '$staticPath/plugin/echarts/dist'
+	    }
+	});
+	// 使用
+    require(
+        [
+            'echarts',
+            'echarts/chart/line' //使用模块，按需加载
+        ],
+        function (ec) {
+            // 基于准备好的dom，初始化echarts图表
+            var myChart = ec.init(document.getElementById('myChart')); 
+            
+            var option = {
+           		title : {
+           	        text: '数据图'
+           	    },
+           		tooltip : {
+           	        trigger: 'axis'
+           	    },
+           	    legend: {
+           	    	selectedMode:'single',
+           	        data:['成交金额','购买人数','成交商品数','下单量','成交转化率'],
+					selected: {
+						'购买人数' : false,
+						'成交商品数' : false,
+						'下单量' : false,
+						'成交转化率' : false
+					}
+           	    },
+           	    xAxis : [
+           	        {
+           	            type : 'category',
+           	            boundaryGap : false,
+           	            data : ${dealDateList}
+           	        }
+           	    ],
+           	    yAxis : [
+           	        {
+           	            type : 'value'
+           	        }
+           	    ],
+           	    series : [
+           	        {
+           	            name:'成交金额',
+           	            type:'line',
+           	            stack: '总量',
+           	            data:${payPriceTotalList}
+           	        },
+           	        {
+           	            name:'购买人数',
+           	            type:'line',
+           	            stack: '总量',
+           	            data:${buyPersonNumList}
+           	        },
+           	        {
+           	            name:'成交商品数',
+           	            type:'line',
+           	            stack: '总量',
+           	            data:${payGoodsNumList}
+           	        },
+           	        {
+           	            name:'下单量',
+           	            type:'line',
+           	            stack: '总量',
+           	            data:${orderNumList}
+           	        },
+           	        {
+           	            name:'成交转化率',
+           	            type:'line',
+           	            stack: '总量',
+           	            data:${payConversionList}
+           	        }
+           	    ]
+            };
+            // 为echarts对象加载数据 
+            myChart.setOption(option); 
+        }
+    );
+		
+		
+	});
+	
+	
+//Form表单提交
+function topage(page){
+	$("#page").val(page);
+	$("#seachForm").submit();
+}
+//导出数据
+function exportExcel(){
+	$("#seachForm").attr('action','$request.contextPath/businessAnalysis/export');
+	$("#seachForm").submit();
+	$("#seachForm").attr('action','$request.contextPath/businessAnalysis/init');
+}
+</script>
+
+<div id="main">
+<!-- left start -->
+<div id="leftSeller" class="border-4"></div>
+<!--left end -->
+
+<!-- right start-->
+<div id="right" class="border-4 bg_06"> 
+	
+	<div id="right_bot" class="right_bot">
+	<form id="seachForm" action="$request.contextPath/businessAnalysis/init">
+		<input type="hidden" name="page" id="page" value="1" />
+	<h3 class="mar_l14">
+		整体状况
+        
+    		<span class="font_name">开始日期：</span><input id="startDate" name="startDate" value="$!{orderDealReportInDTO.startDate}" type="text" class="wid_130 hei_30 input_Style2 border-4" onclick="WdatePicker({maxDate:'#F{$dp.$D(\'endDate\')||\'%y-%M-%d\'}',dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+    		<span class="font_name">结束日期：</span><input id="endDate" name="endDate" value="$!{orderDealReportInDTO.endDate}" type="text" class="wid_130 hei_30 input_Style2 border-4" onclick="WdatePicker({minDate:'#F{$dp.$D(\'startDate\')}',maxDate: '%y-%M-%d',dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+    		<!--<button type="button" class="button_1 hei_32">搜索</button>-->
+    		<button class="button_1 hei_32">搜索</button>
+	</h3>
+	</form>
+	<ul class="kaikuang mar_l10 mar_t10">
+		<li>
+			<p>成交金额</p>
+			<p class="font_18 font_1c">$!{orderDealReportOutDTO.payPriceTotal}</p>
+			<p class="font_12 font_c7">完成支付的订单总金额</p>
+		</li>
+		<li>
+			<p>购买人数</p>
+			<p class="font_18 font_1c">$!{orderDealReportOutDTO.buyPersonNum}</p>
+			<p class="font_12 font_c7">完成支付的买家数量</p>
+		</li>
+		<li>
+			<p>成交商品数</p>
+			<p class="font_18 font_1c">$!{orderDealReportOutDTO.payGoodsNum}</p>
+			<p class="font_12 font_c7">完成支付的商品数量</p>
+		</li>
+		<li>
+			<p>下单量</p>
+			<p class="font_18 font_1c">$!{orderDealReportOutDTO.orderNum}</p>
+			<p class="font_12 font_c7">买家生成的订单数量</p>
+		</li>
+		<li>
+			<p>成交转化率</p>
+			<p class="font_18 font_1c">$!{orderDealReportOutDTO.payConversionStr}</p>
+			<p class="font_12 font_c7">完成支付订单数/下单量</p>
+		</li>
+	</ul>
+	<div class="clear"></div>
+		<div class="mar_l14">
+			<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+			<div id="myChart" style="height:400px"></div>
+			<!-- 商品列表开头 -->
+			<h3 class="mar_l14">数据报表 <button class="button_3 hei_30" onclick="exportExcel()">导出数据</button> </h3>
+			<ul class="list_top bg_08 font_cen font_14b">
+				<li class="wid_120">序号</li>
+				<li class="wid_130">日期</li>
+				<li class="wid_130">成交金额</li>
+				<li class="wid_130">购买人数</li>
+				<li class="wid_130">成交商品数</li>
+				<li class="wid_130">下单量</li>
+				<li class="wid_130">成交转化率</li>
+			</ul>
+			<table class="information mar_b10" id="information"><!--单双行变色加bg_05这个样式-->
+				#foreach($orderDealReportOut in $!{orderDealReportOutList})
+				<tr>
+					<td class="wid_120 font_cen">$velocityCount</td>
+					<td class="wid_130 font_cen">$!{orderDealReportOut.dealDate}</td>
+					<td class="wid_130 font_cen">$!{orderDealReportOut.payPriceTotal}</td>
+					<td class="wid_130 font_cen">$!{orderDealReportOut.buyPersonNum}</td>
+					<td class="wid_130 font_cen">$!{orderDealReportOut.payGoodsNum}</td>
+					<td class="wid_130 font_cen">$!{orderDealReportOut.orderNum}</td>
+					<td class="wid_130 font_cen">$!{orderDealReportOut.payConversionStr} </td>
+				</tr>
+				#end
+			</table>
+			<!--分页数据-->
+				#pageVelocity($pager)
+            		<!--分頁結束 -->
+			<!--<button class="button_2 hei_30 wid_80">返 回</button>-->
+		</div>
+	</div>
+</div>
+<!--id="right" end--> 
+</div> 

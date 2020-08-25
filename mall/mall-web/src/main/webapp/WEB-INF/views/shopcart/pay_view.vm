@@ -1,0 +1,188 @@
+#set($layout = "/mini_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<link href="$staticPath/css/basic.css" rel="stylesheet" type="text/css"/>
+<link href="$staticPath/css/Details.css" rel="stylesheet" type="text/css"/>
+<script>
+	var flag = false;
+	$(document).ready(function(){
+		$("[name='paymentMethod']").click(function(){
+			if( $(this).val() == 'CB' ) {
+				$("#paymentMsg").show();
+			}else{
+				$("#paymentMsg").hide();
+			}
+		});
+	});
+	//点击“立即支付” 弹层
+	function payOrder(){
+		$("#payValid").show();
+		$("#payForm").submit();
+		#*if($("[name='paymentMethod']").val()=='CITIC'){
+			$.ajax({
+    			url: '$request.contextPath/shopCart/checkCITICStatus',
+    			type: "get",
+    			dataType: "json",
+    			success: function(data){
+    				if(data.result){
+    					flag = true;
+    					$("#payValid").show();
+						paySubmit();
+					}else{
+						alert('舒适100正在为您开通企业支付账户，请您耐心等候10分钟再进行支付，如有疑问请联系平台客服。');
+					}
+    			}
+    		});
+		}else{
+			flag = true;
+			$("#payValid").show();
+			paySubmit();
+		}*#
+	}
+	
+	#*function paySubmit(){
+		window.setTimeout(function(){ 
+            if(flag) { 
+           		$("#payForm").submit();
+            } else {
+			 	paySubmit(); 
+            } 
+        }, 500); 
+	}*#
+
+	function closeWinPay(){
+		$("#payValid").hide();
+	}
+	
+</script>
+
+<div id="header">
+    <div class="left_img">
+    	<a href="$!siteDomain">
+    		<img id="logo" src="$!imageServerAddr$!{logoDTO.picUrl}" style="width:227px; height: 90px;"/>
+    	</a>
+    </div><!--left_img （放logo的div） end-->
+    <!--流程图开始-->
+	<div class="tree tree_3"></div>
+ 	<!--流程图结束-->
+</div>
+<!--头部结束-->
+
+<!--主体-->
+<div class="wid border-4">
+	<form id="payForm" target="_blank" action="$request.contextPath/shopCart/payOrder" method="post">
+		<div class="check-s" style="margin-top: 40px;">
+			<p class="font_18 font_7a">
+				<i class="fa-check-circle font_24 "></i>
+				<b style="line-height:50px; font-size: 20px;">订单提交成功，请您尽快完成支付！</b>
+			</p>
+			<div style="float: right; width: 200px; height: 40px; line-height: 40px;">
+				<a href="$request.contextPath/order/queryBuyer" class="font_1c">我的订单</a>|
+				<a href="$request.contextPath/" class="font_1c">继续购物</a>
+			</div>
+	    </div>
+		<div class="cod_con2 font_14" style="width: 1156px; margin: 30px auto 10px auto;">
+			应付金额（元）：<i class="font_fe font_18"><b>$!payTotal</b></i>
+			<input type="hidden" name="orderNo" value="$!orderNo">
+			<input type="hidden" name="type" value="$!orderType">
+		</div>
+		<div class="pay-way" style="width: 1100px; height: 80px; padding: 10px 30px 10px 30px; position: relative;">
+			<div class="font_14" style="float:left;height: 80px; line-height: 88px;">支付方式：</div>
+			#if($paymentMethod == 1)
+			<!-- 注释掉京东支付
+			<div style="float: left; width: 200px; height: 80px; line-height: 80px;">
+				<input id="wyzx" name="paymentMethod" type="radio" value="CB" checked="checked" />
+				<label for="wyzx">
+					<img src="$staticPath/images/wyzx.png" style="width: 124px; height: 37px;">
+				</label>
+			</div>
+			 -->
+			<div style="float: left; width: 200px; height: 80px; line-height: 80px;">
+				<input id="alipay" name="paymentMethod" type="radio" value="AP" checked="checked"/>
+				<label for="alipay">
+					<img src="$staticPath/images/zfb.png" style="width: 124px; height: 37px;">
+				</label>
+			</div>
+			<div style="float: left; width: 200px; height: 80px; line-height: 80px;">
+				<input id="unionpay" name="paymentMethod" type="radio" value="CUP" />
+				<label for="unionpay">
+					<img src="$staticPath/images/CUP.jpg" style="width: 124px; height: 37px;">
+				</label>
+			</div>
+			<div style="float: left; width: 200px; height: 80px; line-height: 80px;">
+				<input id="weixin" name="paymentMethod" type="radio" value="WXPC" />
+				<label for="weixin">
+					<img src="$staticPath/images/wx.png" style="width: 124px; height: 37px;">
+				</label>
+			</div>
+			#end
+			#if( $paymentMethod == 2 )
+			
+			<div style="float: left; width: 200px; height: 80px; line-height: 80px;">
+				<input id="alipay" name="paymentMethod" type="radio" value="AP" checked="checked"/>
+				<label for="alipay">
+					<img src="$staticPath/images/zfb.png" style="width: 124px; height: 37px;">
+				</label>
+			</div>
+			<div style="float: left; width: 200px; height: 80px; line-height: 80px;">
+				<input id="unionpay" name="paymentMethod" type="radio" value="CUP" />
+				<label for="unionpay">
+					<img src="$staticPath/images/CUP.jpg" style="width: 124px; height: 37px;">
+				</label>
+			</div>
+			<div style="float: left; width: 200px; height: 80px; line-height: 80px;">
+				<input id="weixin" name="paymentMethod" type="radio" value="WXPC" />
+				<label for="weixin">
+					<img src="$staticPath/images/wx.png" style="width: 124px; height: 37px;">
+				</label>
+			</div>
+			<!-- 注释掉企业支付
+			<div style="float: left; width: 240px; height: 80px; line-height: 80px; position: relative;">
+	        	<input id="zxyh" name="paymentMethod" type="radio" value="CITIC"  checked="checked" />
+				<label for="zxyh">
+					<img src="$staticPath/images/zxyh.png" style="width: 186px; height: 56px;">
+				</label>
+			</div>
+			-->
+			#end
+		<!--	<span id="paymentMsg" style="position: absolute; left: 105px; top: 77px; height: 20px; line-height: 20px; color: red; font-size: 12px;">
+				京东支付付款将收取转账手续费，公司转账建议使用金融通！
+			</span>-->
+			
+		</div>
+	</form>
+    <div class="pay" style="margin: 20px auto 20px 18px;">
+    	<ul>
+    		<li>
+    			<button class="button_1 mar_r10 font_18 hei_45" onclick="payOrder()">
+    				<i class="demo-icons fa-jpy font_20"></i>确认支付
+    			</button>
+            </li>
+        </ul>
+    </div>
+
+
+
+<!--以下为弹出层-->
+<div id="payValid" class="po_fai" style="display: none;">
+    <div class="po_fai_bg"></div>
+    <div class="po_main">
+		<ul>
+	    	<li class="font_18">
+	    		<i class="fa-info-circle demo-icons font_24 mar_r10"></i>
+	    		<span>请您在新打开的页面完成付款</span>
+	    	</li>
+	        <li class="font_14">支付完成后请根据结果选择:</li>
+	        <li>
+        		<button type="button" class="button_3 hei_40" onclick="closeWinPay()" style="border: 1px solid gray;">
+        			选择其他付款方式
+        		</button>
+        		<button type="button" class="button_1 hei_40" onclick="location.href='$request.contextPath/order/queryBuyer'">
+        			已完成付款
+        		</button>
+	        </li>
+	        <li>如果您在支付过程中遇到问题，请拨打客服电话：400-9987-466</li>
+    	</ul>
+    	<div class="form" style="display: none;"></div>
+	</div>
+</div>
+<!--以上为弹出层-->

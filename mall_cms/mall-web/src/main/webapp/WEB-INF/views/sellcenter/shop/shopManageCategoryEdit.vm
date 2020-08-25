@@ -1,0 +1,157 @@
+#set($layout = "/none_layout.vm")
+<script type="text/javascript">
+	$(function(){
+		//一级类目改变时，加载二级类目
+		$("#categoryLev1").bind("change",function(){
+			optionItems("$request.getContextPath()/shopManageCategoryController/getCategoryByParentId",$(this).val(),"categoryLev2","","categoryCName","categoryCid");
+			//清空三级类目
+			$("#categoryLev3").empty().append($("<option>").text("请选择").val(""));
+		});
+		//二级类目改变时，加载三级类目
+		$("#categoryLev2").bind("change",function(){
+			optionItems("$request.getContextPath()/shopManageCategoryController/getCategoryByParentId",$(this).val(),"categoryLev3","","categoryCName","categoryCid");
+		});
+		//加载平台一级类目
+		optionItems("$request.getContextPath()/shopManageCategoryController/getCategoryByParentId",0,"categoryLev1","","categoryCName","categoryCid");
+		//增加新类目
+		$("#addNewCategory").bind("click",function(){
+			var newCategoryName = $("#categoryLev1 option:selected").text() + ">" + $("#categoryLev2 option:selected").text() + ">" + $("#categoryLev3 option:selected").text();
+			//未选择类目时提示
+			var lev3 = $("#categoryLev3").val();
+			if(lev3=="" || lev3==null){
+				alert("请选择一个类目");
+				return;
+			}
+			//已有的经营类目
+			var existCids = $("#existCids").val();
+			//用户新增的经营类目
+			var addCategoryCids = $("#addCategoryCids").val();
+			//验证该店铺是否已经存在该经营类目
+			if(containsId(existCids, $("#categoryLev3").val()) || containsId(addCategoryCids, $("#categoryLev3").val())){
+				alert("已经存在该经营类目，请重新选择！");
+				return;
+			}
+            //校验该类目是否有返点信息
+            $.get("$request.getContextPath()/shopManageCategoryController/validExistRebate",{cid:lev3},function(response){
+                if(response.result=="success"){
+                    addCategoryCids = addCategoryCids?(addCategoryCids + "," + lev3):lev3;
+                    $("#newCategory").append("<li>"+newCategoryName+" <a href='javascript:void(0)' onclick='removeCategory(this,"+lev3+")'>删除</a></li>");
+                    $("#addCategoryCids").val(addCategoryCids);
+                }else{
+                    alert(response.msg);
+                }
+            },"json");
+		});
+		//保存方法
+		$("#categorySaveBtn").bind("click",function(){
+			var childs = $("#newCategory").children();
+			if(!childs || childs.length==0){
+				alert("请选择类目");
+				return;
+			}
+			$("#categorySaveBtn").loadingMsg();
+			//保存
+			$.post("$request.getContextPath()/shopManageCategoryController/saveCategory",{"addCategoryCids":$("#addCategoryCids").val()},function(response){
+				if(response.result=="success"){
+					alert("申请成功");
+					nTabs(1);//刷新类目信息页签
+				}else{
+					alert("申请失败");
+				}
+				$("#categorySaveBtn").hideMsg();
+			},"json");
+		});
+	});
+	
+	/**移除类目*/
+	function removeCategory(obj,id){
+		//移除元素
+		$(obj).parent().remove();
+		//移除id
+		var newCids = removeEle($("#addCategoryCids").val(),id);
+		$("#addCategoryCids").val(newCids.join(","));
+	}
+	
+	//删除类目
+	function deleteCategory(cid){
+		if(confirm("确定要删除该类目吗？")){
+			$.ajax({
+                url: "$request.getContextPath()/shopManageCategoryController/deleteCategory",
+                dataType:"json",
+                data:{cid:cid},
+                success: function(data){
+                    if(data.result=='success'){
+                        alert("删除成功");
+						nTabs(1);
+                    }else{
+                    	alert(data.msg);
+                    }
+                },error:function(data){
+                    alert("系统繁忙，请稍后再试");
+                }
+            }); 
+		}
+	}
+</script>
+<!-- 店铺已有的经营类目的类目id -->
+<input type="hidden" id="existCids" value="$!existCids" />
+<!-- 店铺最新加的经营类目的类目id -->
+<input type="hidden" id="addCategoryCids" name="addCategoryCids" value="" />
+<div id="main">
+<!--中间部分开始-->
+<!--右边部分开始-->
+    <!--文字段落开始-->
+    <div class="Notice pad_tb20">
+    <!--每一行基本信息开始-->
+            <!--每一行基本信息-->
+            #if($!rejectedCategoryList && $!rejectedCategoryList.entrySet().size()>0)
+            <dl>
+              <dt>被驳回的类目：</dt>
+              <dd>
+                <ol>
+                #foreach($entity in $!rejectedCategoryList.entrySet())
+                  <li>$entity.value
+                  	<i class="demo-icons font_fe">【驳回原因：
+                  	#foreach($reject in $!rejectComment.entrySet())
+                  		#if($entity.key == $reject.key)
+                  			$reject.value
+                  		#end
+                  	#end
+                  	】
+                  	</i>
+                  </li>
+                #end
+              </dd>
+            </dl>
+            #end
+            
+            <dl>
+              <dt>店铺经营类目：</dt>
+              <dd>
+                <ol>
+                #foreach($entity in $!passedCategoryList.entrySet())
+                  <li>$entity.value&nbsp;<i class="my_icon-del" title="删除" onclick="deleteCategory($entity.key)">&nbsp;&nbsp;&nbsp;&nbsp;</i></li>
+                #end
+              </dd>
+            </dl>
+    <!--每一行基本信息 结束-->
+            <!--每一行基本信息-->
+            <dl>
+               <dt><i class="demo-icons font_fs">*</i>店铺类目：</dt>
+               <dd><select id="categoryLev1" class="input_Style2 wid_150 mar_r10 hei_30"></select>
+                   <select id="categoryLev2" class="input_Style2 wid_150 mar_r10 hei_30"></select>
+                   <select id="categoryLev3" class="input_Style2 wid_150 mar_r10 hei_30"></select>
+                   <button id="addNewCategory" type="button" class="button_4 hei_30">+增加新类目</button>
+               </dd>
+            </dl>
+            <!-- 新增加的类目start -->
+            <dl><dt></dt><dd id="newCategory"></dd></dl>
+            <!-- 新增加的类目end -->
+            <div class="wid_460" style="margin:20px auto">
+                <input class="button_2 hei_35 font_14b" type="button" id="categorySaveBtn" loadMsg="正在申请..." value="确认申请" />
+                <input class="button_2 hei_35 font_14b" type="button" value="返回" onclick="forwardToShopIndex()" />
+            </div>
+         </div><!--Notice end-->
+    <!--文字段落结束-->         
+<!--右边部分结束-->
+</div><!--#main end -->

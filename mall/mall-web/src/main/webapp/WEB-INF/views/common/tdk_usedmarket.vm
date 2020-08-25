@@ -1,0 +1,4 @@
+<title>$!{baseTDKConfigDTO3.title}</title>
+#parse("/common/icon.vm")
+<meta name="description" content="$!{baseTDKConfigDTO3.description}">
+<meta name="Keywords" content="$!{baseTDKConfigDTO3.keywords}">

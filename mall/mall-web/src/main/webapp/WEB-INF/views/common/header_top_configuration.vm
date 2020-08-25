@@ -1,0 +1,13 @@
+#set($staticPath="$request.contextPath/assets")
+#parse("/common/header_top.vm")
+
+<link type="text/css" href="$staticPath/css/register.css" rel="stylesheet" />
+<link type="text/css" href="$staticPath/css/manage_style.css" rel="stylesheet" />
+
+
+#parse("/common/search.vm")
+#parse("/common/index_head.vm")
+
+<!--头部开始-->
+
+<!--头部结束-->

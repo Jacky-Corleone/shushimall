@@ -1,0 +1,71 @@
+#set($staticPath="$request.contextPath/assets")
+#set($controllerPath="$request.contextPath/shopItemListIndexController")
+#set($ctx="$request.contextPath")
+#set($layout = "/shop_layout.vm")
+<script type="text/javascript" src="$staticPath/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$staticPath/js/shopdr/shopDR.js"></script>
+<script type="text/javascript" src="$staticPath/js/shopdr/shopLeft.js"></script>
+<script type="text/javascript" src="$staticPath/js/shopdr/template/template2.js"></script>
+<script type="text/javascript" src="$staticPath/js/shopdr/shopItemList.js"></script>
+<script type="text/javascript">
+	var ctx = "$ctx";
+	var imageServerAddr = "$!imageServerAddr";
+	var tmpColor = "$!shopTemplates.color";
+	
+	//变换颜色
+	$(function(){
+		/**初始化模版信息*/
+		$("#allproduct").addClass("focus_li");
+		template2.init();
+		initShopLeft();
+		$("#shop_right .left_box").css({"height":"35px","line-height":"35px","border-bottom":"1px solid #e8e8e8","text-align":"left","font-weight":"bold","font-size":"14px","background":tmpColor,"color":"#fff"});
+	});
+	
+	//到指定的分页页面
+	function topage(page){
+		var form = $("#contentForm").get(0);
+		form.page.value = page;
+		form.submit();
+	}
+</script>
+<form id="contentForm" action="$ctx/shopItemListIndexController/toListIndex" method="get">
+	<input type="hidden" name="shopCid" id="shopCid" value="$!itemInDTO.shopCid" />
+	<input type="hidden" name="page" value="$!pager.page" />
+	<input type="hidden" name="shopId" id="shopId" value="$!shopId" />
+	<input type="hidden" name="minPrice" value="$!itemInDTO.minPrice" />
+	<input type="hidden" name="maxPrice" value="$!itemInDTO.maxPrice" />
+	<input type="hidden" name="desc" />
+</form>
+
+	<input type="hidden" id="templatesId" value="$!shopTemplates.id" />
+	
+	<!-- 小广告条、导航、轮播start -->
+	#parse("/sellcenter/shop/common/shopTop.vm")
+    <!-- 小广告条、导航、轮播end -->
+   
+	<!-- 中间内容开始 -->
+	<!-- 店铺广告位 start-->
+	#parse("/sellcenter/shop/common/template2/ad.vm")
+	<!-- 店铺广告位 end -->
+		<!--下面 包含左侧和右侧的div 开始 -->
+		<div id="shop_content">
+			<!-- 商品列表-左start -->
+			#parse("/sellcenter/shop/common/shopLeft.vm")
+			<!-- 商品列表-左end -->
+			
+			<!-- 商品列表-右start -->
+			<div class="fl" id="shop_right">
+				<!-- 店铺公告 start -->
+				#parse("/sellcenter/shop/common/notice.vm")
+				<!-- 店铺公告 end -->
+			</div>
+			<!-- 商品列表-右end -->
+		</div><!-- 商品分类 end-->
+		
+		<!-- 分页start -->
+		<div class="page">
+		</div>
+		<!-- 分页 end -->
+		
+  	</div><!-- shop_content end -->
+<!-- 商品编辑 end -->

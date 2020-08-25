@@ -1,0 +1,313 @@
+﻿<div class="swiper-container" style=" height: 250px;float: left;">
+    <div class="swiper-wrapper" id="swiper-wrapper">
+    	{{putGix gix}}
+    	{{#if skuItem}}
+			{{#each skuItem.skuPics}}
+	        	<div class="swiper-slide font_cen"><a href="#" onclick="return false;"><img style="max-width: 100%;max-height: 100%;" src="{{getGix picUrl}}"></a></div>
+			{{/each}}
+    	{{else}}
+			{{#each item.picUrls}}
+	        	<div class="swiper-slide font_cen"><a href="#" onclick="return false;"><img style="max-width: 100%;max-height: 100%;" src="{{getGix this}}"></a></div>
+			{{/each}}
+		{{/if}}
+    </div>
+    <div class="swiper-pagination"></div>
+</div>
+<div class="clear"></div>
+<ul class="goods_Details bg_01">
+     <li>
+        <p class="lin_24">
+            {{item.itemName}}<br/>
+        
+	        {{#compare item.hasPrice "==" 1}}
+				    市场价:<span class="font_e3" ><del>￥{{item.marketPrice}}</del></span></br>
+			{{/compare}}
+			{{#compare item.hasPrice "==" true}}
+				{{#if skuItem}}
+	            	售价：<span class="font_e3 mar_r2" guidPrice id="itemPrice_js">￥{{skuItem.skuPrice}}</span>
+            	{{else}}
+	            	售价：<span class="font_e3 mar_r2" guidPrice id="itemPrice_js">￥{{item.guidePrice}}</span>
+            	{{/if}}
+			{{else}}
+
+				
+				<a style = "text-decoration:underline"><span onclick="xjts()"><font color="#7abd54" size="5px">欢迎询价</font></span></a>
+				
+			{{/compare}}
+			
+			
+			
+			{{#if skuItem}}
+				{{#compare skuItem.itemStatus "==" 5}}
+                    <span class="font_e3 mar_r2" >已下架</span>
+				{{/compare}}
+			{{else}}
+				{{#compare item.itemStatus "==" 5}}
+                    <span class="font_e3 mar_r2" >已下架</span>
+				{{/compare}}
+			{{/if}}
+        </p>
+       <p class="hei_34">
+        <span id="shoucangshangpin">
+           {{#compare favouriteItem "==" 'true'}}
+			  	已收藏
+			{{else}}
+
+				 <span id="sc" onclick="js_favourite()">收藏商品</span>
+			{{/compare}}
+			
+		
+      			
+		</span>
+     </p>
+    </li>
+ </ul>
+<div class="clear"></div>
+<div class="pad_lr5 bg_01  mar_t10" style="display:none">
+    <p class="hei_45"> <span class="fl font_1_1 wid_60">促销活动</span></p>
+    <div class="clear"></div>
+    <div class="border_bt" id="_promotion">
+    	
+    </div>
+</div>
+<div class="pad_lr5 bg_01  mar_t10" onclick="show_shop_forword_ctiy()">
+    <p class="hei_45"> <span class="fl font_1_1 wid_60">配送</span></p>
+    <div class="clear"></div>
+    <div class="border_bt" id="_phAdd">
+	  {{#if from}}
+	     {{from}}
+	  {{/if}}
+	 至   <span id="provinceId">{{province}}</span> <span id="city"> {{city}}</span>  <span id="area">{{area}}</span>
+	 	<span class="fr"><i class="fa fa-angle-right "></i></span>
+    </div>
+    <div class="clear"></div>
+      <div class="border_bt" id="_phAdd">
+      <br/>
+	运费
+   {{#if deliveryTypes}}
+		{{#compare deliveryTypes.length "==" "0"}}
+            	包邮
+   		{{else}}         	
+   {{#each deliveryTypes}}
+        {{#compare deliveryType "==" "1"}}
+                             快递    
+         	{{#compare groupFreight "==" "0"}}      
+                                       包邮                     
+        {{else}}    
+                                ￥{{groupFreight}}
+         {{/compare}}          
+      {{/compare}}
+         {{#compare deliveryType "==" "2"}}
+            EMS 
+         {{#compare groupFreight "==" "0"}}      
+                                       包邮                     
+         {{else}}    
+                                ￥{{groupFreight}}
+        {{/compare}}        
+      {{/compare}}
+       {{#compare deliveryType "==" "3"}}
+                           平邮
+         {{#compare groupFreight "==" "0"}}      
+                                       包邮                     
+         {{else}}    
+                                ￥{{groupFreight}}
+        {{/compare}} 
+         {{/compare}} 
+       {{/each}}
+     {{/compare}}
+	{{/if}}
+    </div>
+     <div class="border_bt" id="_phAdd">
+      <br/>
+      {{#if preferentialWay.deliveryType}}
+		优惠
+		 {{#compare preferentialWay.deliveryType "==" "1"}}
+	                               满{{preferentialWay.full}}件
+	     {{/compare}}
+	     {{#compare preferentialWay.deliveryType "==" "2"}}
+	                               满{{preferentialWay.full}}kg
+	     {{/compare}}   
+	     {{#compare preferentialWay.deliveryType "==" "3"}}
+	                               满{{preferentialWay.full}}m³
+	     {{/compare}} 
+	     {{#compare preferentialWay.deliveryType "==" "4"}}
+	                               满{{preferentialWay.full}}元
+	     {{/compare}}     
+	     {{#compare preferentialWay.strategy "==" "1"}}
+	                              减{{preferentialWay.reduce}}元
+	     {{/compare}}  
+	      {{#compare preferentialWay.strategy "==" "2"}}
+	                               包邮
+	     {{/compare}}
+      {{/if}}
+    </div>
+</div>
+<div class="pad_lr5 bg_01  mar_t10">
+    <p class="hei_45 font_1_1">购买限制</p>
+    <div class="border_bt" id="adfsf">
+    	<div class="font_18"><span class="kuai_small bg_7f">起批</span>
+            {{#if shopInfo.initialPrice}}
+            	金额要求：订单总价大于{{shopInfo.initialPrice}}元
+            	  {{#compare shopInfo.initialCondition "==" "1"}}
+            	或
+            {{/compare}}
+            {{#compare shopInfo.initialCondition "==" "2"}}
+            	且
+            {{/compare}}
+            	{{/if}}
+          
+            {{#if shopInfo.initialMount}}
+            	数量要求：货品总数大于{{shopInfo.initialMount}}件
+            	{{/if}}
+		</div>
+            <br/>
+            <div class="font_18"><span class="kuai_small bg_a3">混批</span>
+				{{#if shopInfo.mutilPrice}}
+				{{#if shopInfo.priceMin}}
+					金额要求：订单总价大于{{shopInfo.priceMin}}元 
+							{{#compare shopInfo.mutilCondition "==" "1"}}
+					或
+				{{/compare}}
+				{{#compare shopInfo.mutilCondition "==" "2"}}
+					且
+				{{/compare}}
+					{{/if}}
+		
+				{{#if shopInfo.mountMin}}
+					数量要求：货品总数大于{{shopInfo.mountMin}}件
+				{{/if}}
+				{{else}}
+				无
+				{{/if}}
+            </div>
+        
+    </div>
+</div>
+<div class="pad_lr5 bg_01  mar_t10">
+    <p class="hei_45 font_1_1">服务</p>
+	<div class="border_bt">
+		<div class="font_18">
+			{{item.afterService}}
+		</div>
+	</div>
+</div>
+<!-- 选择 -->
+<div class="hei_45 pad_lr5 bg_01 mar_t10" onclick="show_shop_forword()">
+    <span class="fl font_1_1" id="attrShowPad">
+    {{#if skuItem}}
+		您已选择：
+    	{{#each skuItem.attrSales}}
+    		{{#each values}}
+    		"{{name}}"
+    		{{/each}}
+    	{{/each}}
+    {{else}}
+    	请选择：
+    	{{#each item.attrSale}}
+    	{{name}}{{" "}}
+    	{{/each}}
+    {{/if}}
+    </span>
+    <span class="fr"><i class="fa fa-angle-right "></i></span>
+    <div class="clear"></div>
+</div><!-- 选择 end-->
+<!-- 评论-->
+<div class="pad_lr5 bg_01  mar_t10">
+    <p class="hei_45 font_1_1">商品评论<span class="mar_lr2" id="evalCount">()</span></p>
+    <div class="border_bt" id="proEvalListOne">
+    </div>
+    <div class="font_cen hei_32 font_8_5 " onclick="showMoreEval();">
+    	<span class="border_bt000">查看更多评价</span>
+    </div>
+</div>
+<div class="pad_lr5 bg_01  mar_t10" id="productShopInfoDiv">
+<dl class="shop_name mar_t10"  onclick="gotoShop('{{shopInfo.shopId}}');">
+    <dt class="fl">
+		<img width="100%" height="100%" src="{{gix}}{{shopInfo.disclaimer}}"></dt>
+	    <dd class="fl">
+	        <p class="hei_32">{{shopInfo.shopName}}</p>
+	        <p class="hei_32">服务评价：<span class="font_e3">{{shopEvaluationResult.shopReputation}}</span></p>
+	    </dd>
+    </dt>
+    <div class="clear"></div>
+    <ul class="attestation mar_t10">
+        <li>
+            <p>描述相符：<span class="font_e3">{{shopEvaluationResult.shopDescription}}</span></p>
+        </li>
+        <li>
+            <p>送货速度：<span class="font_e3">{{shopEvaluationResult.shopService}}</span></p>
+        </li>
+        <li>
+            <p>态度服务：<span class="font_e3">{{shopEvaluationResult.shopService}}</span></p>
+        </li>
+    </ul>
+    <div class="clear"></div>
+</dl>
+</div>
+<div class="pad_lr5 bg_01  mar_t10">
+    <div class="clear"></div>
+    <div class="nTab">
+	    <!-- 标题开始 -->
+	    <div class="TabTitle bg_01">
+			<ul id="myTab0" class="myTab3">
+				<li class="active" onclick="nTabs(this,0);">商品介绍</li>
+				<li class="normal" onclick="nTabs(this,1);">包装清单</li>
+				<li class="normal" onclick="nTabs(this,2);">售后保障</li>
+			</ul>
+	    </div><!-- 标题开始 end-->
+	    <div class="clear"></div>
+	    <!-- 内容开始 -->
+	    <div class="TabContent">
+	        <!-- 切换内容    1   -->     
+	        <div id="myTab0_Content0">
+	            <ul class="details_spzs">
+	                <li><span>商品名称：{{item.itemName}}<span></li>
+	                <li><span>商品编号：{{item.itemId}}</span></li>
+	                {{#if item.weight}}
+	                	<li><span>商品毛重：{{item.weight}}{{item.weightUnit}}</span></li>
+	                {{/if}}
+	                {{#if item.volume}}
+	                	<li><span>商品体积：{{item.volume}}m³</span></li>
+	                {{/if}}
+	                <li><span>店铺名称：{{shopInfo.shopName}}</span></li>
+	                <li><span>上架时间：{{stamp2Date item.listtingTime}}</span</li>
+	                <li><span>商品产地：{{item.origin}}</span></li>
+	                <div class="clear"></div>
+	             </ul>
+	            <!--   <div class="pad_lr5 bg_01  mar_t10  font_cen" id="detailDetail"> -->     
+			    	{{!<span class="border_bt000" onclick='$("#detailddetail").show();'>点击显示更多商品详情</span>}}
+			    	<div id="detailddetail"  style="margin-left: 5px;">
+			    		{{{changeUrl item.describeUrl gix}}}
+			    	</div>
+			    <!--  </div> -->    
+	        </div><!-- 切换内容    1   -->  
+	        <!-- 切换内容    2   -->  
+	        <div id="myTab0_Content1" class="none">
+	             {{item.packingList}}
+	        </div>
+	        <!-- 切换内容    2   -->
+	        <!-- 切换内容    3   -->    
+	        <div id="myTab0_Content2" class="none">
+	            {{item.afterService}}
+	        </div><!-- 切换内容    3   -->  
+    	</div>
+	    
+	</div>
+</div>
+ <script>
+	$(document).ready(function(){
+		var WinW=$(window).width();
+		var aImg=$('#detailddetail p img')
+		
+		for(var i=0; i<aImg.length; i++)
+		{
+			if($('#detailddetail p img').eq(i).width() > WinW)
+    		{
+    			$('#detailddetail p').eq(i).css({'width':'95%'})
+    			$('#detailddetail p img').eq(i).css({'width':'95%','height':'auto'})
+    		}
+		}
+		
+		
+	})
+</script> 

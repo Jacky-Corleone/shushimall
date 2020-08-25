@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.goodscenter.dao.CategoryAttrDAO">
+	<resultMap id="itemCategoryAttrMapper" type="com.camelot.goodscenter.domain.CategoryAttr">
+			<result property="id" column="id" />
+			<result property="cid" column="cid" />
+			<result property="valueId" column="value_id" />
+			<result property="valueName" column="value_name" />
+			<result property="indexKey" column="index_key" />
+			<result property="attrId" column="attr_id" />
+			<result property="attrType" column="attr_type" />
+			<result property="attrName" column="attr_name" />
+			<result property="selectType" column="select_type" />
+			<result property="sortNumber" column="sort_number" />
+			<result property="optionType" column="option_type" />
+			<result property="features" column="features" />
+			<result property="created" column="created" />
+			<result property="modified" column="modified" /> 
+			<result property="status" column="status" />
+	</resultMap>
+	<resultMap id="itemCategoryAttrDTOMapper" type="com.camelot.goodscenter.dto.CategoryAttrDTO">
+			<result property="attrId" column="id" />
+			<result property="attrCid" column="cid" />
+			<result property="attrValueId" column="value_id" />
+			<result property="attrValueName" column="value_name" />
+			<result property="attrIndexKey" column="index_key" />
+			<result property="attrAttrId" column="attr_id" />
+			<result property="attrAttrType" column="attr_type" />
+			<result property="attrAttrName" column="attr_name" />
+			<result property="attrSelectType" column="select_type" />
+			<result property="attrSortNumber" column="sort_number" />
+			<result property="attrOptionType" column="option_type" />
+			<result property="attrFeatures" column="features" />
+			<result property="attrCreated" column="created" />
+			<result property="attrModified" column="modified" /> 
+			<result property="attrStatus" column="status" />
+			<result property="isSenior" column="IS_SENIOR" />
+	</resultMap>
+	<resultMap id="itemAttrSellerMap" type="com.camelot.goodscenter.domain.ItemAttrSeller" >
+		<result property="sellerAttrId" column="seller_attrid" />
+		<result property="sellerId" column="seller_id" />
+		<result property="categoryId" column="category_id" />
+		<result property="attrId" column="attr_id" />
+		<result property="attrName" column="attr_name" />
+		<result property="attrType" column="attr_type" />
+		<result property="selectType" column="select_type" />
+		<result property="attrStatus" column="attr_status" />
+		<result property="sortNumber" column="sort_number" />
+		<result property="created" column="created" />
+		<result property="modified" column="modified" />
+		<result property="shopId" column="shop_id" />
+	</resultMap>
+	<resultMap id="itemAttrValueSellerMap" type="com.camelot.goodscenter.domain.ItemAttrValueSeller" >
+		<result property="sellerAttrValueId" column="seller_attr_value_id" />
+		<result property="sellerAttrId" column="seller_attr_id" />
+		<result property="valueId" column="value_id" />
+		<result property="valueName" column="value_name" />
+		<result property="sortNumber" column="sort_number" />
+		<result property="attrValueStatus" column="attr_value_status" />
+		<result property="created" column="created" />
+		<result property="modified" column="modified" />
+	</resultMap>
+	
+	<resultMap id="queryChildCategoryMap" type="com.camelot.goodscenter.dto.outdto.QueryChildCategoryOutDTO" >
+		<result property="childCategorys" column="childCategorys" />
+	</resultMap>
+	
+	<select id="queryChildCategory" resultMap="queryChildCategoryMap" >
+		select queryChildCategory(#{entity.categoryCid}) childCategorys
+	</select>
+	
+	<sql id="where_fragement_dto">
+		where 1=1
+		<if test="entity != null">
+			<if test="entity.attrCid!= null">
+			and cid = #{entity.attrCid}
+			</if>
+			<if test="entity.attrAttrType != null">
+			and attr_type = #{entity.attrAttrType}
+			</if>
+			<if test="entity.attrAttrId != null ">
+			and attr_id = #{entity.attrAttrId}
+			</if>
+			<if test="entity.attrValueId != null and entity.attrValueId != ''">
+			and value_id = #{entity.attrValueId}
+			</if>
+		</if>
+	</sql>
+	<select id="queryById" resultMap="itemCategoryAttrMapper" >
+		select * from item_category_attr
+		where id = #{id}
+	</select>
+	
+	<insert id="add">
+		insert into item_category_attr(
+				cid,
+				attr_id,
+				attr_type,
+				select_type,
+				sort_number,
+				option_type,
+				features,
+				created,
+				modified,
+				status
+		)values(
+				#{attrCid},
+				#{attrAttrId},
+				#{attrAttrType},
+				#{attrSelectType},
+				#{attrSortNumber},
+				#{attrOptionType},
+				#{attrFeatures},
+				now(),	
+				now(),
+				1
+		)
+	</insert>
+	<insert id="addAttr" parameterType="object" useGeneratedKeys="true" keyProperty="attrAttrId">
+		insert into item_attribute(
+				attr_name,
+				created,
+				modified,
+				status,
+				IS_SENIOR
+		)values(
+				#{attrAttrName},
+				now(),
+				now(),
+				1,
+				#{isSenior}
+		)
+	</insert>
+	<insert id="addAttrValue" parameterType="object" useGeneratedKeys="true" keyProperty="attrValueId" >
+		insert into item_attribute_value(
+				attr_id,
+				value_name,
+				index_key,
+				created,
+				modified,
+				status
+		)values(
+				#{attrAttrId},
+				#{attrValueName},
+				#{attrIndexKey},
+				now(),	
+				now(),
+				1
+		)
+	</insert>
+	<insert id="addCategoryAttrValue" >
+		insert into item_category_attr_value(
+		        cid,
+				attr_id,
+				value_id,
+				sort_number,
+				created,
+				modified,
+				status
+		)values(
+				#{attrCid},
+				#{attrAttrId},
+				#{attrValueId},
+				#{attrSortNumber},
+				now(),	
+				now(),
+				1
+		)
+	</insert>
+	
+	<update id="update">
+		update item_category_attr set
+				id = #{id},
+				cid = #{cid},
+				attr_id = #{attrId},
+				attr_type = #{attrType},
+				attr_name = #{attrName},
+				select_type = #{selectType},
+				sort_number = #{sortNumber},
+				option_type = #{optionType},
+				features = #{features},
+				created = now(),
+				modified = now(),
+				status = #{status}
+		where id = #{id}
+	</update>
+	<update id="updateBySelect">
+	
+	</update>
+	
+	<delete id="delete">
+		delete from item_category_attr
+		<if test=" codes != null and codes.size() > 0 ">
+			where id in
+			<foreach collection="codes" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test=" codes == null or codes.size() == 0 ">
+			where 1 = 3
+		</if>
+	</delete>
+	
+	<!-- 根据商品属性值删除商品类别属性关系 -->
+	<delete id="deleteCategoryAttrByAttrId">
+		delete from item_category_attr
+		where attr_id=#{attr_id}
+	</delete>
+	
+	<!-- 根据商品属性值删除商品类别属性值关系 -->
+	<delete id="deleteCategoryAttrValueByValueId">
+		delete from item_category_attr_value
+		where value_id=#{value_id}
+	</delete>
+	
+	<!-- 根据商品属性删除商品类别属性值关系 -->
+	<delete id="deleteCategoryAttrValueByAttrId">
+		delete from item_category_attr_value
+		where attr_id=#{attr_id}
+	</delete>
+	
+	<select id="queryCount"></select>
+<!-- 	根据类目id和商品类型关联两张表查询属性id和属性name -->
+	<select id="queryAttrNameList" resultMap="itemCategoryAttrDTOMapper">
+		select ia.attr_name,ia.attr_id,ia.IS_SENIOR 
+	from item_attribute ia,item_category_attr ica
+	where ia.attr_id = ica.attr_id and ica.cid = #{attrCid} and ica.attr_type = #{attrAttrType}
+	</select>
+<!-- 	根据属性id和类目id关联两张表查询属性值id和属性值name -->
+	<select id="queryValueNameList" resultMap="itemCategoryAttrDTOMapper">
+		select iav.value_id,iav.value_name
+	from item_attribute_value iav,item_category_attr_value icav
+	where iav.value_id = icav.value_id and icav.attr_id = #{attrAttrId} and icav.cid = #{attrCid}
+	</select>
+	
+	<select id="queryAttrSellerList" resultMap="itemAttrSellerMap">
+		SELECT 
+		  ia.*,
+		  itema.attr_name
+		FROM
+		  item_attr ia,
+		  item_attribute itema 
+		WHERE ia.attr_id = itema.attr_id 
+		<if test="param.sellerId!=null">
+		  AND ia.seller_id = #{param.sellerId}
+		</if>
+		  AND ia.shop_id = #{param.shopId}
+		  AND ia.attr_status=1
+  		  AND ia.attr_type=#{param.attrType}
+  		  and ia.category_id=#{param.cid}
+	</select>
+	
+	<select id="queryAttrValueSellerList" resultMap="itemAttrValueSellerMap">
+		SELECT 
+		  iav.*,
+		  itemv.value_name 
+		FROM
+		  item_attr_value iav,
+		  item_attribute_value itemv 
+		WHERE iav.value_id = itemv.value_id 
+		  AND iav.seller_attrid =#{sellerAttrId}
+	</select>
+	
+	
+	<insert id="insertItemAttr" parameterType="com.camelot.goodscenter.domain.ItemAttrBean" useGeneratedKeys="true" keyProperty="param.id">
+		<![CDATA[
+		insert into item_attribute(
+				attr_name,
+				created,
+				modified,
+				status
+		)values(
+				#{param.name},
+				now(),
+				now(),
+				1
+		)
+		]]>
+	</insert>
+	
+	
+	<insert id="insertItemAttrSeller" parameterType="com.camelot.goodscenter.domain.ItemAttrSeller" useGeneratedKeys="true" keyProperty="param.sellerAttrId">
+		<![CDATA[
+		INSERT INTO item_attr (
+		  seller_id,
+		  category_id,
+		  attr_id,
+		  attr_type,
+		  select_type,
+		  attr_status,
+		  sort_number,
+		  created,
+		  modifid,
+		  shop_id
+		) 
+		VALUES
+		  (
+		    #{param.sellerId},
+		    #{param.categoryId},
+		    #{param.attrId},
+		    #{param.attrType},
+		    #{param.selectType},
+		    1,
+		    #{param.sortNumber},
+		    now(),
+		    now(),
+		    #{param.shopId}
+		  )
+		]]>
+	</insert>
+	
+	<select id="getItemAttrSeller" resultMap="itemAttrSellerMap">
+		SELECT 
+		  ia.*,
+		  itema.attr_name
+		FROM
+		  item_attr ia,
+		  item_attribute itema 
+		WHERE ia.attr_id = itema.attr_id 
+		  AND ia.seller_id = #{sellerId}
+		  AND ia.shop_id = #{shopId}
+		  AND ia.attr_status=1
+  		  AND ia.attr_id=#{attrId}
+  		  AND ia.category_id=#{cid}
+	</select>
+	
+	<insert id="insertItemAttrValue" parameterType="com.camelot.goodscenter.domain.ItemAttrValueBean" useGeneratedKeys="true" keyProperty="param.id">
+		<![CDATA[
+		INSERT INTO item_attribute_value (
+		  attr_id,
+		  value_name,
+		  status,
+		  index_key,
+		  created,
+		  modified
+		) 
+		VALUES
+		  (
+		    #{param.attrId},
+		    #{param.name},
+		    1,
+		    null,
+		    now(),
+		    now()
+		  ) 
+		]]>
+	</insert>
+	
+	
+	<insert id="insertItemAttrValueSeller" parameterType="com.camelot.goodscenter.domain.ItemAttrValueSeller" useGeneratedKeys="true" keyProperty="param.sellerAttrValueId">
+		<![CDATA[
+			INSERT INTO item_attr_value (
+			  seller_attrid,
+			  value_id,
+			  sort_number,
+			  attr_value_status,
+			  created,
+			  modified
+			) 
+			VALUES
+			  (
+			    #{param.sellerAttrId},
+			    #{param.valueId},
+			    #{param.sortNumber},
+			    1,
+			    now(),
+			    now()
+			  )
+		]]>
+	</insert>
+	
+</mapper>

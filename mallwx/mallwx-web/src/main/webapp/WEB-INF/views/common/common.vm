@@ -1,0 +1,355 @@
+<link rel="stylesheet" href="${request.getContextPath()}/assets/css/animotion.css"/>
+<div class="Popup" id="_mask" style="display:none;">
+	<div class="Popup_bg">
+	</div>
+    <div class="Popup_main">
+		<div class="_content">
+			<div style="" id="_mask_msg"></div>
+		</div>
+		<div class="Popup_btns">
+			<div>
+				<span id="_mask_confirm_btn"><button>确认</button></span>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="Popup" id="_mask2" style="display:none;">
+    <div class="Popup_bg">
+    </div>
+    <div class="Popup_main">
+        <div class="_content">
+            <span id="_mask2_msg"></span>
+        </div>
+        <div class="Popup_btns">
+                <span style="margin-right: 20px;" id="_mask2_confirm_btn"><button>确认</button></span>
+                <span id="_mask2_can_btn"><button>取消</button></span>
+        </div>
+    </div>
+</div>
+<div class="Popup hideout" id="_mask3" style="width: 0px;height: 0px;overflow: visible">
+    <div class="slowlyfadeout">
+        <span class="slowlyfadeoutwindow" id="_mask_msg3">
+        </span>
+    </div>
+</div>
+<div class="Popup" id="_mask4" style="display: none;">
+    <div id="_mask_bg4" class="Popup_bg">
+    </div>
+    <div class="slowlyfadeout" style="z-index: 1000;">
+        <div class="barrier">
+            <div class="rect1"></div>
+            <div class="rect2"></div>
+            <div class="rect3"></div>
+            <div class="rect4"></div>
+            <div class="rect5"></div>
+        </div>
+    </div>
+</div>
+<style>
+    .barrier {
+        transform: translateX(-50%) translateY(-50%) ;
+        -moz-transform:translateX(-50%) translateY(-50%);
+        -webkit-transform:translate3d(-50%,-50%,0);
+        position: absolute;
+        width: 70px;
+        height: 24px;
+        z-index: 1001;
+        text-align: center;
+    }
+    .barrier > div {
+        background-color: #555;
+        height: 100%;
+        opacity: 0.6;
+        filter: Alpha(Opacity=0.6);
+        width: 6px;
+        display: inline-block;
+        -webkit-animation: loadingani1 1.2s infinite ease-in-out;
+        animation: loadingani1 1.2s infinite ease-in-out;
+        -moz-animation-name: loadingani1 1.2s infinite ease-in-out;
+    }
+    .barrieranimate{
+        -webkit-animation: loadingani1 1.2s infinite ease-in-out;
+        animation: loadingani1 1.2s infinite ease-in-out;
+        -moz-animation-name: loadingani1 1.2s infinite ease-in-out;
+    }
+    .barrier .rect1 {
+        -webkit-animation-delay: 0s;
+        animation-delay: 0s;
+    }
+    .barrier .rect2 {
+        -webkit-animation-delay: 0.1s;
+        animation-delay: 0.1s;
+    }
+    .barrier .rect3 {
+        -webkit-animation-delay: 0.2s;
+        animation-delay: 0.2s;
+    }
+    .barrier .rect4 {
+        -webkit-animation-delay: 0.3s;
+        animation-delay: 0.3s;
+    }
+    .barrier .rect5 {
+        -webkit-animation-delay: 0.4s;
+        animation-delay: 0.4s;
+    }
+
+    /*  弹出层*/
+    /*弹出框样式*/
+    .Popup {
+        width:100%;
+        height:100%;
+        z-index:999;
+        position: absolute;
+    }
+    .hideout{
+        display: none;
+        /*transform: translateX(-200%);
+        -webkit-transform: translate3d(-200%,0,0);
+        -moz-transform:translateX(-200%);*/
+    }
+    .Popup .Popup_bg {
+        position:fixed;
+        background:#000;
+        opacity:0;
+        filter: Alpha(Opacity=0);
+        width:100%;
+        height:100%;
+        left:0px;
+        top:0px;
+        z-index:1000;
+    }
+    .Popup .slowlyfadeout {
+        z-index: 1020;width:1px;height: 1px;position: fixed;top:50%;left: 50%;overflow: visible
+    }
+    .Popup .slowlyfadeout .slowlyfadeoutwindow{
+        position: absolute;
+        z-index: 2000;
+        transform:translateX(-50%) translateY(-50%);
+        -webkit-transform:translate3d(-50%,-50%,0);
+        -moz-transform: translateX(-50%) translateY(-50%);
+        background-color: #222;
+        color:#fff;
+        padding: 5px 10px 5px 10px;
+        -webkit-box-shadow:0 0 10px rgb(165, 165, 165);
+        -moz-box-shadow:0 0 10px rgb(165, 165, 165);
+        box-shadow:0 0 10px rgb(165, 165, 165);
+        opacity:0.8;
+        filter: Alpha(Opacity=0.8);
+        border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px;
+        font-size: 1.25em;
+        min-width:140px;
+        max-width: 200px;
+        text-align: center;
+    }
+    .Popup .Popup_main {
+        position:fixed;
+        background-color:#FFF;
+        width:70%;
+        z-index:1010;
+        top:25%;
+        min-height:150px;
+        left:15%;
+        border: 1px #ddd solid;
+        -webkit-box-shadow:0 0 5px rgb(165, 165, 165);
+        -moz-box-shadow:0 0 5px rgb(165, 165, 165);
+        box-shadow:0 0 5px rgb(165, 165, 165);
+    }
+    .Popup .Popup_btns{
+        position:absolute;
+        bottom:10px;
+        width:100%;
+        text-align: center;
+    }
+    .Popup .Popup_btns span button{
+        background: #fff; border: 1px solid #ddd; line-height: 32px;width:70px;
+    }
+    .Popup ._content{
+        padding-left: 20px;
+        padding-right: 20px;
+        /*position:absolute;*/
+        margin-top:20px;
+        /*width:100%;*/
+        text-align: center;
+        height:70px;
+        padding-top:10px;
+        padding-bottom:10px;
+    }
+</style>
+<script>
+	function alert(_msg,_fun){
+        _refreshAlert();
+		$("#_mask_msg").html(_msg);
+		if(_isfunction(_fun)){
+            $("#_mask_confirm_btn").unbind('click');
+			$("#_mask_confirm_btn").click(function(){
+				_fun();
+				_closeMask();
+			})
+		}else{
+            $("#_mask_confirm_btn").unbind('click');
+			$("#_mask_confirm_btn").show().click(_closeMask);
+		}
+		$("#_mask_can_btn").hide();
+		$("#_mask").show();
+	}
+
+	function _closeMask(){
+		$("#_mask").hide();
+	}
+	function _closeMask2(){
+		$("#_mask2").hide();
+	}
+    function _isfunction(_f){//判断是否为function
+        return (null!==_f && undefined!==_f &&(typeof _f)=== "function");
+    }
+    function _isNotEmpty(__param){//判断字符串是否为空
+        return __param!=="" && null!==__param && undefined !== __param;
+    }
+	function kltconfirm(_msg,_funcnf,_funcnc){
+        _refreshConfirm();
+        $("#_mask2_msg").html(_msg);
+        if(_isfunction(_funcnf)){
+            $("#_mask2_confirm_btn").unbind('click');
+            $("#_mask2_confirm_btn").click(function(){
+                _funcnf();
+                _closeMask2();
+			});
+		}
+        if(_isfunction(_funcnc)){
+            $("#_mask2_can_btn").unbind('click');
+            $("#_mask2_can_btn").click(function(){
+                _funcnc();
+                _closeMask2();
+            });
+        }
+        $("#_mask2").show();
+	}
+
+	function _refreshAlert(){
+		$("#_mask_confirm_btn").show();
+		$("#_mask_msg").html('');
+        $("#_mask_confirm_btn").unbind('click');
+        $("#_mask_confirm_btn").click(function(){
+            _closeMask();
+        });
+        $("#_mask").hide();
+	}
+	function _refreshConfirm(){
+        $("#_mask2_can_btn").show();
+		$("#_mask2_confirm_btn").show();
+		$("#_mask2_msg").html('');
+        $("#_mask2_confirm_btn").unbind('click');
+        $("#_mask2_confirm_btn").click(function(){
+            _closeMask2();
+        });
+        $("#_mask2_can_btn").unbind('click');
+        $("#_mask2_can_btn").click(function(){
+            _closeMask2();
+        });
+        $("#_mask2").hide();
+	}
+    var _toastTimeout0;
+    var _toastTimeout1;
+    function toast(_msg,_fun){
+        $("#_mask_msg3").html(_msg);
+        $("#_mask3").removeClass("hideout alertfadeout");
+        clearTimeout(_toastTimeout0);
+        clearTimeout(_toastTimeout1);
+        _toastTimeout0=setTimeout(function(){
+            $("#_mask3").addClass("alertfadeout");
+            _toastTimeout1=setTimeout(function(){
+                $("#_mask3").removeClass("alertfadeout").addClass("hideout");
+                if(_isfunction(_fun)){
+                    _fun();
+                }
+            },3000);
+        },10)
+    }
+    var _toastTimeout4;
+    function addLoadMask(_options){
+        clearTimeout(_toastTimeout4);
+        var _bg=$("#_mask_bg4");
+        _bg.attr('style','');
+        if(_options){
+            if(_options.background){
+                if(_options.background == "black"){
+                    _bg.css('background',"#000");
+                    _bg.css('opacity','0.4');
+                    _bg.css('filter',"Alpha(Opacity=0.4)");
+                }
+                else if(_options.background == "white"){
+                    _bg.css('background',"#fff");
+                    _bg.css('opacity','0.4');
+                    _bg.css('filter',"Alpha(Opacity=0.4)");
+                }else{
+                    _bg.css('background',_options.background);
+                }
+            }
+            if(_options.bgOpacity){
+                _bg.css('opacity',_options.bgOpacity);
+                _bg.css('filter',"Alpha(Opacity="+_options.background+")");
+            }
+        }else{
+            _bg.css('background',"#fff");
+            _bg.css('opacity','0.7');
+            _bg.css('filter',"Alpha(Opacity=0.7)");
+        }
+        $("#_mask4").show();
+        _toastTimeout4=setTimeout(function(){
+            $("#_mask4").hide();
+        },10000);
+    }
+    function removeLoadMask() {
+        clearTimeout(_toastTimeout4);
+        $("#_mask4").hide();
+    }
+    function _test(){
+        return;
+        $('#targetUrl').val('')
+        showLogin();
+        var _param={}
+        _param.id="hehe";
+        _param.selector='#_bg_gr';
+        _param.callback=function(){
+            //console.log('返回的回调执行了');
+            hideLogin();
+        }
+        registerGoBack(_param);
+    }
+    var _gobackFuns={};//用于扩展的变量
+    function registerGoBack(_option){
+
+        return;//屏蔽掉
+
+        var _key=_option.key;//预留参数key
+        var _fun=_option.callback;//返回时的回调
+        var _param={};
+        _param.key=_key;
+        history.pushState(_param,"nothing");
+        window.onpopstate=function(e){
+            _fun();
+            window.onpopstate=null;
+        }
+        if(_option.fires){//绑定多个触发回调的事件
+            for(var _i=0;_i<_option.fires.length;_i++){
+                var _fire=(_option.fires)[_i];
+                var _e=_fire.event||'click';
+                $(_fire.selector).unbind(_e);
+                $(_fire.selector).bind(_e,function(){
+                    history.back();
+                })
+            }
+        }
+        if(_option.selector){//绑定一个触发回调的事件
+            var _e=_option.event||'click';
+            $(_option.selector).unbind(_e);
+            $(_option.selector).bind(_e,function(){
+                history.back();
+            })
+        }
+    }
+
+    function selectRegion(code){
+        $.cookie('regionCode',code,{expires: 30, path:"/"});
+    }
+</script>

@@ -1,0 +1,10 @@
+{{#if pager}}
+	{{#each pager.records}}
+	<p class="hei_32 font_8_5 pad_l5">{{userName}}</p>
+	<p class="lin_24">{{content}} </p>
+	<p class="lin_24">
+	    <span class="font_6">{{stamp2Date createTime}}</span>
+	    <span class="font_6">商品编码：<i class="font_6 font_1_0">{{skuId}}</i></span>
+	</p>
+	{{/each}}
+{{/if}}

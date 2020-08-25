@@ -1,0 +1,322 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<link href="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="$staticPath/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/jquery-validation/1.11.1/jquery.validate.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/jquery-validation/1.11.1/messages_zh.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		//加载左侧菜单
+		$("#leftSeller").load("$request.contextPath/leftSeller");
+		//平台分类 （一级）
+		$("#first_assortment").change(function(){
+			emptySelect('second_assortment',"二级分类");
+			emptySelect('third_assortment',"三级分类");
+			optionItems($("#first_assortment").val(),"",1, "second_assortment");
+		});
+		//平台分类（二级）
+		$("#second_assortment").change(function(){
+			emptySelect('third_assortment',"三级分类");
+			optionItems($("#first_assortment").val(),$("#second_assortment").val(),2, "third_assortment");
+		});
+		//平台分类（三级）
+		$("#third_assortment").change(function(){
+			$.ajax({
+				url:"$request.contextPath/sellcenter/goodsProperties/goodsProperty",
+				type:"post",
+				data:{
+					"sellerId":"$!userId",
+					"shopId":"$!shopId",
+					"cid":$("#third_assortment").val(),
+					"attrType":1,
+				},
+				dataType: "json",
+				success:function(data){
+					//获取地域数据
+					var itemAttrValueDiv = $("#itemAttrValueDiv");
+					itemAttrValueDiv.html('');
+					$("#itemAttrDiv").html('');
+					var appendStr = "";
+					$.each(data.goodsProperty.result, function (n, itemAttr) {
+						appendStr += '<div><p class="mar_l10 mar_t10"><input name="itemAttr_id"  type="hidden" value="'+itemAttr.id+'"/><input name="itemAttr_name"  id="itemAttr_'+itemAttr.id+'" class="hei_24 wid_150 pad_l10 border-4 cursor" type="text" attr_name="'+itemAttr.name+'" onclick="showSaleEditDiv(\''+itemAttr.id+'\',1)" value="'+itemAttr.name+'" title="点击执行编辑" readonly="readonly"/></p>';
+						appendStr += ' <div class="color_select mar_l10 mar_t10"> ';
+						$.each(itemAttr.values, function (n, itemAttrValue) {
+							appendStr += ' <p><input type="text"  readonly="readonly" id="itemAttrVal_'+itemAttrValue.id+'" title="点击执行编辑" attr_val_name="'+itemAttrValue.name+'" onclick="showSaleEditDiv(\''+itemAttrValue.id+'\',2)" class="wid_40 font_cen border-4 mar_l5 mar_r10 cursor" value="'+itemAttrValue.name+'" /></p> ';
+						});
+						appendStr += ' <div></div><p class="hei_30 mar_l10" ><a href="javascript:void(0)" onclick="addDiv(this,1);" >+添加属性值&nbsp;&nbsp;&nbsp;&nbsp;</a></p> ';
+						appendStr += ' <button type="button" onclick="saveGoodsProperty(this,1);">保 存</button> ';
+						appendStr += ' <button type="button" onclick="cancleDiv(this,1);">取 消</button> ';
+						appendStr += ' </div><div class="clear"></div></div>';
+					});
+					itemAttrValueDiv.append(appendStr);
+				}
+			});
+		});
+	});
+	//保存：属性/属性值 (type:1只保存销售属性值   2:保存销售属性-属性值)
+	function saveGoodsProperty(val,type){
+		var thirdAssortment = $("#third_assortment").val();
+		if(thirdAssortment=="-300" || thirdAssortment==""){
+			alert("请选择三级分类!");
+			return false;
+		}
+		var itemAttr_id = $(val).parent().parent().find("input:eq(0)");
+		var itemAttr_name = $(val).parent().parent().find("input:eq(1)");
+		var itemAttrValueArray = $(val).parent().parent().find("input[name='itemAttrValue']");
+		var valueArray = "";
+		var valueState = true;
+		$.each(itemAttrValueArray, function (n,item) {
+			var itemVal = $(item).val();
+			valueArray = valueArray + itemVal + ",";
+			if($.trim(itemVal)=="" || itemVal==undefined){
+				valueState = false;
+			}
+		});
+		if(itemAttr_name.val()==undefined || $.trim(itemAttr_name.val())==""){
+			alert("销售属性不能空值");
+			return false;
+		}
+		if(!valueState){
+			alert("属性值不能空值");
+			return false;
+		}
+		$("#saveDiv").show();
+		if(null==valueArray || ""==valueArray||undefined==valueArray){
+		 alert("无最新的属性值可以保存!");
+		 $("#saveDiv").hide();
+		 }else{
+		   $.ajax({
+		     type: "post",
+		     dataType: "json",
+		     url:"$request.contextPath/sellcenter/goodsProperties/saveGoodsProperty",
+		     data:{
+		    	 "sellerId":"$!userId",
+		    	 "shopId":"$!shopId",
+		    	 "cid":$("#third_assortment").val(),
+		    	 "type":type,
+		    	 "id":itemAttr_id.val(),
+		    	 "name":itemAttr_name.val(),
+		    	 "valueArray":valueArray
+		     },
+		     success: function(result){
+		    	if(result.itemAttrValueIsNotNull == true){
+		    		//触发取消按钮
+		    		$(val).next().click();
+		    		//重新加载销售属性
+		    		$("#third_assortment").change();
+		    		alert("保存成功!");
+		    	}else{
+		    		alert("无最新的属性值可以保存!");
+		    	}
+		    	$("#saveDiv").hide();
+		     }
+		 });
+		 }
+	}
+	//添加-属性/属性值
+	function addDiv(val, type){
+        if(type==1){
+    		$(val).parent().prev().append('<p><input name="itemAttrValue"  type="text" maxlength="28"  class="wid_40 font_cen border-4 mar_l5 mar_r10" /></p>');
+    	}else if(type==2){
+    	    var itemAttrDiv = '<div>';
+    		itemAttrDiv += '<p class="mar_l10 mar_t10"><input name="itemAttr_id" type="hidden"/><input name="itemAttr_name" class="hei_24 wid_150 pad_l10 border-4" type="text" maxlength="6"  placeholder="请输入属性名称"/></p> ';
+    		itemAttrDiv += '<div class="color_select mar_l10 mar_t10"><div></div>';
+    		itemAttrDiv += '<p><a href="javascript:void(0)" onclick="addDiv(this,1);" >&nbsp;&nbsp;+添加属性值&nbsp;&nbsp;</a></p>';
+    		itemAttrDiv += '<button type="button" onclick="saveGoodsProperty(this,2);">保 存</button> ';
+    		itemAttrDiv += '<button type="button" onclick="cancleDiv(this,2);">取 消</button>';
+    		itemAttrDiv += '</div><div class="clear"></div></div>';
+    		$("#itemAttrDiv").append(itemAttrDiv);
+    	}
+	};
+	
+	//取消-属性/属性值
+	function cancleDiv(val, type){
+		if(type==1){
+			var itemAttrValueArray = $(val).parent().parent().find("input[name='itemAttrValue']");
+			$.each(itemAttrValueArray, function (n,item) {
+				$(item).parent().remove();
+			});
+		}else if(type==2){
+			var itemAttr_id = $(val).parent().parent().find("input:eq(0)").val();
+			if(itemAttr_id!="" && itemAttr_id!=undefined){
+				var itemAttrValueArray = $(val).parent().parent().find("input[name='itemAttrValue']");
+				$.each(itemAttrValueArray, function (n,item) {
+					$(item).parent().remove();
+				});
+			}else{
+				$(val).parent().parent().remove();
+			}
+		}
+	};
+	//清空下拉列表
+	function emptySelect(id,defaultVal){
+		var obj = $("#"+id);
+		obj.empty();
+		if(defaultVal != ""){
+			obj.append($("<option>").text(defaultVal).val(""));
+		}
+	}
+	//平台分类
+	function optionItems(levelOneVal,levelTwoVal,level,optionId){
+		$.ajax({
+			url:"$request.contextPath/sellcenter/goodsProperties/getItemCategorys",
+			type:"post",
+			data:{
+				levelOneId:levelOneVal,
+				levelTwoId:levelTwoVal,
+				level:level,
+				shopId:"$!shopId"
+			},
+			dataType: "json",
+			success:function(data){
+				//获取地域数据
+				var optionItem = $("#"+optionId);
+				$.each(data.result, function (n, category) {
+					var option = $("<option>").text(category.cname).val(category.cid);
+					optionItem.append(option);
+				});
+			}
+		});
+	}
+	
+	//隐藏编辑弹出层
+	function removeElement(id){
+		$("#"+id).hide();
+		$("#edit_type").val("");
+		$("#id").val("");
+		$("#attr_edit_name").val("");
+	}
+	
+	//显示销售属性编辑弹出框
+	function showSaleEditDiv(id,type){
+		$("#edit_type").val(type);
+		$("#id").val(id);
+		var name = "";
+		if(type == 1){
+			//获取销售属性名称
+			name = $("#itemAttr_"+id).val();
+			$("#attr_edit_name").val(name);
+			$("#attr_edit_name").attr("maxlength",6);
+			
+		}else{
+			name = $("#itemAttrVal_"+id).val();
+			$("#attr_edit_name").val(name);
+			$("#attr_edit_name").attr("maxlength",28);
+			
+		}
+		$("#saleDiv").show();
+		
+	}
+	
+	//销售属性/属性值 编辑
+	function modifyAttr(obj){
+
+		var attr_edit_name = $("#attr_edit_name").val();
+		if($.trim(attr_edit_name) == ""){
+			alert("销售名称不允许为空!");
+			return false;
+		}
+		var attrType = $("#edit_type").val();
+		var id = $("#id").val();
+		var url = "/sellcenter/sellProduct/modifySaleAttr";
+		$.ajax({
+			url: "$request.contextPath" + url,
+			type:"post",
+			data:{
+				id:id,
+				name:attr_edit_name,
+				attrType:attrType
+			},
+			dataType: "json",
+			success:function(data){
+				//执行成功
+				if(data.result){
+					//编辑
+					if(attrType == "1"){
+						//编辑销售属性
+						$("#itemAttr_"+id).val(attr_edit_name).attr("");
+					}else{
+						//编辑销售属性值
+						$("#itemAttrVal_"+id).val(attr_edit_name);
+					}
+					alert("执行成功")
+				}else{
+					alert("执行失败")
+				}
+	
+					removeElement('saleDiv');
+				
+			}
+		})
+	}
+	
+</script>
+
+<div id="main">
+<!-- left start -->
+<div id="leftSeller" class="border-4"></div>
+<!--left end -->
+
+<!--right start-->
+<div id="right" class="bg_06 border-4" >
+	<div class="wid_940  bg_05 mar_cen hei_35 pad_l10">销售属性管理</div>
+	<div class="right_xinxi mar_cen">
+		<p class="mar_tb10 mar_l10">
+			平台分类：
+			<select id="first_assortment" name="first_assortment" class="wid_90 mar_l10">
+				<option value="-100" selected="selected">一级分类</option>
+				#foreach($firstAssortment in $firstAssortmentList)
+                	<option value="$!firstAssortment.cid"> $!firstAssortment.cname</option>
+				#end
+			</select>
+			<select id="second_assortment" name="second_assortment" class="wid_90 mar_l10">
+				<option value="-200" selected="selected">二级分类</option>
+			</select>
+			<select id="third_assortment" name="third_assortment" class="wid_90 mar_l10">
+				<option value="-300" selected="selected">三级分类</option>
+			</select>
+		</p>
+		<div id="itemAttrValueDiv"></div>
+		<div id="itemAttrDiv"></div>
+		<p class="hei_24 mar_l10 mar_tb10" ><a href="javascript:void(0)" onclick="addDiv(this,2);">+添加销售属性</a></p>
+	</div>
+</div>
+<!--right end-->
+</div>
+
+
+<div class="po_fai" id="saleDiv" style="display:none;">
+	<div class="po_fai_bg"></div>
+	<div class="po_main1 pad_t10" >
+		<div class="hei_32 bg_05 pad_l10 font_14b">
+			<i class="demo-icons fa-times-circle font_16 fr mar_r10" onclick="removeElement('saleDiv')"></i>
+			销售属性
+		</div>
+		<div class="shop_xinxi mar_t10">
+			<ul class="add_xx mar_l10">
+				<li class="wid_300 mar_l8 mar_tb10">销售属性 : 
+					<input type="hidden" id="edit_type" value="" />
+					<input type="hidden" id="id" value="" />
+					<input type="text"  maxlength="6" id="attr_edit_name" value="" class="border-4 wid_180 mar_l10 input_Style2 hei_30" />
+				</li>
+				<li class="wid_260 mar_l8 mar_tb10">
+					<input type="button"  class="button_2 hei_35 font_14b" id="attr_edit_save" onclick="modifyAttr()" value="保存"/>
+				</li>
+			</ul>
+		</div><div class="clear"></div>
+	</div>
+</div>
+
+
+
+<div class="po_fai" id="saveDiv" style="display:none;z-index:10000">
+    <div class="po_fai_bg"></div>
+    <div class="po_main1">
+      <div class="tit bg_05 hei_30 pad_l10">提示</div>
+    <ul>
+        <li><img src="$request.contextPath/assets/images/loading.gif" alt="" />正在保存,请稍候...</li>
+    </ul>
+  </div>
+</div>
+

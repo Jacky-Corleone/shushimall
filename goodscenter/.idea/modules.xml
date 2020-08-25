@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/goodscenter.iml" filepath="$PROJECT_DIR$/goodscenter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/goodscenter-common/goodscenter-common.iml" filepath="$PROJECT_DIR$/goodscenter-common/goodscenter-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/goodscenter-dao/goodscenter-dao.iml" filepath="$PROJECT_DIR$/goodscenter-dao/goodscenter-dao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/goodscenter-domain/goodscenter-domain.iml" filepath="$PROJECT_DIR$/goodscenter-domain/goodscenter-domain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/goodscenter-export/goodscenter-export.iml" filepath="$PROJECT_DIR$/goodscenter-export/goodscenter-export.iml" />
+      <module fileurl="file://$PROJECT_DIR$/goodscenter-parent/goodscenter-parent.iml" filepath="$PROJECT_DIR$/goodscenter-parent/goodscenter-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/goodscenter-rpc/goodscenter-rpc.iml" filepath="$PROJECT_DIR$/goodscenter-rpc/goodscenter-rpc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/goodscenter-service/goodscenter-service.iml" filepath="$PROJECT_DIR$/goodscenter-service/goodscenter-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/goodscenter-web/goodscenter-web.iml" filepath="$PROJECT_DIR$/goodscenter-web/goodscenter-web.iml" />
+    </modules>
+  </component>
+</project>

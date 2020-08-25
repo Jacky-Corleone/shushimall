@@ -1,0 +1,129 @@
+#set($layout = "/none_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+#parse("/common/tdk.vm")
+<link rel="stylesheet" style="text/css" href="$staticPath/bank/citic/css/login.css">
+<link href="$staticPath/css/basic.css" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" href="$request.getContextPath()/assets/css/bank/css.css" />
+<script type="text/javascript" src="$staticPath/js/jquery-1.11.2.min.js"></script>
+<style type="text/css">
+	.po_fai .po_main ul li{width:100%; text-align: left; line-height:40px;}
+</style>
+
+</head>
+<body class="login_bg">
+	<div id="container">
+    	<img src="$staticPath/bank/citic/images/top_logo.jpg" alt="中信银行LOGO" align="absmiddle">
+        <div id="centerBox">
+        	<div id="mainBox">
+				<p style="text-indent: 5em">请您及时付款，以便订单尽快处理！</p>
+				<p style="text-indent: 5em">企业付款（到账周期为1-4个工作日）</p>
+        		<div class="main">
+        			<div id="menu">
+        			 	<!-- update start by sunn 20130312-->
+	                	<div style="margin-top:5px">
+	               			<div class="menu_title">订单信息</div>
+	               			<!--<div class="menu_title2">商户名称: 中信银行</div>-->
+	               			<div class="menu_title2">订单编号: $!bankOrder.orderNo</div>
+	               			<div class="menu_title2">订单金额: $!bankOrder.orderAmount</div>
+	               			<div class="menu_title2">支付币种: $!bankOrder.curType</div>
+ 	               			<div class="menu_title2">账户余额: $!bankOrder.balance</div>
+	  					</div>
+						<!-- update end by sunn 20130312-->
+               		</div>
+       				<div>
+       					<div style="margin-top:7px">
+                            <p ><font  style="color: #000000;font-family:Microsoft YaHei ;" >
+                                <b>注意事项：汇款时需要注意以下信息，请牢记！</b><br>
+                                1.请选择并点击下方银行图标，进入相应银行网银页面登录您的银行账户。<br>
+                                2.选择汇款/转账业务，根据银行提示输入下列汇款信息，请仔细核对汇款信息，以免支付失败。<br>
+                                如有疑问欢迎联系舒适100平台客服，我们将竭诚为您服务！谢谢！
+                            </font><p>
+	               			<div class="menu_title3">账&nbsp;户&nbsp;名&nbsp;称：&nbsp;$!affiliatedBalance.SUBACCNM</div>
+	               			<div class="menu_title3">账&nbsp;户&nbsp;账&nbsp;号：&nbsp;$!affiliatedBalance.subAccNo</div>
+	               			<div class="menu_title3">开&nbsp;&nbsp;&nbsp;户&nbsp;&nbsp;&nbsp;行：&nbsp;中信银行北京和平里支行</div>
+	               			<div class="menu_title3">开户行行号：&nbsp;302100011753</div>
+	  					</div>
+
+<!--主体-->
+
+          <div class="pay-way2" style="height:110px;">
+                         <div class="pay-bank">
+                            <p style="font-size: 14px;">选择银行：</p>
+                            <ul>
+                                <li style="margin-bottom:5px;"><a href="http://www.icbc.com.cn/icbc/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank2.png"></a></li>
+                                <li style="margin-bottom:5px;"><a href="http://www.cmbchina.com/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank3.png"></a></li>
+                                <li style="margin-bottom:5px;"><a href="http://www.cgbchina.com.cn/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank1.png"></a></li>
+                                <li style="margin-bottom:5px;"><a href="http://www.ccb.com/cn/home/index.html" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank4.png"></a></li>
+                                <li style="margin-bottom:5px;"><a href="http://www.boc.cn/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank5.png"></a></li>
+                                <li style="margin-bottom:5px;"><a href="http://www.abchina.com/cn/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank6.png"></a></li>
+                                <li style="margin-bottom:5px;"><a href="http://www.bankcomm.com/BankCommSite/default.shtml" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank7.png"></a></li>
+                                <li style="margin-bottom:5px;"><a href="http://bank.ecitic.com/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank8.png"></a></li>
+                                <li style="margin-bottom:5px;"><a href="http://www.cmbc.com.cn/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank9.png"></a></li>
+                                <li style="margin-bottom:5px;"><a href="http://www.bjrcb.com/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank10.png"></a></li>
+                                <li style="margin-bottom:5px;"><a href="http://www.cib.com.cn/cn/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank11.png"></a></li>
+                                <li style="margin-bottom:5px;"><a href="http://www.spdb.com.cn/chpage/c1/?COLLCC=2681107466&" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank12.png"></a></li>
+                                <li style="margin-bottom:5px;"><a href="http://www.bankofshanghai.com/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank13.png"></a></li>
+                                <li style="margin-bottom:5px;"><a href="http://www.psbc.com/portal/zh_CN/index.html" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank14.png"></a></li>
+                                <li style="margin-bottom:5px;"><a href="http://www.cebbank.com/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank15.png"></a></li>
+								<li style="margin-bottom:5px;"><a href="http://www.js96008.com/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank16.png"></a></li>
+								<li style="margin-bottom:5px;"><a href="http://www.zj96596.com/" target="_blank"><img src="$request.getContextPath()/assets/images/bank/pay-bank17.png"></a></li>
+                           </ul>
+                        </div>
+						  </div>
+
+
+
+       				</div>
+            		<div class="tip_2" style="display:none">
+	                	<dl>
+	                		<dt style="line-height:23px;">
+	                			<span style="color:#c72727">·</span>
+	                			首次使用网银前下载安装网银伴侣。用户名默认为您的身份证件号码，登录后点击"网银管理-&gt;用户名修改"功能可进行修改。
+	                		</dt>
+	                	  	<dt style="line-height:23px;">
+	                	  		<span style="color:#c72727">·</span>
+	                	  		为了保证您顺利使用，推荐您使用win2000、winXP操作系统、IE6.0以上版本浏览器，并将计算机显示器的分辨率调整为1024*768。
+	                	  	</dt>
+	                	  	<dt style="line-height:23px;">
+	                	  		<span style="color:#c72727">·</span>
+	                	  		您使用我行个人网银，须遵守《中信银行个人网上银行业务章程》。您在使用过程中如有任何疑问，请咨询95558。
+	                	  	</dt>
+	                    </dl>
+           	  		</div>
+        		</div>
+          	</div>
+        </div>
+
+        <div class="bottom"></div>
+        <div class="copyRight">
+            	Copyright &copy; 舒适100 版权所有，并保留所有权利 | 京ICP备15027467号<br/>
+                                                       舒适100字体由汉仪字库提供 | Tel：400-9987-466 | E-mail：service@shushi100.com
+        </div>
+	</div>
+
+
+	<div id="payValid" class="po_fai" style="display: none;">
+    	<div class="po_fai_bg"></div>
+    	<div class="po_main">
+			<span class="mc_prompt_close" style="top: 5px; right: 5px;">
+				<i class="fa-times-circle font_18"></i>
+			</span>
+			<ul>
+	    		<li class="font_18">
+	    			<i class="fa-info-circle demo-icons font_24 mar_r10"></i>
+	    			<span class="title"></span>
+	    		</li>
+	        	<li class="message" style="color: red;"></li>
+	        	<li class="toolbars">
+	        		<a href="$request.contextPath/">返回商城</a>
+	        	</li>
+	        	<li>如果您在支付过程中遇到问题，请拨打客服电话：400-9987-466</li>
+    		</ul>
+		</div>
+	</div>
+</body>
+</html>

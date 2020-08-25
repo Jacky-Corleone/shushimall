@@ -1,0 +1,260 @@
+#set($layout = "/none_layout.vm")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>商品编辑</title>
+<link href="$request.contextPath/static/css/manage_style.css" rel="stylesheet" type="text/css" />
+<link href="$request.contextPath/static/css/basic.css" rel="stylesheet" type="text/css" />
+
+<script language="javascript" type="text/javascript" src="$request.getContextPath()/assets/js/jquery.1.4.2-min.js"></script>
+<script type="text/javascript">
+$(function(){
+	//加载左侧菜单
+	$("#leftSeller").load("$request.contextPath/leftSeller");
+})
+//保存商品
+function save(){
+	window.location.href="$request.contextPath/goodscenter/goodsList";
+}
+</script>
+</head>
+
+<body>
+<!--头部开始-->
+#parse("/common/header_top_seller.vm")
+<div class="clear"></div>
+ 
+<div id="main">
+<!--中间部分开始-->
+<div id="leftSeller" class="border-4">
+</div><!--left end -->
+
+<!--右边部分开始-->
+<div id="right" class="bg_06 border-4">
+ 
+  <div class="add_newshop bg_06 mar_lr10">
+    
+    <div class="shop_xinxi mar_t20"><!-- 添加基本信息 -->
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" >添加商品<span class="font_12 mar_l10 ">基本信息</span></p>
+      <ul class="add_xx mar_t10 mar_l10 ">
+        <li class="wid_460 mar_tb10 "><i class="font_fs mar_l2">*</i>平台类目 : <select ><option>一级分类</option></select><select class="mar_l10"><option>二级分类</option></select><select class="mar_l10"><option>三级分类</option></select></li>
+        <li class="wid_460 mar_tb10"><i class="font_fs mar_l2">*</i>店铺类目 : <select><option>一级分类</option></select><select class="mar_l10"><option>二级分类</option></select><select class="mar_l10"><option>三级分类</option></select></li>
+        <li class="wid_460 mar_tb10"><i class="font_fs mar_l2">*</i>商品名称 : <input class="border-4 wid_260 " type="text" /></li>
+        <li class="wid_460 mar_l8 mar_tb10">广告语 : <input type="text" class="border-4 wid_260 mar_l10" /></li>
+      </ul> 
+    </div><!-- 添加基本信息 end -->
+    <div class="clear"></div>
+
+    <div class="shop_xinxi mar_t20"><!-- 添加商品属性 -->
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" >添加商品<span class="font_12 mar_l10 ">商品属性</span></p>
+      <ul class="add_sx mar_l10">
+        <li class="mar_t10">品牌：<select class="wid_180"><option>节能</option><option>爱普生</option><option>松下</option><option>其他</option></select></li>
+        <li>颜色：
+          <span><input type="checkbox" class="mar_lr20" />白色</span>
+          <span><input type="checkbox" class="mar_lr20"  checked="checked" />黑色</span>
+          <span><input type="checkbox" class="mar_lr20"  />红色</span>
+          <span><input type="checkbox" class="mar_lr20"  />灰色</span>
+          <span><input type="checkbox" class="mar_lr20" />藏蓝</span>
+        </li>
+        <li>尺寸：
+          <span><input type="checkbox" checked="checked" class="mar_lr20"  />办公用大型机</span>
+          <span><input type="checkbox" checked="checked" class="mar_lr20"  />家庭用小型机</span>
+          <span><input type="checkbox" class="mar_lr20"  />便携式mini机</span></li>
+        <li>幅面：
+          <span><input type="checkbox" class="mar_lr20"  />A4</span>
+          <span><input type="checkbox" class="mar_lr20" />A3</span>
+          <span><input type="checkbox" class="mar_lr20" />其他</span></li>
+        <li>网络打印：
+          <span><input type="checkbox" class="mar_lr20"  />有线网络</span>
+          <span><input type="checkbox" class="mar_lr20" />无线网络</span>
+          <span><input type="checkbox" class="mar_lr20" />移动APP</span></li></li>
+      </ul> 
+    </div><!-- 添加商品属性 end -->
+    <div class="clear"></div>
+
+    <!-- 添加商品信息 -->
+    <div class="shop_xinxi mar_t20">
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" >添加商品<span class="font_12 mar_l10 ">商品信息</span></p>
+      <ul class="add_shop_xx mar_l10 mar_t10">
+        <li class="hei_40"><i class="font_fs mar_l2">*</i>销售价：<select class="hei_24 "><option>采购量<=99 销售：85</option><option>100<=采购量<=199 销售:78</option><option>200<=采购量 销售：75</option></select><span class="font_1c scale mar_l10">编辑地域价与阶梯价</span></li>
+        <li class="hei_40 mar_l7">商品货号：<input type="text" class="border-4 hei_24 pad_l10" value="23534543"  /></li>
+        <li class="hei_40"><i class="font_fs mar_l2">*</i>市场价：<input type="text" class="border-4 hei_24 pad_l10" value="165.0" /></li>
+        <li class="hei_40"><i class="font_fs mar_l2">*</i>库存量 ：<input type="text" class="mar_l8 border-4 hei_24 pad_l10"  value="100"/></li>
+        <li class="hei_40"><i class="font_fs mar_l2">*</i>成本价：<input type="text" class="border-4 hei_24 pad_l10" value="70.0"/></li>
+        <li class="hei_40 mar_l7">商品毛重：<input type="text" class="pad_l10 border-4 hei_24 " value="75g"/></li>
+        
+      </ul>  
+    </div><!-- 添加商品信息 end -->
+
+    <div class="clear"></div>
+    <!-- 添加商品销售属性 -->
+    <div class="shop_xinxi mar_t20">
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" >添加商品<span class="font_12 mar_l10 ">销售属性</span></p>
+      <p class="mar_l10 mar_t10"><input class="hei_24 wid_150 pad_l10 border-4" type="text" value="颜色不可编辑"/></p>
+      <div class="color_select mar_l10 mar_t10">
+        <p><input type="checkbox" /><input class="color" type="color"><input type="text" class="wid_40 font_cen border-4 mar_l10" value="红色" /></p>
+        <p><input type="checkbox" /><input class="color" type="color"><input type="text" class="wid_40 font_cen border-4 mar_l10" value="红色" /></p>
+        <p><input type="checkbox" /><input class="color" type="color"><input type="text" class="wid_40 font_cen border-4 mar_l10" value="红色" /></p>
+        <p class="hei_30 mar_l10">+添加属性值</p>
+       
+      </div>
+      <div class="clear"></div>
+      <p class="mar_l10 mar_t10"><input class="hei_24 wid_150 pad_l10 border-4" type="text" value="尺寸不可编辑"/></p>
+      <div class="color_select mar_l10 mar_t10">
+        <p><input type="checkbox" /> <input type="text" class="wid_40 font_cen border-4 mar_l10" value="S" /></p>
+        <p><input type="checkbox" /> <input type="text" class="wid_40 font_cen border-4 mar_l10" value="M" /></p>
+        <p><input type="checkbox" /> <input type="text" class="wid_40 font_cen border-4 mar_l10" value="L" /></p>
+        <p class="hei_24 mar_l10">+添加属性值</p>
+      </div>
+      <div class="clear"></div>
+      <p class="hei_24 mar_l10 mar_tb10">+添加属性值</p>
+      <table class="select_sx mar_l10 box-shadow1">
+        <tr >
+          <td class="wid_110 hei_40 font_cen">颜色</td>
+          <td class="wid_110  font_cen">尺码</td>
+          <td class="wid_180"><i  class="font_fs mar_l2 pad_l10">*</i>销售价<span class="mar_l10 scale font_1c">应用到全部SKU</span><select class="wid_150 border-4 mar_l10" type="text" ><option>采购量<=100 售价 50</option></select></td>
+          <td class="wid_180 pad_l10">成本价<span class="mar_l10 scale font_1c">应用到全部SKU</span><br><input class="wid_60 border-4"  value="70"  type="text" /></td>
+          <td class="wid_180  "><i  class="font_fs mar_l2 pad_l10">*</i>库存<span class="mar_l10 scale font_1c">应用到全部SKU</span><input type="text" class="wid_60 border-4 mar_l10" value="100" /></td>
+          <td class="wid_110 font_cen">操作</td>
+        </tr>
+        <tr class="hei_24 font_cen">
+          <td>红色</td>
+          <td>S</td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td><img src="" width="16" height="16" name="" alt=""  ></td>
+        </tr>
+        <tr class="hei_24 font_cen">
+          <td>红色</td>
+          <td>M</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td class="font_1c">恢复 </td>
+        </tr>
+        <tr class="hei_24 font_cen">
+          <td>蓝色</td>
+          <td>S</td>
+          <td></td>
+          <td></td>
+          <td></td>
+           <td><img src="" width="16" height="16" name="" alt=""  ></td>
+        </tr>
+        <tr class="hei_24 font_cen">
+          <td>蓝色</td>
+          <td>M</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td><img src="" width="16" height="16" name="" alt=""  ></td>
+        </tr>
+       
+      </table>
+    </div><!-- 添加商品信息 end -->
+
+    <div class="clear"></div>
+    <div class="shop_xinxi mar_t20"><!-- 添加商品 -->
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" >添加商品<span class="font_12 mar_l10 ">基本信息(<i class="font_fs mar_l2">*</i>必须添加四张)</span></p>
+      <ul class="shop">
+        <li><img src="" alt="" name  width="80" height="50"></li>
+        <li><img src="" alt="" name  width="80" height="50"></li>
+        <li><img src="" alt="" name  width="80" height="50"></li>
+        <li><img src="" alt="" name  width="80" height="50"></li>
+      </ul>
+      <div class="clear"></div>
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" ><span class="font_12">SKU图片<span></p>
+      <ul class="sku_img mar_tb10">
+        <li class="wid_80 font_cen  ">红色</li>
+        <li class="wid_110 font_cen  ">M</li>
+        <li class="wid_400 font_cen "><img src="" alt="" name  width="60" height="50" ><img class="mar_20" src="" alt="" name  width="60" height="50"><img class="mar_20" src="" alt="" name  width="60" class="mar_20" height="50"><img class="mar_20" src="" alt="" name  width="60" height="50"></li>
+        <li class="wid_110 font_1c font_cen ">使用商品图</li>
+      </ul>
+      <div class="clear"></div>
+       <ul class="sku_img mar_tb10">
+        <li class="wid_80 font_cen  ">红色</li>
+        <li class="wid_110 font_cen  ">M</li>
+        <li class="wid_400 font_cen  "><img src="" alt="" name  width="60" height="50" ><img class="mar_20" src="" alt="" name  width="60" height="50"><img class="mar_20" src="" alt="" name  width="60" class="mar_20" height="50"><img class="mar_20" src="" alt="" name  width="60" height="50"></li>
+        <li class="wid_110 font_1c font_cen  ">使用商品图</li>
+      </ul>
+      <div class="clear"></div>
+       <ul class="sku_img mar_tb10">
+        <li class="wid_80 font_cen  ">蓝色</li>
+        <li class="wid_110 font_cen  ">M</li>
+        <li class="wid_400 font_cen "><img src="" alt="" name  width="60" height="50" ><img class="mar_20" src="" alt="" name  width="60" height="50"><img class="mar_20" src="" alt="" name  width="60" class="mar_20" height="50"><img class="mar_20" src="" alt="" name  width="60" height="50"></li>
+        <li class="wid_110 font_1c font_cen  ">使用商品图</li>
+      </ul>
+      <div class="clear"></div>
+       <ul class="sku_img mar_tb10">
+        <li class="wid_80 font_cen  ">蓝色</li>
+        <li class="wid_110 font_cen  ">M</li>
+        <li class="wid_400 font_cen  "><img src="" alt="" name  width="60" height="50" ><img class="mar_20" src="" alt="" name  width="60" height="50"><img class="mar_20" src="" alt="" name  width="60" class="mar_20" height="50"><img class="mar_20" src="" alt="" name  width="60" height="50"></li>
+        <li class="wid_110 font_1c font_cen  ">使用SKU商品图</li>
+      </ul>
+    </div><!-- 添加商品 end -->
+
+    <div class="clear"></div>
+    <div class="shop_xinxi mar_t20"><!-- 商品详情 -->
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" >添加商品<span class="font_12 mar_l10 "><i class="font_fs mar_l2">*</i>商品详情</span></p>
+      <p class="hei_32 mar_l10">提示：如果需要上传图片，建议尺寸为750*880，大小不能超过1M。</p>
+      <li class="explain li mar_l10">
+          <script type="text/plain" class="editor " id="myEditor1" style="width:930px;height:300px;">
+          </script>
+              <script type="text/javascript">
+                  var um = UM.getEditor('myEditor1');
+              </script>
+        </li>
+     
+    </div><!-- 商品详情 end -->
+
+
+    <div class="shop_xinxi mar_t20"><!-- 其他信息 -->
+      <p class="font_16 hei_32 mar_t10 pad_l10 bg_05" >添加商品<span class="font_12 mar_l10 "><i class="font_fs mar_l2">*</i>其他信息</span></p>
+      <p class="mar_l10"><span class="hei_24">包装清单：</span><br><input type="text" class="hei_24 border-4"  /></p>
+      <p class="mar_l10"><span class="hei_24">售后服务：</span><br><input type="text" class="hei_24 border-4"/></p>
+      <p class="mar_l10 hei_30 mar_tb10">定时上架：<input type="checkbox" />设定 <input class="jcDate wid_110 hei_24  border-4 wid_150 pad_l10"  value="2014-2-27 23:69：06"  /></p>
+      <p class="mar_l10 mar_tb10">1.商品发布后等待平台审核，审核通过后在预设定时间上架。</p>
+      <p class="mar_l10 mar_tb10">2.商品发布后等待平台审核，审核通过后在预设定时间上架。</p>
+      <p class="mar_tb10"><button type="button" class="button_4 but_cx"><a class="font_1c hei_24">取消</a></button>
+         <button type="button" class="button_4 but_cx"><a class="font_1c hei_24">确定</a></button> 
+         <button type="button" class="button_4 but_cx"><a class="font_1c hei_24" onclick="save();">保存</a></button> </p>
+    </div><!-- 其他信息 end -->
+
+
+  </div>
+  
+
+
+
+
+
+
+
+
+
+
+      
+</div> <!--id="right" end--> 
+<!--右边部分结束-->
+</div><!--#main end -->
+</body>
+
+<script type="text/javascript">
+$(function (){
+$("input.jcDate").jcDate({                 
+  IcoClass : "jcDateIco",
+  Event : "click",
+  Speed : 100,
+  Left : 0,
+  Top : 28,
+  format : "-",
+  Timeout : 100
+});
+});
+
+</script>
+</html>     
+    
+
+

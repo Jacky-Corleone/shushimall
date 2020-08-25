@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.maketcenter.dao.CouponsDao">
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="couponsDTOMap" type="com.camelot.maketcenter.dto.CouponsDTO">
+				<result property="id" column="ID"/>
+				<result property="couponId" column="COUPON_ID"/>
+				<result property="couponName" column="COUPON_NAME"/>
+				<result property="couponType" column="COUPON_TYPE"/>
+				<result property="meetPrice" column="MEET_PRICE"/>
+				<result property="shopId" column="SHOP_ID"/> 
+				<result property="couponMax" column="COUPON_MAX"/>
+				<result property="couponUsingRange" column="COUPON_USING_RANGE"/>
+				<result property="platformId" column="PLATFORM_ID"/>
+				<result property="couponUserType" column="COUPON_USER_TYPE"/>
+				<result property="couponUserMembershipLevel" column="COUPON_USER_MEMBERSHIP_LEVEL"/>
+				<result property="couponAmount" column="COUPON_AMOUNT"/>
+				<result property="couponNum" column="COUPON_NUM"/>
+				<result property="sendCouponType" column="SEND_COUPON_TYPE"/>
+				<result property="state" column="STATE"/>
+				<result property="couponStartTime" column="COUPON_START_DATE"/>
+				<result property="couponEndTime" column="COUPON_END_DATE"/>
+				<result property="updateDate" column="UPDATE_DATE"/>
+				<result property="deleted" column="DELETED"/>
+				<result property="createUser" column="CREATE_USER"/>
+				<result property="verifyUser" column="VERIFY_USER"/>
+				<result property="couponExplain" column="COUPONEXPLAIN"/>
+				<result property="rejectReason" column="REJECT_REASON"/>
+				<result property="costAllocation" column="COST_ALLOCATION"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			  ID
+ 			 ,COUPON_ID
+	    	 ,COUPON_NAME
+	    	 ,COUPON_TYPE
+	    	 ,MEET_PRICE
+	    	 ,SHOP_ID
+	    	 ,COUPON_MAX
+	    	 ,COUPON_USING_RANGE
+	    	 ,PLATFORM_ID
+	    	 ,COUPON_USER_TYPE
+	    	 ,COUPON_USER_MEMBERSHIP_LEVEL
+	    	 ,COUPON_AMOUNT
+	    	 ,COUPON_NUM
+	    	 ,SEND_COUPON_TYPE
+	    	 ,STATE
+	    	 ,COUPON_START_DATE
+	    	 ,COUPON_END_DATE
+	    	 ,UPDATE_DATE
+	    	 ,DELETED
+	    	 ,VERIFY_USER
+	    	 ,CREATE_USER
+	    	 ,COUPONEXPLAIN
+	    	 ,REJECT_REASON
+	    	 ,COST_ALLOCATION
+		FROM 
+		coupon_info coupon_info_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.id != null">
+				<![CDATA[ and coupon_info_.ID  = #{entity.id} ]]>
+			</if>
+			<if test="entity.isEffective != null and entity.isEffective != '' ">
+				<if test="entity.isEffective ==1 ">
+				    <![CDATA[	and coupon_info_.COUPON_START_DATE > now() and coupon_info_.state  =1 ]]>	
+				</if>
+				<if test="entity.isEffective ==2 ">
+					<![CDATA[	and coupon_info_.COUPON_START_DATE <= now() and coupon_info_.COUPON_END_DATE >= now() and coupon_info_.state  =1 ]]>	
+				</if>
+				<if test="entity.isEffective ==3 ">
+					<![CDATA[	and coupon_info_.COUPON_END_DATE < now() and coupon_info_.state  =1 ]]>	
+				</if>
+				<if test="entity.isEffective ==4 ">
+					<![CDATA[	and coupon_info_.COUPON_START_DATE <= now() and coupon_info_.end_time >= now() and coupon_info_.state  =3 ]]>	
+				</if>
+				<if test="entity.isEffective ==5 ">
+					<![CDATA[	and coupon_info_.COUPON_END_DATE > now() ]]>	
+				</if>
+			</if>
+			<if test="entity.couponId != null and  entity.couponId !=''">
+				<![CDATA[ and coupon_info_.COUPON_ID  = #{entity.couponId} ]]>
+			</if>
+			<if test="entity.couponType != null">
+				<![CDATA[ and coupon_info_.COUPON_TYPE  = #{entity.couponType} ]]>
+			</if>
+			<if test="entity.couponName != null  and entity.couponName !=''">
+				<![CDATA[ and coupon_info_.COUPON_NAME like  CONCAT('%',#{entity.couponName},'%') ]]>
+			</if>
+			<if test="entity.meetPrice != null">
+				<![CDATA[ and coupon_info_.MEET_PRICE  = #{entity.meetPrice} ]]>
+			</if>
+			<if test="entity.shopId != null ">
+				<![CDATA[ and coupon_info_.SHOP_ID  = #{entity.shopId} ]]>
+			</if>
+			<if test="entity.couponMax != null  and entity.couponMax !=''">
+				<![CDATA[ and coupon_info_.COUPON_MAX  = #{entity.couponMax} ]]>
+			</if>
+			<if test="entity.couponUsingRange != null  and entity.couponUsingRange !=''">
+				<![CDATA[ and coupon_info_.COUPON_USING_RANGE  = #{entity.couponUsingRange} ]]>
+			</if>
+			<if test="entity.platformId != null  and entity.platformId !=''">
+				<![CDATA[ and coupon_info_.PLATFORM_ID  = #{entity.platformId} ]]>
+			</if>
+			<if test="entity.couponUserType != null  and entity.couponUserType !=''">
+				<![CDATA[ and coupon_info_.COUPON_USER_TYPE  = #{entity.couponUserType} ]]>
+			</if>
+			<if test="entity.couponUserMembershipLevel != null and entity.couponUserMembershipLevel != ''">
+				<![CDATA[ and coupon_info_.COUPON_USER_MEMBERSHIP_LEVEL LIKE CONCAT('%',#{entity.couponUserMembershipLevel},'%') ]]>
+			</if>
+			<if test="entity.couponAmount != null">
+				<![CDATA[ and coupon_info_.COUPON_AMOUNT  = #{entity.couponAmount} ]]>
+			</if>
+			<if test="entity.couponNum != null">
+				<![CDATA[ and coupon_info_.COUPON_NUM  = #{entity.couponNum} ]]>
+			</if>
+			<if test="entity.sendCouponType != null">
+				<![CDATA[ and coupon_info_.SEND_COUPON_TYPE  = #{entity.sendCouponType} ]]>
+			</if>
+			
+			<if test="entity.state != null">
+				<![CDATA[ and coupon_info_.STATE  = #{entity.state} ]]>
+			</if>
+			
+			<if test="entity.couponStartTime != null">
+				<![CDATA[ and coupon_info_.COUPON_START_DATE  = #{entity.couponStartTime} ]]>
+			</if>
+			
+			<if test="entity.couponEndTime != null">
+				<![CDATA[ and coupon_info_.COUPON_END_DATE  = #{entity.couponEndTime} ]]>
+			</if>
+			
+			<if test="entity.updateDate != null">
+				<![CDATA[ and coupon_info_.UPDATE_DATE  = #{entity.updateDate} ]]>
+			</if>
+			
+			<if test="entity.updateDate != null">
+				<![CDATA[ and coupon_info_.UPDATE_DATE  = #{entity.updateDate} ]]>
+			</if>
+			
+			<if test="entity.createUser != null">
+				<![CDATA[ and coupon_info_.CREATE_USER  = #{entity.createUser} ]]>
+			</if>
+			
+			<if test="entity.verifyUser != null">
+				<![CDATA[ and coupon_info_.VERIFY_USER  = #{entity.verifyUser} ]]>
+			</if>
+			
+			<if test="entity.couponExplain != null">
+				<![CDATA[ and coupon_info_.COUPONEXPLAIN  = #{entity.couponExplain} ]]>
+			</if>
+			<if test="entity.rejectReason != null">
+				<![CDATA[ and coupon_info_.REJECT_REASON  = #{entity.rejectReason} ]]>
+			</if>
+			<if test="entity.costAllocation != null">
+				<![CDATA[ and coupon_info_.COST_ALLOCATION  = #{entity.costAllocation} ]]>
+			</if>
+			 <if test="entity.shopIds != null and entity.shopIds != '' ">
+                <![CDATA[ and coupon_info_.SHOP_ID in]]>
+                <foreach collection="entity.shopIds" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            
+            <if test="entity.stateList != null and entity.stateList != '' ">
+                <![CDATA[ and coupon_info_.STATE in]]>
+                <foreach collection="entity.stateList" item="state" index="index" open="(" separator="," close=")">
+                    #{state}
+                </foreach>
+            </if>
+            
+            <if test="entity.platformIdList != null and entity.platformIdList != '' ">
+                <![CDATA[ and coupon_info_.PLATFORM_ID in]]>
+                <foreach collection="entity.platformIdList" item="platformId" index="index" open="(" separator="," close=")">
+                    #{platformId}
+                </foreach>
+            </if>
+            
+		</if>
+		<![CDATA[ and coupon_info_.DELETED = 0 ORDER BY coupon_info_.UPDATE_DATE desc ]]>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+    <!-- 根据id查询 -->
+	<select id="queryById" resultMap="couponsDTOMap" parameterType="string">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where coupon_info_.COUPON_ID = #{couponId}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="couponsDTOMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		coupon_info coupon_info_
+		<include refid="where_fragement" />
+	</select>
+	
+	<delete id="delete" parameterType="string">
+		<![CDATA[
+		update coupon_info set DELETED = 1 where COUPON_ID = #{couponId}
+		]]>
+	</delete>
+	
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="com.camelot.maketcenter.dto.CouponsDTO">
+		<![CDATA[
+		insert into coupon_info (
+		    	 COUPON_ID
+		    	 ,COUPON_NAME
+		    	 ,COUPON_TYPE
+		    	 ,MEET_PRICE
+		    	 ,SHOP_ID
+		    	 ,COUPON_MAX
+		    	 ,COUPON_USING_RANGE
+		    	 ,PLATFORM_ID
+		    	 ,COUPON_USER_TYPE
+		    	 ,COUPON_USER_MEMBERSHIP_LEVEL
+		    	 ,COUPON_AMOUNT
+		    	 ,COUPON_NUM
+		    	 ,SEND_COUPON_TYPE
+		    	 ,STATE
+		    	 ,COUPON_START_DATE
+		    	 ,COUPON_END_DATE
+		    	 ,UPDATE_DATE
+		    	 ,DELETED
+		    	 ,VERIFY_USER
+		    	 ,CREATE_USER
+		    	 ,COUPONEXPLAIN
+		    	 ,REJECT_REASON
+		    	 ,COST_ALLOCATION
+		   )values(
+		    	#{couponId}
+		    	,#{couponName}
+		    	,#{couponType}
+		    	,#{meetPrice}
+		    	,#{shopId}
+		    	,#{couponMax}
+		    	,#{couponUsingRange}
+		    	,#{platformId}
+		    	,#{couponUserType}
+		    	,#{couponUserMembershipLevel}
+		    	,#{couponAmount}
+		    	,#{couponNum}
+		    	,#{sendCouponType}
+		    	,#{state}
+		    	,#{couponStartTime}
+		    	,#{couponEndTime}
+		    	,#{updateDate}
+		    	,#{deleted}
+		    	,#{verifyUser}
+		    	,#{createUser}
+		    	,#{couponExplain}
+		    	,#{rejectReason}
+		    	,#{costAllocation}
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.camelot.maketcenter.dto.CouponsDTO">
+		update coupon_info set UPDATE_DATE =now()
+			<if test="couponName != null and couponName != '' ">
+				<![CDATA[	,COUPON_NAME=#{couponName} ]]>	
+			</if>
+			<if test="couponType != null and couponType != '' ">
+				<![CDATA[	,COUPON_TYPE=#{couponType} ]]>	
+			</if>
+			<if test="meetPrice != null and meetPrice != '' ">
+				<![CDATA[	,MEET_PRICE=#{meetPrice} ]]>	
+			</if>
+			<if test="shopId != null and shopId != '' ">
+				<![CDATA[	,SHOP_ID=#{shopId} ]]>	
+			</if>
+			<if test="couponMax != null and couponMax != '' ">
+				<![CDATA[	,COUPON_MAX=#{couponMax} ]]>	
+			</if>
+			<if test="couponUsingRange != null and couponUsingRange != '' ">
+				<![CDATA[	,COUPON_USING_RANGE=#{couponUsingRange} ]]>	
+			</if>
+			<if test="platformId != null and platformId != '' ">
+				<![CDATA[	,PLATFORM_ID=#{platformId} ]]>	
+			</if>
+			<if test="couponUserType != null and couponUserType != '' ">
+				<![CDATA[	,COUPON_USER_TYPE=#{couponUserType} ]]>	
+			</if>
+			<if test="couponUserMembershipLevel != null and couponUserMembershipLevel != '' ">
+				<![CDATA[	,COUPON_USER_MEMBERSHIP_LEVEL=#{couponUserMembershipLevel} ]]>	
+			</if>
+			<if test="couponAmount != null and couponAmount != '' ">
+				<![CDATA[	,COUPON_AMOUNT=#{couponAmount} ]]>	
+			</if>
+			<if test="couponNum != null">
+				<![CDATA[	,COUPON_NUM=#{couponNum} ]]>	
+			</if>
+			<if test="sendCouponType != null">
+				<![CDATA[	,SEND_COUPON_TYPE=#{sendCouponType} ]]>	
+			</if>
+			<if test="state != null">
+				<![CDATA[	,STATE=#{state} ]]>	
+			</if>
+			<if test="couponStartTime != null">
+				<![CDATA[	,COUPON_START_DATE=#{couponStartTime} ]]>	
+			</if>
+			<if test="couponEndTime != null">
+				<![CDATA[	,COUPON_END_DATE=#{couponEndTime} ]]>	
+			</if>
+			<if test="deleted != null">
+				<![CDATA[	,DELETED=#{deleted} ]]>	
+			</if>
+			<if test="createUser != null">
+				<![CDATA[	,CREATE_USER=#{createUser} ]]>	
+			</if>
+			<if test="verifyUser != null">
+				<![CDATA[	,VERIFY_USER=#{verifyUser} ]]>	
+			</if>
+			<if test="couponExplain != null">
+				<![CDATA[	,COUPONEXPLAIN=#{couponExplain} ]]>	
+			</if>
+			<if test="rejectReason != null">
+				<![CDATA[	,REJECT_REASON=#{rejectReason} ]]>	
+			</if>
+			<if test="costAllocation != null">
+				<![CDATA[	,COST_ALLOCATION=#{costAllocation} ]]>	
+			</if>
+		 where COUPON_ID = #{couponId}
+	</update>
+</mapper>

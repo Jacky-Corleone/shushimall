@@ -1,0 +1,4 @@
+@charset "utf-8";
+
+.collect_Shop .collect_Shop_left ul{ width:auto; height:auto; margin:10px; float:left;}
+.collect_Shop .collect_Shop_left ul li { line-height: 30px; width: auto;}

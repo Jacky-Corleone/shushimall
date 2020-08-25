@@ -1,0 +1,269 @@
+#set($layout = "common/order.vm")
+<!-- 买家评价页面 -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>订单评价</title>
+#parse("common/scriptAndCss.vm")
+<script type="text/javascript">
+$(document).ready(function(){
+	/*评分功能*/
+	$(".mar_r2").click(function(){
+		var prevAll =  $(this).prevAll();
+		$(this).attr("src","$request.contextPath/assets/images/star-on-big.png");
+		$.each(prevAll, function (n,prev) {
+			$(prev).attr("src","$request.contextPath/assets/images/star-on-big.png");
+		});
+		var score = $(this).parent().next();
+		score.val(prevAll.length+1);
+	});
+	$(".mar_r2").mousemove(function(){
+		var prevAll = $(this).prevAll();
+		$(this).attr("src","$request.contextPath/assets/images/star-on-big.png");
+		$.each(prevAll, function (n,prev) {
+			$(prev).attr("src","$request.contextPath/assets/images/star-on-big.png");
+		});
+		var nextAll = $(this).nextAll();
+		$.each(nextAll, function (n,next) {
+			$(next).attr("src","$request.contextPath/assets/images/star-off-big.png");
+		});
+	});
+	
+	
+	/*提交：商品评价/店铺评价*/
+	$("#submitBtn").click(function(){
+		//校验必填
+		var valid = initValid($!{userType});
+		if(valid!="true"){
+			alert(valid);
+			return;
+		}
+		var url = "";
+		var orderSource = "buyers";
+		if("2"==$!{userType}){
+			orderSource = "buyers";
+			url = "$request.contextPath/orderWx/submitTrading";
+	
+		}else if ("3"==$!{userType}){
+			orderSource = "saler";
+			url = "$request.contextPath/orderWx/submitSellerToBuyers";
+		}
+		//防止重复提交
+// 		$("#submitBtn").loadingMsg();
+		//提交操作
+		console.log($("#form").serialize());
+		console.log($("#form").serializeArray());
+		console.log($("#form").serializeObject());
+		var data = $("#form").serializeArray();
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			url: url,
+			data: data,
+			success: function(data){
+				alert(data.messages);
+				window.location.href="$request.contextPath/orderWx/toOrderSubmit?orderSource="+orderSource;
+				return false;
+// 				$("#submitBtn").hideMsg();
+			},
+			error:function(result){
+// 				$("#submitBtn").hideMsg();
+				alert("系统出错");
+			}
+		});
+		return false;
+	});
+	$.fn.serializeObject = function() {
+		 var o = {};
+		 var a = this.serializeArray();
+		 $.each(a, function() {
+		 if (o[this.name] !== undefined) {
+		 if (!o[this.name].push) {
+		 o[this.name] = [o[this.name]];
+		}
+		 o[this.name].push(this.value || '');
+		 } else {
+		 o[this.name] = this.value || '';
+		}
+		});
+		 return o;
+		};
+	
+});
+
+//校验必填
+function initValid(userType){
+	//对商品评分：必填
+// 	var skuScopeAll = $("input[name='skuScope']");
+// 	for(var i=0; i<skuScopeAll.length; i++){
+// 		var skuScope = skuScopeAll[i].defaultValue; 
+// 		if(skuScope==null || skuScope=="" || skuScope==undefined){
+// 			if(skuScopeAll.length==1){
+// 				return "商品评分不能为空值!";
+// 			}else{
+// 				return "第“"+(i+1)+"”个商品评分不能为空值!";
+// 			}
+// 		}
+// 	}
+	//对商家评分：必填
+	if(2==userType){//买家
+		var skuScope = $("#skuScope").val();
+		var shopDescriptionScope = $("#shopDescriptionScope").val();
+		var shopServiceScope = $("#shopServiceScope").val();
+		var shopArrivalScope = $("#shopArrivalScope").val();
+		var content = $("textarea[name='content']").val().trim();
+		if(!skuScope){
+			return "商品评分不能为空";
+		}
+		if(shopDescriptionScope==null || shopDescriptionScope=="" || shopDescriptionScope==undefined){
+			return "描述相符不能为空值!";
+		}
+		if(shopServiceScope==null || shopServiceScope=="" || shopServiceScope==undefined){
+			return "服务态度不能为空值!";
+		}
+		if(shopArrivalScope==null || shopArrivalScope=="" || shopArrivalScope==undefined){
+			return "到货速度不能为空值!";
+		}
+		if(!content){
+			return "评论不能为空";
+		}
+		return "true";
+	}else if("3"==$!{userType}){//卖家
+		var skuScope = $("#skuScope").val();
+		var content = $("textarea[name='content']").val().trim();
+		if(!skuScope){
+			return "对买家的评分不能为空";
+		}
+		if(!content){
+			return "评论不能为空";
+		}
+		return "true";
+	}
+}
+</script>
+</head>
+<body >
+<div id="main" class="po_re">
+    <!-- 头部 -->
+<!--     <header class="po_re"> -->
+<!--         <div class="top_l fl"> -->
+<!--             <i class="fa fa-angle-left"></i>微信 -->
+<!--         </div> -->
+<!--         中间字居中 -->
+<!--         <div class="top_c fl wid_50 font_cen"> -->
+<!--            	 订单评价 -->
+<!--         </div>中间字居中 -->
+<!--          <div class="top_r fr"> -->
+<!--             <img src="$request.contextPath/assets/images/more.png" /> -->
+<!--         </div> -->
+<!--         <div class="clear"></div> -->
+<!--     </header> -->
+    <!-- 头部 end-->
+    <!-- 中间内容 -->
+    <form id="form" method="post" onsubmit="return false;">
+    	<!-- 评价隐藏字段：start -->
+		<!-- 说明：订单ID/评价人/被评价人/被评价店铺id/商品id/商品sku -->
+		<input name="orderId" type="hidden" value="$!tradeOrdersDTO.orderId"/>
+		<input name="userId" type="hidden" value="$!tradeOrdersDTO.buyerId"/>
+		<input name="byUserId" type="hidden" value="$!tradeOrdersDTO.sellerId"/>
+		<input name="byShopId" type="hidden" value="$!tradeOrdersDTO.shopId"/>
+		
+	    <div class="content" id="wrapper">
+<!-- 	        <p class="hei_50 font_cen bg_04 font_ff">明基（BenQ）MS3081经典商务会议投影机</p> -->
+				#foreach($tradeOrderItemsDTO in $tradeOrdersDTO.items)
+					<input name="itemIds" type="hidden" value="$!tradeOrderItemsDTO.itemId" id="itemId"/>
+					<input name="skuIds" type="hidden" value="$!tradeOrderItemsDTO.skuId" id="skuId"/>
+				#end
+	        <!-- 评论 -->
+	        #if("2"==$!{userType})
+		        <ul class="mar_t20 star">
+		            <!-- 打分 -->
+		            <li>
+		            	<p class="wid_15 fl font_right pad_r5">商品评分</p>
+		            	<p>
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2"/>
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2"/>
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2" />
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2">
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2">
+		            	</p>
+		            	<input name="skuScope" type="hidden" id="skuScope"/>
+		            </li>
+		            <li>
+		            	<p class="wid_15 fl font_right pad_r5">描述相符</p>
+		            	<p>
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2"/>
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2"/>
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2" />
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2">
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2">
+		            	</p>
+		            	<input id="shopDescriptionScope" name="shopDescriptionScope" type="hidden"/>
+		            </li>
+		            <!-- 打分 end-->
+		            <!-- 打分 -->
+		            <li>
+		            	<p class="wid_15 fl font_right pad_r5">服务态度</p>
+		            	<p>
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2"/>
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2"/>
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2" />
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2">
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2">
+		            	</p>
+		            	<input id="shopServiceScope" name="shopServiceScope" type="hidden"/>
+		            </li>
+		            <!-- 打分 end-->
+		            <!-- 打分 -->
+		            <li>
+		            	<p class="wid_15 fl font_right pad_r5">发货速度</p>
+		            	<p>
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2"/>
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2"/>
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2" />
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2">
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2">
+		            	</p>
+		            	<input id="shopArrivalScope" name="shopArrivalScope" type="hidden"/>
+		            </li>
+		            <!-- 打分 end-->
+		        </ul><!-- 评论 den-->
+		    #else
+		        <ul class="mar_t20 star">
+		        	<li>
+		            	<p class="wid_15 fl font_right pad_r5">对买家评价</p>
+		            	<p>
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2"/>
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2"/>
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2" />
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2">
+		            		<img src="$request.contextPath/assets/images/star-off-big.png" class=" mar_r2">
+		            	</p>
+		            	<input id="skuScope" name="skuScope" type="hidden"/>
+		            </li>
+		        </ul>
+	        #end
+	        <!-- 赞 -->
+<!-- 	        <div class="pad_lr5 hei_32 mar_t10 font_cen"> -->
+<!-- 	            <p class="wid_30 fl font_e5"><i class="fa fa-thumbs-up font_1_2 font_e5"></i>好评</p> -->
+<!-- 	            <p class="wid_30 fl font_4"><i class="fa fa-thumbs-up font_1_2 font_4"></i>中评</p> -->
+<!-- 	            <p class="wid_30 fl font_5"><i class="fa fa-thumbs-up font_1_2 font_5"></i>差评</p> -->
+<!-- 	        </div> -->
+	        <!-- 赞 end-->
+	        <!-- 留言 -->
+	        <dl class="pad_l5 mar_t15">
+	            <dt><b class="font_e5">*</b><span>评论</span></dt>
+	            <dd class="mar_t10"><textarea class="wid_87 words mar_lr4" name="content"></textarea></dd>
+	        </dl>  <!-- 留言 end-->
+	        <div class="font_cen"><button class="button_1 wid_87 hei_32" id="submitBtn">提交</button></div>
+	    </div><!-- 中间内容 end-->
+    </form>
+
+</div>
+	#parse("common/footer.vm")
+</body>
+</html>

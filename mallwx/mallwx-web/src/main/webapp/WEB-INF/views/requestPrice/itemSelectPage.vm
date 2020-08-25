@@ -1,0 +1,41 @@
+#set($layout = "common/order.vm")
+#foreach($item in $items)
+    <dl class="shop_present pad_tb5" >
+    
+        <dt class="fl">
+    
+            <a href="#"> <img src="$!gix$!item.pictureUrl"></a>
+        </dt>
+        <dd class="fr">
+    
+            <p class="hei_24">$!item.itemName</p>
+            <h4>销售价：<span>$!item.marketPrice</span></h4>
+            <input type="checkbox" name="itemOrder"  onclick="showShopInfo(this,$!item.itemId);">
+        </dd>
+    	<dd id="$!item.itemId" class="fr" style="display:none;">
+    		 <h4>全选<input type="checkbox" id="c_$!item.itemId" checked  onclick="checkAllCurrShop(this,$!item.itemId);"/>选择供应商 </h4>
+        	#foreach($shop in $maps.get("$!item.itemId"))
+            	<p ><input type="checkbox" name='$!item.itemId' value="$!shop.shopId" checked  onclick="changeShopIdInfo(this,$!item.itemId);"/>
+					<input type="hidden" name='shopName' value="$!shop.shopName" />
+					<input type="hidden" name='linkMan1' value="$!shop.linkMan1" />
+					供应商：$!shop.shopName </p>
+				<p >商品编号：$!shop.linkMan1 </p>
+        	#end
+    	</dd>
+        <input type="hidden" name="itemName" value="$!item.itemName">
+        <input type="hidden" name="itemId" value="$!item.itemId">
+        <input type="hidden" name="itemPrice" value="$!item.marketPrice">
+    	<input type="hidden" name="shopIds" value="">
+		<input type="hidden" name="shopNames" value="">
+		<input type="hidden" name="itemIds" value="">
+    </dl>
+    <div class="clear"></div>
+    <!--产品大全对应的供应商-->
+#end
+<input type="hidden" id="totalPage" value="$!totalPage">
+<script >
+$(document).on("touchmove", "#wrapper", function(e) {e.preventDefault();});
+page = $!pager.page
+totalPage = $!pager.totalPage
+</script>
+

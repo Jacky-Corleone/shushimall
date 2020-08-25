@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+	<!-- dubbo服务取调用其他模块的dubbo服务 -->
+	<dubbo:reference id="shopSalesVolumeExportService" registry="qingdaoRegistry"
+		owner="storecenter" interface="com.camelot.storecenter.service.ShopSalesVolumeExportService"
+		version="1.0" protocol="dubbo" timeout="100000" init="true" />
+
+    <dubbo:reference id="shopExportService" registry="qingdaoRegistry"
+                     owner="storecenter" interface="com.camelot.storecenter.service.ShopExportService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+    <dubbo:reference id="shopEvaluationService" registry="qingdaoRegistry"
+                     owner="zhangfan" interface="com.camelot.storecenter.service.ShopEvaluationService"
+                     version="1.0" protocol="dubbo" timeout="100000" init="true" />
+</beans>

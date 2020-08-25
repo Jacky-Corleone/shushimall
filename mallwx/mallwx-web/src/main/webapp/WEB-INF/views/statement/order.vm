@@ -1,0 +1,104 @@
+#set($layout = "common/order.vm")
+<script type="text/javascript"
+	src="$request.contextPath/assets/js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript">
+//点击月取值月份id
+function changeOrderStatus(obj, Num) {
+// 	var obj = obj.parentNode.id;
+	$.ajax({
+		type : "POST",
+		url : "$request.contextPath/statement/statementMMinfo",
+		data : {
+			month : Num,
+			year : $("#yyyyid").val()
+		},
+		dataType : "html",
+		success : function(data) {
+			for(var i=1;i<13;i++){
+				$("#myTab0" + "_Content" + i).empty();
+			}
+			$("#myTab0" + "_Content" + Num).empty().append(data);
+			
+		}
+		
+	});
+}
+function showStatement(){
+	$.ajax({
+		url:'$request.contextPath/statement/showStatement',
+		type:'post',
+		success:function(res){
+			alert(res);
+		}
+	});
+}
+</script>
+	<div id="main" class="po_re">
+		<!-- 中间内容 -->
+		<div class="content" id="wrapper">
+			<div class="nTab">
+				<!--             标题开始 -->
+				<div class="TabTitle bg_01">
+					<ul id="myTab0" class="myTab2 ">
+						<!-- 	选择年份         -->
+						<li class="active"><select name="yyyyid" id="yyyyid"
+							onchange="setDays(this,FormDate.Month,FormDate.Day)">
+								<option value="2015">2015</option>
+								<option value="2016">2016</option>
+								<option value="2017">2017</option>
+								<option value="2018">2018</option>
+								<option value="2019">2019</option>
+								<option value="2020">2020</option>
+						</select> <label class="hei_32">年</label></li>
+						
+						
+						
+						<div style="width:80%;height:50px;overflow-x:scroll;">
+							<div style="width:900px;background:#0f1">		
+								<li style="width: 55px" class="normal" onclick="changeOrderStatus(this,1);">一月</li>
+								<li style="width: 55px" class="normal" onclick="changeOrderStatus(this,2);">二月</li>
+								<li style="width: 55px" class="normal" onclick="changeOrderStatus(this,3);">三月</li>
+								<li style="width: 55px" class="normal" onclick="changeOrderStatus(this,4);">四月</li>
+								<li style="width: 55px" class="normal" onclick="changeOrderStatus(this,5);">五月</li>
+								<li style="width: 55px" class="normal" onclick="changeOrderStatus(this,6);">六月</li>
+								<li style="width: 55px" class="normal" onclick="changeOrderStatus(this,7);">七月</li>
+								<li style="width: 55px" class="normal" onclick="changeOrderStatus(this,8);">八月</li>
+								<li style="width: 55px" class="normal" onclick="changeOrderStatus(this,9);">九月</li>
+								<li style="width: 55px" class="normal" onclick="changeOrderStatus(this,10);">十月</li>
+								<li style="width: 55px" class="normal" onclick="changeOrderStatus(this,11);">十一月</li>
+								<li style="width: 55px" class="normal" onclick="changeOrderStatus(this,12);">十二月</li>
+							</div>
+						</div>
+					</ul>
+				</div>
+				<div class="TabTitle mar_t10">
+					<ul id="myTab0" class="myTab2">
+						<!--  生成账单       查看所有对账单-->
+						<li class="hei_32" 
+							onclick="genarteOrder()">生成对账单</li>
+					</ul>
+				</div>
+			</div>
+
+			
+			<!-- 内容开始 -->
+			<div id="myTab0_Content1"></div>
+			<div id="myTab0_Content2"></div>
+			<div id="myTab0_Content3"></div>
+			<div id="myTab0_Content4"></div>
+			<div id="myTab0_Content5"></div>
+			<div id="myTab0_Content6"></div>
+			<div id="myTab0_Content7"></div>
+			<div id="myTab0_Content8"></div>
+			<div id="myTab0_Content9"></div>
+			<div id="myTab0_Content10"></div>
+			<div id="myTab0_Content11"></div>
+			<div id="myTab0_Content12"></div>
+		</div>
+		<!-- 中间内容 end-->
+
+
+
+		#parse("common/footWx.vm")
+
+	</div>

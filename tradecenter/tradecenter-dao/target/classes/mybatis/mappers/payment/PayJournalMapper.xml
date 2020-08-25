@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.camelot.payment.dao.PaymentJournalDAO">
+	
+	<resultMap id="paymentJournalResultMap" type="PaymentJournal">
+		<result column="ID" property="id"/>
+		<result column="OUT_TRADE_NO" property="outTradeNo"/>
+		<result column="ORDER_NO" property="orderNo"/>
+		<result column="TYPE" property="type"/>
+		<result column="DETAILS" property="details"/>
+		<result column="CREATED_TIME" property="createdTime"/>
+	</resultMap>
+	
+	<insert id="add" parameterType="PaymentJournal" useGeneratedKeys="true" keyProperty="id">
+		<![CDATA[
+		INSERT INTO PAYMENT_JOURNAL
+		  (OUT_TRADE_NO,
+	       ORDER_NO,
+	       TYPE,
+	       DETAILS,
+	       CREATED_TIME)
+		VALUES
+		 ]]>
+		  (#{outTradeNo},
+		   #{orderNo},
+		   #{type},
+		   #{details},
+		   now())
+	</insert>
+	
+</mapper>

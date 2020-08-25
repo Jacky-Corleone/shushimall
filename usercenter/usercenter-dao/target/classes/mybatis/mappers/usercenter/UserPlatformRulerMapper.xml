@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.usercenter.dao.UserPlatformServiceRuleMybatisDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="userPlatformServiceRuleMap" type="userPlatformServiceRule">
+				<result property="id" column="id"/>
+				<result property="userId" column="user_id"/>
+				<result property="ruleId" column="rule_id"/>
+				<result property="createTime" column="create_time"/>
+				<result property="modifyTime" column="modify_time"/>
+				<result property="isDeleted" column="is_deleted"/>
+				<result property="userCount" column="userCount"/>
+				<result property="companyName" column="company_Name"/>
+				
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{pager.pageOffset} , #{pager.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,user_id
+ 			,rule_id
+ 			,create_time
+ 			,modify_time
+ 			,is_deleted
+		FROM 
+		user_platform_service_rule user_platform_service_rule_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.id != null  and entity.id !=''">
+				<![CDATA[ and user_platform_service_rule_.id  LIKE CONCAT('%',#{entity.id},'%') ]]>
+			</if>
+			<if test="entity.userId != null  and entity.userId !=''">
+				<![CDATA[ and user_platform_service_rule_.user_id  LIKE CONCAT('%',#{entity.userId},'%') ]]>
+			</if>
+			<if test="entity.ruleId != null  and entity.ruleId !=''">
+				<![CDATA[ and user_platform_service_rule_.rule_id  LIKE CONCAT('%',#{entity.ruleId},'%') ]]>
+			</if>
+			<if test="entity.createTime != null  and entity.createTime !=''">
+				<![CDATA[ and user_platform_service_rule_.create_time  LIKE CONCAT('%',#{entity.createTime},'%') ]]>
+			</if>
+			<if test="entity.modifyTime != null  and entity.modifyTime !=''">
+				<![CDATA[ and user_platform_service_rule_.modify_time  LIKE CONCAT('%',#{entity.modifyTime},'%') ]]>
+			</if>
+			<if test="entity.isDeleted != null  and entity.isDeleted !=''">
+				<![CDATA[ and user_platform_service_rule_.is_deleted  LIKE CONCAT('%',#{entity.isDeleted},'%') ]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+   <!-- 根据id查询 -->
+	<select id="selectById" resultMap="userPlatformServiceRuleMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where user_platform_service_rule_.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="userPlatformServiceRuleMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		user_platform_service_rule user_platform_service_rule_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 根据 USERID 查询 用户 所拥有的 平台规则 关系 -->
+	<select id="getUserPlatformRuleListByUserId" resultMap="userPlatformServiceRuleMap"  parameterType="String">
+		<include refid="selectAllColumns"/>
+		where user_id=#{userId} and is_deleted='0'
+	</select>
+
+    <!-- 根据 USERID 查询 用户 所拥有的 平台规则 关系 -->
+    <select id="getUserPlatformRuleListByUserIds" resultMap="userPlatformServiceRuleMap"  parameterType="String">
+        <include refid="selectAllColumns"/>
+        where is_deleted='0' and user_id in
+        <foreach collection="userIds" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+	<!-- 根据userid  ruleid，修改记录 -->
+	<update id="updateUserRuleByUserIdAndRuleId" parameterType="userPlatformServiceRule">
+		<![CDATA[
+		update user_platform_service_rule set
+   			modify_time = #{modifyTime},
+   			is_deleted = '1'
+		 where user_id = #{userId} and  rule_id = #{ruleId}
+		]]>
+	</update>
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="userPlatformServiceRule">
+		
+		<![CDATA[
+		insert into user_platform_service_rule (
+		    	
+		    	  user_id
+		    	 ,rule_id
+		    	 ,create_time
+		    	 
+		    	 ,is_deleted
+		   )values(
+		    	
+		    	#{userId}
+		    	,#{ruleId}
+		    	,#{createTime}
+		    	
+		    	,#{isDeleted}
+		   )
+	    ]]>	
+	</insert>
+	
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="userPlatformServiceRule">
+		<![CDATA[
+		update user_platform_service_rule set
+   			
+   			 user_id = #{userId}
+   			,rule_id = #{ruleId}
+   			,create_time = #{createTime}
+   			,modify_time = #{modifyTime}
+   			,is_deleted = #{isDeleted}
+		 where id = #{id}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		delete from user_platform_service_rule where id = #{id}
+		]]>
+	</delete>
+	
+	<select id="selectRuleStatistics" resultMap="userPlatformServiceRuleMap" >
+
+		select
+ 			
+ 			count(user_id)   userCount
+ 			,rule_id
+ 			
+		FROM 
+		user_platform_service_rule user_platform_service_rule_ where user_platform_service_rule_.is_deleted='0'
+		group by rule_id
+		
+		<if test="pager!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectRuleStatisticsCount" resultType="long">
+			select count(1) from (
+				select
+	 			
+	 			count(user_id)   userCount
+	 			,rule_id
+	 			
+			FROM 
+			user_platform_service_rule user_platform_service_rule_ where user_platform_service_rule_.is_deleted='0'
+			group by rule_id
+			
+			
+			) t
+	</select>
+	
+	
+	<select id="selectRuleDetails" resultMap="userPlatformServiceRuleMap" >
+
+		select
+ 			user_platform_service_rule_.user_id   
+ 			,rule_id
+ 			,t.company_name
+			,user_platform_service_rule_.create_time
+		FROM 
+		user_platform_service_rule user_platform_service_rule_
+		left join user_extends t on user_platform_service_rule_.user_id=t.user_id
+		where 1=1 and user_platform_service_rule_.is_deleted='0'
+		<if test="entity.ruleId != null">
+				<![CDATA[ and rule_id  =#{entity.ruleId} ]]>
+		</if>
+		<if test="entity.createTimeBegin != null">
+				<![CDATA[ and user_platform_service_rule_.create_time  > #{entity.createTimeBegin} ]]>
+		</if>
+		<if test="entity.createTimeEnd != null">
+				<![CDATA[ and user_platform_service_rule_.create_time  < #{entity.createTimeEnd} ]]>
+		</if>
+		<if test="pager!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="selectRuleDetailsCount" resultType="long">
+	select count(1) from (
+			select
+ 			user_platform_service_rule_.user_id   
+ 			,rule_id
+ 			,t.company_name
+			,user_platform_service_rule_.create_time
+		FROM 
+		user_platform_service_rule user_platform_service_rule_
+		left join user_extends t on user_platform_service_rule_.user_id=t.user_id
+		where 1=1 and user_platform_service_rule_.is_deleted='0'
+		<if test="entity.ruleId != null">
+				<![CDATA[ and rule_id  =#{entity.ruleId} ]]>
+		</if>
+		<if test="entity.createTimeBegin != null">
+				<![CDATA[ and user_platform_service_rule_.create_time  > #{entity.createTimeBegin} ]]>
+		</if>
+		<if test="entity.createTimeEnd != null">
+				<![CDATA[ and user_platform_service_rule_.create_time  < #{entity.createTimeEnd} ]]>
+		</if>
+		) t
+	</select>
+</mapper>

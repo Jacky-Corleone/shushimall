@@ -1,0 +1,33 @@
+/*弹出框样式*/
+.Popup {
+	display:block;
+	width:640px;
+	height:100%;
+}
+.Popup .Popup_bg {
+	background:#000;
+	opacity:0.7;
+	filter: Alpha(Opacity=70);
+	width:100%;
+	height:100%;
+	position:fixed;
+	left:0;
+	top:0;
+	z-index:9999999;
+}
+.Popup .Popup_main {
+	background-color:#FFF;
+	width:90%;
+	min-height:250px;
+	z-index:101;
+	position:fixed;
+	top:10%;
+	left:4%;
+	margin:0 auto;
+	zoom:1;
+}
+.Popup .Popup_main .Popup_down {
+	height:380px;
+	overflow-y:auto;
+	overflow-x: hidden;
+}

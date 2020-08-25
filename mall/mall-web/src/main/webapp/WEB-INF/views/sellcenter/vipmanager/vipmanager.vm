@@ -1,0 +1,395 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript">
+    //加载左侧菜单
+    $(function(){
+        $("#leftSeller").load("$request.contextPath/leftSeller");
+        optionItems("0","shengid");
+		
+		$("#findBtn").click(function(){
+    		topage(1);
+    	});
+    });
+	
+	
+	
+	function topage(page){
+		$("#findBtn").loadingMsg();
+        //用户名
+        var userName=$("#userNameid").val();
+        var companyName=$("#companyNameid").val();
+        var sheng=$("#shengid").val();
+        var shi=$("#shiid").val();
+        //var qu=$("#quid").val();
+        var createTimeStart=$("#createTimeStartid").val();
+        var createTimeEnd=$("#createTimeEndid").val();
+        $.ajax({
+            url:"$request.contextPath/sellcenter/vipmanager/vipselectjson",
+            type:"post",
+            data:{
+                page:page,
+                userName:userName,
+                companyName:companyName,
+                sheng:sheng,
+                shi:shi,
+                qu:'',
+                createTimeStart:createTimeStart,
+                createTimeEnd:createTimeEnd
+            },
+            dataType:'json',
+            success:function(data){
+                if(data.success){
+					$("#findBtn").hideMsg();
+                    showTable(data.obj);
+                    showPager(data.obj);
+                }else{
+                    $("#lierror").html("查询失败");
+                    showDiv('showErrorMsg');
+                }
+            }
+        });
+	}
+    //失败按钮
+    function showDiv(divid){
+        $("#"+divid).show();
+    }
+    //工具方法：下拉框
+    function optionItems(parentCode, optionId){
+        $.ajax({
+            url:"$request.contextPath/shopBaseInfoController/queryAddress",
+            type:"post",
+            data:{
+                parentCode:parentCode
+            },
+            dataType: "json",
+            success:function(data){
+				if(optionId=='shiid'){
+    				var optionItem = $("#"+optionId);
+                    optionItem.empty();
+                    optionItem.append($("<option>").text("请选择").val(""));
+                    /* $("#quid").empty();
+                    $("#quid").append($("<option>").text("请选择").val("")); */
+				}/* else if(optionId=='quid'){
+					var optionItem = $("#"+optionId);
+                    optionItem.empty();
+                    optionItem.append($("<option>").text("请选择").val(""));
+				} */
+                var optionItem = $("#"+optionId);
+                $.each(data, function (n, address) {
+                    var option = $("<option>").text(address.name).val(address.code);
+                    optionItem.append(option);
+                });
+            }
+        });
+    }
+    //ajax查询后拼接table代码
+    function showTable(pager){
+        var list=pager.records;
+        var table = $("#vipusertable");
+        table.empty();
+        if(list){
+            $(list).each(function (n, detail) {
+				var createDt = new Date(detail.createDt).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
+                var tr=$("<tr>");
+                tr.append($("<td>").attr("class","wid_40 font_cen").text(getcode(n+1)));
+                tr.append($("<td>").attr("class","wid_250 font_cen").text(getcode(detail.userName)));
+                tr.append($("<td>").attr("class","wid_200 font_cen").text(getcode(detail.nikeName)));
+                /* tr.append($("<td>").attr("class","wid_180 font_cen").text(getcode(detail.companyName))); */
+                /* tr.append($("<td>").attr("class","wid_200 font_cen").text(getcode(detail.address))); */
+                tr.append($("<td>").attr("class","wid_250 font_cen").text(getcode(createDt)));
+                var a=$("<a>").attr("href","javascript:showdetail("+getcode(detail.userId)+")").attr("class","font_1c").text("查看");
+                tr.append($("<td>").attr("class","wid_180 font_cen").append(a));
+                table.append(tr);
+            });
+        }
+    }
+    
+    //ajax查询后拼接分页代码
+    function showPager(pager){
+        var page = $("#pagerul");
+        page.empty();
+        var firsta=$("<a>").attr("href","javascript:topage(1)").text("首页");
+        var firstl=$("<li>").attr("class","lastPage").append(firsta);
+        var beforea=$("<a>").attr("href","javascript:topage("+pager.previewPage+")").text("上一页");
+        var beforel=$("<li>").attr("class","lastPage").append(beforea);
+        page.append(firstl);
+        page.append(beforel);
+        for(var pageNo=pager.startPageIndex;pageNo<=pager.endPageIndex;pageNo++){
+            var zhonga=$("<a>").attr("href","javascript:topage("+pageNo+")");
+            if(pager.page==pageNo){
+                zhonga.attr("class","curr");
+            }
+            if((pager.pageCode/2)==pageNo){
+                zhonga.text("...");
+            }else{
+                zhonga.text(pageNo);
+            }
+            var zhongl=$("<li>").append(zhonga);
+            page.append(zhongl);
+        }
+        var nexta=$("<a>").attr("href","javascript:topage("+pager.nextPage+")").text("下一页");
+        var nextl=$("<li>").attr("class","nextPage").append(nexta);
+        var enda=$("<a>").attr("href","javascript:topage("+pager.totalPage+")").text("末页");
+        var endl=$("<li>").attr("class","nextPage").append(enda);
+        page.append(nextl);
+        page.append(endl);
+    }
+    //打开明细页面
+    function showdetail(uid){
+        //huhuan("righttable","right");
+        $.ajax({
+            url:"$request.contextPath/sellcenter/vipmanager/vipuserdetial",
+            type:"post",
+            data:{
+                uid:uid
+            },
+            dataType:'json',
+            success:function(data){
+                if(data.success){
+                    fzdetail(data);
+                    huhuan("righttable","right");
+					var str = '';
+					for(var i = 0 ; i < (data.addressInfoDTOList).length;i++){
+					
+						var detail = (data.addressInfoDTOList)[i];
+						
+						str = str+'<tr><td class="wid_60 font_cen">'+(i+1)+'</td>'
+							+'<td class="wid_330 font_cen">'+detail.fulladdress+'</td>'
+							+'<td class="wid_200 font_cen">'+new Date(parseInt(detail.createtime)).toLocaleString()+'</td>';
+						if(detail.updatetime!=null){
+							str = str+'<td class="wid_220 font_cen">'+new Date(parseInt(detail.updatetime)).toLocaleString()+'</td></tr>';
+						}else{
+							str = str+'<td class="wid_220 font_cen"></td></tr>';
+						}
+							
+					}
+					
+					$('#information').append(str);
+                }else{
+                    $("#lierror").html(data.error);
+                    showDiv('showErrorMsg');
+                }
+            },error:function(){
+                $("#lierror").html("系统繁忙，获取信息失败");
+                showDiv('showErrorMsg');
+            }
+        });
+    }
+    function fzdetail(map){
+        if(map){
+            $("#detailuserNameid").text(getcode(map.userInfoDTO.userDTO.uname));
+            $("#detailnickNameid").text(getcode(map.userInfoDTO.userDTO.nickname));
+            $("#detailmobileid").text(getcode(map.userInfoDTO.userDTO.umobile));
+            $("#detailemailid").text(getcode(map.userInfoDTO.userDTO.userEmail));
+			if(map.userInfoDTO.userBusinessDTO==null){
+				return ;
+			}
+			$("#detailcompanyNameid").text(getcode(map.userInfoDTO.userBusinessDTO.companyName));
+			$("#detailcompanyAddressid").text(getcode(map.userInfoDTO.userBusinessDTO.companyAddress));
+			
+            $("#detailartificialPersonNameid").text(getcode(map.userInfoDTO.userBusinessDTO.artificialPersonName));
+            $("#detailregisteredCapitalid").text(getcode(map.userInfoDTO.userBusinessDTO.registeredCapital));
+            $("#detailbusinessScopeid").text(getcode(map.userInfoDTO.userBusinessDTO.businessScope));
+            
+        }
+    }
+    function huhuan(hideid,showid){
+		$("#information").empty();
+        $("#"+hideid).attr("style","display:none");
+        $("#"+showid).attr("style","display:block");
+    }
+    function getcode(date){
+        if(date){
+            return date;
+        }else{
+            return '';
+        }
+    }
+    function hideDiv(divid){
+        $("#"+divid).hide();
+    }
+</script>
+
+<!--头部开始-->
+<style type="text/css">
+    div.po_main500 {
+        width: 500px;
+        min-height: 105px;
+        margin-left: -310px;
+        margin-top: -200px;
+    }
+</style>
+<div id="main">
+<!--中间部分开始-->
+<!--left start-->
+<div id="leftSeller" class="border-4"></div>
+<!--left end -->
+<!--右边列表部分开始-->
+    <div id="righttable" style="display: block;">
+        <div id="right_top" class="right_top border-4 bg_06">
+            <div class="right_top_l">
+                <ul class="list">
+                    <li class="wid_220">
+                        <span class="font_wid">用户名：</span><input id="userNameid" class="input_Style2 wid_120 hei_30" type="text" />
+                    </li>
+                    <li class="wid_220 hide">
+                        <span class="font_wid">公司名称：</span><input id="companyNameid" type="text" class="input_Style2 wid_120 hei_30"/>
+                    </li>
+                    <!--    
+                    <li class="wid_400">
+                        <span class="font_wid">公司所在地：</span>
+                        <select id="shengid" onchange="optionItems($(this).val(),'shiid')" class="input_Style2 wid_90 mar_r10 hei_35">
+                            <option value="">请选择</option>
+                        </select>
+                        <select id="shiid" class="input_Style2 wid_90 mar_r10 hei_35">
+                            <option value="">请选择</option>
+                        </select>
+                        -->
+                        <!-- <select id="quid" class="input_Style2 wid_90 mar_r10 hei_35">
+                            <option value="">请选择</option>
+                        </select> -->
+                    </li>
+                    <li class="wid_400">
+                        <span class="font_wid">创建时间：</span>
+                        <input id="createTimeStartid" class="input_Style2 wid_120 hei_30" type="text" readonly="readonly" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});" />
+                        <i class="demo-icons">-</i>
+                        <input id="createTimeEndid" class="input_Style2 wid_120 hei_30" type="text" readonly="readonly" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});" />
+                    </li>
+                </ul>
+            </div>
+            <div class="right_top_r ">
+					<button id="findBtn" type="button" class="button_2 hei_35 mar_r10" loadMsg="正在查询..." style="padding:0px">查询</button>
+            </div>
+        </div>
+        <!-- right结束 -->
+
+        <div id="right_bot" class="right_bot border-4 mar_t10 bg_06">
+            <!-- 商品列表开头 -->
+            <div class="right_xinxi mar_l14">
+                <ul class="list_top bg_08 font_cen font_14b">
+                    <li class="wid_40">编号</li>
+                    <li class="wid_250">用户名</li>
+                    <li class="wid_200">昵称</li>
+                    <li class="wid_180 hide">公司名称</li>
+                    <!--<li class="wid_200">所在地</li>-->
+                    <li class="wid_250">创建时间</li>
+                    <li class="wid_180">操作</li>
+                </ul>
+                <table class="information mar_t10" >
+                    <tbody id="vipusertable">
+                    #foreach($detail in ${pager.records})
+                        <tr>
+                            <td class="wid_40 font_cen">$!{velocityCount}</td>
+                            <td class="wid_250 font_cen">$!{detail.userName}</td>
+                            <td class="wid_200 font_cen">$!{detail.nikeName}</td>
+                            <td class="wid_180 font_cen hide">$!{detail.companyName}</td>
+                            <!--<td class="wid_200 font_cen">$!{detail.address}</td>-->
+                            <td class="wid_250 font_cen">$!date.format('yyyy-MM-dd HH:mm:ss',$!detail.createDt)</td>
+                            <td class="wid_180 font_cen"><a href="javascript:showdetail($!{detail.userId})" class="font_1c">查看</a></td>
+                        </tr>
+                    #end
+                    </tbody>
+                </table>
+                #pageVelocity($pager)
+            </div>
+
+        </div>
+
+    </div>
+<!--右边列表部分结束-->
+
+<!--右边明细部分开始-->
+    <div id="right" style="display: none;">
+        <div id="right_bot" class="right_bot border-4 mar_t10 bg_06">
+            <h3 class="mar_l14">会员基本信息</h3>
+            <div id="right_top" class="right_top bg_06">
+                <ul class="list mar_20">
+                    <li class="wid_300">
+                        <span class="font_wid">用户名：</span>
+                        <span id="detailuserNameid"></span>
+						
+                    </li>
+                    <li class="wid_300">
+                        <span class="font_wid">用户昵称：</span>
+                        <span id="detailnickNameid"></span>
+                    </li>
+                    <li class="wid_300">
+                        <span class="font_wid">公司名称：</span>
+                        <span id="detailcompanyNameid"></span>
+                    </li>
+                    <div class="clear"></div>
+                    <li class="wid_300">
+                        <span class="font_wid">联系电话：</span>
+                        <span id="detailmobileid"></span>
+                    </li>
+                    <li class="wid_300">
+                        <span class="font_wid">电子邮箱：</span>
+                        <span id="detailemailid"></span>
+                    </li>
+                    <!-- 
+                    <li class="wid_300">
+                        <span class="font_wid">公司地址：</span>
+                        <span id="detailcompanyAddressid"></span>
+                    </li>
+                    -->
+                </ul>
+            </div>
+            <!-- 
+            <h3 class="mar_l14">会员资质信息</h3>
+            <div id="right_top" class="right_top bg_06">
+                <ul class="list mar_20">
+                    <li class="wid_300">
+                        <span class="font_wid">法定代表人：</span>
+                        <span id="detailartificialPersonNameid"></span>
+                    </li>
+                    <li class="wid_300">
+                        <span class="font_wid">资助资本：</span>
+                        <span id="detailregisteredCapitalid"></span>
+                    </li>
+					<li class="wid_100">
+						<span class="font_wid">经营范围：</span>
+                    </li>
+                    </li>
+                    <li class="wid_200">
+                        <span id="detailbusinessScopeid"></span>
+                    </li>
+                </ul>
+            </div>--> <!-- right_top 结束 -->
+            
+            <!-- 商品列表开头 -->
+            <div class="right_xinxi mar_l14">
+                <h3>买家收货地址记录</h3>
+                <ul class="list_top bg_08 font_cen font_14b">
+                    <li class="wid_60">编号</li>
+                    <li class="wid_330">收货地址</li>
+                    <li class="wid_200">创建时间</li>
+                    <li class="wid_220">最近使用时间</li>
+                </ul>
+                <!-- 类型选择 -->
+                <!-- 商品信息 -->
+                <table class="information mar_b10" id="information"><!--单双行变色加bg_05这个样式-->
+                </table>
+                <button onclick="huhuan('right','righttable')" class="button_2 hei_30 wid_80">返 回</button>
+            </div><!--right_xinxi end -->
+
+        </div><!--right_bot end -->
+    </div>
+    <!--右边明细部分结束-->
+
+</div><!--#main end -->
+<!-- 提现  开始 -->
+<div class="po_fai" id="showErrorMsg" style="display:none">
+    <div class="po_fai_bg"></div>
+    <div class="po_main1">
+        <div class="tit bg_05 hei_30 pad_l10">提示</div>
+        <ul>
+            <li id="lierror">提现失败！</li>
+            <li><a href="#"><button type="button" class="button_1 hei_35" onclick="hideDiv('showErrorMsg')" id="showMsgBtn">确定</button></a></li>
+        </ul>
+    </div>
+</div>
+
+

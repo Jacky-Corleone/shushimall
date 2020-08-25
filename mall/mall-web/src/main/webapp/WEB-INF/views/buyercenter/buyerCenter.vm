@@ -1,0 +1,885 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/buyer_layout.vm")
+
+<script type="text/javascript" src="$staticPath/js/common.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		//加载左侧菜单
+		$("#leftBuyer").load("$request.contextPath/leftBuyer");
+		//延期付款 和  待付款 选项卡切换
+		$('#tabs li').click(function(){
+		  var $this = $(this);
+		  var $t = $this.index();
+		  $li.removeClass();
+		  $this.addClass('active');
+		});
+		change_tab(1,1);
+		
+		//申请退款弹层
+		/*
+		$(".js_shenqing_refund").click(function(){
+			var orderId = $(this).attr("name");
+			$("#boxContent").load("$request.contextPath/order/refundBox", {orderId: orderId}, function(){
+				$(".js_choice").show();
+			});
+		});
+		*/
+		switch ("$!state") {
+		case '1':
+			$("#stayPayment").attr("class", "active");
+			break;
+		case '2':
+			$("#stayDelivery").attr("class", "active");
+			break;
+		case '3':
+			$("#stayReceipt").attr("class", "active");
+			break;
+		case '4':
+			$("#evaluation").attr("class", "active");
+			break;
+		case '5':
+			$("#successOrder").attr("class", "active");
+			break;
+		case '6':
+			$("#cancleOrder").attr("class", "active");
+			break;
+		default:
+			$("#all").attr("class", "active");
+		}
+
+		$("#all").click(function() {
+			submitForm(0);
+		});
+		$("#stayPayment").click(function() {
+			submitForm(1);
+		});
+		$("#stayDelivery").click(function() {
+			submitForm(2);
+		});
+		$("#stayReceipt").click(function() {
+			submitForm(3);
+		});
+		$("#evaluation").click(function() {
+			submitForm(4);
+		});
+		$("#successOrder").click(function() {
+			submitForm(5);
+		});
+		$("#cancleOrder").click(function() {
+			submitForm(6);
+		});
+
+		//查看物流信息 弹框取消
+		$(".js_logistics_cancle").click(function(){
+			$(".js_logistics").hide();
+		});
+	});
+	//调整tab页签效果
+	function submitForm(state) {
+		var stateObj = $("#state");
+		if (stateObj.val == state) {
+			return;
+		}
+		if(state==1||state==2){
+			changeShipmentype(this,1,state);
+		}else{
+			$("input[name='page']").val("1");
+			stateObj.val(state);
+			$("#queryForm").submit();
+		}
+	};
+	//到指定的分页页面
+	function topage(page) {
+		$("input[name='page']").val(page);
+		$("#queryForm").submit();
+	}
+	/* //收藏商品跳转到指定位置
+	function collectionPage(page) {
+		$("#pageJSON").val(page);
+		changeTabSubmit();
+	}
+	//热销商品跳转到指定位置
+	function hotCollectionPage(page) {
+		$("#hotMallAdDTOPager").val(page);
+		changeTabSubmit();
+	}
+	//集采商品跳转到指定位置
+	function titleCollectionPage(page) {
+		$("#titleMallAdDTOPager").val(page);
+		changeTabSubmit();
+	} */
+	 
+	function changeTabSubmit(tab){
+		$.ajax({
+             type : "POST",
+             dataType : "text",
+             cache : false,
+             data : $("#queryForm").serialize(),
+             url : "$request.getContextPath()/buyercenter/ajax_buyer?tabFlag="+tab,
+             success : function(msg){
+    			$("#ajax_buyer").html(msg);
+    			Set_Tab('opt',tab,3,'hover','');
+    		}
+         });
+	}
+	
+	function change_tab(tab,page){
+		$("#page").val(page);
+		// changeTabSubmit(tab);
+	}
+	
+	//待付款  和  分期付款
+	function changeShipmentype(thisObj, Num, state) {
+		if (thisObj.className == "active"){
+			return;
+		}
+		$("#shipmentType").val(Num);
+		$("input[name='state']").val(state);
+		
+		$("#queryForm").submit();
+	};
+	//订单状态处理
+	function orderStatusHandle(obj, orderId, orderStatus){
+		if(confirm("您确定要取消此订单吗？")){
+			$.ajax({
+				type: "POST",
+				dataType: "json",
+				url: "$request.getContextPath()/order/cancelOrder",
+				data: {
+					orderId: orderId,
+					orderStatus: orderStatus
+				},
+				success: function(data){
+					if(data.success){
+						$("#queryForm").submit();
+					}else{
+						alert(data.errorMessages);
+					}
+				}
+			});
+		}
+	}
+	function deleteOrderById(orderId){
+		if(confirm("您确定要删除此订单吗？")){
+			$.ajax({
+				type: "POST",
+				dataType: "json",
+				url: "$request.getContextPath()/order/deleteOrderById",
+				data: {
+					orderId: orderId
+				},
+				success: function(data){
+					if(data.success){
+						$("#queryForm").submit();
+					}else{
+						alert(data.errorMessages);
+					}
+				}
+			});
+		}
+	}
+//确认收货
+function openBomb(orderId, refund){
+	if(refund==2){
+		if(confirm("您申请的退款/退货正在处理中，点击“确认收货”会关闭卖家未处理或拒绝退款的申请，请确认是否继续？")){
+			$("#orderId_pay").val(orderId);
+			$("#addCartBomb").show();
+			$("#refund").val(refund);
+		}
+	}else{
+		$("#orderId_pay").val(orderId);
+		$("#addCartBomb").show();
+		$("#refund").val(refund);
+	}
+}
+function closeBomb(){
+	$("#addCartBomb").hide();
+}
+//确认收货
+function confirmReceipt(){
+	$("#payerror").html("");
+	var orderId = $("#orderId_pay").val();
+	var paypwd = $("#paypwd").val();
+	if(orderId==null || $.trim(orderId)==""){
+		$("#payerror").html("请指定要操作的订单");
+		return;
+	}
+	if(paypwd==null || $.trim(paypwd)==""){
+		$("#payerror").html("请输入支付密码");
+		return;
+	}
+	if(confirm("点击确定之后，您的付款将直接到卖家账户里，请务必收到货后再确定")){
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "$request.getContextPath()/order/confirmReceipt",
+			data: {
+				orderId: orderId,
+				paypwd: paypwd
+			},
+			success: function(data){
+				if(data.success){
+					$("#queryForm").submit();
+				}else{
+					$("#payerror").html(data.errorMessages);
+				}
+			}
+		});
+	}
+}
+//延期付款
+function delayPayment(orderId){
+	if(confirm("如果您确定操作延期，该订单将会被延期收货14天！")){
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "$request.getContextPath()/order/delayDelivery",
+			data: {
+				orderId: orderId
+			},
+			success: function(data){
+				if(data.success){
+					$("#queryForm").submit();
+				}else{
+					alert(data.errorMessages);
+				}
+			}
+		});
+	}
+}
+//查看物流信息
+function addLogistics(obj, logisticsNo, logisticsCompany){
+	$(".js_logistics").show();
+	$("#logisticsNo").val(logisticsNo);
+	$("#logisticsCompany").val(logisticsCompany);
+
+}
+function openCustomerWin() {
+    if( '$!userDTO.uid' ==  ''){
+        alert("你目前处于非登录状态，请先登录再联系客服！");
+        this.location.href="$request.contextPath/user/login";
+        return false;
+    }
+    $.ajax({
+        type: "post",
+        dataType: "json",
+        url:"$request.contextPath/shopCart/ifLogin_shopCustomer",
+        success: function(data){
+            if(data.ifLogin_shopCustomer == false){
+                alert("你目前处于非登录状态，请先登录再联系客服！");
+                this.location.href="$request.contextPath/user/login";
+                return false;
+            }
+        }
+    });
+}
+
+function openUrl(url){
+	var url = ( url != "" && url != null ) ? ( url.indexOf("http") != -1 ? url : ( "http://" + url ) ) : "/";
+	window.open(url);
+}
+
+
+	 //查看物流信息
+    function queryDelivery(orderItemId){
+   		$(".js_logistics").show();
+		//清空缓存
+		$("#deliveryNumber").val("");
+		$("#deliveryCompany").val("");
+		$("#deliveryRemark").val("");
+		$("#deliveryOrderItemId").val("");
+		$("#deliveryData").html("");
+		//加载数据
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "$request.getContextPath()/delivery/getDeliveryInfo",
+			data: {
+				orderItemId: orderItemId
+			},
+			success: function(data){
+				if(data.success){
+					//页面数据填写
+					setDelfiveryInfo(data.deliveryDTO,data.pushDelibery);
+				}else{
+					alert("获取数据失败");
+				}
+			}
+		});
+	}
+		//显示物流信息
+	function setDelfiveryInfo(deliveryDTO,pushDelibery){
+		$("#deliveryMessage").empty();
+		$("#deliveryNumber").val(deliveryDTO.deliveryNumber);
+		$("#deliveryCompanyCode").val(deliveryDTO.deliveryCompanyCode);
+		$("#deliveryCompanyName").val(deliveryDTO.deliveryCompanyName);
+		$("#deliveryRemark").text(deliveryDTO.deliveryRemark);
+		var dataArray = pushDelibery.lastResult.data;
+		if(dataArray != null){
+			var $html = '';
+			for(var i = 0 ; i < dataArray.length ; i++){
+				var data = dataArray[i];
+				$html =$html+
+				 "<ul class='list_top bg_05 font_7b'>" +
+					"<li  style='height : 35px;margin-left:45px;text-align:left;' class='font_cen'>" + FormatDate(data.time ) +"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+     data.context + "</li>" +
+				 "</ul>";
+				
+			}
+			$("#deliveryMessage").append($html);
+		}
+	}
+	function FormatDate (strTime) {
+	    var date = new Date(strTime);
+	    var minute = date.getMinutes() < 10 ? "0"+date.getMinutes() : date.getMinutes();
+	    var second = date.getSeconds() < 10 ? "0"+date.getSeconds() : date.getSeconds();
+	    return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate() 
+	    	+ " " + date.getHours() + ":" + minute + ":" + second;
+	}
+
+</script>
+
+<div id="main">
+<!-- left start -->
+<div id="leftBuyer">&nbsp;</div>
+<!-- left end -->
+
+<!-- right start-->
+<div id="right">
+
+	<!-- right_top start-->
+	<div id="right_top" class="right_top bg_06 mar_b10">
+		<div class="wid_940 fl mar_20">
+			<p class="hei_30">用户名：<span>$!userDTO.uname</span>
+				#*<a href="$request.getContextPath()/integralRecord/list">
+					<span class="font_7a fr">总 积 分: #if("$!totalIntegral"!="") $!totalIntegral #else 0 #end</span>
+				</a>*#
+			</p>
+			<p class="hei_30">
+				#if($!userDTO.securityLevel == 1)
+					支付密码 安全级别：低
+				<span class="plan po_re">
+					<span class="po_ab plan_scale" style="width: 33px;"></span>
+					<!--进度宽度 中间style控制宽度 end -->
+				</span>
+				<!--进度条最下面背景色 end -->
+				#elseif($!userDTO.securityLevel == 2)
+					支付密码 安全级别：中
+				<span class="plan po_re">
+					<span class="po_ab plan_scale" style="width: 67px;"></span>
+				<!--进度宽度 中间style控制宽度 end -->
+				</span>
+				<!--进度条最下面背景色 end -->
+				#elseif($!userDTO.securityLevel == 3)
+					支付密码 安全级别：高
+				<span class="plan po_re">
+					<span class="po_ab plan_scale" style="width: 100px;"></span>
+				<!--进度宽度 中间style控制宽度 end -->
+				</span>
+				<!--进度条最下面背景色 end -->
+				#elseif($!userDTO.isHavePayPassword == "0")
+					支付密码 安全级别：<span class="font_14b font_fe">您还未设置支付密码</span>
+				<span class="plan po_re">
+					<span class="po_ab plan_scale" style="width: 0px;"></span>
+					<!--进度宽度 中间style控制宽度 end -->
+				</span>
+				<!--进度条最下面背景色 end -->
+				#end <span style="color:#999;">建议经常修改支付密码</span>
+				<span class="font_7a fr">
+					#if("$!userDTO.isHavePayPassword" == "0")
+						<a href="$request.contextPath/security/setpaypwdpage?userType=buyer">设置支付密码</a>
+					#else
+						<a href="$request.contextPath/security/modifypaypwdpage?userType=buyer">修改支付密码</a>
+					#end
+				</span>
+			</p>
+			<div class="clear"></div>
+		</div>
+	</div>
+	<!-- right_top end-->
+
+	<!-- right_middle start-->
+	<div class="nTab bg_06">
+		<!-- 标题开始 -->
+		<div class="TabTitle">
+			<form id="queryForm" action="$request.getContextPath()/buyercenter/loadBuyerCenter" method="post">
+				<input id="state" name="state" value="$!state" type="hidden"></input>
+				<input type="hidden" id="page" name="page" value="$!pager.page">
+				<input type="hidden" id="pageJSON" name="pageJSON" value="$!pagerJSON.page">
+				<input type="hidden" name="shipmentType" id="shipmentType" value="$!shipmentType">
+				<ul id="myTab0">
+					<li id="all" class="normal">全部订单（$!allOrdersCount）</li>
+					<li id="stayPayment" class="normal">待付款（$!stayPayment）</li>
+					<li id="stayDelivery" class="normal">待配送/服务（$!stayDelivery）</li>
+					<li id="stayReceipt" class="normal">待收货/验收（$!stayReceipt）</li>
+					<li id="evaluation" class="normal">待评价（$!evaluation）</li>
+					<li id="successOrder" class="normal">已完成（$!successOrder）</li>
+					<li id="cancleOrder" class="normal">已取消（$!cancleOrder）</li>
+				</ul>
+			</form>
+		</div>
+		<!-- 标题结束 -->
+
+		<!-- 内容开始 -->
+		<div id="right_bot" class="right_bot">
+			#if($state == 1 )
+			<ul id="tabs" class="TabTitle2 mar_t10 hide">
+				<li onclick="changeShipmentype(this,1,$state);" #if($shipmentType == 1 ) class="active" #else class="normal" #end>待付款</li>
+				<li onclick="changeShipmentype(this,2,$state);" #if($shipmentType == 2 ) class="active" #else class="normal" #end>延期付款</li>
+			</ul>
+			#end
+			#if($state == 2 )
+			<ul id="tabs" class="TabTitle2 mar_t10 hide">
+				<li onclick="changeShipmentype(this,1,$state);" #if($shipmentType == 1 ) class="active" #else class="normal" #end>已付款订单</li>
+				<li onclick="changeShipmentype(this,2,$state);" #if($shipmentType == 2 ) class="active" #else class="normal" #end>延期付款订单</li>
+			</ul>
+			#end
+			<!--标题开始 -->
+			<div class="right_xinxi mar_l14">
+				<ul class="list_top bg_08 font_14b mar_b10">
+					<li class="wid_300 font_cen hei_40">商品信息</li>
+					<li class="wid_100 font_cen hei_40">单价</li>
+					<li class="wid_40 font_cen hei_40">数量</li>
+					<li class="wid_80 font_cen hei_40">商品操作</li>
+					<li class="wid_80 font_cen hei_40">售后服务</li>
+					<li class="wid_100 font_cen hei_40">总金额</li>
+					<li class="wid_90 font_cen hei_40">订单状态</li>
+					<li class="wid_90 font_cen hei_40">订单类型</li>
+					<li class="wid_50 font_cen hei_40">交易操作</li>
+				</ul>
+				<!--循环列表begin-->
+				#foreach($entity in $pager.records)
+				<div class="mar_b10">
+					<ul class="list_top bg_05 font_14b mar_b10 border">
+						<li class="wid_300 hei_40 mar_20">
+							<a href="$request.getContextPath()/order/queryOrderInfoBuyer?orderId=$!entity.orderId&passKey=$!entity.passKey" target="_blank">订单号：$!entity.orderId</a>
+						</li>
+						<li class="wid_220 hei_40 fr">下单时间：$!date.format('yyyy-MM-dd HH:mm:ss ',$!entity.createTime )</li>
+						<li class="wid_180 hei_40 over_ell fr">
+						#foreach($json in $!jsonArray)
+							#if($!entity.orderId == $!json.orderId)
+								<span title="$!json.shopName">$!json.shopName</span>
+							#end
+						#end
+						</li>
+
+					</ul>
+					<!-- 每一个商品信息 -->
+					<table class="information" id="information">
+						<tr>
+							<td class="wid_450 border-1 orderItems_js">
+							#set($count=0)
+							#foreach($entityItem in $!entity.items)
+								#set($count=$count+1)
+								#foreach($json in $!jsonArray)
+									#if($!entity.orderId == $!json.orderId)
+										#foreach($jsonItem in $!json.items)
+											#if($!entityItem.skuId == $!jsonItem.skuId)
+											<ul class="Refund_one #if($count<$!entity.items.size()) border-6 #end" style="width:602px">
+												<li class="wid_300">
+                                                    <div >
+                                                        <a href="$request.getContextPath()/productController/details?id=$!entityItem.itemId&skuId=$!entityItem.skuId" target="_blank">
+                                                            <img class="fl mar_l10 skuPicUrl_js" src="$!imageServerAddr$!jsonItem.skuPicUrl" name="" width="82" height="82" />
+                                                        </a>
+                                                    </div>
+													<div class="fl wid_200 baobei_container">
+    													<div class="fl wid_200 baobei_name" style="margin-top:20px">
+        													<p class="mar_l10 itemName_js" title="$!jsonItem.itemName">
+        														<a href="$request.getContextPath()/productController/details?id=$!entityItem.itemId&skuId=$!entityItem.skuId" target="_blank">
+                                                                   #set($str=$!jsonItem.itemName)
+                                                                   #if($str.length()>40)
+                                                                       #set($str=$str.substring(0,40))
+                                                                       $str ...
+                                                                   #else
+                                                                     $!jsonItem.itemName
+                                                                   #end
+                                                                </a>
+        														<br/>
+        													</p>
+        												</div>
+    													<div class="fl wid_200 baobei_spec">
+        													<p class="mar_l10 itemName_js" title="$!jsonItem.itemAttrTitle">
+        														#foreach($itemAttrName in $!jsonItem.itemAttr)
+                                                            		<span style="margin-right:5px">
+                                                    				    $itemAttrName.name :
+                                                    				#foreach($itemAttrValue in $itemAttrName.values)
+                                                    					$itemAttrValue.name 
+        															#end
+        															</span>
+                                                    			#end
+        													</p>
+        												</div>
+                                                    </div>
+												</li>
+												#if($!entity.paymentMethod == 3)
+          											<li class="wid_90 font_cen hei_80 payPrice_js" style="overflow:hidden" title="$!jsonItem.payPrice积分">
+       												$!jsonItem.payPrice积分
+    											#else
+          											<li class="wid_90 font_cen hei_80 payPrice_js" style="overflow:hidden" title="￥$!jsonItem.payPrice">
+													￥$!jsonItem.payPrice
+												#end
+												</li>
+												<li class="wid_48 font_cen hei_80 num_js" style="overflow:hidden;" title="$!jsonItem.num">
+													$!jsonItem.num
+												</li>
+												<li class="wid_90 font_cen hei_80 payPrice_js" style="overflow:hidden">
+													#if($!entity.locked == 1)
+														#if($!entity.paid == 1)无
+															<!-- $shipmentType == 2   订单列表：马上付款 和 申请退款/退货 是互斥的-->
+														#else
+															#if(!$!jsonItem.refundFlag)
+																#if($entity.state == 2 || $entity.state == 3)
+																	#if($entity.state == 3)
+																		<p style="line-height:22px;padding-top:20px">
+																			<!--  判断是纯服务还是其他商品-->
+																			#if($!jsonItem.addSource <= 3)
+																				<a href="$request.getContextPath()/order/refundAgreement?orderId=$!entity.orderId&skuId=$!entityItem.skuId" class="font_1c cursor">申请退款/退货</a>
+																				<!-- 查看物流信息 -->
+	        																	</br>
+	        																	<a class="font_1c cursor" onclick="queryDelivery('$!jsonItem.orderItemId');">查看物流信息</a>
+																			#else
+																				<a class="font_1c cursor" onclick="queryDelivery('$!jsonItem.orderItemId');" >查看物流信息</a>
+																			#end
+        																</p>
+    																#else
+    																	<a href="$request.getContextPath()/order/refundAgreement?orderId=$!entity.orderId&skuId=$!entityItem.skuId" class="font_1c cursor">申请退款/退货</a>
+    																#end
+																#elseif($entity.state > 3 && $entity.state < 6 )
+																		<!--  判断是纯服务还是其他商品-->
+																		#if($!jsonItem.addSource <= 3)
+																		<p style="line-height:22px;padding-top:20px">
+																			<a href="$request.getContextPath()/order/refundAgreement?orderId=$!entity.orderId&skuId=$!entityItem.skuId" class="font_1c cursor">申请售后</a>
+																			</br>
+            																<!-- 查看物流信息 -->
+        																	<a class="font_1c cursor" onclick="queryDelivery('$!jsonItem.orderItemId');">查看物流信息</a>
+																		</p>
+																		#else
+																		<p>
+																			<a class="font_1c cursor" onclick="queryDelivery('$!jsonItem.orderItemId');">查看物流信息</a>
+																		</p>
+																		#end
+																#elseif($entity.state >=6 )
+    																<!-- 查看物流信息 -->
+    																<a class="font_1c cursor" onclick="queryDelivery('$!jsonItem.orderItemId');">查看物流信息</a>
+    															#end
+															#else
+																#if($entity.state >=3 && $entity.state < 6)
+																		<!--  判断是纯服务还是其他商品-->
+																			#if($!jsonItem.addSource <= 3)
+																			<p style="line-height:22px;padding-top:20px">
+																				<a href="$request.getContextPath()/order/refundSubmitSucc?returnId=$!jsonItem.refundId&skuId=$!entityItem.skuId" target="_blank" class="font_1c cursor">查看退款/退货进度</a>
+																				</br>
+        																		<!-- 查看物流信息 -->
+        																		<a class="font_1c cursor" onclick="queryDelivery('$!jsonItem.orderItemId');">查看物流信息</a>
+    																		</p>
+																			#else
+																			<p>
+																				<a class="font_1c cursor" onclick="queryDelivery('$!jsonItem.orderItemId');">查看物流信息</a>
+    																		</p>
+																			#end
+    															#else
+    																#if($entity.state >=6)
+    																		#if($!jsonItem.addSource <= 3)
+	    																	<p style="line-height:22px;padding-top:20px">
+																				<a href="$request.getContextPath()/order/refundSubmitSucc?returnId=$!jsonItem.refundId&skuId=$!entityItem.skuId" target="_blank" class="font_1c cursor">查看退款/退货进度</a>
+																				</br>
+            																	<!-- 查看物流信息 -->
+            																	<a class="font_1c cursor" onclick="queryDelivery('$!jsonItem.orderItemId');">查看物流信息</a>
+            																</p>
+																			#else
+	    																	<p>
+																				<a class="font_1c cursor" onclick="queryDelivery('$!jsonItem.orderItemId');">查看物流信息</a>
+            																</p>
+																			#end
+    																#else
+																		<p style="line-height:22px;padding-top:20px">
+																			#if($!jsonItem.addSource <= 3)
+																				<a href="$request.getContextPath()/order/refundSubmitSucc?returnId=$!jsonItem.refundId&skuId=$!entityItem.skuId" target="_blank" class="font_1c cursor">查看退款/退货进度</a>
+																			#end
+																		</p>
+    																#end
+    															#end
+															#end
+														#end
+													#end
+												</li>
+												<li class="wid_70 font_cen hei_80 payPrice_js">
+												#if($jsonItem.afterService == '1'||!$jsonItem.afterService )无
+	        									#elseif ($jsonItem.afterService == '2' )进行中
+	        									#elseif ($jsonItem.afterService == '3' )已完成
+	        									#elseif ($jsonItem.afterService == '4' )已关闭
+	        									#elseif ($jsonItem.afterService == '5' )<p style="line-height:22px;padding-top:20px">部分商品</br>已退款</p>
+	        									#else &nbsp;
+		        								#end
+												</li>
+											</ul>
+											#end
+										#end
+									#end
+								#end
+							#end
+							</td>
+							<td class="wid_100 border-1 font_cen">
+								#if($entity.paymentMethod == 3)
+											<div class="wid_100" style="overflow:hidden" title="$entity.integral积分">
+	        									<span class="hei_30">$entity.integral积分</span><br/>
+        									</div>
+										#else
+											<div class="wid_100" style="overflow:hidden" title="￥$entity.paymentPrice">
+	        									<span class="hei_30">￥$entity.paymentPrice</span><br/>
+	        									#if($entity.discountAmount)
+	        										<span title="VIP优惠" class="cursor">惠:￥$entity.discountAmount</span>
+	        									#end
+        									</div>
+										#end
+							</td>
+							<td class="wid_90 border-1 font_cen">
+								#if($entity.state == '1' )  待付款
+									#elseif ($entity.state == '2' )
+										<!--  判断是纯服务还是其他商品-->
+										#set($count=1)
+										#foreach($entityItem in $!entity.items)
+												#foreach($json in $!jsonArray)
+													#if($!entity.orderId == $!json.orderId)
+														#foreach($jsonItem in $!json.items)
+															#if($!entityItem.skuId == $!jsonItem.skuId)
+																#if($!jsonItem.addSource > 3)
+																	#if($count == 1)
+																		待服务
+																		#set($count=2)
+																	#end
+																#else
+																	#if($count == 1)
+																		待配送
+																		#set($count=2)
+																	#end
+																#end
+															#end
+														#end
+													#end
+												#end
+											#end					
+									#elseif ($entity.state == '3' )
+										<!--  判断是纯服务还是其他商品-->
+										#set($count=1)
+										#foreach($entityItem in $!entity.items)
+											#foreach($json in $!jsonArray)
+												#if($!entity.orderId == $!json.orderId)
+													#foreach($jsonItem in $!json.items)
+														#if($!entityItem.skuId == $!jsonItem.skuId)
+															#if($!jsonItem.addSource > 3)
+																#if($count == 1)
+																	待验收
+																	#set($count=2)
+																#end
+															#else
+																#if($count == 1)
+																	待收货
+																	#set($count=2)
+																#end
+															#end
+														#end
+													#end
+												#end
+											#end
+										#end	
+									#elseif ($entity.state == '4' )待评价
+									#elseif ($entity.state == '5' )已完成
+									#elseif ($entity.state == '6' )已取消
+									#elseif ($entity.state == '7' )已关闭
+									#else &nbsp;
+								#end
+							</td>
+							<td class="wid_70 border-1 font_cen">
+								<div class="wid_70" style="overflow:hidden">
+									#if($!entity.orderType == '0' )  询价订单
+    									#elseif ($!entity.orderType == '1' ) 协议订单
+    									#else 普通订单
+    								#end
+                                </div>
+							</td>
+							<td class="wid_80 border-1 font_cen">
+							#if($!entity.locked == 1)
+								<a class="font_1c cursor" href="$request.getContextPath()/order/queryOrderInfoBuyer?orderId=$!entity.orderId&passKey=$!entity.passKey" target="_blank">订单详情</a><br/>
+								#if($entity.refund == 2)
+									<!-- 延期付款订单列表：马上付款 和 申请退款/退货 是互斥的-->
+								#else
+									#if($entity.state != 6 && $!entity.paid == 1)
+									<a class="font_1c cursor" href="$request.getContextPath()/shopCart/payView?orderNo=$!entity.orderId">马上付款</a><br/>
+									#end
+								#end
+								#if($entity.state == '1' )  <!-- 待付款 -->
+									<a class="font_1c cursor" onclick="orderStatusHandle(this, '$!entity.orderId', 6);">取消订单</a><br/>
+									#elseif($entity.paid == '1' && ($entity.state == '1' || $entity.state == '2') )
+										<!-- 待付款和待配送的延期订单可以取消 -->
+										<a class="font_1c cursor" onclick="orderStatusHandle(this, '$!entity.orderId', 6);">取消订单</a><br/>
+									#elseif ($entity.state == '2' )<!-- 待配送 -->
+									#elseif ($entity.state == '3' )
+									<a class="font_1c cursor" onclick="openBomb('$!entity.orderId', $!entity.refund);">
+										#set($count=1)
+										#foreach($entityItem in $!entity.items)
+												#foreach($json in $!jsonArray)
+													#if($!entity.orderId == $!json.orderId)
+														#foreach($jsonItem in $!json.items)
+															#if($!entityItem.skuId == $!jsonItem.skuId)
+																#if($!jsonItem.addSource > 3)
+																	#if($count == 1)
+																		&nbsp;确认验收
+																		#set($count=2)
+																	#end
+																#else
+																	#if($count == 1)
+																		&nbsp;确认收货
+																		#set($count=2)
+																	#end
+																#end
+															#end
+														#end
+													#end
+												#end
+											#end
+									</a><br/><!-- 待确认送货 -->
+										#if($entity.delay == 1)
+										<a class="font_1c cursor" onclick="delayPayment('$!entity.orderId', $!entity.refund);">
+											#set($count=1)
+											#foreach($entityItem in $!entity.items)
+												#foreach($json in $!jsonArray)
+													#if($!entity.orderId == $!json.orderId)
+														#foreach($jsonItem in $!json.items)
+															#if($!entityItem.skuId == $!jsonItem.skuId)
+																#if($!jsonItem.addSource > 3)
+																	#if($count == 1)
+																		<!-- 延期验收 -->
+																		#set($count=2)
+																	#end
+																#else
+																	#if($count == 1)
+																		&nbsp;延期收货
+																		#set($count=2)
+																	#end
+																#end
+															#end
+														#end
+													#end
+												#end
+											#end
+										</a><br/>
+										#elseif($entity.delay == 2)
+										<span>已延期收货</span><br/>
+										#end
+									#elseif ($entity.state == '4' ) <!-- 待评价 -->
+									<a class="font_1c cursor" href="$request.getContextPath()/buyerEvaluation/initTrading?orderId=$!entity.orderId">评价</a><br/>
+									<a class="font_1c cursor" href="$request.contextPath/shopCart/buyAgain?orderId=$!entity.orderId">再次购买</a><br/>
+									#elseif ($entity.state == '5' ) <!-- 已完成 -->
+									<a class="font_c7 cursor" onclick="deleteOrderById('$!entity.orderId');">删除</a><br/>
+									<a class="font_1c cursor" href="$request.contextPath/shopCart/buyAgain?orderId=$!entity.orderId">再次购买</a><br/>
+									#elseif ($entity.state == '7' ) <!-- 已完成 -->
+									<a class="font_c7 cursor" onclick="deleteOrderById('$!entity.orderId');">删除</a><br/>
+									<a class="font_1c cursor" href="$request.contextPath/shopCart/buyAgain?orderId=$!entity.orderId">再次购买</a><br/>
+									#elseif ($entity.state == '6' )
+									<span>已取消</span><br/>
+									<a class="font_c7 cursor" onclick="deleteOrderById('$!entity.orderId');">删除</a><br/><!-- 已取消 -->
+								#end
+							#else
+								<span>订单已被冻结</span><br/>
+							#end
+							</td>
+						</tr>
+					</table>
+				</div>
+				#end
+			<!--分页开始 -->
+			#pageVelocity($pager)<!--分页结束 -->
+			</div>
+
+		</div>
+		<!-- 内容结束 -->
+	</div>
+	<!-- right_middle end-->
+
+	<div class="clear"></div>
+    <div class="att1" id="ajax_buyer"><!-- right_bottom start--><!--tab切换开始 -->
+	</div><!--tab切换结束 --><!-- right_bottom end-->
+</div><!-- right end-->
+</div><!-- main end -->
+
+
+
+<!--输入支付密码   开始-->
+<div id="addCartBomb" class="po_fai" style="display: none;">
+    <div class="po_fai_bg"></div>
+    <div class="po_main" style="width:420px;min-height:200px; margin-left:-210px;">
+		<ul>
+	    	<li class="font_18">
+	    		<span class="title">支付密码：</span>
+				<input type="hidden" id="orderId_pay" value="" />
+				<input type="password" name="paypwd" id="paypwd" class="input_Style2 wid_180 hei_30" value="" />
+	    	</li>
+	    	<li class="font_fe font_14b">请收到货后，再确认收货！否则您可能钱货两空！</li>
+	        <li class="msg font_14" id="payerror" style="color: red;"></li>
+	        <li>
+        		<button type="button" style="width: 90px; " class="button_1 hei_40" onclick="confirmReceipt();">
+					提 交
+        		</button>
+				<button type="button" style="width: 85px;" class="button_3 hei_40" onclick="closeBomb();" style="margin-right: 10px;">
+        			取 消
+        		</button>
+				#if($!isHavePayPassword == 0)
+        			<span class="font_12" style="margin-right: -50px;">尚未设置密码？<a style="color: blue;" href="$request.contextPath/security/setpaypwdpage?backUrl=/order/queryBuyer">去设置</a></span>
+        		#else
+        			<span class="font_12" style="margin-right: -50px;">忘记支付密码？<a style="color: blue;" href="$request.contextPath/security/findpaypwdpage?backUrl=/order/queryBuyer">去设置</a></span>
+        		#end
+	        </li>
+
+	        <!-- <li class="font_12">尚未设置密码？<a href="$request.contextPath/security/setpaypwdpage" class="font_1c">去设置</a></li> -->
+    	</ul>
+	</div>
+</div>
+<!--输入支付密码   结束-->
+<!--选择商品，申请退款   开始 -->
+<div class="po_fai js_choice" style="display:none">
+	<div class="po_fai_bg"></div>
+	<div class="po_main0 pad_t10" id="boxContent">
+
+	</div>
+</div>
+<!--选择商品，申请退款   结束-->
+
+<!--===========================添加物流信息DIV start================================-->
+<div class="po_fai moban js_logistics" style="display:none;">
+    <div class="po_main2 "  style="margin-left:-190px;width:540px;height:450px;padding:0px" >
+    	<div class="hei_32 bg_05 pad_l10 "><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor js_logistics_cancle"></i>物流信息</div>
+        <input type="hidden" id="deliveryOrderItemId" value=""/>
+		<dl class="wid_500 hei_30 mar_t20 po_re" >
+			<dt style="height:20px;" class="fl wid_80 font_right">物流编号：</dt>
+			<dd class="fl ">
+				<input type="text" readonly="true" class="wid_150 hei_30" id="deliveryNumber" name="deliveryNumber"/>
+			</dd>
+			<dt style="height:20px;" class="fl wid_80 font_right">物流公司：</dt>
+			<dd class="fl ">
+				<input type="hidden" id="deliveryCompanyCode" name="deliveryCompanyCode" value=""/>
+				<input type="text" readonly="true" class="wid_150 hei_30" id="deliveryCompanyName" name="deliveryCompanyName" value="" />
+			</dd>
+       	</dl>
+       	<dl class="wid_500 hei_20 mar_t20 po_re">
+			<dt style="height:20px;" class="fl wid_80 font_right">备注：</dt>
+			<dd class="fl">
+				<span class="wid_350 hei_20 mar_r10"  id="deliveryRemark"/></span>
+			</dd>				
+		</dl>
+		<div class="mar_b10" style="z-index:1">
+    
+    		<div class="information" id="deliveryMessage"  >
+    		</div>
+        </div>
+		
+		
+		<br/>
+		<div class=" mar_tb10 mar_r20 font_cen">
+			<button class="button_5 hei_30 mar_l10 demo-icons js_logistics_cancle"><a href="#">关闭</a></button>
+		</div>
+    </div>
+</div>
+<!--===========================添加物流信息DIV end================================-->
+
+

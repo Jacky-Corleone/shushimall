@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.storecenter.dao.ShopFareDAO">
+    <resultMap id="ShopFareDTOMapper" type="com.camelot.storecenter.dto.ShopFareDTO">
+       <result property="id" column="id"/>
+       <result property="sellerId" column="seller_id"/>
+       <result property="shopId" column="shop_id"/>
+       <result property="fareName" column="fare_name"/>
+       <result property="fareType" column="fare_type"/>
+       <result property="paymentType" column="payment_type"/>
+       <result property="fareRegion" column="fare_region"/>
+       <result property="firstWeightPrice" column="first_weight_price"/>
+       <result property="continueWeightPrice" column="continue_weight_price"/>
+    </resultMap>
+    <!-- =========================================================== -->
+     <sql id="page_tail">
+      limit #{page.pageOffset},#{page.rows}
+    </sql>
+    
+    <sql id="where_conment">
+       shop_fare 
+       WHERE 
+       <if test="entity != null">
+         <if test="entity.shopId != null and entity.shopId !=0">
+             shop_id=#{entity.shopId}
+         </if>
+         <if test="entity.sellerId != null and entity.sellerId !=0">
+            and seller_id=#{entity.sellerId}
+         </if>
+         <if test="entity.fareRegion != null and entity.sellerId !=''">
+             and fare_region=#{entity.fareRegion}
+         </if>
+       </if>
+    </sql>
+    
+    <select id="selectListByCondition" resultMap="ShopFareDTOMapper">
+      select * from 
+      <include refid="where_conment"></include>
+      <if test="page != null">
+        <include refid="page_tail"></include>
+      </if>
+    </select>  
+    <select id="selectCountByCondition" resultType="long">
+      select count(*) from 
+      <include refid="where_conment"></include>
+    </select>
+    
+    <select id="selectById" resultMap="ShopFareDTOMapper">
+      select * from shop_fare where id=#{id}
+    </select>
+    
+    <select id="selectByFareRegion" resultMap="ShopFareDTOMapper">
+      select * from shop_fare where shop_id=#{shopId}
+        <if test="fareRegion != null and fareRegion !=''">
+           and FIND_IN_SET(#{fareRegion},fare_region) > 0  
+        </if>
+    </select>
+    
+    <select id="selectByFareRegions"  resultMap="ShopFareDTOMapper">
+       select * from shop_fare where shop_id=#{shopId} and  FIND_IN_SET(0,fare_region)>0
+    </select>
+    
+    <select id="queryBysellerIdAndShopId" resultType="String" parameterType="com.camelot.storecenter.dto.ShopFareDTO">
+       select group_concat(fare_region) from shop_fare where seller_id=#{sellerId} and shop_id=#{shopId}
+        <if test="id!=null "> and id!=#{id}</if>
+
+    </select>
+    
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.camelot.storecenter.dto.ShopFareDTO">
+      insert shop_fare(
+             seller_id
+             ,shop_id
+             ,fare_name
+             ,fare_type
+             ,payment_type
+             ,fare_region
+             ,first_weight_price
+             ,continue_weight_price
+             )
+      values (
+             #{sellerId}
+             ,#{shopId}
+             ,#{fareName}
+             ,#{fareType}
+             ,#{paymentType}
+             ,#{fareRegion}
+             ,#{firstWeightPrice}
+             ,#{continueWeightPrice})
+    </insert>
+    
+    <update id="update" parameterType="com.camelot.storecenter.dto.ShopFareDTO">
+       update shop_fare
+       set fare_name=#{fareName}
+          ,fare_type=#{fareType}
+          ,payment_type=#{paymentType}
+          ,fare_region=#{fareRegion}
+          ,first_weight_price=#{firstWeightPrice}
+          ,continue_weight_price=#{continueWeightPrice}
+        where id=#{id}
+    </update>
+    
+    <delete id="delete">
+     delete from shop_fare where id=#{id}
+    </delete>
+</mapper>

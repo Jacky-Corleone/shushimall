@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+ 		<!-- 促销活动 -->
+        <dubbo:service interface="com.camelot.pricecenter.service.ShopCartPromotionService"
+			owner="camelot" ref="shopCartPromotionService" version="1.0" protocol="dubbo"
+			delay="-1" registry="qingdaoRegistry" />
+			
+ 		<!-- 运费 -->
+        <dubbo:service interface="com.camelot.pricecenter.service.ShopCartFreightService"
+			owner="camelot" ref="shopCartFreightService" version="1.0" protocol="dubbo"
+			delay="-1" registry="qingdaoRegistry" />
+			
+ 		<!-- VipCard -->
+        <dubbo:service interface="com.camelot.pricecenter.service.ShopCartVIPCardService"
+			owner="camelot" ref="shopCartVIPCardService" version="1.0" protocol="dubbo"
+			delay="-1" registry="qingdaoRegistry" />
+		<!--满减活动 -->
+        <dubbo:service interface="com.camelot.pricecenter.service.ShopCartFullReductionService"
+			owner="camelot" ref="shopCartFullReductionService" version="1.0" protocol="dubbo"
+			delay="-1" registry="qingdaoRegistry" />	
+		<!--优惠券 -->
+        <dubbo:service interface="com.camelot.pricecenter.service.ShopCartCouponService"
+			owner="camelot" ref="shopCartCouponService" version="1.0" protocol="dubbo"
+			delay="-1" registry="qingdaoRegistry" />	
+		<!--积分 -->
+        <dubbo:service interface="com.camelot.pricecenter.service.ShopCartIntegralService"
+			owner="camelot" ref="shopCartIntegralService" version="1.0" protocol="dubbo"
+			delay="-1" registry="qingdaoRegistry" />	
+</beans>

@@ -1,0 +1,134 @@
+<!-- 底部 -->
+<script>
+	function checkLogin(_this,_type){
+	window.__urlType__=_type;
+	$.ajax({
+			url:'$request.contextPath/user/checkLogin',
+			dataType:'json',
+        	type:"post",
+			success:function(res){
+				var aa=$(_this).attr("href");
+				if(res.isLogin){
+					if(res.userType<3&& _type==3){
+    				  //toast("很抱歉，您还不是卖家哦~ </br></br> 请在电脑端登录申请成为卖家");
+    				    alert("很抱歉，您还不是卖家哦~ </br></br> 请在电脑端登录申请成为卖家");
+						return;
+					}
+					window.location=aa;
+				}else{
+					$("#targetUrl").val(aa);
+                    showLogin();
+				}
+			}
+		});
+		return false
+	}
+	
+	
+	jQuery(function($) {     
+		// 加载购物车信息
+		$.ajax({
+			url : '$request.contextPath/user/shocar',
+			type : 'post',
+			dataType:"json",
+			success : function(res) {
+				//console.log(JSON.stringify(res));
+				if(res.quantity>0){
+					$("#cart_dd").html(res.quantity);	
+					$("#cart_dd").show();
+				}else{
+					$("#cart_dd").hide();
+					
+				} 
+			},
+			error : function() {
+				console.log("网络错误");
+			}
+		});	
+});  
+	
+	function indexHome(){
+		location.href="$request.contextPath/";
+	}
+	
+</script>
+<div class="foot bg_02">
+    <footer style="width:auto;">
+        <dl class="fl">
+			<a  href="javascript:indexHome();">
+                <dt><img id="_homeIcon" src="$request.contextPath/assets/images/home.png"></dt>
+                <dd>首页</dd>
+			</a>
+        </dl>
+        <dl class="fl">
+			<a href="$request.contextPath/cart/tocart">
+            <dt class="po_re" >
+               <img id="_cartIcon" src="$request.contextPath/assets/images/shopping.png" >
+            <span id="cart_dd" style="display:none"></span>
+            </dt>
+            <dd >购物车</dd>
+			</a>
+        </dl>
+        <dl class="fl">
+			<a href="$request.contextPath/buyers" onclick="return checkLogin(this,2)">
+                <dt><img id="_buyerIcon" src="$request.contextPath/assets/images/maijia.png"></dt>
+                <dd>买家中心</dd>
+			</a>
+        </dl>
+        <dl class="fl">
+			<a href="$request.contextPath/salerCenter" onclick="return checkLogin(this,3)">
+                <dt><img id="_sellerIcon" src="$request.contextPath/assets/images/mai.png"></dt>
+                <dd>卖家中心</dd>
+			</a>
+        </dl>
+    </footer>
+ </div> <!-- 底部 -->
+<script>
+	$(function(){
+		var _pathName=window.location.pathname;
+        if(_pathName==="$request.contextPath/"){
+            $("#_homeIcon").attr('src','$request.contextPath/assets/images/home_0.png');
+            $("#_homeIcon").parent().siblings().css('color',"#c80000");
+            return;
+        }
+        if(_pathName.indexOf("/cart/tocart")>0){
+            $("#_cartIcon").attr('src','$request.contextPath/assets/images/shopping_0.png');
+            $("#_cartIcon").parent().siblings().css('color',"#c80000");
+            return;
+        }
+		if(_pathName.indexOf("/buyers")>0){
+			$("#_buyerIcon").attr('src','$request.contextPath/assets/images/maijia_0.png');
+			$("#_buyerIcon").parent().siblings().css('color',"#c80000");
+			return;
+		}
+		if(_pathName.indexOf("/salerCenter")>0){
+			$("#_sellerIcon").attr('src','$request.contextPath/assets/images/mai_0.png');
+            $("#_sellerIcon").parent().siblings().css('color',"#c80000");
+			return;
+		}
+	});
+	function changeIconToRed(index){
+		if(index===0){
+			$("#_homeIcon").attr('src','$request.contextPath/assets/images/home_0.png');
+			$("#_homeIcon").parent().siblings().css('color',"#c80000");
+			return;
+		}
+		if(index===1){
+            $("#_cartIcon").attr('src','$request.contextPath/assets/images/shopping_0.png');
+            $("#_cartIcon").parent().siblings().css('color',"#c80000");
+            return;
+		}
+		if(index===2){
+            $("#_buyerIcon").attr('src','$request.contextPath/assets/images/maijia_0.png');
+            $("#_buyerIcon").parent().siblings().css('color',"#c80000");
+            return;
+		}
+		if(index===3){
+            $("#_sellerIcon").attr('src','$request.contextPath/assets/images/mai_0.png');
+            $("#_sellerIcon").parent().siblings().css('color',"#c80000");
+            return;
+		}
+	}
+</script>
+#parse("common/common.vm")
+#parse("home/loginWindow.vm")

@@ -1,0 +1,361 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<script type="text/javascript" src="$request.getContextPath()/assets/plugin/My97DatePicker/WdatePicker.js"></script>
+<script language="javascript">
+$(function(){
+	//加载左侧菜单
+	$("#leftSeller").load("$request.getContextPath()/leftSeller");
+});
+    function opengooddetail(itemid,skuid){
+        var url="$request.getContextPath()/productController/details?id="+itemid+"&skuId="+skuid;
+        window.open(url);
+    }
+    var pageNo=$pageNo;
+    function topage(page) {
+    	pageNo=page;
+    	$("input[name='page']").val(page);
+    	$("#queryForm").submit();
+    }
+    /* 
+    function topage(page){
+        pageNo=page;
+        //用户名
+        var orderId=$("#orderId").val();
+        var createTimeStart=$("#createTimeStartid").val();
+        var createTimeEnd=$("#createTimeEndid").val();
+        var complaintype=$("#complaintype").val();
+        $.ajax({
+            url:"$request.contextPath/complain/gocomplainsellerlist",
+            type:"post",
+            data:{
+                page:page,
+                orderId:orderId,
+                createTimeStart:createTimeStart,
+                createTimeEnd:createTimeEnd,
+                complaintype:complaintype
+            },
+            dataType:'json',
+            success:function(data){
+                if(data.success){
+                    showTable(data.obj);
+                    showPager(data.obj);
+                }else{
+                    $("#lierror").html("查询失败");
+                    showDiv('showErrorMsg');
+                }
+            },error:function(){
+                alert("系统繁忙，请稍后再试");
+            }
+        });
+    } */
+    //失败按钮
+    function showDiv(divid){
+        $("#"+divid).show();
+    }
+    //工具方法：下拉框
+    function optionItems(parentCode, optionId){
+        $.ajax({
+            url:"$request.contextPath/controller/configuration/queryAddress",
+            type:"post",
+            data:{
+                parentCode:parentCode
+            },
+            dataType: "json",
+            success:function(data){
+                var optionItem = $("#"+optionId);
+                optionItem.empty();
+                optionItem.append($("<option>").text("请选择").val(""));
+                $.each(data, function (n, address) {
+                    var option = $("<option>").text(address.name).val(address.code);
+                    optionItem.append(option);
+                });
+            }
+        });
+    }
+    //ajax查询后拼接table代码
+    function showTable(pager){
+        var list=pager.records;
+        //获取需要刷新的div
+        var div = $("#tabledetailid");
+        div.empty();
+        if(list){
+            $(list).each(function (n, detail) {
+                var divn=$("<div>").attr("class","wid_950 mar_cen border-4");
+                var p=$("<p>").attr("class","hei_40 bg_05 wid_950 border-6");
+                var i1=$("<i>").attr("class","fl mar_l10");
+                var span1=$("<span>").text("订单号： ");
+                var b=$("<b>").attr("class","font_fe mar_r20").text(getcode(detail.orderId));
+                var span2=$("<span>").text(getcode(detail.shopName));
+                /* var button=$("<button>").attr("class","button_4 button_small font_82");
+                var i2=$("<i>").attr("class","fa-qq demo-icons font_7a");
+                var a=$("<a>").attr("class","font_12").text("联系卖家");
+                button.append(i2);
+                button.append(a); */
+                i1.append(span1);
+                i1.append(b);
+                i1.append(span2);
+                //i1.append(button);
+                var i3=$("<i>").attr("class","fr mar_r10 font_c7").text("投诉时间："+getcode(detail.created));
+                p.append(i1);
+                p.append(i3);
+                divn.append(p);
+                var list1=detail.list;
+                $(list1).each(function (n, de) {
+
+                    var ul=$("<ul>").attr("class","list_top hei_90 font_14b");
+                    var li1=$("<li>").attr("class","wid_250 font_cen");
+                    var ossftpChange=$("#ossftpChange").val();
+                    var img="";
+                    if(ossftpChange=="1"){
+                        img=$("<img>").attr("style","width:65px;height:40px;").attr("src","$!imageServerAddr"+getcode(de.skuUrl));
+                    }else{
+                        img=$("<img>").attr("src","$!imageServerAddr"+getcode(de.skuUrl)+"@65w_40h_2e_100sh.jpg");
+                    }
+                    var adetail=$("<a>").text(getcode(de.skuName)).attr("href","javascript:opengooddetail("+de.itemid+","+de.skuId+")");
+                    li1.append(img);
+                    li1.append(adetail);
+                    var li2=$("<li>").attr("class","wid_120 font_cen").text(getcode(de.payPrice));
+                    var li3=$("<li>").attr("class","wid_110 font_cen").text(getcode(de.goodCount));
+                    var li4=$("<li>").attr("class","wid_130 font_cen font_fe font_16").text(getcode(de.amount));
+                    var li5=$("<li>").attr("class","wid_110 font_cen").text(getcode(detail.tousufang));
+                    var li6=$("<li>").attr("class","wid_110 font_cen").text(getcode(detail.staceName));
+                    var li7=$("<li>").attr("class","wid_120 font_cen").attr("style","line-height:15px");
+                    var p1=$("<p>").attr("class","mar_cen");
+                    //var a1=$("<a>").attr("class","font_1c cursor").attr("target","_blank").attr("href","$request.contextPath/order/refundInfoSeller?returnGoodId="+getcode(detail.thid)).text("查看售后详情");
+                    var a1=$("<a>").attr("class","font_1c cursor").attr("target","_blank").attr("href","$request.contextPath/order/refundInfoSeller?returnGoodId="+detail.thid).text("退款处理");
+                    var br1=$("<br>");
+                    p1.append(a1);
+                    p1.append(br1);
+                    //查看投诉进度
+                    var a2=$("<a>").attr("class","font_1c cursor").text("查看投诉进度").attr("target","_blank").attr("href","javascript:gocomplaindetail("+getcode(detail.complainid)+")");
+                    var br2=$("<br>");
+                    p1.append(a2);
+                    p1.append(br2);
+                    if(getcode(detail.stace)=='0'&&getcode(detail.sellerOrBuyer)=='2'){
+                        var a3=$("<a>").attr("class","font_1c cursor").text("取消投诉").attr("href","javascript:canclecomplain("+getcode(detail.refundId)+")");
+                        var br3=$("<br>");
+                        p1.append(a3);
+                        p1.append(br3);
+                    }
+                    li7.append(p1);
+                    ul.append(li1);
+                    ul.append(li2);
+                    ul.append(li3);
+                    ul.append(li4);
+                    ul.append(li5);
+                    ul.append(li6);
+                    ul.append(li7);
+                    divn.append(ul);
+                });
+                div.append(divn);
+            });
+        }
+    }
+    //ajax查询后拼接分页代码
+    function showPager(pager){
+        var page = $("#pagerul");
+        page.empty();
+        var firsta=$("<a>").attr("href","javascript:topage(1)").text("首页");
+        var firstl=$("<li>").attr("class","lastPage").append(firsta);
+        var beforea=$("<a>").attr("href","javascript:topage("+page.previewPage+")").text("上一页");
+        var beforel=$("<li>").attr("class","lastPage").append(beforea);
+        page.append(firstl);
+        page.append(beforel);
+        for(var pageNo=pager.startPageIndex;pageNo<=pager.endPageIndex;pageNo++){
+            var zhonga=$("<a>").attr("href","javascript:topage("+pageNo+")");
+            if(pager.page==pageNo){
+                zhonga.attr("class","curr");
+            }
+            if((pager.pageCode/2)==pageNo){
+                zhonga.text("...");
+            }else{
+                zhonga.text(pageNo);
+            }
+            var zhongl=$("<li>").append(zhonga);
+            page.append(zhongl);
+        }
+        var nexta=$("<a>").attr("href","javascript:topage("+pager.nextPage+")").text("下一页");
+        var nextl=$("<li>").attr("class","nextPage").append(nexta);
+        var enda=$("<a>").attr("href","javascript:topage("+pager.totalPage+")").text("末页");
+        var endl=$("<li>").attr("class","nextPage").append(enda);
+        page.append(nextl);
+        page.append(endl);
+    }
+    function getcode(date){
+        if(date){
+            return date;
+        }else{
+            return ' ';
+        }
+    }
+    function hideDiv(divid){
+        $("#"+divid).hide();
+    }
+    function canclecomplain(id){
+    	if(confirm("确定取消投诉么？")){
+	        $.ajax({
+	            url:"$request.contextPath/complain/complaincancle",
+	            type:"post",
+	            data:{
+	                id:id
+	            },
+	            dataType:'json',
+	            success:function(data){
+	                if(data.success){
+	                    $("#lierror").html(data.msg);
+	                    showDiv('showErrorMsg');
+	                   // topage(pageNo);
+	                }else{
+	                    $("#lierror").html("取消失败");
+	                    showDiv('showErrorMsg');
+	                }
+	            },error:function(){
+	                alert("系统繁忙，请稍后再试");
+	            }
+	        });
+    	}
+    }
+    function gocomplaindetail(complainid){
+        var url="$request.contextPath/complain/gocomplainsellerdetail?complainid="+complainid
+        window.open(url);
+    }
+</script>
+<!--导航菜单end-->
+<input type="hidden" value='$!jsonRefundItem' id="jsonRefundItem"/>
+<div id="main">
+	<!--中间部分开始-->
+	<!--左边部分开始-->
+	<div id="leftSeller" class="border-4"></div>
+	<!--左边部分结束-->
+	<!--右边部分开始-->
+    <!--右边部分开始-->
+    <div id="right">
+        <!--搜索条件 开始-->
+        <h3>我的投诉订单</h3>
+        <form id="queryForm" action="$request.getContextPath()/complain/gocomplainsellerlist" method="post">
+       	<input type="hidden" id="page" name="page" value="$!pager.page"></input>
+        <div id="right_top" class="right_top  mar_b10">
+            <div class="right_top_l">
+                <ul class="list">
+                    <li class="wid_220">
+                        <span class="font_wid">订单号：</span><input id="orderId" name="orderId" value="$!complainDTO.orderId" class="input_Style2 wid_120 hei_30" type="text" />
+                    </li>
+                    <li class="wid_220">
+                        <span class="font_wid">投诉方：</span>
+                    #*<input  type="text" class="input_Style2 wid_120 hei_30"/>*#
+                        <select id="complaintype" name="complaintype" class="input_Style2 wid_120 mar_r10 hei_35">
+                            <option value="">请选择</option>
+                            <option value="2" #if($!complainDTO.complainType == 2) selected="selected" #end>我</option>
+                            <option value="1" #if($!complainDTO.complainType == 1) selected="selected" #end>买家</option>
+                        </select>
+                    </li>
+                    <li class="wid_400">
+                        <span class="font_wid">投诉时间：</span>
+                        <input id="createTimeStart" name="createTimeStart" value="$!complainDTO.createdBegin" class="input_Style2 wid_120 hei_30" type="text" readonly="readonly" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});" />
+                        <i class="demo-icons">-</i>
+                        <input id="createTimeEnd" name="createTimeEnd" value="$!complainDTO.createdEnd" class="input_Style2 wid_120 hei_30" type="text" readonly="readonly" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"  />
+                    </li>
+                </ul>
+            </div><!--right_top_l end -->
+
+            <div class="right_top_r">
+                <button type="button" class="button_4 but_cx3" onclick="topage(1)">
+                    <a class="font_1c hei_24">搜  索</a>
+                </button>
+            </div> <!--right_top_l end -->
+        </div> <!-- 搜索条件 -->
+	</form>
+        <div class="nTab">
+            <!-- 内容开始 -->
+            <div class="TabContent box-shadow1">
+                <!-- 全部订单 下的内容开始 -->
+                <div id="myTab0_Content0">
+                    <!--每一个下面的内容复制开始-------------------------------- -->
+                    <div id="right_bot" class="right_bot mar_t10">
+                        <!-- 商品列表开头 -->
+                        <ul class="list_top bg_08 font_14b wid_950 mar">
+                            <li class="wid_250 font_cen hei_35">商品信息</li>
+                            <li class="wid_120 font_cen hei_35">退款单价</li>
+                            <li class="wid_110 font_cen hei_35">退货数量</li>
+                            <li class="wid_130 font_cen hei_35">退款货品总金额</li>
+                            <li class="wid_110 font_cen hei_35">投诉方</li>
+                            <li class="wid_110 font_cen hei_35">投诉状态</li>
+                            <li class="wid_120 font_cen hei_35">交易操作</li>
+                        </ul>
+                        <div id="tabledetailid">
+                        #foreach($detail in ${pager.records})
+                        <!--每一笔订单可以循环一下内容 开始-->
+                        <div class="wid_950 mar_cen border-4" >
+                            <!-- 订单号 -->
+                            <p class="hei_40 bg_05 wid_950 border-6">
+                                <i class="fl mar_l10">
+                                    <span>订单号：</span>
+                                    <b class="font_fe mar_r20"> $!{detail.orderId}</b>
+                                    <span>$!{detail.shopName}</span>
+##                                    <button class="button_4 button_small font_82">
+##                                        <i class="fa-qq demo-icons font_7a"></i><!--前面是QQ图标  不在线用font_82样式 亮起来用font_7a-->
+##                                        <a class="font_12">联系卖家</a>
+##                                    </button>
+                                </i>
+                                <i class="fr mar_r10 font_c7">投诉时间：$!{detail.created}</i>
+                            </p>
+                            <!-- 每一个商品信息 -->
+                            #foreach($de in $detail.list)
+                            <ul class="list_top hei_90 font_14b">
+                                <li class="wid_100 font_cen">
+                                    <div>
+                                        <img src="$!imageServerAddr$!{de.skuUrl}" style="width: 65px;height: 40px;"/>
+                                    </div>
+                                </li>
+                                <li class="wid_150 font_cen">
+                                    <div class="hei_60" style="line-height:20px;position:relative;margin-top:20px;">
+                                        <a href="javascript:opengooddetail($!{de.itemid},$!{de.skuId})" title="$!{de.skuName}">
+                                            $!{de.skuName}&nbsp;
+                                        </a>
+                                    </div>
+                                </li>
+
+                                <li class="wid_120 font_cen">$!{de.payPrice}&nbsp;</li>
+                                <li class="wid_110 font_cen">$!{de.goodCount}&nbsp;</li>
+                                <li class="wid_130 font_cen font_fe font_16">$!{de.amount}&nbsp;</li>
+                                <li class="wid_110 font_cen">$!{detail.tousufang}&nbsp;</li>
+                                <li class="wid_110 font_cen">$!{detail.staceName}&nbsp;</li>
+                                <li class="wid_100 font_cen" style="line-height:30px;padding:10px;">
+                                    <p>
+                                        <a class="font_1c" href="$request.contextPath/order/refundInfoSeller?returnGoodId=$!{detail.thid}&passKey=$!{detail.passKey}" target="_blank">退款处理</a><br/>
+                                        #*<a href="$request.getContextPath()/order/refundSubmitSucc?returnId=$!{detail.thid}&passKey=$!{detail.passKey}" target="_blank" class="font_1c cursor">查看退款/退货进度</a><br/>*#
+                                        #*<a class="font_1c cursor" target="_blank" href="$request.contextPath/order/refundInfoSeller?returnGoodId=$!{detail.thid}&passKey=$!{detail.passKey}">查看售后详情</a><br />*#
+                                        <a target="_blank" href="$request.contextPath/complain/gocomplainsellerdetail?complainid=$!{detail.complainid}&passKey=$!{detail.passKey2}" class="font_1c cursor">查看投诉进度</a><br />
+                                        #if(${detail.stace}=='0'&&${detail.sellerOrBuyer}=='2')
+                                            <a href="javascript:canclecomplain($!{detail.refundId})" class="font_1c cursor">取消投诉</a><br />
+                                        #end
+                                    </p>
+                                </li>
+                            </ul>
+                            #end
+                        </div>
+                         #end
+                        </div>
+                        <!--每一笔订单可以循环一下内容 结束-->
+                    </div><!--right_bot end -->
+                </div><!--myTab0_Content0 end -->
+                 #pageVelocity($pager)
+            </div><!--TabContent end-->
+
+        </div><!--nTab end -->
+
+    </div><!--id="right" end-->
+</div>
+
+<div class="po_fai" id="showErrorMsg" style="display:none">
+<div class="po_fai_bg"></div>
+<div class="po_main1">
+    <div class="tit bg_05 hei_30 pad_l10">提示</div>
+    <ul>
+        <li id="lierror">查询失败！</li>
+        <li><a href="#"><button type="button" class="button_1 hei_35" onclick="javascript:topage($pageNo)" id="showMsgBtn">确定</button></a></li>
+    </ul>
+</div>
+</div>

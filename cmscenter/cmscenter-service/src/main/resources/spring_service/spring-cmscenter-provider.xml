@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+	<!-- 使用DUBBO协议暴露服务;图片管理 -->
+	<dubbo:service interface="com.camelot.cmscenter.service.CmsImageService"
+		owner="cmscenter" ref="cmsImageService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		<dubbo:service interface="com.camelot.cmscenter.service.CmsArticleService"
+	owner="cmscenter" ref="cmsArticleService" version="1.0" protocol="dubbo"
+	delay="-1" registry="qingdaoRegistry" />
+	<dubbo:service interface="com.camelot.cmscenter.service.CmsCategoryService"
+	owner="cmscenter" ref="cmsCategoryService" version="1.0" protocol="dubbo"
+	delay="-1" registry="qingdaoRegistry" />
+	<dubbo:service interface="com.camelot.cmscenter.service.CmsSpecialSubjectService"
+		owner="cmscenter" ref="cmsSpecialSubjectService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		
+	<dubbo:service interface="com.camelot.cmscenter.service.CmsSpecialSubjectModelService"
+	owner="cmscenter" ref="cmsSpecialSubjectModelService" version="1.0" protocol="dubbo"
+	delay="-1" registry="qingdaoRegistry" />
+	<!-- 使用DUBBO协议暴露服务;标签 -->
+	<dubbo:service interface="com.camelot.cmscenter.service.CmsArtTagsService"
+		owner="cmscenter" ref="cmsArtTagsService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+	<!-- 使用DUBBO协议暴露服务;标签关联 -->
+	<dubbo:service interface="com.camelot.cmscenter.service.CmsArtTagsListService"
+		owner="cmscenter" ref="cmsArtTagsListService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		<!-- 使用DUBBO协议暴露服务;站点服务 -->
+	<dubbo:service interface="com.camelot.cmscenter.service.CmsSiteService"
+		owner="cmscenter" ref="cmsSiteService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		
+	<dubbo:service interface="com.camelot.cmscenter.service.CmsExperStoreService"
+	owner="cmscenter" ref="cmsExperStoreService" version="1.0" protocol="dubbo"
+	delay="-1" registry="qingdaoRegistry" />
+</beans>

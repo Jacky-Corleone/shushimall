@@ -1,0 +1,42 @@
+#set($ctxPath="$request.contextPath")
+#set($layout = "common/blanklayout.vm")
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>个人中心 - 个人信息</title>
+<link href="$ctxPath/assets/css/detail.css" rel="stylesheet" type="text/css"/>
+<style >
+.content{
+	position : static;
+}
+</style>
+<script type="text/javascript" src="$ctxPath/assets/js/style.js"></script>
+<script type="text/javascript" src="$ctxPath/assets/js/iscroll.js"></script>
+<script type="text/javascript" src="$ctxPath/assets/js/zepto.js"></script>
+<script type="text/javascript" src="$ctxPath/assets/js/jquery-1.11.2.min.js"></script>
+</head>
+<body class="bg_02">
+<div id="main" class="po_re">
+
+    <!-- 中间内容 -->
+    <div class="content" id="wrapper">
+        <h3 class="hei_50 font_cen bg_01 font_1_2">我的信息</h3>
+        <div class="news bg_01">
+            <ul class="news_ul pad_l5">
+                <li><span>微信号：</span><span>${uu.uname}</span></li>
+                <li><span>绑定账户：</span><span>$!uu.uname</span></li>
+                <li><span>账户类型：</span><span>123</span></li>
+                <li><span>绑定厂商：</span><span>123</span></li>
+            </ul>
+           <!-- <div class="font_cen pad_tb50">
+                <button class="button_1 hei_34 pad_lr5" type="button" onclick="test1()">修改账户信息</button>
+                <button class="button_1 hei_34 pad_lr5">重新绑定</button>
+            </div>-->
+        </div>
+    </div><!-- 中间内容 end-->
+</div>
+</body>
+</html>

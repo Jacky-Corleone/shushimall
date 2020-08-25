@@ -1,0 +1,8 @@
+#set($staticPath="$request.contextPath/assets")
+<link href="$staticPath/css/manage_style.css" rel="stylesheet" type="text/css" />
+#parse("/common/header_top.vm")
+
+
+#parse("/common/search.vm")
+#parse("/common/center_head.vm")
+

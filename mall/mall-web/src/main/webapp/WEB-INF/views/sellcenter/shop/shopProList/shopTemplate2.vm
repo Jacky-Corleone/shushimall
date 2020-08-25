@@ -1,0 +1,118 @@
+#set($staticPath="$request.contextPath/assets")
+#set($controllerPath="$request.contextPath/shopItemListIndexController")
+#set($ctx="$request.contextPath")
+#set($layout = "/shop_layout.vm")
+<script type="text/javascript" src="$staticPath/js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="$staticPath/js/shopdr/shopDR.js"></script>
+<script type="text/javascript" src="$staticPath/js/shopdr/shopLeft.js"></script>
+<script type="text/javascript" src="$staticPath/js/shopdr/template/template2.js"></script>
+<script type="text/javascript" src="$staticPath/js/shopdr/shopItemList.js"></script>
+<script type="text/javascript">
+	var ctx = "$ctx";
+	var imageServerAddr = "$!imageServerAddr";
+	var tmpColor = "$!shopTemplates.color";
+	
+	//变换颜色
+	$(function(){
+		/**初始化模版信息*/
+		$("#allproduct").addClass("focus_li");
+		template2.init();
+		initShopLeft();
+	});
+	
+	//到指定的分页页面
+	function topage(page){
+		var form = $("#contentForm").get(0);
+		form.page.value = page;
+		form.submit();
+	}
+</script>
+<form id="contentForm" action="$ctx/shopItemListIndexController/toListIndex" method="get">
+	<input type="hidden" name="shopCid" id="shopCid" value="$!itemInDTO.shopCid" />
+	<input type="hidden" name="page" value="$!pager.page" />
+	<input type="hidden" name="shopId" id="shopId" value="$!shopId" />
+	<input type="hidden" name="orderSort" id="orderSort" value="$!orderSort" />
+	<input type="hidden" name="keyword" value="$!keyword" />
+</form>
+
+	<input type="hidden" id="templatesId" value="$!shopTemplates.id" />
+	
+	<!-- 小广告条、导航、轮播start -->
+	#parse("/sellcenter/shop/common/shopTop.vm")
+    <!-- 小广告条、导航、轮播end -->
+   
+	<!-- 中间内容开始 -->
+	<!-- 店铺广告位 开始 -->
+  	#parse("/sellcenter/shop/common/template2/ad.vm")
+	<!-- 店铺广告位 end -->
+		<!--shop_content start -->
+		<div id="shop_content">
+			<!-- 店铺优惠券 -->
+				#parse("/sellcenter/shop/common/coupons.vm")
+			<!--  优惠券结束 -->
+		
+			<!-- 商品列表-左start -->
+			#parse("/sellcenter/shop/common/shopLeft.vm")
+			<!-- 商品列表-左end -->
+			
+			<!-- 商品列表-右start -->
+			<div class="fl" id="shop_right">
+				
+				<!-- 排序start -->
+                <div class="shop_search bg_05 mar_t10 border-1">
+	                <ul class="paixu">
+	                	<li class="wid_90 font_cen" onclick="SHOPITEMLIST.loadItemList(2)">默认排序</li>
+	                	<li class="wid_90 font_cen" onclick="SHOPITEMLIST.loadItemList(#if($!orderSort==5)6#else 5#end)">销量</li>
+	                	<li class="wid_90 font_cen" onclick="SHOPITEMLIST.loadItemList(#if($!orderSort==1)2#else 1#end)">上架时间</li>
+	                	<li class="wid_90 font_cen" onclick="SHOPITEMLIST.loadItemList(#if($!orderSort==7)8#else 7#end)">价格</li>
+	                </ul>
+	            </div>
+                <!-- 排序end -->
+
+                <!-- 产品图片start -->
+                <div class="shopping_leixin">
+                    <!--每个产品的div开始-->
+					#foreach($entity in $pager.records)
+                   		<div class="shopping_box po_re">
+	                        <div class="shopping_box_1">
+		                        <div class="big_img">
+		                        	<a href="$ctx/productController/details?id=$entity.itemId&skuId=$entity.skuId" target="_blank"><img src="$!imageServerAddr$!entity.picUrl" width="238" height="250" /></a>
+		                        </div>
+		                        <div class="n_font">
+		                        	#set($fullAttVal="")
+									#foreach($atts in $!entity.attributes)
+										#foreach($attvalue in $!atts.values)
+											#set($fullAttVal = $fullAttVal + $!attvalue.name)
+										#end
+									#end
+									<a href="$request.getContextPath()/productController/details?id=$entity.itemId&skuId=$entity.skuId" title="$entity.itemName &nbsp; $fullAttVal" alt="$entity.itemName &nbsp; $fullAttVal">
+									$entity.itemName&nbsp; 
+									$fullAttVal
+									</a>
+		                        </div>
+		                        <div class="jq font_14b shop_font0">
+		                        	#if($!entity.skuInquiryPirce)
+										$!entity.skuInquiryPirce
+									#else
+										#if($!entity.hasPrice == 1)
+											￥$!entity.skuPrice
+										#else
+											暂无报价
+										#end
+									#end
+		                        </div>
+		                    </div>
+	                    </div>
+                   	#end
+	                <!--每个产品的div结束-->
+                </div>
+                <!-- 产品图片end -->
+                
+                <!-- 分页start -->
+				#pageVelocity($pager)
+				<!-- 分页 end -->
+		   </div>
+		   <!-- 商品列表-右end -->
+  	</div>
+  	<!-- shop_content end -->
+<!-- 商品编辑 end -->

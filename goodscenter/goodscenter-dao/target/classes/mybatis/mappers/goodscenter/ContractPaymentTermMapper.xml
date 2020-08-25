@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.goodscenter.dao.ContractPaymentTermDAO">
+    <resultMap id="contractPaymentTermMapper" type="com.camelot.goodscenter.dto.ContractPaymentTermDTO">
+        <result property="id" column="id"/>
+        <result property="contractNo" column="contract_no"/>
+        <result property="paymentDays" column="payment_days"/>
+        <result property="paymentType" column="payment_type"/>
+        <result property="paymentProportion" column="payment_proportion"/>
+        <result property="activeFlag" column="active_flag"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+    </resultMap>
+
+    <sql id="where">
+        <where>
+            <if test="contractPaymentTerm.id != null and contractPaymentTerm.id != '' ">
+                and contractPaymentTerm.id = #{contractPaymentTerm.id}
+            </if>
+            <if test="contractPaymentTerm.contractNo != null and contractPaymentTerm.contractNo != '' ">
+                and contractPaymentTerm.contract_no = #{contractPaymentTerm.contractNo}
+            </if>
+            <if test="contractPaymentTerm.paymentDays != null and contractPaymentTerm.paymentDays != '' ">
+                and contractPaymentTerm.payment_days = #{contractPaymentTerm.paymentDays}
+            </if>
+            <if test="contractPaymentTerm.paymentType != null and contractPaymentTerm.paymentType != '' ">
+                and contractPaymentTerm.payment_type = #{contractPaymentTerm.paymentType}
+            </if>
+            <if test="contractPaymentTerm.paymentProportion != null and contractPaymentTerm.paymentProportion != '' ">
+                and contractPaymentTerm.payment_proportion = #{contractPaymentTerm.paymentProportion}
+            </if>
+            <if test="contractPaymentTerm.activeFlag != null and contractPaymentTerm.activeFlag != '' ">
+                and contractPaymentTerm.active_flag = #{contractPaymentTerm.activeFlag}
+            </if>
+            <if test="contractPaymentTerm.createBy != null and contractPaymentTerm.createBy != '' ">
+                and contractPaymentTerm.create_by = #{contractPaymentTerm.createBy}
+            </if>
+            <if test="contractPaymentTerm.createDate != null and contractPaymentTerm.createDate != '' ">
+                and contractPaymentTerm.create_date = #{contractPaymentTerm.createDate}
+            </if>
+        </where>
+    </sql>
+
+    <select id="queryPage" resultMap="contractPaymentTermMapper">
+        select * from contract_payment_term contractPaymentTerm
+        <include refid="where"/>
+        limit #{pager.pageOffset},#{pager.rows}
+    </select>
+
+    <select id="queryPageCount" resultType="long">
+        select count(0) from contract_payment_term contractPaymentTerm
+        <include refid="where"/>
+    </select>
+
+    <select id="findByContractNo" resultMap="contractPaymentTermMapper">
+		select * from contract_payment_term contractPaymentTerm
+		where contract_no = #{contractNo}
+	</select>
+   <select id="findById" resultMap="contractPaymentTermMapper">
+		select * from contract_payment_term contractPaymentTerm
+		where id = #{id}
+	</select>
+    <select id="findByContractPaymentTermDTO" resultMap="contractPaymentTermMapper">
+        select * from contract_payment_term contractPaymentTerm
+        <include refid="where"/>
+    </select>
+
+    <insert id="insert" parameterType="com.camelot.goodscenter.dto.ContractPaymentTermDTO" useGeneratedKeys="true"
+            keyProperty="id">
+		insert into contract_payment_term(
+				contract_no,
+				payment_days,
+				payment_type,
+				payment_proportion,
+				active_flag,
+				create_by,
+				create_date
+		)values(
+				#{contractNo},
+				#{paymentDays},
+				#{paymentType},
+				#{paymentProportion},
+				#{activeFlag},
+				#{createBy},
+				SYSDATE()
+		)
+
+	</insert>
+
+    <update id="update">
+		update contract_payment_term set
+				contract_no = #{contractNo},
+				payment_days = #{paymentDays},
+				payment_type = #{paymentType},
+				payment_proportion = #{paymentProportion},
+				active_flag = #{activeFlag},
+				create_by = #{createBy},
+				create_date = #{createDate}
+		where id = #{id}
+	</update>
+
+    <delete id="delete">
+        delete from contract_payment_term
+        <if test=" codes != null and codes.size() > 0 ">
+            where id in
+            <foreach collection="codes" open="(" separator="," close=")" item="code">
+                #{code}
+            </foreach>
+        </if>
+        <if test=" codes == null or codes.size() == 0 ">
+            where 1 = 3
+        </if>
+    </delete>
+
+    <select id="findAll" resultType="map">
+        select * from contract_payment_term contractPaymentTerm
+        <include refid="where"/>
+    </select>
+</mapper>

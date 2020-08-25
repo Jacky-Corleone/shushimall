@@ -1,0 +1,292 @@
+<style type="text/css">
+	.po_fai .coupon_ul li{ text-align:left;}
+	.coupon_ul li span,#list_name span{ display:inline-block; min-width:150px; max-width:180px; line-height:20px; text-align:left; padding-left:20px; }
+</style>
+<script type="text/javascript">
+$(document).ready(function() {
+	$(".show_list").click(function(event){
+		event.stopPropagation();
+		$("#couponDetails").html("<img style='margin: 5% 42%;width:10%' src='$staticPath/images/loading-4.gif'>");
+		$("#list_name").html("");
+		$("#couponList").show();
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "$request.contextPath/coupons/couponShowList",
+			data: {
+				couponsId: $(this).prop("id")
+			},
+			success: function(data){
+    			var $html_title = "";
+    			var $html = "";
+    			if(data[0].couponUsingRange==2){
+    				$html_title = "<span>店铺编号</span><span>店铺名称</span><span>商家编号</span>";
+    				$("#list_name").html($html_title);
+    				$html = "<ul class='coupon_ul coupon_ul01'>";
+    				for(var i = 1 ; i < data.length ; i++ ){
+    					$html += "<li><span>"+data[i].itemId+"</span><span>"+data[i].itemName+"</span><span>"+data[i].skuAttr+"</span></li>";
+    				}
+    			}
+				if(data[0].couponUsingRange==3){
+					$html_title = "<span>一级类目</span><span>二级类目</span><span>三级类目</span>";
+					$("#list_name").html($html_title);
+					$html = "<ul class='coupon_ul coupon_ul01'>";
+					for(var i = 1 ; i < data.length ; i++ ){
+    					$html += "<li><span>"+data[i].itemName+"</span><span>"+data[i].itemId+"</span><span>"+data[i].skuAttr+"</span></li>";
+					}
+				}
+				if(data[0].couponUsingRange==4){
+					$html_title = "<span>商品名称</span><span>sku编码</span><span>销售属性</span><span>所属类目</span>";
+					$("#list_name").html($html_title);
+					$html = "<ul class='coupon_ul coupon_ul02'>";
+					for(var i = 1 ; i < data.length ; i++ ){
+    					$html += "<li><span>"+data[i].itemName+"</span><span>"+data[i].itemId+"</span><span>";
+    					for(var j = 0 ; j < data[i].skuAttr.length ; j++ ){
+    						$html += data[i].skuAttr[j].name + "/";
+    						for(var k = 0 ; k < data[i].skuAttr[j].values.length ; k++ ){
+    							$html += data[i].skuAttr[j].values[k].name;
+    						}
+    					}
+    					$html += "</span><span>";
+						for(j = 0 ; j < data[i].categoryNme.length ; j++ ){
+    						$html += data[i].categoryNme[j].cname + "/";
+    						for(var u = 0 ; u < data[i].categoryNme[j].childCats.length ; u++ ){
+    							$html += data[i].categoryNme[j].childCats[u].cname + "/";
+    							for(var v = 0 ; v < data[i].categoryNme[j].childCats[u].childCats.length ; v++ ){
+    								$html += data[i].categoryNme[j].childCats[u].childCats[v].cname;
+    							}
+    						}
+    					}
+    					$html += "</span></li>";
+					}
+				}
+				$html += "</ul>";
+				$("#couponDetails").html($html);
+			}
+		});
+	});
+	$(".no").click(function(){
+		$("#couponList").hide();
+	});
+})
+</script>
+#if($!couponsDTOsIsNotNull)
+	<div class="shop_Coupons">
+		<div>
+			<h3 class="pad_l10 bg_05 hei_35 border-6" id="changColor">优惠券列表
+				<span style="float:right;cursor: pointer;" onclick = "showCoupons()" id="show_hide">
+		        	更多&gt;&gt;
+		    	</span>
+		    </h3>
+		</div>
+	#foreach($entity in $!couponsDTOs)
+	#set($showflag = false)
+	<!-- false-未领取，true-已领取-->
+	#if($!entity.state == '0')
+		#set($showflag = true)
+	    #if($!entity.isGet== false)
+			#if($!entity.couponType == '1')
+	    		<dl class="shop_Coupons_box Coupons_bg_01" onclick="getCoupons('$!entity.couponId',this)">
+        	#end
+        	#if($!entity.couponType == '2')
+        		<dl class="shop_Coupons_box Coupons_bg_07" onclick="getCoupons('$!entity.couponId',this)">
+        	#end
+           	#if($!entity.couponType == '3')
+           		<dl class="shop_Coupons_box Coupons_bg_06" onclick="getCoupons('$!entity.couponId',this)">
+           	#end
+		#elseif($!entity.isGet== true)
+			#if($!entity.couponType == '1')
+	    		<dl class="shop_Coupons_box Coupons_bg_04" >
+        	#end
+        	#if($!entity.couponType == '2')
+        		<dl class="shop_Coupons_box Coupons_bg_10" >
+        	#end
+           	#if($!entity.couponType == '3')
+           		<dl class="shop_Coupons_box Coupons_bg_08" >
+           	#end
+		#end
+	#elseif($!entity.state == '1')
+		#set($showflag = true)
+	 	#if($!entity.isGet== false)
+			#if($!entity.couponType == '1')
+	    		<dl class="shop_Coupons_box Coupons_bg_01" onclick="getCoupons('$!entity.couponId',this)">
+        	#end
+        	#if($!entity.couponType == '2')
+        		<dl class="shop_Coupons_box Coupons_bg_07" onclick="getCoupons('$!entity.couponId',this)">
+        	#end
+           	#if($!entity.couponType == '3')
+           		<dl class="shop_Coupons_box Coupons_bg_06" onclick="getCoupons('$!entity.couponId',this)">
+           	#end
+		#elseif($!entity.isGet== true)
+			#if($!entity.couponType == '1')
+	    		<dl class="shop_Coupons_box Coupons_bg_04" >
+        	#end
+        	#if($!entity.couponType == '2')
+        		<dl class="shop_Coupons_box Coupons_bg_10" >
+        	#end
+           	#if($!entity.couponType == '3')
+           		<dl class="shop_Coupons_box Coupons_bg_08" >
+           	#end
+		#end
+	#elseif($!entity.state == '2')
+		<dl class="shop_Coupons_box Coupons_bg_02">
+	#elseif($!entity.state == '3')
+	    <dl class="shop_Coupons_box Coupons_bg_02">
+	#elseif($!entity.state == '7')
+		#set($showflag = true)
+		#if($!entity.couponType == '1')
+    		<dl class="shop_Coupons_box Coupons_bg_05" >
+       	#end
+       	#if($!entity.couponType == '2')
+       		<dl class="shop_Coupons_box Coupons_bg_11" >
+       	#end
+        #if($!entity.couponType == '3')
+          	<dl class="shop_Coupons_box Coupons_bg_09" >
+        #end
+	#end
+		<dt>
+			<span class="font_24">$!entity.couponsMoney</span>
+			<span class="fr">
+				#if($!entity.couponUsingRange==1)
+					平台通用类
+				#elseif($!entity.couponUsingRange==2)
+					店铺通用类
+				#elseif($!entity.couponUsingRange==3)
+					品类通用类
+				#elseif($!entity.couponUsingRange==4)
+					SKU使用类
+				#end
+			</span>
+		</dt>
+	    <dd>
+	    	#if($!entity.costAllocation==1)
+	                         平台发布
+	            #if($!entity.couponUsingRange==2)
+					（部分店铺）#if($showflag)<span id="$!entity.couponId" class="show_list font_fe fr cursor">详情>></span>#end
+				#elseif($!entity.couponUsingRange==3)
+					（部分品类）#if($showflag)<span id="$!entity.couponId" class="show_list font_fe fr cursor">详情>></span>#end
+				#elseif($!entity.couponUsingRange==4)
+					（部分商品）#if($showflag)<span id="$!entity.couponId" class="show_list font_fe fr cursor">详情>></span>#end
+				#end       
+	        #elseif($!entity.costAllocation==2)
+				#if($!entity.shopName)
+					<span title="$!entity.shopName">
+						#set($shopName=$!entity.shopName)
+						#if($shopName.length() > 6)
+							#set($shopName=$shopName.substring(0,6)+"...")
+						#end
+						发行店铺：$shopName
+					</span>
+					#if($!entity.couponUsingRange==4)
+						#if($showflag)<span id="$!entity.couponId" class="show_list font_fe fr cursor">详情>></span>#end
+					#end
+				#end
+			#end
+		</dd>
+	    <dd>
+    		#if($!entity.couponType == '1')满￥$!entity.meetPrice
+        	#end
+        	#if($!entity.couponType == '2')限额￥$!entity.couponMax
+        	#end
+           	#if($!entity.couponType == '3')&nbsp;
+           	#end
+		</dd>
+	    <dd>有效期：<span class="font_12">$!date.format('yyyy-MM-dd',$!entity.couponStartTime)至$!date.format('yyyy-MM-dd',$!entity.couponEndTime)</span></dd>
+	</dl>
+	#end
+	</div>
+#end
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		//加载左侧菜单
+		$("#leftBuyer").load("$request.contextPath/leftBuyer");
+		var i = 0;
+		$(".shop_Coupons_box").each(function(){
+			if(i>3){
+				$(this).hide();
+			}
+			i++;
+		});
+		
+		var tmpColor = "$!shopTemplates.color";
+		/**初始化模版信息*/
+		if(!tmpColor){
+			tmpColor ="E50011";
+			$("#changColor").css({"height":"35px","line-height":"35px","border-bottom":"1px solid #e8e8e8","text-align":"left","font-weight":"bold","font-size":"14px","background":tmpColor,"color":"#fff"});
+		}
+	})
+	
+	//显示更多优惠券
+	function showCoupons(){
+		var i =0;
+		$(".shop_Coupons_box").each(function(){
+			$(this).show();
+			i++;
+		});
+		if(i < 4){
+			alert("没有更多的优惠券了");
+		}else{
+			$("#show_hide").html("收起&gt;&gt;");
+			$("#show_hide").removeAttr("onclick");
+    		$("#show_hide").attr("onclick","hideCoupons()");
+		}
+	}
+	
+	function hideCoupons(){
+		var i = 0;
+		$(".shop_Coupons_box").each(function(){
+			if(i>3){
+				$(this).hide();
+			}
+			i++;
+		});
+		$("#show_hide").html("更多&gt;&gt;");
+		$("#show_hide").removeAttr("onclick");
+		$("#show_hide").attr("onclick","showCoupons()");
+	}
+	
+	// 领取优惠券
+	function getCoupons(couponId,obj){
+		if(confirm("确认领取优惠券？")){
+			var newClass = ""; 
+			if(obj.className.endsWith('01')){
+				newClass = "shop_Coupons_box Coupons_bg_04";
+			}else if(obj.className.endsWith('07')){
+				newClass = "shop_Coupons_box Coupons_bg_10";
+			}else{
+				newClass = "shop_Coupons_box Coupons_bg_08";
+			}
+			$.ajax({
+				type: "POST",
+				dataType: "json",
+				url: "$request.contextPath/coupons/getCoupons",
+				data: {
+					couponId: couponId
+				},
+				success: function(data){
+					if(data.resultMessage == "领取成功"){
+	    				$(obj).removeAttr("onclick");
+	    	    		$(obj).removeAttr("class");
+	    	    		$(obj).addClass(newClass);
+	    			} 
+	    			alert(data.resultMessage);
+				}
+			});
+		}
+	}
+	
+</script>
+
+
+<div id="couponList" class="po_fai none" style="width:50%;display:none">
+	<div class="po_fai_bg"></div>
+	<div class="clear"></div>
+	<div class="po_main pad_t10" style="z-index:1000;min-width:550px; width:auto;">
+	 	<div id="list_name" class=" hei_32 bg_05 font_14b">
+	 	</div>
+		<div id = "couponDetails" style="min-height:100px;max-height:300px; overflow-y:auto;"></div>
+		<div class="clear"></div>
+		<button type="button" class="button_2 no mar_tb10" id="confirm" style="margin-left: 42%;  height:30px;">关 闭</button>
+	</div>
+</div>

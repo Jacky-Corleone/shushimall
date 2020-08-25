@@ -1,0 +1,51 @@
+@charset "utf-8";
+/* CSS Document */
+body{ background:#fafafa;}
+/* 注册一开始--------------------------------- */
+.register_font{float:left; font-size:22px;line-height:60px; font-weight:bold; color:#999; margin:0px 15px;}
+.register_content{ width:980px; margin:10px auto; height:auto; overflow:hidden;}
+.register_content .register_nav{ width:980px; margin:20px auto; height:35px; line-height:35px;background:url(../images/register_nav_bg.jpg) no-repeat; font-family:"微软雅黑";}
+.register_content .register_nav .span_font{display:block; width:310px; float:left; padding-left:10px; font-size:14px;}
+.register_content .register{ width:100%;height:auto; margin:auto; overflow:hidden;}
+.register_content .register_box{ width:380px; height:380px; float:right; margin:10px 0px 0px 10px; padding-top:20px;}
+.register_content .register_box ul{width:280px; height:auto; overflow:hidden;margin-top:10px;float:left;font-size:14px;}
+.register_content .register_box li{ position:relative;}
+.register_content .register_box span{display:inline-block;}
+.register_content .register_box .register-icon{
+	display:inline-block;
+	font-size:18px;
+	text-align:center;
+	position:absolute;
+	right:0px;
+	top:0px;
+	width:35px;
+	height:35px;
+	line-height:40px;
+}
+.register_content .register_pic{ width:500px; height:380px; float:left; margin:10px 30px;}
+/* 注册一结束---------------------------------end */
+
+/* 注册二开始--------------------------------- */
+.register_content .register_state{width:520px; height:40px;line-height:40px; margin:auto; background:#fffdf3; padding-left:20px; border:2px solid #f1ddb5;}
+.register_content .register_box_mid{width:520px; min-height:500px; margin:10px auto;}
+.register_content .register_box_mid p{width:300px; margin:20px auto 0 auto;line-height:40px;}
+.register_content .register_box_mid span{display:inline-table;line-height:38px; text-align:center; padding-left:5px; padding-right:5px;}
+.register_content .register_box_mid dl{width:520px; margin:20px auto; overflow:hidden;}
+.register_content .register_box_mid dt,.register_content .register_box_mid dd{ height:40px; line-height:40px; float:left;}
+.register_content .register_box_mid dt{ width:120px;text-align:right;}
+.register_content .register_box_mid dd{width:400px; text-align:left;}
+
+.Form_input{width:400px; height:auto; line-height:30px;text-align:left;float:right; }
+.Form_input .picture,.Form_input .describe{width:120px; height:120px;text-align:center;float:left;margin-top:20px; overflow:hidden;}
+.Form_input .picture{line-height:120px; }
+.Form_input .describe{line-height:20px; text-align:left;float:left; margin-left:10px;}
+.Form_input .describe .del_button a{line-height:20px; text-align:left;position:absolute; bottom:0px; left:0px; color:#0483c7;}
+.button_1{
+	margin:30px auto 0px;
+	width:250px;
+}
+.button_2,.button_3{
+	margin:30px 15px 0px 15px;
+	width:140px;
+}
+/* 注册二 结束--------------------------------- */

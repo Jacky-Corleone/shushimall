@@ -1,0 +1,94 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/configuration_layout.vm")
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<div>
+<!--内容流程start-->
+    <div class="stepflex">
+        <dl class="first doing"><!--正在哪个流程就加入 doing 这个样式 -->
+            <dt class="s-num">1</dt>
+            <dd class="s-text">填写账户名<s></s><b></b></dd>
+        </dl>
+        <dl class="normal">
+            <dt class="s-num">2</dt>
+            <dd class="s-text">验证身份<s></s><b></b></dd>
+        </dl>
+        <dl class="normal">
+            <dt class="s-num">3</dt>
+            <dd class="s-text">设置新密码<s></s><b></b></dd>
+        </dl>
+        <dl class="last">
+            <dt class="s-num"><i class="fa-check"></i></dt>
+            <dd class="s-text">完成<s></s><b></b></dd>
+        </dl>
+    </div><!--stepflex end -->
+    <div class="clear"></div>
+    <div class="register_content">
+    	<form action="$request.contextPath/findpwd/verifyuser" method="post" id="loginfo_form">
+        	<div class="register_box_mid"  style="margin-top:40px">
+                <dl>
+                    <dt>用户名/邮箱/手机：</dt>
+                    <dd style="border:none"><input name="loginInfo" id="loginInfo_id" type="text"  class="input_Style1 wid_180" maxlength="20" placeholder="用户名/邮箱/手机"/>
+                    <i id="status_icon" class="fa-exclamation-circle font_16 font_fe"></i><!--前面图标若信息正确就用此图标--> <i id="loginfo_i"></i>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>验证码：</dt>
+                    <dd style="border:none"><input name="captcha" id="captcha_id" type="text"  class="input_Style1" style="width: 77px" maxlength="10" placeholder="验证码"/>
+                    <span style="width: 220px;">
+                    	<img id="vc" style="" src="$request.contextPath/findpwd/acquire" />
+                    	  看不清？<a href="javascript:_chage();">换一张</a>
+                    </span><!--前面图标若信息正确就用此图标-->
+                    <span id="captcha_span" class="msg_span"></span>
+                    </dd>
+                </dl>
+                <div id="btn_submit" style="width: 280px;" class="button_1 hei_40 font_16">下一步</div>
+             </div><!--register_box-->
+    </div><!--register_content-->
+<!--内容end-->
+</div>
+<script type="text/javascript">
+
+	//验证用户名
+	$("#loginInfo_id").focusout(checkLoginfo);
+
+	function checkLoginfo(){
+		var loginInfo = $("#loginInfo_id").val();
+		if(loginInfo.length < 1){
+			$("#loginfo_i").html("不能为空");
+			$("#loginfo_i").css("color", "red");
+			return false;
+		}
+		var data = {loginInfo:loginInfo};
+		$.ajax({
+			url:"$request.contextPath/findpwd/verifyloginfo",
+			type:"post",
+			data:data,
+			success:function(data){
+				if(data.message){
+					$("#status_icon").removeClass("fa-exclamation-circle font_fe").addClass("fa-check-circle font_7a");
+					$("#loginfo_i").html("");
+				}else {
+					$("#status_icon").removeClass("fa-check-circle font_7a").addClass("fa-exclamation-circle font_fe");
+					$("#loginfo_i").html("用户名/邮箱/手机不存在");
+				}
+			}
+		});
+		if($("#loginfo_i").html() == ""){
+			return true;
+		}
+		return false;
+	}
+
+ 	function _chage(){
+		var img = document.getElementById("vc");
+		img.src="$request.contextPath/findpwd/acquire?a=" + new Date().getTime();
+	}
+
+ 	$("#btn_submit").click(function(){
+        $("#btn_submit").loadingMsg();
+		if(checkLoginfo()){
+			$("#loginfo_form").submit();
+		}
+	});
+
+ </script>

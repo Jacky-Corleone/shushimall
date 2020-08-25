@@ -1,0 +1,109 @@
+#set($layout = "/none_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<link href="$staticPath/css/product.css" rel="stylesheet" type="text/css" />
+<link href="$staticPath/css/basic.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$staticPath/js/tab.js"></script>
+<script type="text/javascript" src="$staticPath/js/all_classify.js"></script>
+<link type="text/css" href="$staticPath/css/basic.css" rel="stylesheet"/>
+<script type="text/javascript" src="$staticPath/js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="$staticPath/js/jquery.cookie.js"></script>
+<script type="text/javascript" src="$staticPath/js/xiaoguo.js"></script>
+<script type="text/javascript" src="$staticPath/js/js.js"></script>
+<style type="text/css">
+</style>
+<script type="text/javascript">
+
+	$(function(){
+		//添加物流信息
+		$(".js_logistics_submit").click(function(){
+			var orderId = $("#logistics_orderId").val();
+			var logisticsNo = $("#logisticsNo").val();
+			var logisticsCompany = $("#logisticsCompany").val();
+			var logisticsRemark = $("#logisticsRemark").val();
+			//是否将此模板应用到其他商品（默认否）
+			var logisticsIsUseToother = "no";
+			var chkObjs = document.getElementsByName("logisticsIsUseToother");
+            for(var i=0;i<chkObjs.length;i++){
+                if(chkObjs[i].checked){
+                    logisticsIsUseToother = "yes";
+                }
+            }
+			if($.trim(logisticsNo) == ""){alert("请填写物流编号"); return;}
+			if($.trim(logisticsCompany) == ""){alert("请选择物流公司"); return;}
+			if($.trim(logisticsRemark) == ""){alert("请填写备注"); return;}
+			$.ajax({
+				type: "POST",
+				dataType: "json",
+				url: "$request.getContextPath()/order/modifyLogistics",
+				data: {
+					orderId: orderId,
+					logisticsNo: logisticsNo,
+					logisticsCompany: logisticsCompany,
+					logisticsRemark: logisticsRemark,
+					logisticsIsUseToother: logisticsIsUseToother
+				},
+				success: function(data){
+					if(data.success){
+						$(".js_logistics").hide();
+						submitGoodsForm();
+					}else{
+						alert("物流信息添加失败："+data.errorMessages);
+					}
+					
+				}
+			});
+		});
+		//添加物流信息 弹框取消
+		$(".js_logistics_cancle").click(function(){
+			window.opener.close();
+		});
+	}
+	
+</script>
+     
+<div class="">
+    <div class="po_main">
+    	<div class="hei_32 bg_05 pad_l10 "><i class="demo-icons fa-times-circle font_16 fr mar_r10 cursor js_logistics_cancle"></i>物流信息</div>
+        <input type="hidden" id="logistics_orderId" value=""/>
+		<dl class="wid_500 hei_40 mar_t20 po_re" >
+			<dt style="height:30px;" class="fl wid_90 font_right">物流编号：</dt>
+			<dd class="fl ">
+				<input type="text" class="input_Style2 mar_r10 hei_30 " id="deliveryNumber" name="deliveryNumber" value="$!deliveryDTO.deliveryNumber" maxlength="30" onblur="checkOrderCode(this)" onkeyup="this.value=this.value.replace(/[^A-Za-z0-9]/g,'')"/>
+			</dd>
+            <dd  class="fl ">
+                <input type="text"  id="errorMeg" style="color:red;padding-top: 12px;display: none;" value="不允许输入字母、数字之外的字符！" size="30"/>
+            </dd>
+			<dt style="height:30px;" class="fl wid_90 font_right">物流公司：</dt>
+			<dd class="fl ">
+				<select class="input_Style2 wid_120 mar_r10 hei_30" id="deliveryCompanyCode" name="deliveryCompanyCode" >
+					<option value="">请选择</option>
+					#foreach( $companyDto in $deliveryCompanyList)
+                	 	<option #if($!deliveryDTO.deliveryCompanyCode == $!companyDto.code) selected="selected" #end value="$!companyDto.code"> $!companyDto.name </option>
+					#end
+				</select>
+			</dd>
+		</dl>
+		<dl class="wid_500 hei_80 mar_t20 po_re">
+			<dt style="height:30px;" class="fl wid_90 font_right">备注：</dt>
+			<dd class="fl">
+				<textarea class="input_Style2 wid_350 hei_60 mar_r10" id="deliveryRemark" name="deliveryRemark" maxlength="100" placeholder="不能超过100字" rows="4" />
+				$!deliveryDTO.deliveryRemark
+				</textarea>
+			</dd>				
+		</dl>
+		<dl class="wid_500 hei_40 mar_t20 po_re" >
+			<dt class="fl wid_250 font_right" style="height:30px;">是否将物流应用到相同运费模版的其他商品：</dt>
+			<dd class="fl">
+				<input type="radio" style="height:30px;" class="radio_Style2 wid_20 mar_r10 font_right" id="isSametemplate_yes" name="isSametemplate" value="yes" #if($!deliveryDTO.isSametemplate == 'yes') checked="true" #end/><span style="height:30px;">是</span>
+				<input type="radio" style="height:30px;" class="radio_Style2 wid_20 mar_r10 font_right" id="isSametemplate_no" name="isSametemplate" value="no" #if($!deliveryDTO.isSametemplate == 'no') checked="false" #end/><span style="height:30px;">否</span>
+			</dd>
+		</dl>
+		<br/>
+		<div class=" mar_tb10 mar_r20 font_cen">
+			<button class="button_1 hei_30 js_logistics_submit">确定</button>
+			<button class="button_5 hei_30 mar_l10 demo-icons js_logistics_cancle"><a href="#">取消</a></button>
+		</div>
+    </div>
+</div>
+<!-- 物流信息 end -->
+

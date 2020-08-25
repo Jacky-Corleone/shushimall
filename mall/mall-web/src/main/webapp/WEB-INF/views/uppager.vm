@@ -1,0 +1,16 @@
+<div class="Search_Sort border-4">
+        <ul class="fl"><!--向上span用<span class="arrow_up">,向下span用<span class="arrow_down">-->
+            <a href=""><li>上传时间<i class="arrow_down"></i></li></a>
+            <a href=""><li>相关度<i class="arrow_up"></i></li></a>
+            <a href=""><li>被推荐次数<i class="arrow_up"></i></li></a>
+            <a href=""><li>评价分数<i class="arrow_up"></i></li></a>
+        </ul>	
+         	<div class="fr">
+            	<ul>
+                	<li>共<strong>$!pager.totalCount</strong>个商品</li>
+                    <a href="#"><li ><b class="font_fe"><a href="#">$!pager.page</a></b>/$!pager.totalPage</li></a>
+                    <li class="bl" onclick="topage($!pager.previewPage)">上一页</li>
+                    <li class="bl" style="border-right:none;" onclick="topage($!pager.nextPage)">下一页</li>                      
+                </ul>
+            </div>             
+ </div>

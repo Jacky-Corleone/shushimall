@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        ">
+        <!-- 使用dubbo协议暴露支付接口 -->
+        <dubbo:service interface="com.camelot.payment.PaymentExportService"
+		owner="storecenter" ref="paymentExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+	<!-- 使用dubbo协议暴露支付接口 -->
+	<dubbo:service interface="com.camelot.payment.PaymentWxExportService"
+				   owner="storecenter" ref="paymentWxExportService" version="1.0" protocol="dubbo"
+				   delay="-1" registry="qingdaoRegistry" />
+		<!-- 使用dubbo协议暴露中信接口 -->
+        <dubbo:service interface="com.camelot.payment.CiticExportService"
+		owner="storecenter" ref="citicExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		<!-- 使用dubbo协议暴露提现审核接口 -->
+		<dubbo:service interface="com.camelot.payment.FinanceWithdrawApplyExportService"
+		owner="storecenter" ref="financeWithdrawApplyService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		<!-- 使用dubbo协议暴露提现记录接口 -->
+		<dubbo:service interface="com.camelot.payment.FinanceWithdrawRecordExportService"
+		owner="storecenter" ref="financeWithdrawRecordService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		<!-- 使用dubbo协议暴露金融账户接口 -->
+		<dubbo:service interface="com.camelot.payment.DualAccountInfoService"
+		owner="camelot" ref="dualAccountInfoService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+		
+		<!-- 使用dubbo协议暴露手续费查询接口 -->
+		<dubbo:service interface="com.camelot.payment.FactorageJournalExportService"
+		owner="camelot" ref="factorageJournalExportService" version="1.0" protocol="dubbo"
+		delay="-1" registry="qingdaoRegistry" />
+</beans>

@@ -1,0 +1,89 @@
+#set($layout = "/none_layout.vm")
+
+					#foreach($couponsInfo in $pager.records)
+                    <ul class="list_top hei_40">
+                        <li class="wid_30 over_ell font_cen">
+                        	<input type="checkbox" id="subCheck" onclick="setSelectAll()" name="contractId" class="$couponsInfo.state" value="$couponsInfo.couponId"/>
+                        </li>
+                        <li class="wid_120 over_ell font_cen" title="$!couponsInfo.couponId"><!-- 编码 -->
+                        	$!couponsInfo.couponId
+                        </li>
+                        <li class="wid_100 over_ell font_cen" title="$!couponsInfo.couponName"><!-- 名称 -->
+                        	$!couponsInfo.couponName
+                        </li>
+                        
+                        <!-- 平台 -->
+                        <li class="wid_80 over_ell font_cen" style= "display:none">
+                        	#if($!couponsInfo.platformId == '1')
+                              	  PC端
+                            #elseif($!couponsInfo.platformId == '2')
+                           		  绿印平台
+                            #elseif($!couponsInfo.platformId == '3')
+                                                                  移动端
+                            #elseif($!couponsInfo.platformId == '4')
+                                 PC端和移动端
+                            #end
+                        </li>
+                        <li class="wid_80 over_ell font_cen"><!-- 范围 -->
+                        	#if($!couponsInfo.couponUsingRange == '1')
+                              	  平台通用
+                            #elseif($!couponsInfo.couponUsingRange == '2')
+                           		 店铺通用
+                            #elseif($!couponsInfo.couponUsingRange == '3')
+                                                                  品类通用
+                            #elseif($!couponsInfo.couponUsingRange == '4')
+                                                                  限制SKU
+                            #end
+                        </li>
+                        <li class="wid_60 over_ell font_cen"><!-- 类型 -->
+                        	#if($!couponsInfo.couponType == '1')
+                              	  满减券
+                            #elseif($!couponsInfo.couponType == '2')
+                           		  折扣券	
+                            #elseif($!couponsInfo.couponType == '3')
+                                                                  现金券
+                            #end
+                        </li>
+                        <!-- 使用规则 -->
+                        <li class="wid_120 over_ell font_cen" title= "$!couponsInfo.descr">
+                              	  	$!couponsInfo.descr
+                        </li>
+                        <li class="wid_50 over_ell font_cen" title="$!couponsInfo.couponNum"><!--总数量  -->
+                        	$!couponsInfo.couponNum
+                        </li>
+                        <li class="wid_50 over_ell font_cen" title="$!couponsInfo.receivedNumber"><!-- 已领数量 -->
+                        	$!couponsInfo.receivedNumber
+                        </li>
+                        <li class="wid_250 over_ell font_cen" title="$!date.format('yyyy-MM-dd HH:mm:ss',$!couponsInfo.couponStartTime)至$!date.format('yyyy-MM-dd HH:mm:ss',$!couponsInfo.couponEndTime)"><!-- 有效时间 -->
+                        	$!date.format('yyyy-MM-dd HH:mm:ss',$!couponsInfo.couponStartTime)至$!date.format('yyyy-MM-dd HH:mm:ss',$!couponsInfo.couponEndTime)
+                        </li>
+                        <li class="wid_80 over_ell font_cen"><!-- 状态 -->
+                        	#if($!couponsInfo.state == '0')
+                              	  未开始
+                        	#elseif($!couponsInfo.state == '1')
+                              	  已开始
+                            #elseif($!couponsInfo.state == '2')
+                           		  已结束
+                            #elseif($!couponsInfo.state == '3')
+                                                                  已终止
+                            #elseif($!couponsInfo.state == '4')
+                                                                  待送审
+                            #elseif($!couponsInfo.state == '5')
+                                                                  待审核
+                            #elseif($!couponsInfo.state == '6')
+                                                                  审核驳回
+                            #end
+                        </li>
+                        <!-- 创建时间 <li class="wid_80 font_cen">
+                        	$!date.format('yyyy-MM-dd',$!couponsInfo.updateDate)
+                        </li> -->
+                        <!-- 创建人 -->
+                        <!--
+                        <li class="wid_80 font_cen">
+                        	$!couponsInfo.userName
+                        </li>  -->
+                        
+                    </ul>
+                       #end
+                        <!-- 分页 -->
+                    #pageVelocity($pager)

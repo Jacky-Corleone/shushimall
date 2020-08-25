@@ -1,0 +1,106 @@
+#set($layout = "/none_layout.vm")
+#set($staticPath="$request.contextPath/assets")
+<script type="text/javascript">
+	$(".floorBunner").each(function(i,obj){
+		var width = $(obj).width();
+		var height = $(obj).height();
+		var size = $(obj).find("img").size();
+		var avgWidth = width / size;
+		$(obj).find("img").each(function(i,img){
+			$(img).css("width",avgWidth).css("height",height);
+		});
+	});
+</script>
+
+<!--楼层顶部广告位-->
+#if( $floor.topBunner && $floor.topBunner.size() > 0 )
+	<div class="floorBunner">
+		#foreach( $bunner in $floor.topBunner )
+     		<a onclick="adVisit('$!bunner.id','$!bunner.url',3)" class="cursor fl"  target="_blank">
+     			<img src="$!imageServerAddr$bunner.picSrc" border="0" height="80">
+     		</a>
+		#end
+ 	</div>
+#end
+<!--楼层顶部广告位-->
+<div class="clear"></div>
+<div class="Floor_product">
+	<!--楼层图标 标题 -->
+	#if($type=="_1")
+		<div id="combo" class="Recommend">
+  			<a href='javascript:;'><img src="mall-web/assets/images/Hot_product.png" ></a>
+  			<span onclick="toUrl()" class="fr font_fe Recommend_more cursor">查看更多+</span>
+  		</div>
+	#end
+	#if($type!="_1")
+    <div class="floor floor_title">
+          <a name="f$!floorNum$!type" class="font_fe font_24">${floor.titleDTO}</a>
+          <span onclick="toUrl()" class="fr font_fe Recommend_more cursor">查看更多+</span>
+    </div>
+    #end
+    <div class="Floor_left">
+        
+        <!--楼层左侧活动产品 -->
+        <div class="catalogueList">
+           #foreach($sale in $floor.sales)
+                   <span class="cList_pic">
+                       <a  class="cursor" onclick="adVisit('$!bunner.id','$!sale.url',3)" target="_blank" title="$sale.title">
+                           <img  width="293" height="613" src="$!imageServerAddr$sale.picSrc"  border="0">
+                       </a>
+               </span>
+           #end
+        </div>
+    </div>
+	
+<!--楼层商品-->
+<div class="FloorList">
+		<ul class="Hot_product">
+			#foreach( $g in $floor.goods )
+				#if($velocityCount<7)
+				<li>
+					<a href="javascript:adVisit('$!g.id','$!g.url',3);">
+     					<div class="pl_img" >
+     						<b class="cursor" title="$g.title" target="_blank">
+     							<img width="290px" height="210px" src="$!imageServerAddr$g.picSrc" border="0" />
+     						</b>
+     					</div>
+     					<div class="pl_name cursor">
+     						<h3 class="adVisitCount">$g.title</h3>
+     						<p>$!g.name</p>
+	     					<div class="pl_price">
+	     							#if($!g.hasPrice == 1)
+	    								<div id="itemPrice_js" class="font_fe font_18">#if($!g.guidePrice > 0) ￥$!g.guidePrice #end</div>
+	    								#else
+	    							#if($!logging_status == "true")
+	    								<span id="doAskPrice" class="font_fe font_14b">欢迎询价</span>
+	    							#else
+	    								<div>暂无报价</div>
+	    									#end
+	    							#end
+	     					</div>
+     					</div>
+     				</a>		
+    			 </li>
+    			 #end
+			#end
+		</ul>
+</div>
+
+<!--楼层商品-->
+</div>
+<div class="clear"></div>
+	
+<!-- 楼层底部广告 -->
+#if( $floor.btmBunner && $floor.btmBunner.size() > 0 )
+	<div class="brand_img mar_t10">
+   		<ul>
+   			#foreach( $bunner in $floor.btmBunner )
+   				<li>
+     				<a class="cursor" onclick="adVisit('$!bunner.id','$!bunner.url',3)" target="_blank">
+   						<img src="$!imageServerAddr$bunner.picSrc" width="100" height="40">
+   					</a>
+   				</li>
+   			#end
+   		</ul>
+   	</div>
+#end

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.goodscenter.dao.ItemBrandDAO">
+	<resultMap id="itemBrandMapper" type="com.camelot.goodscenter.domain.ItemBrand">
+			<result property="brandId" column="brand_id" />
+			<result property="brandName" column="brand_name" />
+			<result property="brandLogoUrl" column="brand_logo_url" />
+			<result property="brandStatus" column="brand_status" />
+			<result property="created" column="created" />
+			<result property="modified" column="modified" />
+			<result property="brandKey" column="brand_key" />
+			
+	</resultMap>
+	
+	<resultMap id="itemBrandDTO" type="com.camelot.goodscenter.dto.ItemBrandDTO">
+			<result property="brandId" column="brand_id" />
+			<result property="brandName" column="brand_name" />
+			<result property="brandLogoUrl" column="brand_logo_url" />
+			<result property="brandStatus" column="brand_status" />
+			<result property="created" column="created" />
+			<result property="modified" column="modified" />
+			<result property="brandKey" column="brand_key" />
+	</resultMap>
+	
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+		  *
+		from 
+			item_brand
+		]]>
+	</sql>
+	
+	<!-- mysql 分页尾 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	
+	<!-- 根据id查询品牌数据 -->
+	<select id="queryBrandByIds" resultMap="itemBrandDTO">
+		select * from item_brand
+		<if test=" list != null and list.size() > 0 ">
+			where brand_id in 
+			<foreach item="brandId" index="index" collection="list" open="(" separator="," close=")">  
+			  #{brandId}  
+			</foreach>
+		</if>
+	</select>
+	
+	<!-- 查询品牌列表分页数据 -->
+	<select id="queryBrandByIdsWithPage" resultMap="itemBrandDTO">
+		select * from item_brand
+		<include refid="pagination_tail" />
+	</select>
+	
+	<select id="queryPage" resultType="map">
+		select * from item_brand
+	</select>
+	
+	<select id="findById" resultMap="itemBrandMapper" >
+		select * from item_brand
+		where id = #{id}
+	</select>
+	
+	<insert id="add" keyProperty="brandId" useGeneratedKeys="true">
+		insert into item_brand(
+				brand_name,
+				brand_logo_url,
+				brand_status,
+				brand_key,
+				created,
+				modified
+		)values(
+				#{brandName},
+				#{brandLogoUrl},
+				1,
+				#{brandKey},
+				now(),
+				now()
+		)
+		<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="brandId">
+			select @@IDENTITY
+		</selectKey>
+	</insert>
+	
+	<select id="queryCount" resultType="java.lang.Long">
+		select count(1) from item_brand  
+	</select>
+	
+	<update id="update">
+		update item_brand set
+				brand_name = #{brandName},
+				brand_logo_url = #{brandLogoUrl},
+				modified = now()
+		where brand_id = #{brandId}
+	</update>
+	<update id="updateStatus">
+		update item_brand set
+				brand_status =2,
+				modified = now()
+		where brand_id = #{brandId}
+	</update>
+	<delete id="delete">
+		delete from item_brand
+		<if test=" codes != null and codes.size() > 0 ">
+			where id in
+			<foreach collection="codes" open="(" separator="," close=")" item="code">
+				#{code}
+			</foreach>
+		</if>
+		<if test=" codes == null or codes.size() == 0 ">
+			where 1 = 3
+		</if>
+	</delete>
+	
+	<select id="findAll" resultType="map">
+		select * from item_brand
+	</select>
+	
+	
+	<!-- 分页查询 -->
+	<select id="queryItemBrandAllList" resultMap="itemBrandDTO">
+		<include refid="selectAllColumns"/>
+		<!-- order by 手工添加 -->
+		<include refid="pagination_tail" />
+	</select>
+	
+	<!-- 根据类目id查询品牌列表 -->
+	<select id="queryItemBrandList" resultMap="itemBrandDTO">
+		select a.brand_id,a.brand_name,a.brand_logo_url,a.brand_status,a.created,a.modified  
+		from item_brand a , item_category_brand b where a.brand_id=b.brand_id  and brand_status=1 and cbrand_status=1
+		<if test="entity != null">
+			<if test="entity.secondCid != null">	
+				AND second_lev_cid = #{entity.secondCid} 
+			</if>
+			<if test="entity.thirdCid != null">
+				and third_lev_cid = #{entity.thirdCid}
+			</if>
+		</if>
+	</select>
+	
+	<!-- 根据品牌id查询是否和类目关联 -->
+	<select id="queryBrandCategoryById" resultMap="itemBrandDTO">
+		select a.brand_id,a.brand_name,a.brand_logo_url,a.brand_status,a.created,a.modified  
+		from item_brand a , item_category_brand b where a.brand_id=b.brand_id and a.brand_id =#{brandId}  and brand_status=1 and cbrand_status=1
+	</select>
+	
+	<select id="queryBrandList" resultMap="itemBrandDTO">
+		select * From item_brand  where 1=1
+		<if test="entity!=null">
+			<if test="entity.brandKey!=null">
+				<if test="entity.brandKey!='其它'">
+					and brand_Key = #{entity.brandKey}
+				</if>
+				<if test="entity.brandKey=='其它'">
+					and brand_Key REGEXP '^[0-9]'
+				</if>
+			</if>
+			<if test="entity.brandName!=null">
+				and brand_name=#{entity.brandName}
+			</if>
+			<if test="entity.brandStatus!=null">
+				and brand_status=#{entity.brandStatus}
+			</if>
+			
+		</if>
+		<if test="page!=null">
+			 limit #{page.pageOffset} , #{page.rows}
+		</if>
+	</select>
+	<select id="queryCountBrandList" resultType="java.lang.Long">
+		select count(1) From item_brand  where 1=1
+		<if test="entity!=null">
+			<if test="entity.brandKey!=null">
+				<if test="entity.brandKey!='其它'">
+					and brand_Key = #{entity.brandKey}
+				</if>
+				<if test="entity.brandKey=='其它'">
+					and brand_Key REGEXP '^[0-9]'
+				</if>
+			</if>
+			<if test="entity.brandName!=null">
+				and brand_name=#{entity.brandName}
+			</if>
+			<if test="entity.brandStatus!=null">
+				and brand_status=#{entity.brandStatus}
+			</if>
+		</if>
+	</select>
+	
+	<delete id="deleteItemBrand">
+		delete from item_category_brand where third_lev_cid=#{cid} and brand_id=#{brandId}
+	</delete>
+</mapper>

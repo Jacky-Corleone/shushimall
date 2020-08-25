@@ -1,0 +1,170 @@
+#set($ctxPath="$request.contextPath")
+#set($layout = "common/blanklayout.vm")
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>常见问题</title>
+    <style >
+        .yuan{width: 2em; height: 2em; margin-top: 5px; border-radius: 100%; text-align: center; line-height: 2em; color: #fff; margin-right: 3%;}
+        .q{background: #ff8320;}
+    </style>
+    <link href="$ctxPath/assets/css/detail.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="$ctxPath/assets/js/iscroll.js"></script>
+    <script type="text/javascript" src="$ctxPath/assets/js/tab.js"></script>
+    <script type="text/javascript" src="$ctxPath/assets/js/style.js"></script>
+</head>
+<body>
+<div id="main" class="po_ab">
+    <!-- 中间内容 -->
+    <div class="content" id="wrapper">
+        <!-- 一条问题 -->
+        <div class="mar_lr4 mar_t15">
+            <div class="pad_l5 bg_02"  style="line-height:34px;">
+                <p class="yuan q fl">Q</p>
+                <p class="font_1_2">有哪些订单状态？</p>
+                <div class="clear"></div>
+            </div>
+            <div class="pad_l5 mar_t15 ">
+                <p class="yuan bg_05 fl">A</p>
+                <p class="fl wid_87 lin_24 font_1_2">一个新订单从下单到订单完成，会经历各种状态，我们会将各种状态显示在订单详情页面，希望以此种方式让您更好的了解订单情况，及时跟踪订单状态，打消疑虑并顺利完成购物。*目前的主要订单状态有：等待付款、已付款等待发货、卖家已发货、收货并确认、已完成。</p>
+                <div class="clear"></div>
+            </div>
+        </div><!-- 一条问题 end-->
+        <!-- 一条问题 -->
+        <div class="mar_lr4 mar_t15">
+            <div class="pad_l5 bg_02"  style="line-height:34px;">
+                <p class="yuan q fl">Q</p>
+                <p class="font_1_2">我刚刚注册了账户，如何提交订单？</p>
+                <div class="clear"></div>
+            </div>
+            <div class="pad_l5 mar_t15 ">
+                <p class="yuan bg_05 fl">A</p>
+                <p class="fl wid_87 lin_24 font_1_2">1.选择商品【加入购物车】；<br>2、点击【去购物车结账】-【去结算】；<br>3、填写收货信息和支付及配送方式，然后点击提交订单即可。</p>
+                <div class="clear"></div>
+            </div>
+        </div><!-- 一条问题 end-->
+        <!-- 一条问题 -->
+        <div class="mar_lr4 mar_t15">
+            <div class="pad_l5 bg_02" style="line-height:34px;">
+                <p class="yuan q fl">Q</p>
+                <p class="font_1_2">商品页面有满减活动，下单后金额为何没有变化？</p>
+                <div class="clear"></div>
+            </div>
+            <div class="pad_l5 mar_t15 ">
+                <p class="yuan bg_05 fl">A</p>
+                <p class="fl wid_87 lin_24 font_1_2">1.订单的金额没有达到满减活动的金额要求；<br>2.订单中有未参加满减活动的商品；<br>3.所选购的商品享受多个促销，如：满减或者是享受赠品。加入购物车时默认的活动是享受赠品的情况下，此时需在购物车商品价格后面有一个“修改优惠”的蓝色字体，点击选择参加满减活动即可；<br>4.若以上情况都不存在，请删除购物车中的商品，重新登陆后购买。</p>
+                <div class="clear"></div>
+            </div>
+        </div><!-- 一条问题 end-->
+        <!-- 一条问题 -->
+        <div class="mar_lr4 mar_t15">
+            <div class="pad_l5 bg_02"  style="line-height:34px;">
+                <p class="yuan q fl">Q</p>
+                <p class="font_1_2">订单提交成功后商品降价了，可以退给我差价吗？</p>
+                <div class="clear"></div>
+            </div>
+            <div class="pad_l5 mar_t15 ">
+                <p class="yuan bg_05 fl">A</p>
+                <p class="fl wid_87 lin_24 font_1_2">请直接联系卖家商量相关事宜。</p>
+                <div class="clear"></div>
+            </div>
+        </div><!-- 一条问题 end-->
+
+        <div class="mar_lr4 mar_t15">
+            <div class="pad_l5 bg_02"  style="line-height:34px;">
+                <p class="yuan q fl">Q</p>
+                <p class="font_1_2">什么时候允许修改订单？</p>
+                <div class="clear"></div>
+            </div>
+            <div class="pad_l5 mar_t15 ">
+                <p class="yuan bg_05 fl">A</p>
+                <p class="fl wid_87 lin_24 font_1_2">订单一旦提交就无法修改，如果想修改订单请取消订单后并重新下单。</p>
+                <div class="clear"></div>
+            </div>
+        </div><!-- 一条问题 end-->
+
+        <div class="mar_lr4 mar_t15">
+            <div class="pad_l5 bg_02"  style="line-height:34px;">
+                <p class="yuan q fl">Q</p>
+                <p class="font_1_2">下单之后如何修改收货地址？</p>
+                <div class="clear"></div>
+            </div>
+            <div class="pad_l5 mar_t15 ">
+                <p class="yuan bg_05 fl">A</p>
+                <p class="fl wid_87 lin_24 font_1_2">平台暂时不提供修改收货地址的功能，如需修改收货地址请直接和卖家联系。</p>
+                <div class="clear"></div>
+            </div>
+        </div><!-- 一条问题 end-->
+
+        <div class="mar_lr4 mar_t15">
+            <div class="pad_l5 bg_02"  style="line-height:34px;">
+                <p class="yuan q fl">Q</p>
+                <p class="font_1_2">下单之后如何修改商品的数量和颜色等属性？</p>
+                <div class="clear"></div>
+            </div>
+            <div class="pad_l5 mar_t15 ">
+                <p class="yuan bg_05 fl">A</p>
+                <p class="fl wid_87 lin_24 font_1_2">如果已经提交订单则无法修改相关信息，如果需要请重新下单。</p>
+                <div class="clear"></div>
+            </div>
+        </div><!-- 一条问题 end-->
+
+        <div class="mar_lr4 mar_t15">
+            <div class="pad_l5 bg_02"  style="line-height:34px;">
+                <p class="yuan q fl">Q</p>
+                <p class="font_1_2">什么时候允许修改订单？</p>
+                <div class="clear"></div>
+            </div>
+            <div class="pad_l5 mar_t15 ">
+                <p class="yuan bg_05 fl">A</p>
+                <p class="fl wid_87 lin_24 font_1_2">订单一旦提交就无法修改，如果想修改订单请取消订单后并重新下单。</p>
+                <div class="clear"></div>
+            </div>
+        </div><!-- 一条问题 end-->
+
+        <div class="mar_lr4 mar_t15">
+            <div class="pad_l5 bg_02"  style="line-height:34px;">
+                <p class="yuan q fl">Q</p>
+                <p class="font_1_2">如何取消订单？</p>
+                <div class="clear"></div>
+            </div>
+            <div class="pad_l5 mar_t15 ">
+                <p class="yuan bg_05 fl">A</p>
+                <p class="fl wid_87 lin_24 font_1_2">如果订单尚未发货，可直接在订单详情页取消订单。如果订单状态为已发货，请联系卖家取消订单。</p>
+                <div class="clear"></div>
+            </div>
+        </div><!-- 一条问题 end-->
+
+        <div class="mar_lr4 mar_t15">
+            <div class="pad_l5 bg_02"  style="line-height:34px;">
+                <p class="yuan q fl">Q</p>
+                <p class="font_1_2">取消订单时，订单为什么会被锁定？</p>
+                <div class="clear"></div>
+            </div>
+            <div class="pad_l5 mar_t15 ">
+                <p class="yuan bg_05 fl">A</p>
+                <p class="fl wid_87 lin_24 font_1_2">为避免卖家已经发货因此取消订单需要卖家确认，所以会临时锁定订单。</p>
+                <div class="clear"></div>
+            </div>
+        </div><!-- 一条问题 end-->
+
+        <div class="mar_lr4 mar_t15">
+            <div class="pad_l5 bg_02"  style="line-height:34px;">
+                <p class="yuan q fl">Q</p>
+                <p class="font_1_2">订单取消后还能恢复吗？</p>
+                <div class="clear"></div>
+            </div>
+            <div class="pad_l5 mar_t15 ">
+                <p class="yuan bg_05 fl">A</p>
+                <p class="fl wid_87 lin_24 font_1_2">订单取消后无法恢复，如果需要请重新下单。</p>
+                <div class="clear"></div>
+            </div>
+        </div><!-- 一条问题 end-->
+    </div><!-- 中间内容 end-->
+    <!-- 底部 -->
+</div>
+</body>
+</html>

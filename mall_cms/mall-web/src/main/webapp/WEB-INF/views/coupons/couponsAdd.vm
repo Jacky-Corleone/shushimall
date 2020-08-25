@@ -1,0 +1,1064 @@
+#set($staticPath="$request.contextPath/assets")
+#set($layout = "/seller_layout.vm")
+<script type="text/javascript" src="$staticPath/plugin/common/loadMsg.js"></script>
+<script type="text/javascript" src="$staticPath/js/common.js"></script>
+<script type="text/javascript" src="$staticPath/plugin/My97DatePicker/WdatePicker.js"></script>
+<link href="$staticPath/assets/css/manage_style.css">
+<style type="text/css">
+#couponUserMembershipLevelLI label {
+	cursor:pointer;
+}
+</style>
+<script type="text/javascript">
+    $(document).ready(function () {
+        //加载左侧菜单
+        $("#leftSeller").load("$request.contextPath/leftSeller");
+    });
+    
+    //切换优惠券类型改变优惠券面额类型
+    function changeInput(value){
+    	//1 满减券
+    	if(value == '1'){
+    		$("#typeDesc").html("<i class='font_fs mar_l2'>*</i>满减：");
+    		$("#full").show();
+    		$("#full").val("满(元)");
+    		$("#full").removeAttr("class");
+    		$("#full").addClass("wid_50 input_Style2 hei_30");
+    		$("#meetPriceDesc").show();
+    		$("#reduction").show();
+    		$("#reduction").val("减(元)");
+    		$("#quota").hide();
+    		$("#couponMaxDesc").hide();
+    		$("#couponAmountDesc").removeAttr("class");
+    		$("#couponAmountDesc").addClass("wid_60 input_Style2 hei_30");
+    	//2 折扣券   
+    	}else if(value == '2'){
+    		$("#typeDesc").html("<i class='font_fs mar_l2'>*</i>折扣：");
+    		$("#quota").show();
+    		$("#quota").val("限额(元)");
+    		$("#couponMaxDesc").show();
+    		$("#full").show();
+    		$("#full").val("折扣(0~10)");
+    		$("#full").removeAttr("class");
+    		$("#full").addClass("wid_80 input_Style2 hei_30");
+    		$("#meetPriceDesc").hide();
+    		$("#reduction").hide();
+    		$("#couponAmountDesc").removeAttr("class");
+    		$("#couponAmountDesc").addClass("wid_60 input_Style2 hei_30");
+    	//3 现金券
+    	}else if(value == '3'){
+    		$("#typeDesc").html("<i class='font_fs mar_l2'>*</i>现金：");
+    		$("#full").show();
+    		$("#full").val("直降(元)");
+    		$("#full").removeAttr("class");
+    		$("#full").addClass("wid_80 input_Style2 hei_30");
+    		$("#meetPriceDesc").hide();
+    		$("#reduction").hide();
+    		$("#quota").hide();
+    		$("#couponMaxDesc").hide();
+    		$("#couponAmountDesc").removeAttr("class");
+    		$("#couponAmountDesc").addClass("wid_220 input_Style2 hei_30");
+    	}
+    	//切换时清空数据
+    	$("#couponAmount").val("");
+		$("#couponAmountDesc").val("");
+		$("#meetPrice").val("");
+		$("#meetPriceDesc").val("");
+		$("#couponMax").val("");
+		$("#couponMaxDesc").val("");
+    }
+    
+    //sku物品选择弹出层
+    function showItemSearchDIV() {
+        createLoadMask();
+        searchItem($("#shopId").val());
+    }
+    
+  //搜索物品
+    function searchItem(shopId) {
+        var keyword = $.trim($("#searchKeyWord").val());
+        $.ajax({
+            url: $("#contextPath").val() + "/contract/searchItem",
+            data: {
+                "Keyword": keyword,
+                "shopId": shopId
+            },
+            type: 'post',
+            dataType: 'html',
+            success: function (data) {
+                $("#itemSearchResult").html(data);
+                showItemDIV();
+                closeLoadMask();
+            }
+        });
+    }
+    
+    function createLoadMask() {
+        $("#loadMask").show();
+    }
+
+    function closeLoadMask() {
+        $("#loadMask").hide();
+    }
+    
+  //展示物品弹出层
+    function showItemDIV() {
+        $("#itemSearchDIV").show();
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeItemSearchDIV() {
+        $("#itemSearchDIV").hide();
+        document.body.style.overflow = "auto"; // 恢复页面滚动条
+    }
+    
+    
+    function createItemLi() {
+    	var skuIds = $("#skuIds").val();
+        var a = $("input:checkbox[name='itemOrder']:checked");
+        if(a.length == 0){
+        	alert("请至少选择一个商品");
+        	return;
+        }
+        var temp = "";
+        $(a).each(function () {
+            var obj = $(this).parent().parent();
+            var itemName = obj.find("[name='itemName']").val();
+            var itemPrice = obj.find("[name='itemPrice']").val();
+            var itemSkuId = obj.find("[name='itemSkuId']").val();
+            var attrSale = obj.find("[name='attrSale']").val();
+            var proType = obj.find("[name='proType']").val();
+            temp += "<ul class='list_top hei_40' id='ul'>" +
+            	"<input name='id' type='hidden' value='-1'>&nbsp;</input>" +
+                "<li class='wid_200 over_ell font_cen' title='"+itemSkuId+"'>" + itemSkuId + "&nbsp;</li>" +
+                "<li class='wid_200 over_ell font_cen' title='"+proType+"'>" + proType + "&nbsp;</li>" +
+                "<input type='hidden' name='itemName' value='" + itemName + "'>" +
+                "<input type='hidden' name='matCd' value='" + itemSkuId + "'>" +
+                "<li class='wid_200 over_ell font_cen' title='"+itemName+"' style='text-align: center'>" + itemName + "&nbsp;</li>" +
+                "<li class='wid_200 over_ell font_cen' title='"+attrSale+"'>" + attrSale + "&nbsp;</li>" +
+                "<li class='wid_80 over_ell font_cen font_7a' style='cursor:pointer;' onclick='removeItem(this)'>删除</li></ul>";
+            skuIds+= itemSkuId+";";
+          //添加页后取消复选框的选择
+           $(this).prop("checked", false);
+        });
+        $("#skuIds").val(skuIds);
+        $("#itemList").append(temp);
+        alert("添加成功");
+    }
+    
+    function removeItem(e) {
+        if (confirm("确定删除？")) {
+            var skuId = $(e).parent().find("[name='matCd']").val();
+            var matId = $(e).parent().find("[name='id']").val();
+            var skuIds = $("#skuIds").val();
+            skuIds = skuIds.replace(skuId+";","");
+            $("#skuIds").val(skuIds);
+            $(e).parent().remove();
+        }
+    }
+    
+    function removeUser(e) {
+        if (confirm("确定删除？")) {
+            var uid = $(e).parent().find("[name='uid']").val();
+            var userIds = $("#userIds").val();
+            userIds = userIds.replace(uid+";","");
+            $("#userIds").val(userIds);
+            $(e).parent().remove();
+        }
+    }
+    
+    function searchItemByKeyword() {
+        var shopId = $("#itemSearchResult").find("[name='shopId']").val();
+        var keyword = $("#itemSearchDIV").find("[name='keyword']").val();
+        if (keyword && '' != $.trim(keyword)) {
+            if ("请输入要查询的物品名称" == $.trim(keyword)) {
+                keyword = null;
+            }
+            $.ajax({
+                url: $("#contextPath").val() + "/contract/searchItem",
+                data: {
+                    "shopId": shopId,
+                    "keyword": keyword
+                },
+                type: 'post',
+                dataType: 'html',
+                success: function (data) {
+                    $("#itemSearchResult").html(data);
+                }
+            });
+        }
+    }
+    
+    function checkIsChosen(e) {
+        var skuId = $(e).parent().parent().find("[name='itemSkuId']").val();
+        var skuIds = $("#skuIds").val();
+        if (skuIds) {
+            if (skuIds.indexOf(skuId) > -1) {
+                alert("该物品已添加列表中！");
+                $(e).prop("checked", false);
+                return;
+            }
+        }
+    }
+    
+    function checkIsChosenUser(e) {
+        var userId = $(e).parent().parent().find("[name='uid']").val();
+        var userIds = $("#userIds").val();
+        if (userIds) {
+            if (userIds.indexOf(userId) > -1) {
+                alert("该用户已添加列表中！");
+                $(e).prop("checked", false);
+                return;
+            }
+        }
+    }
+    
+ 	//弹出层关闭
+   function closeDiv(obj) {
+       $(obj).parent().parent().parent().hide();
+       //增加恢复页面滚动条
+       closeItemSearchDIV();
+       closeLoadMask();
+   }
+    
+ 	
+ 	function couponUsingRangeChange(value){
+ 		//店铺通用
+ 		if(value == '2'){
+ 			$("#sku_div").hide();
+ 			$("#skuButton").hide();
+ 			$("#skuIds").val("");
+ 			$("#itemList").html("");
+ 		//可以选择sku
+ 		}else if(value == '4'){
+ 			$("#sku_div").show();
+ 			$("#skuButton").show();
+ 		}
+ 	}
+ 	
+ 	function getCompany(e) {
+ 		//正整数
+    	var zzs = /^[1-9]*[1-9][0-9]*$/;
+ 		if(!$("#couponNum").val()){
+    		alert("请输入优惠券数量");
+    		return;
+    	}else{
+    		if(!zzs.test($("#couponNum").val())){
+    			alert("优惠券数量请输入正整数");
+        		return;
+    		}
+    	}
+ 	    createLoadMask();
+ 	    //卖家查看
+ 	    var type = '';
+ 	    var shopId = "";
+		var level = "";
+		var userName = "";
+		var companyName = "";
+		$("#userType").val("");
+		$("#userLevel").val("");
+		$("#isVip").val("");
+		$("#userName").val("");
+		$("#companyName").val("");
+ 	    $.ajax({
+ 	        url: $("#contextPath").val() + "/coupons/getUserDetail",
+ 	        data: {
+ 	            "type": type,
+ 	            "shopId": shopId,
+ 	            "level": level,
+ 	            "userName":userName,
+ 	            "companyName":companyName
+ 	        },
+ 	        type: 'post',
+ 	        dataType: 'html',
+ 	        success: function (data) {
+ 	            $("#partBDetail").html(data);
+ 	            $("#IdivOperate").val(e);
+ 	            showDiv();
+ 	        }
+
+ 	    });
+ 	}
+    // 显示弹出层
+ 	function showDiv() {
+ 	    var obj = document.getElementById("Idiv");
+ 	    obj.style.display = "block";
+ 	    // 以下部分要将弹出层居中显示
+
+ 	}
+    
+ 	function searchCompany() {
+ 	    $("#partBDetail").html("");
+		//卖家查看标识
+ 	    var type = $("#userType").val();
+		var shopId = $("#isVip").val();
+		if(shopId == '1'){
+			shopId = $("#shopId").val();
+		}
+		var level = $("#userLevel").val();
+		
+		var userName = $("#userName").val();
+		var companyName = $("#companyName").val();
+		
+ 	    $.ajax({
+ 	        url: $("#contextPath").val() + "/coupons/getUserDetail",
+ 	        data: {
+ 	        	"type": type,
+ 	            "shopId": shopId,
+ 	            "level": level,
+ 	            "userName":userName,
+ 	            "companyName":companyName
+ 	        },
+ 	        type: 'post',
+ 	        dataType: 'html',
+ 	        success: function (data) {
+ 	            $("#partBDetail").html(data);
+ 	            showDiv();
+ 	        }
+ 	    });
+ 	}
+ 	
+ 	function toItemPage(page) {
+ 	    var shopId = $("#itemSearchResult").find("[name='shopId']").val();
+ 	    var keyword = $.trim($("#itemSearchDIV").find("[name='keyword']").val());
+ 	    if ("请输入要查询的物品名称" == keyword) {
+ 	        keyword = null;
+ 	    }
+ 	    $.ajax({
+ 	        url: $("#contextPath").val() + "/contract/searchItem",
+ 	        data: {
+ 	            "shopId": shopId,
+ 	            "keyword": keyword,
+ 	            "page": page
+ 	        },
+ 	        type: 'post',
+ 	        dataType: 'html',
+ 	        success: function (data) {
+ 	            $("#itemSearchResult").html(data);
+ 	            showItemDIV();
+ 	        }
+ 	    });
+ 	}
+ 	
+ 	// 分页
+    function topage(page) {
+        toCompanyPage(page);
+    }
+ 	
+    function toCompanyPage(page){
+    	//卖家查看标识
+ 	    var type = $("#userType").val();
+		var shopId = $("#isVip").val();
+		if(shopId == '1'){
+			shopId = $("#shopId").val();
+		}
+		var level = $("#userLevel").val();
+		var userName = $("#userName").val();
+		var companyName = $("#companyName").val();
+ 	    $.ajax({
+ 	        url: $("#contextPath").val() + "/coupons/getUserDetail",
+ 	        data: {
+ 	        	"type": type,
+ 	            "shopId": shopId,
+ 	            "level": level,
+ 	            "userName":userName,
+ 	            "companyName":companyName,
+ 	            "page": page
+ 	        },
+            type: 'post',
+            dataType: 'html',
+            success: function (data) {
+                $("#partBDetail").html(data);
+            }
+        });
+    }
+    
+    function changeSendType(value){
+    	if(value == '1'){
+    		$("#userButton").hide();
+    		$("#user_div").hide();
+    		$("#userIds").val("");
+ 			$("#userList").html("");
+ 			//$("#couponUserMembershipLevelLI").show();
+    		//$("#couponUserTypeLI").show();
+    	}else if(value == '2'){
+    		//判断发放次数
+    		var saveCount =  $("#saveCount").val();
+    		if(saveCount>5){
+    			$("#sendCouponType option[value='1']").attr("selected", true);
+    			alert("超出发放优惠券次数");
+    			return;
+    		}
+    		//$("#couponUserMembershipLevelLI").hide();
+    		//$("#couponUserTypeLI").hide();
+    		$("#couponUserMembershipLevel").val("0");
+    		$("input:checkbox[name='level_checkbox']").each(function (){
+    			$(this).prop("checked", false);
+         	});
+    		$("#couponUserType").val("0");
+    		$("#userButton").show();
+    		$("#user_div").show();
+    	}
+    }
+    
+    function checkAlluser(allCheck){
+    	var userIds = $("#userIds").val();
+    	var a = $("input:checkbox[name='userCheck']");
+    	if(allCheck.checked){
+    		$(a).each(function () {
+    			var obj = $(this).parent().parent();
+    			var uid = obj.find("[name='uid']").val();
+    			if(userIds.indexOf(uid) > -1){
+    				$(this).prop("checked", false);
+    			}else{
+    				$(this).prop("checked", true);
+    			}
+    		});
+    	}else{
+    		$(a).each(function () {
+    			$(this).prop("checked", false);
+    		});
+    	}
+    }
+    
+    function createUserLi() {
+    	var userIds = $("#userIds").val()
+        var a = $("input:checkbox[name='userCheck']:checked");
+        if(a.length == 0){
+        	alert("请至少选择一个用户");
+        	return;
+        }
+        var cheNum;
+        //判断选择人数是否超出优惠券数量
+		if(userIds){
+			cheNum = userIds.split(";").length -1 + a.length;
+        }else{
+        	cheNum = a.length;
+        }
+        var num = $("#couponNum").val();
+        
+        if(cheNum > num){
+        	alert("选择的人数大于优惠券总数");
+        	return;
+        }
+        
+        var temp = "";
+        $(a).each(function () {
+            var obj = $(this).parent().parent();
+            var uid = obj.find("[name='uid']").val();
+            var uname = obj.find("[name='uname']").val();
+            var umobile = obj.find("[name='companyName']").val();
+            var level = obj.find("[name='level']").val();
+            temp += "<ul class='list_top hei_40' id='ul'>" +
+                "<li class='wid_200 over_ell font_cen' title='"+uid+"'>" + uid + "&nbsp;</li>" +
+                "<input type='hidden' name='uid' value='" + uid + "'>" +
+                "<li class='wid_200 over_ell font_cen' title='"+uname+"'>" + uname + "&nbsp;</li>" +
+                "<li class='wid_200 over_ell font_cen' title='"+umobile+"' style='text-align: center'>" + umobile + "&nbsp;</li>" +
+                //"<li class='wid_200 over_ell font_cen' title='"+level+"'>" + level + "&nbsp;</li>" +
+                "<li class='wid_80 over_ell font_cen font_7a' style='cursor:pointer;' onclick='removeUser(this)'>删除</li></ul>";
+                userIds+= uid+";";
+            //添加页后取消复选框的选择
+            $(this).prop("checked", false);
+        });
+        $("#userIds").val(userIds);
+        $("#userList").append(temp);
+        alert("添加成功");
+    }
+    
+    function addCoupon(){
+    	//优惠券名称
+    	if(!$("#couponName").val()){
+    		alert("请输入优惠券名称");
+    		return;
+    	}
+    	
+    	//正整数
+    	var zzs = /^[1-9]*[1-9][0-9]*$/;
+    	//正数
+    	var zs = /^[0-9]+([.]{1}[0-9]{1,2})?$/;
+    	
+    	//优惠券类型
+    	var value = $("#couponType").val();
+    	//面额
+		var couponAmount = $("#couponAmount").val()
+		var meetPrice = $("#meetPrice").val();
+    	//1 满减券
+    	if(value == '1'){
+    		if(!meetPrice){
+        		alert("请输入满减金额限额");
+        		return;
+        	}else{
+        		if(!zzs.test(meetPrice)){
+        			alert("满减金额限额请输入正确的金额(正整数)");
+            		return;
+        		}
+        	}
+    		
+    		if(!couponAmount){
+        		alert("请输入满减金额面值");
+        		return;
+        	}else{
+        		if(!zzs.test(couponAmount)){
+        			alert("满减金额面值请输入正确的金额(正整数)");
+            		return;
+        		}
+        	}
+    		
+			if(parseInt(couponAmount) >= parseInt(meetPrice)){
+				alert("满减：减额必须小于满额");
+        		return;
+    		}
+    		
+    	//2 折扣券   
+    	}else if(value == '2'){
+    		if(!couponAmount){
+        		alert("请输入折扣券折扣");
+        		return;
+        	}else{
+        		if( couponAmount >10 || couponAmount<=0 || !zs.test(couponAmount)){
+                    alert("折扣只能输入小数并且范围在0-10(包括10)之间！！");
+                    return false;
+                }
+        	}
+    		
+    		if(!$("#couponMax").val()){
+        		alert("请输入折扣金额限额");
+        		return;
+        	}else{
+        		if(!zzs.test($("#couponMax").val())){
+        			alert("折扣金额限额请输入正确的金额(正整数)");
+            		return;
+        		}
+        	}
+    	//3 现金券
+    	}else if(value == '3'){
+    		if(!couponAmount){
+        		alert("请输入现金券金额面值");
+        		return;
+        	}else{
+        		if(!zzs.test(couponAmount)){
+        			alert("现金券金额面值请输入正确的金额(正整数)");
+            		return;
+        		}
+        	}
+    	}
+    	
+    	var couponNum = $("#couponNum").val();
+    	if(!couponNum){
+    		alert("请输入优惠券数量");
+    		return;
+    	}else{
+    		if(!zzs.test(couponNum)){
+    			alert("优惠券数量请输入正整数");
+        		return;
+    		}
+    	}
+    	
+    	if(!$("#couponStartTime").val()){
+    		alert("请输入有效期开始时间");
+    		return;
+    	}
+    	
+    	if(!$("#couponEndTime").val()){
+    		alert("请输入有效期结束时间");
+    		return;
+    	}
+    	
+    	var start=new Date($("#couponStartTime").val()); 
+		var end=new Date($("#couponEndTime").val());  
+		if(start > end){
+			alert("有效期结束时间必须大于有效期开始时间");
+			return;
+		}
+    	
+    	//适用范围为sku时
+    	if($("#couponUsingRange").val()=='4'){
+    		if(!$("#skuIds").val()){
+        		alert("请选择sku商品");
+        		return;
+        	}		
+    	}
+    	
+    	//发放方式为 直接发放用户时
+    	if($("#sendCouponType").val() == '2'){
+    		var userIds = $("#userIds").val();
+    		if(!userIds){
+        		alert("请选择发放用户");
+        		return;
+        	}else{
+        		var count = userIds.split(';').length - 1;
+        		if(couponNum < count){
+        			$("#couponNum").val(count);
+        			alert("优惠券数量必须大于等于所选择的用户数量");
+        			return;
+        		}
+        	}	
+    	}
+    	//会员等级复选框
+    	var couponUserMembershipLevel = 0;
+    	var checkLev = $("input:checkbox[name='level_checkbox']:checked");
+    	var checkVal = "";
+    	$(checkLev).each(function (){
+    		checkVal += $(this).val() + ",";
+     	});
+    	if(checkVal != ""){
+    		couponUserMembershipLevel = checkVal.substring(0,(checkVal.length-1));
+    	}
+    	$("#couponUserMembershipLevel").val(couponUserMembershipLevel);
+    	//发放方式为 待用户领取时
+    	if($("#sendCouponType").val() == '1'){
+    		if(couponUserMembershipLevel == ''){
+    			alert("请选择会员等级");
+    			return;
+    		}
+    	}
+    	
+    	
+    	
+    	//提交表单新增优惠券
+    	document.getElementById("couponForm").submit();
+    	//连续点击不生效
+    	$("#saveButton").removeAttr("onclick");
+    }
+    
+    function compareUserCount(value){
+    	var userIds = $("#userIds").val();
+    	if(userIds){
+    		var count = userIds.split(';').length - 1;
+    		if(value < count){
+    			$("#couponNum").val(count);
+    			alert("优惠券数量必须大于等于所选择的用户数量");
+    		}
+    	}	
+    }
+    
+    function changeMoney(obj,desc,id){
+    	if(!obj.value){
+    		$("#"+id).val('');
+    	}
+    	//折扣
+    	if($("#couponType").val() == 2 && id =="couponAmount"){
+    		//正数
+    		var couponAmount = obj.value;
+        	var zs = /^[0-9]+([.]{1}[0-9]{1,2})?$/;
+    		if( couponAmount >10 || couponAmount<=0 || !zs.test(couponAmount)){
+    			$("#"+id).val('');
+                $(obj).val('');
+                alert("折扣只能输入小数并且范围在0-10(包括10)之间！！");
+                return;
+            }else{
+            	$("#"+id).val(couponAmount);
+            	$(obj).val(obj.value.replace( /\B(?=(?:\d{4})+$)/g, ',' ));
+            }
+    		return ;
+    	}
+    	//转换成 	1,1000,1000  显示价格
+    	if(obj.value){
+    		obj.value = obj.value.replace(/,/g,"")
+    		if(id == 'meetPrice' ){
+    			if(obj.value.length > 9){
+    				$("#"+id).val(obj.value.substring(0,9));
+    				$(obj).val(obj.value.substring(0,9).replace( /\B(?=(?:\d{4})+$)/g, ',' ));
+        			alert(desc + "长度超出限制");
+        			return;
+    			}
+    		}else{
+    			if(obj.value.length > 6){
+    				$("#"+id).val(obj.value.substring(0,6));
+    				$(obj).val(obj.value.substring(0,6).replace( /\B(?=(?:\d{4})+$)/g, ',' ));
+        			alert(desc + "长度超出限制");
+        			return;
+    			}
+    		}
+    		var zzs = /^[1-9]*[1-9][0-9]*$/;
+    		if(!zzs.test(obj.value)){
+    			$("#"+id).val("");
+            	$(obj).val("");
+    			alert(desc);
+    			return;
+    		}
+    		$("#"+id).val(obj.value);
+        	$(obj).val(obj.value.replace( /\B(?=(?:\d{4})+$)/g, ',' ));
+    	}
+    }
+    
+</script>
+<!--导航菜单end-->
+<div id="main">
+	<div id="leftSeller" style="width: 198px; float: left;">&nbsp;</div>
+	<input id="contextPath" type="hidden" value="$request.contextPath">
+	<input id="saveCount" type="hidden" value="$saveCount">
+    <!--中间部分开始-->
+    <!--右边部分开始-->
+    <div id="right" class="bg_06 border-4">
+        <div class="mar_lr10 pad_tb20">
+            <form id="couponForm" method="post" action="$request.contextPath/coupons/saveCouponsInfo">
+                <p class="font_16 hei_32 pad_l10 bg_05">优惠券</p>
+                <ul class="listCouponsAdd mar_t10 mar_l10 ">
+                
+                	<li class="wid_460 mar_tb10 ">
+                        <span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>申请人:</span>
+                        <input type="text" class="wid_260 input_Style2 hei_30" value="$!{user.uname}" style="border: 0" readonly="readonly"/>
+                        <input type="hidden" class="wid_260 input_Style2 hei_30" value="$!{user.uid}" name="createUser"/>
+                    </li>
+                    
+                    <li class="wid_460 mar_tb10 ">
+                        <span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>申请店铺:</span>
+                        <input type="text" class="wid_260 input_Style2 hei_30" value="$!{shop.shopName}" style="border: 0" readonly="readonly" />
+                        <input type="hidden" class="wid_260 input_Style2 hei_30" value="$!{shop.shopId}" id="shopId" name="shopId"/>
+                    </li>
+                	
+                    <li class="wid_460 mar_tb10 ">
+                        <span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>优惠券名称:</span>
+                        <input type="text" class="wid_260 input_Style2 hei_30" id="couponName" name="couponName" maxlength="25" #if($!type == '2') style="border: 0" readonly="readonly" value="$!couponsDTO.couponName" #end/>
+                    </li>
+                    
+                    <li class="wid_460 mar_tb10 ">
+                        <span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>优惠券编号:</span>
+                        <input type="text" class="wid_260 input_Style2 hei_30" id="couponId" name="couponId" value="$!{couponsId}" style="border: 0" readonly="readonly"/>
+                    </li>
+                    
+                    <li class="wid_460 mar_tb10 ">
+                    	<span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>优惠券类型:</span>
+                    	#if($!type == '1') 
+                        <select id="couponType" name="couponType" class="input_Style2 wid_160 mar_r10 hei_30 " onchange="changeInput(this.value)">
+	                        <option value="1">满减券</option>
+	                        <option value="2">折扣券</option>
+	                        <option value="3">现金券</option>
+	                    </select>
+	                    #end      
+                        #if($!type == '2')
+                        	#if($!couponsDTO.couponType == '1') <input type="text" class="wid_260 input_Style2 hei_30" value="满减券" style="border: 0" readonly="readonly"/> #end
+                        	#if($!couponsDTO.couponType == '2') <input type="text" class="wid_260 input_Style2 hei_30" value="折扣券" style="border: 0" readonly="readonly"/> #end
+                        	#if($!couponsDTO.couponType == '3') <input type="text" class="wid_260 input_Style2 hei_30" value="现金券" style="border: 0" readonly="readonly"/> #end
+                        #end   
+                    </li>
+                    
+                    <li class="wid_460 mar_tb10 ">
+                        
+                        #if($!type == '1')
+                        <span class="font_wid mar_r10" id="typeDesc"><i class="font_fs mar_l2">*</i>满减：</span>
+                        <input type="hidden" id="meetPrice" name="meetPrice" value=""/>
+                        <input type="hidden" id="couponAmount" name="couponAmount" value=""/>
+                        <input type="hidden" id="couponMax" name="couponMax" value=""/>
+                          
+                        <input type="text" class="wid_50 input_Style2 hei_30" id="full" value="满(元)" style="border: 0" readonly="readonly"/>
+                        <input type="text" class="wid_60 input_Style2 hei_30" id="meetPriceDesc" maxlength="11" onchange="changeMoney(this,'请输入正确满减金额限额(正整数)','meetPrice')"/>
+                        <input type="text" class="wid_50 input_Style2 hei_30" id="reduction" value="减(元)" style="border: 0" readonly="readonly"/>
+                        <input type="text" class="wid_60 input_Style2 hei_30" id="couponAmountDesc" maxlength="7" onchange="changeMoney(this,'请输入正确优惠券面值(正整数)','couponAmount')"/>
+                        <input type="text" class="wid_70 input_Style2 hei_30" id="quota" value="限额(元)" style="border: 0;display:none" readonly="readonly"/>
+                        <input type="text" class="wid_60 input_Style2 hei_30" id="couponMaxDesc" style="display:none" maxlength="7" onchange="changeMoney(this,'请输入正确折扣限额(正整数)','couponMax')"/>
+                        #end 
+                        #if($!type == '2')
+                        	#if($!couponsDTO.couponType == '1') <span class="font_wid mar_r10" id="typeDesc"><i class="font_fs mar_l2">*</i>满减：</span> #end
+                        	#if($!couponsDTO.couponType == '2') <span class="font_wid mar_r10" id="typeDesc"><i class="font_fs mar_l2">*</i>折扣：</span> #end
+                        	#if($!couponsDTO.couponType == '3') <span class="font_wid mar_r10" id="typeDesc"><i class="font_fs mar_l2">*</i>现金：</span> #end
+                        	<input type="text" class="wid_260 input_Style2 hei_30" id="couponAmount" name="couponAmount" value="$!couponsDTO.descr" style="border: 0" readonly="readonly"/>
+                        #end 
+                    </li>
+                    
+                    <li class="wid_460 mar_tb10">
+                        <span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>优惠券数量:</span>
+                        <input type="text" class="wid_260 input_Style2 hei_30" id="couponNum" name="couponNum" onchange="compareUserCount(this.value)" maxlength="6" #if($!type == '2') value="$!couponsDTO.couponNum" style="border: 0" readonly="readonly"#end/>
+                    </li>
+                    
+                     <li class="wid_460 mar_tb10 ">
+                        <span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>有效期:</span>
+                        #if($!type == '1') 
+                        <input class="jcDate wid_140 hei_30 input_Style2" type="text" id="couponStartTime" name="couponStartTime" 
+                               onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false,minDate:'%y-%M-%d %H:%m:%s'});"/>
+                        #end      
+                        #if($!type == '2') 
+                        <input type="text" class="wid_140 input_Style2 hei_30" id="couponStartTime" name="couponStartTime" value="$!date.format('yyyy-MM-dd HH:mm:ss',$!couponsDTO.couponStartTime)" style="border: 0" readonly="readonly"/>
+                        #end       
+                               
+                        <input type="text" class="wid_20 input_Style2 hei_30" id="to" value="至" style="border: 0;" readonly="readonly"/>
+                        #if($!type == '1') 
+                        <input class="jcDate wid_140 hei_30 input_Style2" type="text" id="couponEndTime" name="couponEndTime" 
+                               onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false,minDate:'#F{$dp.$D(\'couponStartTime\')}'});"/>
+                        #end  
+                        #if($!type == '2') 
+                        <input type="text" class="wid_140 input_Style2 hei_30" id="couponEndTime" name="couponEndTime" value="$!date.format('yyyy-MM-dd HH:mm:ss',$!couponsDTO.couponEndTime)" style="border: 0" readonly="readonly"/>
+                        #end   
+                    </li>
+                    
+                    <li class="wid_460 mar_tb10 ">
+                    	<input type="hidden" class="wid_260 input_Style2 hei_30" value="" id="skuIds" name="skuIds"/>
+                        <span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>使用范围 :</span>
+                        <!-- 1:平台通用类,2:店铺通用类,3:品类通用类,4:SKU使用类 -->
+                        #if($!type == '1')
+                        <select id="couponUsingRange" name="couponUsingRange" onchange="couponUsingRangeChange(this.value)" class="input_Style2 wid_160 mar_r10 hei_30 ">
+	                        <option value="2">店铺内通用</option>
+	                        <option value="4">限 SKU 商品</option>
+	                    </select>
+	                    <button type="button" class="button_2 hei_24 " id="skuButton" style="display:none" onclick="showItemSearchDIV()">+选择商品属性</button>
+                   		#end  
+                        #if($!type == '2')
+                        	#if($!couponsDTO.couponUsingRange == '2') <input type="text" class="wid_260 input_Style2 hei_30" value="店铺内通用" style="border: 0" readonly="readonly"/> #end
+                        	#if($!couponsDTO.couponUsingRange == '4') <input type="text" class="wid_260 input_Style2 hei_30" value="限 SKU 商品" style="border: 0" readonly="readonly"/> #end
+                        #end  
+                    </li>
+                    
+                    <li class="wid_460 mar_tb10 " style= "display:none">
+                        <span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>使用平台:</span>
+                        #if($!type == '1')
+                        <select id="platformId" name="platformId" class="input_Style2 wid_160 mar_r10 hei_30 ">
+                        	<!-- 绿印 注释掉  印刷家平台 option -->
+	                        <option value="1">PC端</option>
+	                        <!-- 科印 注释掉  绿印平台 option 
+	                        <option value="2">绿印平台</option>
+	                         -->
+	                        <!-- 绿印 注释掉 小管家 option -->
+	                        <option value="3">移动端</option>
+	                        <option value="4">PC端和移动端</option>
+	                    </select>
+	                    #end 
+                        #if($!type == '2')
+                        	#if($!couponsDTO.platformId == '1') <input type="text" class="wid_260 input_Style2 hei_30" value="PC端" style="border: 0" readonly="readonly"/> #end
+<!--                         	#if($!couponsDTO.platformId == '2') <input type="text" class="wid_260 input_Style2 hei_30" value="绿印平台" style="border: 0" readonly="readonly"/> #end -->
+                        	#if($!couponsDTO.platformId == '3') <input type="text" class="wid_260 input_Style2 hei_30" value="移动端" style="border: 0" readonly="readonly"/> #end
+                        	#if($!couponsDTO.platformId == '4') <input type="text" class="wid_260 input_Style2 hei_30" value="PC端和移动端" style="border: 0" readonly="readonly"/> #end
+                        #end 
+                    </li>
+                    
+                    <li class="wid_460 mar_tb10 ">
+                    	<input type="hidden" class="wid_260 input_Style2 hei_30" value="" id="userIds" name="userIds"/>
+                        <span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>发放方式:</span>
+                        #if($!type == '1')
+                        <select id="sendCouponType" name="sendCouponType" class="input_Style2 wid_160 mar_r10 hei_30 " onchange="changeSendType(this.value)">
+	                        <option value="1">待用户领取</option>
+	                        <option value="2">直接发放用户</option>
+	                    </select>
+	                    <button type="button" class="button_2 hei_24 " id="userButton" style="display:none" onclick="getCompany(1)">+选择用户</button>
+                    	#end  
+                        #if($!type == '2')
+                        	#if($!couponsDTO.sendCouponType == '1') <input type="text" class="wid_260 input_Style2 hei_30" value="待用户领取" style="border: 0" readonly="readonly"/> #end
+                        	#if($!couponsDTO.sendCouponType == '2') <input type="text" class="wid_260 input_Style2 hei_30" value="直接发放用户" style="border: 0" readonly="readonly"/> #end
+                        #end 
+                    </li>
+                    
+                    <li class="wid_460 mar_tb10 ">
+                        <span class="font_wid mar_r10"> <i class="font_fs mar_l2">*</i>成本分摊:</span>
+                        #if($!type == '1')
+                        <select id="costAllocation" name="costAllocation" class="input_Style2 wid_160 mar_r10 hei_30 ">
+	                        <option value="2">店铺承担</option>
+	                    </select>
+	                    <button type="button" class="button_2 hei_24 " id="userButton" style="display:none" onclick="getCompany(1)">+选择用户</button>
+                    	#end  
+                        #if($!type == '2')
+                        	#if($!couponsDTO.costAllocation == '1') <input type="text" class="wid_260 input_Style2 hei_30" value="平台承担" style="border: 0" readonly="readonly"/> #end
+                        	#if($!couponsDTO.costAllocation == '2') <input type="text" class="wid_260 input_Style2 hei_30" value="店铺承担" style="border: 0" readonly="readonly"/> #end
+                        #end 
+                    </li>
+                    #if($!type == '1')
+	                    <li class="wid_460 mar_tb10 " id="couponUserTypeLI" style= "display:none">
+	                        <span class="font_wid mar_r10"><i class="font_fs mar_l2">*</i>用户类型:</span>
+	                        <select id="couponUserType" name="couponUserType" class="input_Style2 wid_160 mar_r10 hei_30 ">
+				            	 <option value="0">全部</option>
+				                 <option value="1">个人</option>
+				                 <option value="2">企业</option>
+					        </select>
+	                    </li>
+	                    
+	                    <!-- 1-普通会员：<3000 成长值  2-铜牌会员：>=3000 成长值   3-银牌会员：>=10000 成长值   4-金牌会员：>=100000 成长值 5-钻石会员：>=300000 成长值-->
+	                     <li class="wid_460 mar_tb10 " id="couponUserMembershipLevelLI" style= "display:none">
+	                     		<input type="hidden" id="couponUserMembershipLevel" name="couponUserMembershipLevel" value="0">
+	                        	<span class="font_wid mar_r10"><i class="font_fs mar_l2">*</i>会员等级:</span>
+                                <label ><input type="checkbox" name="level_checkbox" value="1" checked="checked">红象</label>
+		                       	<label><input type="checkbox" name="level_checkbox" value="2" checked="checked">铜象</label>
+		                       	<label><input type="checkbox" name="level_checkbox" value="3" checked="checked">银象</label>
+		                       	<label><input type="checkbox" name="level_checkbox" value="4" checked="checked">金象</label>
+		                       	<label><input type="checkbox" name="level_checkbox" value="5" checked="checked">钻石象</label>
+	                    </li>
+                    #end
+                    #if($!type == '2')
+			         	#if($!couponsDTO.sendCouponType == '1')
+			         		<li class="wid_460 mar_tb10 " id="couponUserTypeLI" style= "display:none">
+                       			<span class="font_wid mar_r10"><i class="font_fs mar_l2">*</i>用户类型:</span>
+					         	#if($!couponsDTO.couponUserType == '0') <input type="text" class="wid_260 input_Style2 hei_30" value="全部" style="border: 0" readonly="readonly"/> #end
+	                        	#if($!couponsDTO.couponUserType == '1') <input type="text" class="wid_260 input_Style2 hei_30" value="个人" style="border: 0" readonly="readonly"/> #end
+	                        	#if($!couponsDTO.couponUserType == '2') <input type="text" class="wid_260 input_Style2 hei_30" value="企业" style="border: 0" readonly="readonly"/> #end
+                        	</li>
+                        	
+                        	<li class="wid_460 mar_tb10 " id="couponUserMembershipLevelLI" style= "display:none">
+	                        	<span class="font_wid mar_r10"><i class="font_fs mar_l2">*</i>会员等级:</span>
+		                       	<input type="text" class="wid_260 input_Style2 hei_30" value="$!{vipLevel}" style="border: 0" readonly="readonly"/>
+                        	</li>
+                        #end
+                    #end
+                    
+                    <li class="wid_460 mar_tb10 ">
+                        <span class="font_wid mar_r10">优惠券说明:</span>
+                        <input type="text" class="wid_260 input_Style2 hei_30" id="couponExplain" name="couponExplain" maxlength="100" #if($!type == '2') value="$!couponsDTO.couponExplain" style="border: 0" readonly="readonly"#end/>
+                    </li>
+                </ul>
+            </form>
+            
+            <div class="clear"></div>
+            #if($!type == '1')
+            <div class="right_xinxi mar" id="sku_div" style="display:none">
+                <ul class="list_top bg_08 font_cen font_14b">
+                    <li class="wid_200">产品编号</li>
+                    <li class="wid_200">所属类目</li>
+                    <li class="wid_200">物品名称</li>
+                    <li class="wid_200">销售属性</li>
+                    <li class="wid_80">操作</li>
+                </ul>
+                <div id="itemList">
+                </div>
+            </div>
+            #end 
+            #if($!type == '2')
+            	#if($!couponsDTO.couponUsingRange == '4')
+            		<ul class="list_top bg_08 font_cen font_14b">
+	                    <li class="wid_230">属性编号</li>
+	                    <li class="wid_230">所属类目</li>
+	                    <li class="wid_230">物品名称</li>
+	                    <li class="wid_230">销售属性</li>
+                	</ul>
+            		#foreach($usingRange in $couponUsingRangeList)
+                		<ul class='list_top hei_40' id='ul'>
+			                <li class='wid_230 over_ell font_cen' title='$usingRange.couponUsingId&nbsp;'>$usingRange.couponUsingId&nbsp;</li>
+			                <li class='wid_230 over_ell font_cen' title='$usingRange.categoryNme&nbsp;'>$usingRange.categoryNme&nbsp;</li>
+			                <li class='wid_230 over_ell font_cen' title='$usingRange.itemName&nbsp;'>$usingRange.itemName&nbsp;</li>
+			                <li class='wid_230 over_ell font_cen' title='$usingRange.skuAttr&nbsp;'>$usingRange.skuAttr&nbsp;</li>
+	                	</ul>
+               		#end 
+            	#end
+            #end	
+            <div class="clear"></div>
+            #if($!type == '1')
+            <div class="right_xinxi mar" id="user_div" style="display:none">
+                <!-- 协议物品 开头 -->
+                <ul class="list_top bg_08 font_cen font_14b">
+                	<li class="wid_200">用户编号</li>
+                    <li class="wid_200">用户名称</li>
+                    <li class="wid_200">公司名称</li>
+                    <!-- <li class="wid_200">会员等级</li> -->
+                    <li class="wid_80">操作</li>
+                </ul>
+                <div id="userList">
+                </div>
+            </div>
+            #end 
+            #if($!type == '2')
+            	#if($!couponsDTO.sendCouponType == '2')
+		            <div class="right_xinxi mar" id="user_div">
+		                <!-- 协议物品 开头 -->
+		                <ul class="list_top bg_08 font_cen font_14b">
+		                	<li class="wid_230">用户编号</li>
+		                    <li class="wid_230">用户名称</li>
+		                    <li class="wid_230">公司名称</li>
+		                    <!-- <li class="wid_230">会员等级</li> -->
+		                </ul>
+	               		#foreach($user in $couponUserList)
+	                		<ul class='list_top hei_40' id='ul'>
+				                <li class='wid_230 over_ell font_cen' title='$user.userId'>$user.userId&nbsp;</li>
+				                <li class='wid_230 over_ell font_cen' title='$user.userName'>$user.userName&nbsp;</li>
+				                <li class='wid_230 over_ell font_cen' title='$user.companyName'>$user.companyName&nbsp;</li>
+						    	<!-- <li class='wid_230 over_ell font_cen' title='$user.level'>$user.level&nbsp;</li> -->
+		                	</ul>
+	               		#end 
+		            </div>
+		         #end 
+             #end 
+            <div class="clear"></div>
+            <div class="wid_330 mar_cen">
+            	 #if($!type == '1') 
+				 <button type="button" class="button_2 hei_35"  loadMsg="正在保存..." id="saveButton" onclick="addCoupon()">保 存</button>
+				 #end
+                <button type="button" class="button_3 hei_35 mar_l14" onclick="history.go(-1)">返 回</button>
+            </div>
+        </div>
+    </div>
+    <!--右边部分结束-->
+</div>
+
+<!-- 查询物品sku信息 -->
+<div id="itemSearchDIV" class="po_fai" style="display:none;">
+    <!--弹出蒙版背景-->
+    <div class="po_main_Mess pad_t10" style="width:560px;overflow-y: auto;height:60%;">
+        <div class="hei_32 bg_05 pad_l10 font_14b"><i class="demo-icons fa-times-circle font_16 fr mar_r10 no"
+                                                      onclick="closeDiv(this)"></i>卖方物品列表
+            <input class="wid_220 input_Style2 hei_24" style="margin-left:25px"
+                   name="keyword" onblur="if($.trim(this.value)=='') value='请输入要查询的物品名称';"
+                   onfocus="if(this.value=='请输入要查询的物品名称') value='';" value='请输入要查询的物品名称' class="wid_11 input_3">
+            <button class="button_1 hei_24" onclick="searchItemByKeyword()">查询</button>
+        </div>
+        <!--标题 end -->
+        <div id="itemSearchResult">
+        </div>
+        <!--内容div end -->
+
+        <div class="clear"></div>
+        <div class="wid_200 mar_cen" style="position: absolute;bottom: 0;left:0;right:0;">
+            <button class="button_2 hei_35 " onclick="createItemLi()">
+                添加
+            </button>
+            <button class="button_3  hei_35" onclick="closeDiv(this)">
+               关闭
+            </button>
+        </div>
+        <!-- 确认 取消 结束 -->
+    </div>
+    <!--po_main_Mess end-->
+</div>
+
+<!-- 选择卖方信息 -->
+<div id="Idiv" class="po_fai" style=" display:none">
+    <div class="po_main_Mess pad_t10" style="width:780px;overflow-y: auto;height:90%;">
+        <div class="hei_62 bg_05 pad_l10 font_14b"><i class="demo-icons fa-times-circle font_16 fr mar_r10 no" onclick="closeDiv(this)"></i>
+                   用户名称
+            <input id="userName" class="input_Style2 wid_80 mar_r10 hei_28 " />
+                   <!-- 用户类型 -->
+            <select id="userType" class="input_Style2 wid_80 mar_r10 hei_30 " style="display:none">
+            	 <option value="">请选择</option>
+                 <option value="1">个人</option>
+                 <option value="2">企业</option>
+	        </select>
+	           <!-- 会员等级 --><!-- 1-红象会员：<50000 成长值  2-铜象会员：<150000 成长值   3-银象会员：<300000 成长值   4-金象会员：<500000 成长值 5-钻石象会员：>=500000 成长值-->
+            <select id="userLevel" class="input_Style2 wid_80 mar_r10 hei_30 " style="display:none">
+            	 <option value="">请选择</option>
+                 <option value="1">红象</option>
+                 <option value="2">铜象</option>
+                 <option value="3">银象</option>
+                 <option value="4">金象</option>
+                 <option value="5">钻石象</option>
+	        </select>
+	      
+	        <!-- 是否会员 -->
+	        <select id="isVip" class="input_Style2 wid_80 mar_r10 hei_30 " style="display:none">
+            	 <option value="">请选择</option>
+                 <option value="1">是 </option>
+                 <option value="2">否</option>
+	        </select>
+	        <!-- </br>
+	        </br> -->
+	          公司名称
+	        <input id="companyName" class="input_Style2 wid_230 mar_r10 hei_28 " />
+	        
+            <button class="button_1 hei_24" onclick="searchCompany()">查询</button>
+        </div>
+        <!--标题 end -->
+        <input type="hidden" id="IdivOperate">
+
+        <div id="partBDetail">
+        </div>
+        <div class="clear"></div>
+        <div class="wid_200 mar_cen">
+            <button class="button_2 hei_35 " onclick="createUserLi()">
+              	 添加
+            </button>
+            <button class="button_3  hei_35" onclick="closeDiv(this)">
+              	 关闭
+            </button>
+        </div>
+        <!--内容div end -->
+    </div>
+    <!--po_main_Mess end-->
+</div>
+
+<!-- 背景蒙板 -->
+<div class="po_fai" id="loadMask" style="display: none">
+    <div class="po_fai_bg"></div>
+</div>

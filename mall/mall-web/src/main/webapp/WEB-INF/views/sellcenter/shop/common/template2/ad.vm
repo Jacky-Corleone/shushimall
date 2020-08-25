@@ -1,0 +1,309 @@
+<!-- 广告铺位 -->
+
+<div class="shop_advert">
+  			 <ul>
+  			 	<!-- 第一个广告图start -->
+  			 	<li class="po_re" >
+  			 		<a href="$!shopRenovationMap.get('3a').chainUrl" target="_blank">
+  			 			<img src="$!imageServerAddr$!shopRenovationMap.get('3a').pictureUrl" alt="" id="adHot1_pictureUrlName" width="233" height="125">
+  			 		</a>
+  			 		#if($!flag && $!flag=='decorate')
+  			 		<div class="img_edit1 po_ab" >
+						<div class="bg_03 img_edit1 img_opacity">
+						</div>
+						<div class="bg_03 hei_40 po_ab pa_01 wid_100">
+							<div class="fr">
+								<p class="fl mar_lr20 font_ff banner_edit cursor banner_dele" id="adHot1">
+									<input type="hidden" id="adHot1_title" value="广告位编辑" />
+									<input type="hidden" id="adHot1_picUrl" value="$!shopRenovationMap.get('3a').pictureUrl" />
+									<input type="hidden" id="adHot1_id" value="$!shopRenovationMap.get('3a').id" />
+									<input type="hidden" id="adHot1_chainUrl" value="$!shopRenovationMap.get('3a').chainUrl" />
+									<input type="hidden" id="adHot1_position" value="a" />
+									<input type="hidden" id="adHot1_modultType" value="3" />
+									<input type="hidden" id="adHot1_width" value="233" />
+			        				<input type="hidden" id="adHot1_height" value="125" />
+									<i class="demo-icons fa-pencil"></i>编 辑
+								</p>
+							</div>
+						</div>
+					</div>
+					#end
+  			 	</li>
+  			 	<!-- 第一个广告图end -->
+  			 	
+  			 	<!-- 第二个广告图start -->
+  			 	<li class="po_re" >
+  			 		<a href="$!shopRenovationMap.get('3b').chainUrl" target="_blank">
+  			 			<img src="$!imageServerAddr$!shopRenovationMap.get('3b').pictureUrl" alt="" id="adHot2_pictureUrlName" width="233" height="125">
+  			 		</a>
+  			 		#if($!flag && $!flag=='decorate')
+  			 		<div class="img_edit1 po_ab" >
+						<div class="bg_03 img_edit1 img_opacity">
+						</div>
+						<div class="bg_03 hei_40 po_ab pa_01 wid_100">
+							<div class="fr">
+								<p class="fl mar_lr20 font_ff banner_edit cursor banner_dele" id="adHot2">
+									<input type="hidden" id="adHot2_title" value="广告位编辑" />
+									<input type="hidden" id="adHot2_picUrl" value="$!shopRenovationMap.get('3b').pictureUrl" />
+									<input type="hidden" id="adHot2_id" value="$!shopRenovationMap.get('3b').id" />
+									<input type="hidden" id="adHot2_position" value="b" />
+									<input type="hidden" id="adHot2_modultType" value="3" />
+									<input type="hidden" id="adHot2_width" value="233" />
+			        				<input type="hidden" id="adHot2_height" value="125" />
+									<i class="demo-icons fa-pencil"></i>编 辑
+								</p>
+							</div>
+						</div>
+					</div>
+					#end
+  			 	</li>
+  			 	<!-- 第二个广告图end -->
+  			 	
+  			 	<!-- 第三个广告图start -->
+  			 	<li class="po_re" >
+  			 		<a href="$!shopRenovationMap.get('3c').chainUrl" target="_blank">
+  			 			<img src="$!imageServerAddr$!shopRenovationMap.get('3c').pictureUrl" alt="" id="adHot3_pictureUrlName" width="233" height="125">
+  			 		</a>
+  			 		#if($!flag && $!flag=='decorate')
+  			 		<div class="img_edit1 po_ab" >
+						<div class="bg_03 img_edit1 img_opacity">
+						</div>
+						<div class="bg_03 hei_40 po_ab pa_01 wid_100">
+							<div class="fr">
+								<p class="fl mar_lr20 font_ff banner_edit cursor banner_dele" id="adHot3">
+									<input type="hidden" id="adHot3_title" value="广告位编辑" />
+									<input type="hidden" id="adHot3_picUrl" value="$!shopRenovationMap.get('3c').pictureUrl" />
+									<input type="hidden" id="adHot3_id" value="$!shopRenovationMap.get('3c').id" />
+									<input type="hidden" id="adHot3_chainUrl" value="$!shopRenovationMap.get('3c').chainUrl" />
+									<input type="hidden" id="adHot3_position" value="c" />
+									<input type="hidden" id="adHot3_modultType" value="3" />
+									<input type="hidden" id="adHot3_width" value="233" />
+			        				<input type="hidden" id="adHot3_height" value="125" />
+									<i class="demo-icons fa-pencil"></i>编 辑
+								</p>
+							</div>
+						</div>
+					</div>
+					#end
+  			 	</li>
+  			 	<!-- 第三个广告图end -->
+  			 	
+  			 	<!-- 第四个广告图start -->
+  			 	<li class="po_re" >
+  			 		<a href="$!shopRenovationMap.get('3d').chainUrl" target="_blank">
+  			 			<img src="$!imageServerAddr$!shopRenovationMap.get('3d').pictureUrl" alt="" id="adHot4_pictureUrlName" width="233" height="125">
+  			 		</a>
+  			 		#if($!flag && $!flag=='decorate')
+  			 		<div class="img_edit1 po_ab" >
+						<div class="bg_03 img_edit1 img_opacity">
+						</div>
+						<div class="bg_03 hei_40 po_ab pa_01 wid_100">
+							<div class="fr">
+								<p class="fl mar_lr20 font_ff banner_edit cursor banner_dele" id="adHot4">
+									<input type="hidden" id="adHot4_title" value="广告位编辑" />
+									<input type="hidden" id="adHot4_picUrl" value="$!shopRenovationMap.get('3d').pictureUrl" />
+									<input type="hidden" id="adHot4_id" value="$!shopRenovationMap.get('3d').id" />
+									<input type="hidden" id="adHot4_chainUrl" value="$!shopRenovationMap.get('3d').chainUrl" />
+									<input type="hidden" id="adHot4_position" value="d" />
+									<input type="hidden" id="adHot4_modultType" value="3" />
+									<input type="hidden" id="adHot4_width" value="233" />
+			        				<input type="hidden" id="adHot4_height" value="125" />
+									<i class="demo-icons fa-pencil"></i>编 辑
+								</p>
+							</div>
+						</div>
+					</div>
+					#end
+  			 	</li>
+  			 	<!-- 第四个广告图end -->
+  			 </ul>
+  		</div>
+  		
+		<div class="shop_hot shop_color0">
+  			 <ul>
+  			 	<!-- 第五个广告图start -->
+  			 	<li class="po_re" >
+  			 		<a href="$!shopRenovationMap.get('3e').chainUrl" target="_blank">
+  			 			<img src="$!imageServerAddr$!shopRenovationMap.get('3e').pictureUrl" alt="" id="adHot5_pictureUrlName" width="319" height="415">
+  			 		</a>
+  			 		#if($!flag && $!flag=='decorate')
+  			 		<div class="img_edit1 po_ab" >
+						<div class="bg_03 img_edit1 img_opacity">
+						</div>
+						<div class="bg_03 hei_40 po_ab pa_01 wid_100">
+							<div class="fr">
+								<p class="fl mar_lr20 font_ff banner_edit cursor banner_dele" id="adHot5">
+									<input type="hidden" id="adHot5_title" value="广告位编辑" />
+									<input type="hidden" id="adHot5_picUrl" value="$!shopRenovationMap.get('3e').pictureUrl" />
+									<input type="hidden" id="adHot5_id" value="$!shopRenovationMap.get('3e').id" />
+									<input type="hidden" id="adHot5_chainUrl" value="$!shopRenovationMap.get('3e').chainUrl" />
+									<input type="hidden" id="adHot5_position" value="e" />
+									<input type="hidden" id="adHot5_modultType" value="3" />
+									<input type="hidden" id="adHot5_width" value="319" />
+			        				<input type="hidden" id="adHot5_height" value="415" />
+									<i class="demo-icons fa-pencil"></i>编 辑
+								</p>
+							</div>
+						</div>
+					</div>
+					#end
+  			 	</li>
+  			 	<!-- 第五个广告图end -->
+  			 	
+  			 	<!-- 第六个广告图start -->
+  			 	<li class="po_re" >
+  			 		<a href="$!shopRenovationMap.get('3f').chainUrl" target="_blank">
+  			 			<img src="$!imageServerAddr$!shopRenovationMap.get('3f').pictureUrl" alt="" id="adHot6_pictureUrlName" width="319" height="415">
+  			 		</a>
+  			 		#if($!flag && $!flag=='decorate')
+  			 		<div class="img_edit1 po_ab" >
+						<div class="bg_03 img_edit1 img_opacity">
+						</div>
+						<div class="bg_03 hei_40 po_ab pa_01 wid_100">
+							<div class="fr">
+								<p class="fl mar_lr20 font_ff banner_edit cursor banner_dele" id="adHot6">
+									<input type="hidden" id="adHot6_title" value="广告位编辑" />
+									<input type="hidden" id="adHot6_picUrl" value="$!shopRenovationMap.get('3f').pictureUrl" />
+									<input type="hidden" id="adHot6_id" value="$!shopRenovationMap.get('3f').id" />
+									<input type="hidden" id="adHot6_chainUrl" value="$!shopRenovationMap.get('3f').chainUrl" />
+									<input type="hidden" id="adHot6_position" value="f" />
+									<input type="hidden" id="adHot6_modultType" value="3" />
+									<input type="hidden" id="adHot6_width" value="319" />
+			        				<input type="hidden" id="adHot6_height" value="415" />
+									<i class="demo-icons fa-pencil"></i>编 辑
+								</p>
+							</div>
+						</div>
+					</div>
+					#end
+  			 	</li>
+  			 	<!-- 第六个广告图end -->
+  			 	
+  			 	<!-- 第七个广告图start -->
+  			 	<li class="po_re" >
+  			 		<a href="$!shopRenovationMap.get('3g').chainUrl" target="_blank">
+  			 			<img src="$!imageServerAddr$!shopRenovationMap.get('3g').pictureUrl" alt="" id="adHot7_pictureUrlName" width="319" height="415">
+  			 		</a>
+  			 		#if($!flag && $!flag=='decorate')
+  			 		<div class="img_edit1 po_ab" >
+						<div class="bg_03 img_edit1 img_opacity">
+						</div>
+						<div class="bg_03 hei_40 po_ab pa_01 wid_100">
+							<div class="fr">
+								<p class="fl mar_lr20 font_ff banner_edit cursor banner_dele" id="adHot7">
+									<input type="hidden" id="adHot7_title" value="广告位编辑" />
+									<input type="hidden" id="adHot7_picUrl" value="$!shopRenovationMap.get('3g').pictureUrl" />
+									<input type="hidden" id="adHot7_id" value="$!shopRenovationMap.get('3g').id" />
+									<input type="hidden" id="adHot7_chainUrl" value="$!shopRenovationMap.get('3a').chainUrl" />
+									<input type="hidden" id="adHot7_position" value="g" />
+									<input type="hidden" id="adHot7_modultType" value="3" />
+									<input type="hidden" id="adHot7_width" value="319" />
+			        				<input type="hidden" id="adHot7_height" value="415" />
+									<i class="demo-icons fa-pencil"></i>编 辑
+								</p>
+							</div>
+						</div>
+					</div>
+					#end
+  			 	</li>
+  			 	<!-- 第七个广告图end -->
+  			 	
+  			 	<!-- 第八个广告图start -->
+  			 	<li class="po_re" >
+  			 		<a href="$!shopRenovationMap.get('3h').chainUrl" target="_blank">
+  			 			<img src="$!imageServerAddr$!shopRenovationMap.get('3h').pictureUrl" alt="" id="adHot8_pictureUrlName" width="319" height="415">
+  			 		</a>
+  			 		#if($!flag && $!flag=='decorate')
+  			 		<div class="img_edit1 po_ab" >
+						<div class="bg_03 img_edit1 img_opacity">
+						</div>
+						<div class="bg_03 hei_40 po_ab pa_01 wid_100">
+							<div class="fr">
+								<p class="fl mar_lr20 font_ff banner_edit cursor banner_dele" id="adHot8">
+									<input type="hidden" id="adHot8_title" value="广告位编辑" />
+									<input type="hidden" id="adHot8_picUrl" value="$!shopRenovationMap.get('3h').pictureUrl" />
+									<input type="hidden" id="adHot8_id" value="$!shopRenovationMap.get('3h').id" />
+									<input type="hidden" id="adHot8_chainUrl" value="$!shopRenovationMap.get('3h').chainUrl" />
+									<input type="hidden" id="adHot8_position" value="h" />
+									<input type="hidden" id="adHot8_modultType" value="3" />
+									<input type="hidden" id="adHot8_width" value="319" />
+			        				<input type="hidden" id="adHot8_height" value="415" />
+									<i class="demo-icons fa-pencil"></i>编 辑
+								</p>
+							</div>
+						</div>
+					</div>
+					#end
+  			 	</li>
+  			 	<!-- 第八个广告图end -->
+  			 	
+  			 	<!-- 第九个广告图start -->
+  			 	<li class="po_re" >
+  			 		<a href="$!shopRenovationMap.get('3i').chainUrl" target="_blank">
+  			 			<img src="$!imageServerAddr$!shopRenovationMap.get('3i').pictureUrl" alt="" id="adHot9_pictureUrlName" width="319" height="415">
+  			 		</a>
+  			 		#if($!flag && $!flag=='decorate')
+  			 		<div class="img_edit1 po_ab" >
+						<div class="bg_03 img_edit1 img_opacity">
+						</div>
+						<div class="bg_03 hei_40 po_ab pa_01 wid_100">
+							<div class="fr">
+								<p class="fl mar_lr20 font_ff banner_edit cursor banner_dele" id="adHot9">
+									<input type="hidden" id="adHot9_title" value="广告位编辑" />
+									<input type="hidden" id="adHot9_picUrl" value="$!shopRenovationMap.get('3i').pictureUrl" />
+									<input type="hidden" id="adHot9_id" value="$!shopRenovationMap.get('3i').id" />
+									<input type="hidden" id="adHot9_chainUrl" value="$!shopRenovationMap.get('3i').chainUrl" />
+									<input type="hidden" id="adHot9_position" value="i" />
+									<input type="hidden" id="adHot9_modultType" value="3" />
+									<input type="hidden" id="adHot9_width" value="319" />
+			        				<input type="hidden" id="adHot9_height" value="415" />
+									<i class="demo-icons fa-pencil"></i>编 辑
+								</p>
+							</div>
+						</div>
+					</div>
+					#end
+  			 	</li>
+  			 	<!-- 第九个广告图end -->
+  			 	
+  			 	<!-- 第十个广告图start -->
+  			 	<li class="po_re" >
+  			 		<a href="$!shopRenovationMap.get('3j').chainUrl" target="_blank">
+  			 			<img src="$!imageServerAddr$!shopRenovationMap.get('3j').pictureUrl" alt="" id="adHot10_pictureUrlName" width="319" height="415">
+  			 		</a>
+  			 		#if($!flag && $!flag=='decorate')
+  			 		<div class="img_edit1 po_ab" >
+						<div class="bg_03 img_edit1 img_opacity">
+						</div>
+						<div class="bg_03 hei_40 po_ab pa_01 wid_100">
+							<div class="fr">
+								<p class="fl mar_lr20 font_ff banner_edit cursor banner_dele" id="adHot10">
+									<input type="hidden" id="adHot10_title" value="广告位编辑" />
+									<input type="hidden" id="adHot10_picUrl" value="$!shopRenovationMap.get('3j').pictureUrl" />
+									<input type="hidden" id="adHot10_id" value="$!shopRenovationMap.get('3j').id" />
+									<input type="hidden" id="adHot10_chainUrl" value="$!shopRenovationMap.get('3j').chainUrl" />
+									<input type="hidden" id="adHot10_position" value="j" />
+									<input type="hidden" id="adHot10_modultType" value="3" />
+									<input type="hidden" id="adHot10_width" value="319" />
+			        				<input type="hidden" id="adHot10_height" value="415" />
+									<i class="demo-icons fa-pencil"></i>编 辑
+								</p>
+							</div>
+						</div>
+					</div>
+					#end
+  			 	</li>
+  			 	<!-- 第十个广告图end -->
+  			 </ul>
+  		</div>
+<script type="text/javascript">
+	$(function(){
+		//广告位弹框事件绑定
+		$("p#adHot1,p#adHot2,p#adHot3,p#adHot4,p#adHot5,p#adHot6,p#adHot7,p#adHot8,p#adHot9,p#adHot10,p#proHot1").unbind("click");
+		$("p#adHot1,p#adHot2,p#adHot3,p#adHot4,p#adHot5,p#adHot6,p#adHot7,p#adHot8,p#adHot9,p#adHot10,p#proHot1").bind("click",function(){
+			var eleId = $(this).attr("id");//遮罩层元素id
+			ShopDecorate.buildDecorate("commonDialog",eleId);
+		});
+	});
+</script>
+  		  		

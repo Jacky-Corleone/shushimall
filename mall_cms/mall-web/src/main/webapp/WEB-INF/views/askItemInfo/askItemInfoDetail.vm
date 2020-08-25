@@ -1,0 +1,54 @@
+#set($layout = "/none_layout.vm")
+<table id="detailTable">
+    <tr>
+        <th style="width:150px;height:30px">公司名称</th>
+        <th style="width:150px;height:30px">联系人</th>
+        <th style="width:150px;height:30px">联系方式</th>
+        <th style="width:150px;height:30px">电子邮件</th>
+    </tr>
+    #foreach($userInfo in $page.records)
+        <tr ondblclick="getPartBDetail(this)">
+            <td style="width:150px;height:30px">$!userInfo.companyName</td>
+            <td style="width:150px;height:30px">$!userInfo.uname</td>
+            <td style="width:150px;height:30px">$!userInfo.umobile</td>
+            <td style="width:150px;height:30px">$!userInfo.userEmail</td>
+			<td style="display:none">$!userInfo.uid</td>
+			<td style="display:none">$!userInfo.parentId</td>
+            #if($!userInfo.usertype==2)
+                <td style="width:150px;height:30px">买家</td>
+                #elseif($!userInfo.usertype==3)
+                    <td style="width:150px;height:30px">卖家</td>
+                    #else
+                        <td style="width:150px;height:30px"></td>
+            #end
+        </tr>
+    #end
+</table>
+<!-- 分页 -->
+<div class="page ml14px">
+    <ul>
+        <li class="lastPage">
+            <a href="javascript:topageSupply(1)">首页</a>
+        </li>
+        <li class="lastPage">
+            <a href="javascript:topageSupply($page.previewPage)">上一页</a>
+        </li>
+        #foreach($pageNo in [$!page.startPageIndex .. $!page.endPageIndex])
+            <li>
+                <a #if($pageNo==$page.page) class="curr" #end href="javascript:topageSupply($pageNo)">
+                        #if($page.pageCode/2==$pageNo)
+                            ...
+                            #else
+                                $pageNo
+                        #end
+                </a>
+            </li>
+        #end
+        <li class="nextPage">
+            <a href="javascript:topageSupply($page.nextPage)">下一页</a>
+        </li>
+        <li class="nextPage">
+            <a href="javascript:topageSupply($page.totalPage)">末页</a>
+        </li>
+    </ul>
+</div>

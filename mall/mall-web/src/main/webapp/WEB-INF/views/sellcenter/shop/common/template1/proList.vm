@@ -1,0 +1,320 @@
+<!--每个产品的div开始-->
+					<div class="shopping_box po_re">
+                        <div class="shopping_box_1">
+	                        <div class="big_img">
+	                        	<!-- 若图片被清空，则链接失效 -->
+	                        	<a #if($!shopRenovationMap.get('5a').skuId) href="$ctx/productController/details?id=$!shopRenovationMap.get('5a').skuId" #end target="_blank">
+	                        		<img src="$!imageServerAddr$!shopRenovationMap.get('5a').pictureUrl" id="product1_pictureUrlName" width="238" height="250"/>
+	                        	</a>
+	                        </div>
+	                        <div class="n_font" id="product1_moduleName">
+                                <a #if($!shopRenovationMap.get('5a').skuId) href="$ctx/productController/details?id=$!shopRenovationMap.get('5a').skuId" #end target="_blank">
+                                    $!shopRenovationMap.get('5a').moduleName
+                                </a>
+                            </div>
+	                        <div class="jq font_14b shop_font0">
+                                <label id="product1_price">
+                                    #if($!shopRenovationMap.get('5a').hasPrice==2) 暂无报价 #else ￥$!shopRenovationMap.get('5a').price #end
+                                </label>
+                            </div>
+	                        #if($!flag && $!flag=='decorate')
+	                        <div class="po_ab pa_01 img_edit1">
+								<div class="img_edit1 bg_03 img_opacity">
+								</div>
+								<div class="hei_40 po_ab pa_01 wid_980 bg_03 cursor ">
+									<p class="fr mar_r20 font_ff banner_del" id="reset_product1_5a">
+										<i class="demo-icons fa-trash"></i>清空
+									</p>
+									<p class="fr mar_r20 font_ff banner_edit" id="product1">
+										<input type="hidden" id="product1_title" value="推荐位编辑" />
+										<input type="hidden" id="product1_picUrl" value="$!shopRenovationMap.get('5a').pictureUrl" />
+										<input type="hidden" id="product1_id" value="$!shopRenovationMap.get('5a').id" />
+										<input type="hidden" id="product1_chainUrl" value="$!shopRenovationMap.get('5a').chainUrl" />
+										<input type="hidden" id="product1_position" value="a" />
+										<input type="hidden" id="product1_modultType" value="5" />
+										<input type="hidden" id="product1_width" value="238" />
+				        				<input type="hidden" id="product1_height" value="250" />
+										<i class="demo-icons fa-pencil"></i>编 辑
+									</p>
+								</div>
+							</div>
+							#end
+	                    </div>
+                    </div>			
+	                <!--每个产品的div结束-->
+	                    
+                    <!--每个产品的div开始-->
+					<div class="shopping_box po_re">
+                        <div class="shopping_box_1">
+	                        <div class="big_img">
+	                        	<a #if($!shopRenovationMap.get('5b').skuId) href="$ctx/productController/details?id=$!shopRenovationMap.get('5b').skuId" #end target="_blank">
+	                        		<img src="$!imageServerAddr$!shopRenovationMap.get('5b').pictureUrl" id="product2_pictureUrlName" width="238" height="250"/>
+	                        	</a>
+	                        </div>
+	                        <div class="n_font" id="product2_moduleName">
+                                <a #if($!shopRenovationMap.get('5b').skuId) href="$ctx/productController/details?id=$!shopRenovationMap.get('5b').skuId" #end target="_blank">
+                                    $!shopRenovationMap.get('5b').moduleName
+                                </a>
+                            </div>
+	                        <div class="jq font_14b shop_font0">
+                                <label id="product2_price">
+                                    #if($!shopRenovationMap.get('5b').hasPrice==2) 暂无报价 #else ￥$!shopRenovationMap.get('5b').price #end
+                                </label>
+                            </div>
+	                        #if($!flag && $!flag=='decorate')
+	                        <div class="po_ab pa_01 img_edit1">
+								<div class="img_edit1 bg_03 img_opacity">
+								</div>
+								<div class="hei_40 po_ab pa_01 wid_980 bg_03 cursor ">
+									<p class="fr mar_r20 font_ff banner_del" id="reset_product2_5b">
+										<i class="demo-icons fa-trash"></i>清空
+									</p>
+									<p class="fr mar_r20 font_ff banner_edit" id="product2">
+										<input type="hidden" id="product2_title" value="推荐位编辑" />
+										<input type="hidden" id="product2_picUrl" value="$!shopRenovationMap.get('5b').pictureUrl" />
+										<input type="hidden" id="product2_id" value="$!shopRenovationMap.get('5b').id" />
+										<input type="hidden" id="product2_chainUrl" value="$!shopRenovationMap.get('5b').chainUrl" />
+										<input type="hidden" id="product2_position" value="b" />
+										<input type="hidden" id="product2_modultType" value="5" />
+										<input type="hidden" id="product2_width" value="238" />
+				        				<input type="hidden" id="product2_height" value="250" />
+										<i class="demo-icons fa-pencil"></i>编 辑
+									</p>
+								</div>
+							</div>
+							#end
+	                    </div>
+                    </div>			
+                    <!--每个产品的div结束-->
+	                    
+                    <!--每个产品的div开始-->
+					<div class="shopping_box po_re">
+                        <div class="shopping_box_1">
+	                        <div class="big_img">
+	                        	<a #if($!shopRenovationMap.get('5c').skuId) href="$ctx/productController/details?id=$!shopRenovationMap.get('5c').skuId" #end target="_blank">
+	                        		<img src="$!imageServerAddr$!shopRenovationMap.get('5c').pictureUrl" id="product3_pictureUrlName" width="238" height="250"/>
+	                        	</a>
+	                        </div>
+	                        <div class="n_font" id="product3_moduleName">
+                                <a #if($!shopRenovationMap.get('5c').skuId) href="$ctx/productController/details?id=$!shopRenovationMap.get('5c').skuId" #end target="_blank">
+                                    $!shopRenovationMap.get('5c').moduleName
+                                </a>
+                            </div>
+	                        <div class="jq font_14b shop_font0">
+                                <label id="product3_price">
+                                    #if($!shopRenovationMap.get('5c').hasPrice==2) 暂无报价 #else ￥$!shopRenovationMap.get('5c').price #end
+                                </label>
+                            </div>
+	                        #if($!flag && $!flag=='decorate')
+	                        <div class="po_ab pa_01 img_edit1">
+								<div class="img_edit1 bg_03 img_opacity">
+								</div>
+								<div class="hei_40 po_ab pa_01 wid_980 bg_03 cursor ">
+									<p class="fr mar_r20 font_ff banner_del" id="reset_product3_5c">
+										<i class="demo-icons fa-trash"></i>清空
+									</p>
+									<p class="fr mar_r20 font_ff banner_edit" id="product3">
+										<input type="hidden" id="product3_title" value="推荐位编辑" />
+										<input type="hidden" id="product3_picUrl" value="$!shopRenovationMap.get('5c').pictureUrl" />
+										<input type="hidden" id="product3_id" value="$!shopRenovationMap.get('5c').id" />
+										<input type="hidden" id="product3_chainUrl" value="$!shopRenovationMap.get('5c').chainUrl" />
+										<input type="hidden" id="product3_position" value="c" />
+										<input type="hidden" id="product3_modultType" value="5" />
+										<input type="hidden" id="product3_width" value="238" />
+				        				<input type="hidden" id="product3_height" value="250" />
+										<i class="demo-icons fa-pencil"></i>编 辑
+									</p>
+								</div>
+							</div>
+							#end
+	                    </div>
+                    </div>			
+                    <!--每个产品的div结束-->
+	                    
+                    <!--每个产品的div开始-->
+					<div class="shopping_box po_re">
+                        <div class="shopping_box_1">
+	                        <div class="big_img">
+	                        	<a #if($!shopRenovationMap.get('5d').skuId) href="$ctx/productController/details?id=$!shopRenovationMap.get('5d').skuId" #end target="_blank">
+	                        		<img src="$!imageServerAddr$!shopRenovationMap.get('5d').pictureUrl" id="product4_pictureUrlName" width="238" height="250"/>
+	                        	</a>
+	                        </div>
+	                        <div class="n_font" id="product4_moduleName">
+                                <a #if($!shopRenovationMap.get('5d').skuId) href="$ctx/productController/details?id=$!shopRenovationMap.get('5d').skuId" #end target="_blank">
+                                    $!shopRenovationMap.get('5d').moduleName
+                                </a>
+                            </div>
+	                        <div class="jq font_14b shop_font0">
+                                <label id="product4_price">
+                                    #if($!shopRenovationMap.get('5d').hasPrice==2) 暂无报价 #else ￥$!shopRenovationMap.get('5d').price #end
+                                </label>
+                            </div>
+	                        #if($!flag && $!flag=='decorate')
+	                        <div class="po_ab pa_01 img_edit1">
+								<div class="img_edit1 bg_03 img_opacity">
+								</div>
+								<div class="hei_40 po_ab pa_01 wid_980 bg_03 cursor ">
+									<p class="fr mar_r20 font_ff banner_del" id="reset_product4_5d">
+										<i class="demo-icons fa-trash"></i>清空
+									</p>
+									<p class="fr mar_r20 font_ff banner_edit" id="product4">
+										<input type="hidden" id="product4_title" value="推荐位编辑" />
+										<input type="hidden" id="product4_picUrl" value="$!shopRenovationMap.get('5d').pictureUrl" />
+										<input type="hidden" id="product4_id" value="$!shopRenovationMap.get('5d').id" />
+										<input type="hidden" id="product4_chainUrl" value="$!shopRenovationMap.get('5d').chainUrl" />
+										<input type="hidden" id="product4_position" value="d" />
+										<input type="hidden" id="product4_modultType" value="5" />
+										<input type="hidden" id="product4_width" value="238" />
+				        				<input type="hidden" id="product4_height" value="250" />
+										<i class="demo-icons fa-pencil"></i>编 辑
+									</p>
+								</div>
+							</div>
+							#end
+	                    </div>
+                    </div>			
+                    <!--每个产品的div结束-->
+	                    
+                    <!--每个产品的div开始-->
+					<div class="shopping_box po_re">
+                        <div class="shopping_box_1">
+	                        <div class="big_img">
+	                        	<a #if($!shopRenovationMap.get('5e').skuId) href="$ctx/productController/details?id=$!shopRenovationMap.get('5e').skuId" #end target="_blank">
+	                        		<img src="$!imageServerAddr$!shopRenovationMap.get('5e').pictureUrl" id="product5_pictureUrlName" width="238" height="250"/>
+	                        	</a>
+	                        </div>
+	                        <div class="n_font" id="product5_moduleName">
+                                <a #if($!shopRenovationMap.get('5e').skuId) href="$ctx/productController/details?id=$!shopRenovationMap.get('5e').skuId" #end target="_blank">
+                                    $!shopRenovationMap.get('5e').moduleName
+                                </a>
+                            </div>
+	                        <div class="jq font_14b shop_font0">
+                                <label id="product5_price">
+                                    #if($!shopRenovationMap.get('5e').hasPrice==2) 暂无报价 #else ￥$!shopRenovationMap.get('5e').price #end
+                                </label>
+                            </div>
+	                        #if($!flag && $!flag=='decorate')
+	                        <div class="po_ab pa_01 img_edit1">
+								<div class="img_edit1 bg_03 img_opacity">
+								</div>
+								<div class="hei_40 po_ab pa_01 wid_980 bg_03 cursor ">
+									<p class="fr mar_r20 font_ff banner_del" id="reset_product5_5e">
+										<i class="demo-icons fa-trash"></i>清空
+									</p>
+									<p class="fr mar_r20 font_ff banner_edit" id="product5">
+										<input type="hidden" id="product5_title" value="推荐位编辑" />
+										<input type="hidden" id="product5_picUrl" value="$!shopRenovationMap.get('5e').pictureUrl" />
+										<input type="hidden" id="product5_id" value="$!shopRenovationMap.get('5e').id" />
+										<input type="hidden" id="product5_chainUrl" value="$!shopRenovationMap.get('5e').chainUrl" />
+										<input type="hidden" id="product5_position" value="e" />
+										<input type="hidden" id="product5_modultType" value="5" />
+										<input type="hidden" id="product5_width" value="238" />
+				        				<input type="hidden" id="product5_height" value="250" />
+										<i class="demo-icons fa-pencil"></i>编 辑
+									</p>
+								</div>
+							</div>
+							#end
+	                    </div>
+                    </div>			
+                    <!--每个产品的div结束-->
+	                    
+                    <!--每个产品的div开始-->
+					<div class="shopping_box po_re">
+                        <div class="shopping_box_1">
+	                        <div class="big_img">
+	                        	<a #if($!shopRenovationMap.get('5f').skuId) href="$ctx/productController/details?id=$!shopRenovationMap.get('5f').skuId" #end target="_blank">
+	                        		<img src="$!imageServerAddr$!shopRenovationMap.get('5f').pictureUrl" id="product6_pictureUrlName" width="238" height="250"/>
+	                        	</a>
+	                        </div>
+	                        <div class="n_font" id="product6_moduleName">
+                                <a #if($!shopRenovationMap.get('5f').skuId) href="$ctx/productController/details?id=$!shopRenovationMap.get('5f').skuId" #end target="_blank">
+                                    $!shopRenovationMap.get('5f').moduleName
+                                </a>
+                            </div>
+	                        <div class="jq font_14b shop_font0">
+                                <label id="product6_price">
+                                    #if($!shopRenovationMap.get('5f').hasPrice==2) 暂无报价 #else ￥$!shopRenovationMap.get('5f').price #end
+                                </label>
+                            </div>
+	                        #if($!flag && $!flag=='decorate')
+	                        <div class="po_ab pa_01 img_edit1">
+								<div class="img_edit1 bg_03 img_opacity">
+								</div>
+								<div class="hei_40 po_ab pa_01 wid_980 bg_03 cursor ">
+									<p class="fr mar_r20 font_ff banner_del" id="reset_product6_5f">
+										<i class="demo-icons fa-trash"></i>清空
+									</p>
+									<p class="fr mar_r20 font_ff banner_edit" id="product6">
+										<input type="hidden" id="product6_title" value="推荐位编辑" />
+										<input type="hidden" id="product6_picUrl" value="$!shopRenovationMap.get('5f').pictureUrl" />
+										<input type="hidden" id="product6_id" value="$!shopRenovationMap.get('5f').id" />
+										<input type="hidden" id="product6_chainUrl" value="$!shopRenovationMap.get('5f').chainUrl" />
+										<input type="hidden" id="product6_position" value="f" />
+										<input type="hidden" id="product6_modultType" value="5" />
+										<input type="hidden" id="product6_width" value="238" />
+				        				<input type="hidden" id="product6_height" value="250" />
+										<i class="demo-icons fa-pencil"></i>编 辑
+									</p>
+								</div>
+							</div>
+							#end
+	                    </div>
+                    </div>
+                    <!--每个产品的div结束-->
+                    
+<script type="text/javascript">
+	$(function(){
+		//推荐位弹框事件绑定
+		$("p[id*='product']").unbind("click");
+		$("p[id*='product']").bind("click",function(){
+			var eleId = $(this).attr("id");//遮罩层元素id
+			$("#productDialog_eleId").val(eleId);
+            $("#_itemName,#_itemId").val("");//清空商品编码和商品名称
+			ShopDecorate.buildDecorate("productDialog",eleId);
+			ShopDecorate.loadShopProduct();
+		});
+		
+		//清空按钮操作
+		$("p[id*='reset_product']").unbind("click");
+		$("p[id*='reset_product']").bind("click",function(){
+			var product=this.id.split("_")[1];	//获取 字符串 如 "product6"
+			var position=this.id.substring(this.id.length-2); // 获取位置信息 如"5f"
+			var option = {};
+			//shopRenovationList 除了id和位置信息 ，其余全设为空
+			option.data = {
+					"shopRenovationList[0].id":$("#"+product+"_id").val(),
+	                "shopRenovationList[0].pictureUrl":"",
+	                "shopRenovationList[0].modultType":position.substring(0,1),
+	                "shopRenovationList[0].position":position.substring(1,2),
+	                "shopRenovationList[0].chainUrl":"",
+	                "shopRenovationList[0].hasPrice":"",
+	                "shopRenovationList[0].skuId":"",
+	                "shopRenovationList[0].price":"",
+	                "shopRenovationList[0].moduleName":"",
+	                "templatesId":$("#templatesId").val()
+	            }
+			$.ajax({
+		        type: "POST",
+		        url: ctx + "/shopItemListIndexController/temporaryReset",
+		        timeout: 100000,
+		        data: option.data,
+		        dataType:"json",
+		        success: function(response){
+		            if(response.result=='success'){
+		            	//置为空
+		               	$("#"+product+"_picUrl").val("");
+		               	$("#"+product+"_chainUrl").val("");
+		               	$("#"+product+"_pictureUrlName").removeAttr("src");
+		               	$("#"+product+"_price").text("￥");
+		               	$("#"+product+"_moduleName").text("");
+		            }
+		        },
+		        error: function(){
+		            alert("操作出错，请重新操作");
+		        }
+		    });
+		});
+		
+	});
+</script>                    

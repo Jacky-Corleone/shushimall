@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.camelot.basecenter.dao.IptableDAO">
+	<!-- 返回值映射map -->
+	<resultMap id="iptableMapper" type="com.camelot.basecenter.domain.Iptable">
+			<result property="id" column="ID" />
+			<result property="startipnum" column="StartIPNum" />
+			<result property="startiptext" column="StartIPText" />
+			<result property="endipnum" column="EndIPNum" />
+			<result property="endiptext" column="EndIPText" />
+			<result property="country" column="Country" />
+			<result property="local" column="Local" />
+			<result property="num" column="num" />
+	</resultMap>
+	
+	<resultMap id="iptableDTOMapper" type="com.camelot.basecenter.dto.IptableDTO" extends="iptableMapper">
+	</resultMap>
+	
+	
+	<!-- 查询字段公共sql -->
+	<sql id="selectAllColumns">
+		<![CDATA[
+		SELECT
+			 ID, 
+			 StartIPNum, 
+			 StartIPText, 
+			 EndIPNum, 
+			 EndIPText, 
+			 Country, 
+			 Local 
+			FROM iptable record
+		]]>
+	</sql>
+
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+				<if test = "entity.id != null and entity.id != ''">
+					<![CDATA[ and record.ID  = #{entity.id} ]]>
+				</if>
+				<if test = "entity.startipnum != null and entity.startipnum != ''">
+					<![CDATA[ and record.StartIPNum  = #{entity.startipnum} ]]>
+				</if>
+				<if test = "entity.startiptext != null and entity.startiptext != ''">
+					<![CDATA[ and record.StartIPText  = #{entity.startiptext} ]]>
+				</if>
+				<if test = "entity.endipnum != null and entity.endipnum != ''">
+					<![CDATA[ and record.EndIPNum  = #{entity.endipnum} ]]>
+				</if>
+				<if test = "entity.endiptext != null and entity.endiptext != ''">
+					<![CDATA[ and record.EndIPText  = #{entity.endiptext} ]]>
+				</if>
+				<if test = "entity.country != null and entity.country != ''">
+					<![CDATA[ and record.Country  = #{entity.country} ]]>
+				</if>
+				<if test = "entity.local != null and entity.local != ''">
+					<![CDATA[ and record.Local  = #{entity.local} ]]>
+				</if>
+				<if test = "entity.num != null">
+					<![CDATA[ and record.StartIPNum  <= #{entity.num} and record.endipnum  >= #{entity.num}]]>
+				</if>
+		</if>
+	</sql>
+
+	<select id="queryList" resultMap="iptableDTOMapper" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+	</select>
+	
+	
+	<!-- 查询单个实体 -->
+	<select id="queryIptableDTO" resultMap="iptableDTOMapper" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+	</select>
+	<select id="queryById" resultMap="iptableMapper" >
+		select * from iptable
+		where id = #{id}
+	</select>
+	
+</mapper>

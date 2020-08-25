@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.maketcenter.dao.CouponsUserDao">
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="couponUserDTOMap" type="com.camelot.maketcenter.dto.CouponUserDTO">
+				<result property="id" column="ID"/>
+				<result property="couponId" column="COUPON_ID"/>
+				<result property="userId" column="USER_ID"/>
+				<result property="userCouponType" column="USER_COUPON_TYPE"/>
+				<result property="couponReceiveTime" column="COUPON_RECEIVE_TIME"/>
+				<result property="deleted" column="DELETED"/>
+	</resultMap>
+	
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<!-- 插入记录 -->
+	<insert id="add" parameterType="com.camelot.maketcenter.dto.CouponUserDTO">
+		<![CDATA[
+		insert into coupon_user (
+		    	  COUPON_ID
+		    	 ,USER_ID
+		    	 ,USER_COUPON_TYPE
+		    	 ,COUPON_RECEIVE_TIME
+		    	 ,DELETED
+		   )values(
+		    	 #{couponId}
+		    	,#{userId}
+		    	,#{userCouponType}
+		    	,#{couponReceiveTime}
+		    	,#{deleted}
+		   )
+	    ]]>	
+	</insert>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+			coupon_user_.ID,
+			coupon_user_.COUPON_ID,
+			coupon_user_.USER_ID,
+			coupon_user_.USER_COUPON_TYPE,
+			coupon_user_.COUPON_RECEIVE_TIME,
+			coupon_user_.DELETED
+		FROM 
+			coupon_user coupon_user_ , coupon_info coupon_info_
+		WHERE 
+			coupon_info_.COUPON_ID = coupon_user_.COUPON_ID
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		<if test="entity!=null">
+			<if test="entity.id != null">
+				<![CDATA[ and coupon_user_.ID  = #{entity.id} ]]>
+			</if>
+			<if test="entity.couponId != null">
+				<![CDATA[ and coupon_user_.COUPON_ID  = #{entity.couponId} ]]>
+			</if>
+			<if test="entity.userId != null">
+				<![CDATA[ and coupon_user_.USER_ID  = #{entity.userId} ]]>
+			</if>
+			<if test="entity.userCouponType != null">
+				<![CDATA[ and coupon_user_.USER_COUPON_TYPE  = #{entity.userCouponType} ]]>
+			</if>
+			<if test="entity.couponReceiveTime != null">
+				<![CDATA[ and coupon_user_.COUPON_RECEIVE_TIME  = #{entity.couponReceiveTime} ]]>
+			</if>
+			<if test="entity.platformIdList != null and entity.platformIdList != '' ">
+                <![CDATA[ and coupon_info_.PLATFORM_ID in]]>
+                <foreach collection="entity.platformIdList" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+			
+			<if test="entity.deleted != 1">
+				<![CDATA[ and coupon_user_.DELETED = 0 ]]>
+			</if>
+		</if>
+		
+		<![CDATA[ ORDER BY coupon_user_.ID desc ]]>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="couponUserDTOMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+			coupon_user coupon_user_ , coupon_info coupon_info_
+		WHERE 
+			coupon_info_.COUPON_ID = coupon_user_.COUPON_ID
+		<include refid="where_fragement" />
+	</select>
+	
+	<delete id="delete" parameterType="long">
+		<![CDATA[
+		update coupon_user set DELETED = 1 where ID = #{id}
+		]]>
+	</delete>
+	
+	<update id="update" parameterType="com.camelot.maketcenter.dto.CouponUserDTO">
+		update coupon_user set COUPON_ID = #{couponId}
+			<if test="userId != null and userId != '' ">
+				<![CDATA[	,USER_ID=#{userId} ]]>	
+			</if>
+			<if test="userCouponType != null and userCouponType != '' ">
+				<![CDATA[	,USER_COUPON_TYPE=#{userCouponType} ]]>	
+			</if>
+			<if test="couponReceiveTime != null and couponReceiveTime != '' ">
+				<![CDATA[	,COUPON_RECEIVE_TIME=#{meetPrice} ]]>	
+			</if>
+			<if test="deleted != null and deleted != '' ">
+				<![CDATA[	,DELETED=#{deleted} ]]>	
+			</if>
+		 where COUPON_ID = #{couponId}
+	</update>
+	
+</mapper>

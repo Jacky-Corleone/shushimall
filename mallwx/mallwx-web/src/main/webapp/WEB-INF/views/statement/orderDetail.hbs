@@ -1,0 +1,51 @@
+{{#each orderInfos}}
+    <div class="pad_lr5 bg_01 mar_b10">
+        <!-- 订单号 -->
+        <div class="hei_32 border_2">
+            <p class="fl wid_57">
+                <i onclick="checkThis(this);" ischeck orderId="{{orderId}}" class="fa fa-circle-thin font_3"></i><!--fa-check-circle-->
+                <span>订单号:{{orderId}}</span>
+            </p>
+            <p class="fr wid_35 font_right">
+                <a class="font_e5 mar_l5" id="$!order.orderId">{{ordreStatus}}</a>
+            </p>
+            <input type="hidden" id="totalItem" value="$!{totalItem}">
+        </div>
+        <!-- 订单号 -->
+        {{#if items}}
+            {{#each items}}
+            <!-- 商品信息 -->
+            <div class="border_2 shop_order pad_tb5">
+                <p class="fl shop_order_img">
+                    <a href="product/toDetail?id={{itemId}}&skuId={{skuId}}">
+                        <img src="{{../../../imageServerAddr}}{{skuPicUrl}}" width="75px" height="75px"/>
+                    </a>
+                </p>
+                <div class="wid_50 fl shop_order_p">
+                    <p>
+                        <a href="$request.contextPath/product/toDetail?id=$!item.itemId&skuId={{skuId}}">
+                            {{itemName}}
+                        </a>
+                    </p>
+                    <p>商品属性：{{skuName}}</p>
+                </div>
+                <div class="fl lin_24">
+                    <p>￥{{payPrice}}</p>
+                    <p class="font_66">x{{num}}</p>
+                </div>
+
+                <div class="clear"></div>
+            </div>
+            <!-- 商品信息 -->
+            {{/each}}
+        {{else}}
+            没有商品
+        {{/if}}
+        <p class="hei_34">下单时间：{{createTime}}&nbsp;&nbsp;&nbsp;&nbsp;<span class="fr">总价：{{paymentPrice}}</span></p>
+        <!-- 按钮 -->
+        <div class="pad_tb5">
+            <button class="button_3 pad_mlr5" id="orderDetail" onclick="orderDetail('{{orderId}}')">订单详情</button>
+            <div class="clear"></div>
+        </div>
+    </div>
+{{/each}}

@@ -1,0 +1,287 @@
+#set($layout = "common/blanklayout.vm")
+#set($staticPath="$request.contextPath/assets")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <base href="${request.getContextPath()}/"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>快速注册</title>
+    <link href="assets/css/detail.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="assets/plugin/common/captcha.js"></script>
+    <script type="text/javascript" src="assets\js\jquery-1.11.2.min.js"></script>
+    <script type="text/javascript">
+        var ctx = "$request.contextPath";
+        $(function () {
+
+
+            $("#personalBtn").click(function () {
+                checkLogName("personalLoginName");
+                if (($('#mag').html() != "" && $('#mag').html() == null) && $('#mag').html() != "该用户名可以使用！") {
+                    return false;
+                }
+//                if($("#personalPhoneCaptchaInput").val()!="111111"){
+                    //验证手机
+                    var personalPhoneCaptchaBoolean = checkSynchronizedCaptcha("personalPhoneCaptchaKey", "personalPhoneCaptchaInput", 2, 0);
+                    if (personalPhoneCaptchaBoolean == false) {
+
+                        return false;
+                    }
+
+//                }
+                $("#submitFormloginname").val($('#personalLoginName').val().trim());
+                $("#submitFormloginPhone").val($('#personalPhoneInput').val().trim());
+                $("#submitForm").submit();
+                //window.location = "$request.contextPath/person/quickRegSuc?loginname="+$('#personalLoginName').val().trim()+"&loginPhone="+$('#personalPhoneInput').val().trim();
+                return false;
+
+            });
+        });
+
+        function checkMobile(){
+          var mobile= $.trim($("#personalPhoneInput").val());
+            if(!mobile){
+                toast("请输入手机号");
+                return;
+            }
+
+            var phoneRegex = /^[1]([3|5|7|8][0-9]{1}|59|58|88|89)[0-9]{8}$/;
+            if(!phoneRegex.test(mobile)){
+                toast("手机号格式不正确!");
+                return false;
+            }
+
+            //检查手机号是否已经被注册
+            var haha=false;
+            $.ajax({
+                url: "person/checkMobileUnique",
+                type: "post",
+                data: {
+                    "mobile":mobile
+                },
+                dataType: "text",
+                async:false,
+                success: function (data) {
+                    if ('true' == data) {
+                        toast("该手机已被注册！");
+
+                    }else{
+                        haha=true;
+                    }
+                }
+            });
+
+            if(!haha){return;}
+
+            //检查改手机号能否继续发送短信验证码
+            var data = {
+                contact:mobile//手机号
+            };
+            $.ajax({
+                url:"captcha/isSendCaptcha",
+                type:"post",
+                timeout:180000,
+                data:data,
+                dataType:'json',
+                async:false,
+                success:function(data){
+                    if(data.isOK == 2){
+                        //p_chage();// 加载验证码
+                        //$('#personPicCaptchaDiv').attr('style','');
+
+                        //验证码正确，手机号可用，发送手机验证码
+                        //sendCaptcha('personalPhoneCaptchaKey','sendPersonalPhoneCaptchaButton','personalPhoneInput',1,2,0);
+
+                        //
+                        $("#sendPersonalPhoneCaptchaButton").html("发送中……");
+
+                        $.ajax({
+                            url:'captcha/send',
+                            data:{type:2,contact:mobile,smsType:'REGISTER',contact:mobile},
+                            dataType:'json',
+                            success:function(res){
+                                //p_chage();
+                                if(res.isOK==2){
+                                    $("#personalPhoneCaptchaKey").val(res.codeKey);
+                                    tick();
+                                }else{
+                                    toast(res.message);
+                                    $("#sendPersonalPhoneCaptchaButton").html("发送验证码");
+                                }
+                            },
+                            error:function(){
+                                $("#sendPersonalPhoneCaptchaButton").html("发送验证码");
+                            }
+                        });
+                    }else{
+                        if(data.message!=''){
+                            alert(data.message);
+                            //$("#sendPersonalPhoneCaptchaButton").attr("disabled",false);//
+                        }
+                    }
+                }
+            });
+
+
+
+        }
+
+        var mill=0
+        var myInterval;
+        function tick(){
+            mill=0;
+            var bjbj=180-mill;
+            $("#sendPersonalPhoneCaptchaButton").html("再次发送("+bjbj+")");
+            $("#sendPersonalPhoneCaptchaButton").attr("disabled",true);
+            clearInterval(myInterval);
+            myInterval=setInterval(function(){
+                mill=mill+1;
+                bjbj=180-mill;
+                $("#sendPersonalPhoneCaptchaButton").html("再次发送("+bjbj+")");
+                if(mill>=180){
+                    $("#sendPersonalPhoneCaptchaButton").html("发送验证码");
+                    $("#sendPersonalPhoneCaptchaButton").attr("disabled",false);
+                    clearInterval(myInterval);
+                }
+            },1000);
+        }
+
+        /*验证用户名:唯一*/
+        function checkLogName(loginnameId) {
+            clean();
+            var reg = /^[a-zA-Z0-9]{4,20}$/;
+            var loginname = $('#' + loginnameId).val().trim();
+            var r = loginname.match(reg);
+            if (r == null) {
+                $("#mag").html("用户名4-20位字符，支持字母、数字!");
+                return false;
+            }
+            if (loginname.length < 1) {
+                $("#mag").html("用户名不能为空！");
+                return false;
+            }
+            var lognameFormat = /^[a-zA-Z0-9]{4,20}$/;
+            if (!lognameFormat.test(loginname)) {
+                $("#mag").html("用户名格式不正确！");
+                return false;
+            }
+            var data = {loginname: loginname};
+            $.ajax({
+                url: "$request.contextPath/information/register/verifyLoginName",
+                type: "post",
+                data: data,
+                dataType: "json",
+                success: function (data) {
+                    if (true == data) {
+                        $("#mag").html("此用户名已经被使用!");
+                        return false;
+                    }
+                }
+            });
+            $("#mag").html("该用户名可以使用！");
+            return false;
+        }
+        function clean() {
+            $("#mag").html("");
+        }
+
+
+
+        /**
+         * 点击发送验证码时，判断此手机号是否符合发送验证码的资格，
+         * 一个手机号每天只能收到3条相同的验证码
+         */
+        function isSendCaptcha(contactInputId,type){
+            var phoneRegex = /^[1]([3|5|7|8][0-9]{1}|59|58|88|89)[0-9]{8}$/;
+            var contact = $("#"+contactInputId).val();
+            if(!phoneRegex.test(contact)){
+                toast("手机格式不正确!");
+                return false;
+            }
+            var data = {
+                contact:contact//手机号
+            };
+            $.ajax({
+                url:"captcha/isSendCaptcha",
+                type:"post",
+                timeout:180000,
+                data:data,
+                success:function(data){
+                    //可以发送验证码，弹出图片验证码框
+
+                    if(data.isOK == 2){
+                        if("e_regiter" == type){
+                            enterprise_chage();
+                            $('#enterprisePicCaptchaDiv').attr('style','');
+                        }else if("p_regiter" == type){
+                            p_chage();
+                            //$('#personPicCaptchaDiv').attr('style','');
+
+                        }
+                    }else{
+                        if(data.message!=''){
+                            alert(data.message);
+                        }
+                    }
+                }
+            })
+        }
+
+        function p_chage(){
+            var img = document.getElementById("p_vc");
+            img.src="user/acquire?a=" + new Date().getTime()+"&type=p_register";
+        }
+
+    </script>
+</head>
+<body>
+#parse("common/common.vm")
+<div id="main" class="po_ab">
+    <!-- 中间内容 -->
+    <form id="personalForm" method="post">
+        <div class="content" id="wrapper">
+            <div class="hei_100 font_cen wid_100">
+                <img src="assets/images/logo-ke.png" style="max-width: 100%;max-height: 100%"/>
+            </div>
+            <div class="hei_50 font_cen font_1_5">欢迎加入印刷家</div>
+            <h3 class="hei_50 font_cen"><span id="mag" style="color: #c80000"></span></h3>
+            <ul class="pass mar_cen wid_87">
+                <li><input type="text" id="personalLoginName" onblur="checkLogName('personalLoginName')"
+                           name="loginname" class="wid_95  input_3" placeholder="输入用户名"/>
+                </li>
+                <li><input type="text" id="personalPhoneInput" name="personalPhoneInput" class="wid_95 input_3"
+                           placeholder="输入手机号"/>
+                </li>
+                #*<li>
+                    <input id="personalPicCaptchaKey" type="hidden"/>
+                    <input type="text" id="pic_captcha_id" name="captcha"
+                           class="wid_40 input_3 fl mar_r2" placeholder="输入图片中的文字"/>
+                    <img id="p_vc" src="user/acquire?type=p_register" />
+                    <a href="javascript:p_chage();">换一张</a>
+                </li>*#
+                <li>
+                    <input id="personalPhoneCaptchaKey" type="hidden"/>
+                    <input type="text" id="personalPhoneCaptchaInput" maxlength="6" name="personalPhoneCaptchaInput"
+                           class="wid_57 input_3 fl mar_r2" placeholder="输入验证码"/>
+                    <button id="sendPersonalPhoneCaptchaButton"
+                            onclick="checkMobile();return false;"
+                            class="button_2 fl wid_20 hei_32 pad_lr5">发送验证码
+                    </button>
+                </li>
+            </ul>
+            <div class="font_cen">
+                <button id="personalBtn" class="button_1 wid_87 hei_32">加入</button>
+            </div>
+        </div>
+        <!-- 中间内容 end-->
+    </form>
+    <form id="submitForm" style="display: none;" action="$request.contextPath/person/quickRegSuc" method="post">
+        <input id="submitFormloginname" name="loginname"/>
+        <input id="submitFormloginPhone" name="loginPhone"/>
+    </form>
+</div>
+</body>
+</html>

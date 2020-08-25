@@ -1,0 +1,12 @@
+{{#each pager.records}}
+<dl onclick="window.location='shopBaseInfoController/toView?shopId={{shopId}}&keyword={{../keyword}}'">
+    <dt class="fl">
+       <img src="{{../gix}}{{shopLogoUrl}}" >
+    </dt>
+    <dd class="fr" style="position: relative;">
+        <p>{{shopName}}</p>
+
+        <h4 style="position: absolute;bottom: 5px;" class="font_e5">服务评价：{{serviceScore}}分</h4>
+    </dd>
+</dl>
+{{/each}}

@@ -1,0 +1,172 @@
+#set($layout = "/mini_layout.vm")
+#set($assetsPath="$request.contextPath/assets")
+<link href="$assetsPath/css/manage_style.css" rel="stylesheet" type="text/css" />
+<link href="$assetsPath/css/Details.css" rel="stylesheet" type="text/css"/>
+<style type="text/css">
+.Center_Search_list{
+  padding-left: 5px;
+  width:70px;
+  float:left;
+  background:#fafafa;
+  height:32px;
+  overflow:hidden;
+  float:left;
+  line-height:32px;
+  text-align:center;
+  line-height:32px;
+  border: 1px solid #eee;
+  outline: none;
+  font-family: "微软雅黑"
+}
+.Center_Search_list  option{ background-color: #fff; border: none; }
+</style>
+<script type="text/javascript">
+	function delItemFavourite(id){
+		var result = confirm("确定删除?");
+		if(result){
+			var ids = [id];
+			$.ajax({
+				url: "$request.contextPath/favourite/delItem",
+				type:"post",
+				data:{ "ids[]": ids },
+				dataType: "json",
+				success: function(data){
+					if( data.success ){
+						location.href = "$request.contextPath/favourite/products";
+					}else{
+						alert(data.result);
+					}
+				}
+			});
+		}
+	}
+	
+	function topage(page){
+		$("#page").val(page);
+		$("#favourite_product_form").submit();
+	}
+	
+	$(function(){	
+	//搜索店铺/商品
+	$("#shopSearch").bind("click",function(){
+		var type = $("#searchType").val();
+		if(type=="g"){
+			//商品搜索
+			$("#shopSearchForm").attr("action", "$request.getContextPath()/searchController/searchItem");
+		}else if(type=="s"){
+			//店铺搜索
+			$("#shopSearchForm").attr("action", "$request.getContextPath()/searchController/searchShop");
+		}
+		$("#shopSearchForm").submit();
+	});
+	$("#keyword").keydown(function(e){
+		if(e.keyCode==13){
+			$("#shopSearch").trigger("click");
+		}
+	});
+	});	
+	
+	//满减
+	function showManJian(itemId){
+		$("#"+itemId).css({
+			top:"273px",
+			left:"-5px"
+		})
+		$("#"+itemId).show();
+	}
+	function hideManJian(itemId){
+		$("#"+itemId).hide();
+	}
+</script>
+<div class="clear"></div>
+
+<!--导航菜单start-->
+#parse("/common/search.vm")
+#parse("/common/index_head.vm")
+<!--导航菜单end-->
+ 
+ 
+ 
+<div class=" bg_06 border-4 " id="main">
+	<p class="hei_45 wid_1160 border-3 pad_l10">
+		<i class="font_14b font_fe">收藏的宝贝</i>
+		<!--
+		<i class="mar_l18 font_82">印刷类10</i>
+		<i class="mar_l18 font_82">女装3</i>
+		<i class="mar_l18 font_82">鞋类3</i>
+		-->
+	</p>
+    <div class="att_con0" >
+    	#foreach( $product in $pager.records )
+    		<ul class="po_re" style="float:none;display:inline-block;margin-bottom:10px;">
+    			<li class="att_pro">
+    				<a href="$request.contextPath/productController/details?id=$product.itemId&skuId=$product.skuId" class="att_new">
+    					<img src="$!imageServerAddr$product.picUrl"/>
+    				</a>
+            	</li>
+            	<li class="att_name over_ell">
+					#set($fullAttVal="")
+					#foreach($atts in $!product.attributes)
+						#foreach($attvalue in $!atts.values)
+							#set($fullAttVal = $fullAttVal + $!attvalue.name)
+						#end
+					#end
+            		<a href="$request.contextPath/productController/details?id=$product.itemId&skuId=$product.skuId" title="$!product.itemName $fullAttVal">$product.itemName&nbsp;$fullAttVal</a>
+            		<span style="float: right; margin-right: 10px;">
+            			<a href="javascript:delItemFavourite($product.id);">删除</a>
+            		</span>
+           		</li>
+            	<li style="overflow:hidden;min-height: 21px;line-height: 21px;">
+            		#if($product.hasPrice)
+            			#set($key = $product.skuId)
+            			#set($str = "")
+            			#if(${downVal.get($str.valueOf($key))})
+							<div class="ship icon-service-sales $!product.skuId"></div><strong class="font_e3">￥${downVal.get($str.valueOf($key))}</strong>
+						#else
+							<strong class="font_e3"> ￥$!product.price </strong>
+		                #end
+		            #else 
+		            	<strong>暂无报价</strong>
+		            #end
+						#foreach($full in $fulljsonArray)
+							#if($!full.shopId == $!product.shopId && $!full.itemId == $!product.itemId)
+								<div class="ship icon-service-marketing cursor" style="margin-top:0" onmouseenter="showManJian($!product.skuId)" onmouseleave="hideManJian($!product.skuId)"></div>
+							#end
+						#end
+           		</li>
+           		<!--  满减详情页 -->
+						<div  id="$!product.skuId"  class="open_active box-shadow1 none">
+							<h3 class="mar_lr10 border-5">
+								<a><span class="mar_r20 font_12b font_fe ">满减</span><span id="promotionTime"></span></a>
+							</h3>
+							#foreach($full in $fulljsonArray)
+								#if(${full.promotionFullReduction})
+									#if($!full.shopId == $!product.shopId && $!full.itemId == $!product.itemId)
+										#foreach($fullReduction in $!full.promotionFullReduction)
+											<div class="mar_l10" id="promotionList_manjian" style="line-height:24px;">
+												<span class="over_ell" title="">商品总额满 $!{fullReduction.meetPrice}减 $!{fullReduction.discountPrice}元</span> 
+											</div>
+										#end
+									#end
+								#end
+							#end
+						</div>
+        	</ul>
+    	#end
+       	<div class="clear"></div>
+    </div>  
+	<form id="favourite_product_form" action="$request.contextPath/favourite/products" method="post">
+	<input type="hidden" id="page" name="page" value="$!pager.page" />
+	#pageVelocity($pager)
+	</form>
+	
+	<div class="clear"></div>
+	<div id="recommend" style="width: 1200px; min-height: 250px;"></div>
+    
+</div>
+
+<!-- <script type="text/javascript">
+	$(document).ready(function(){
+		$("#recommend").load("$request.contextPath/recommend");
+	});
+</script> -->

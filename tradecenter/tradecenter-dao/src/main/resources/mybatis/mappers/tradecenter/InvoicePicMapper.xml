@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.camelot.tradecenter.dao.InvoicePicDAO">
+	
+	<!-- =========================================================== -->
+    <!-- 定义resultMap                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<resultMap id="invoicePicDTOMap" type="com.camelot.tradecenter.dto.InvoicePicDTO" >
+		<id property="id" column="id" />
+		<result property="invoiceId" column="invoice_id" />
+		<result property="picType" column="pic_type" />
+		<result property="picUrl" column="pic_url" />
+		<result property="createTime" column="create_time" />
+	</resultMap>
+	<!-- =========================================================== -->
+    <!-- 一些公共变量设置                                                                                                                                                                             -->
+    <!-- =========================================================== -->
+	<!-- mysql 分页 -->
+	<sql id="pagination_tail">
+	  limit #{page.pageOffset} , #{page.rows}
+	</sql>
+	<!-- mysql 查询总数 -->
+	<sql id="count_Tail">
+		select count(1) from 
+	</sql>
+	
+	<sql id="selectAllColumns">
+		<![CDATA[
+		select
+ 			id
+ 			,invoice_id
+ 			,pic_type
+ 			,pic_url
+ 			,create_time
+		FROM 
+		invoice_pic invoice_pic_
+		]]>
+	</sql>
+	
+	<sql id="where_fragement">
+		where 1=1
+		<if test="entity!=null">
+			<if test="entity.id != null and entity.id !=''">
+				<![CDATA[ and invoice_pic_.id = #{entity.id} ]]>
+			</if>
+			<if test="entity.invoiceId != null and entity.invoiceId !=''">
+				<![CDATA[ and invoice_pic_.invoice_id = #{entity.invoiceId} ]]>
+			</if>
+			<if test="entity.picUrl != null and entity.picUrl !=''">
+				<![CDATA[ and invoice_pic_.pic_url = #{entity.picUrl} ]]>
+			</if>
+			<if test="entity.picType != null and entity.picType !=''">
+				<![CDATA[ and invoice_pic_.pic_type = #{entity.picType} ]]>
+			</if>
+		</if>
+	</sql>
+	
+	<!-- =========================================================== -->
+    <!-- DAO方法中的基本增删改查方法                                                                                                                                                           -->
+    <!-- =========================================================== -->
+	<!-- 根据id查询 -->
+	<select id="queryById" resultMap="invoicePicDTOMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where invoice_pic_.id = #{id}
+		]]>
+	</select>
+	
+	<!-- 根据发票id查询 -->
+	<select id="queryByInvoiceId" resultMap="invoicePicDTOMap" parameterType="long">
+		<include refid="selectAllColumns" />
+		<![CDATA[
+		where invoice_pic_.invoice_id = #{invoiceId}
+		]]>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryList" resultMap="invoicePicDTOMap" >
+		<include refid="selectAllColumns"/>
+		<include refid="where_fragement" />
+		<if test="page!=null">
+			<include refid="pagination_tail" />
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="long">
+		<include refid="count_Tail" />
+		invoice_pic invoice_pic_
+		<include refid="where_fragement" />
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="add">
+		<![CDATA[
+		insert into invoice_pic (
+	 			invoice_id
+	 			,pic_type
+	 			,pic_url
+	 			,create_time
+		   )values(
+		    	#{invoiceId}
+		    	,#{picType}
+		    	,#{picUrl}
+		    	,now()
+		   )
+		]]>
+	</insert>
+	
+</mapper>
